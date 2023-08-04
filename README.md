@@ -1,70 +1,58 @@
-# Getting Started with Create React App
+<h1>🥏 Minnesota Winter League</h1>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Development 💻
 
-## Available Scripts
+To begin development on the App, open `./App/` in your IDE and run `npm run start` to begin local development.
 
-In the project directory, you can run:
+To begin development on the Functions, open `./Functions/index.js` in your IDE and begin development. You will want to use `firebase emulators:start` to leverage Firebase Local Emulator Suite for debugging. It is suggested that you are developing with the most recent LTS version of Node (v18.x.x as of writing).
 
-### `npm start`
+# Deploy App 📦
+### Deploy App to Preview Channel
+1. Create a Pull Request to merge a new feature branch into the Main branch.
+2. Firebase Hosting GitHub Action will build and deploy the new changes to a Preview Channel on Firebase Hosting.
+   
+### Deploy App to Production
+1. After testing the features at the Preview Channel URL, merge the Pull Request into the Main branch.
+2. Firebase Hosting GitHub Action will build and deploy the new changes to the Live Channel on Firebase Hosting.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### [Manual] Deploy App to Preview Channel
+PowerShell
+```PowerShell
+# From project root
+npm --prefix App install package.json
+npm --prefix App run build
+$Date = Get-Date -Format "dddd-MM-dd-yyyy-HH-mm-ss"
+$Channel = "Preview-" + $Date
+firebase hosting:channel:deploy $Channel --expires 2d
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Bash
+```Bash
+# From project root
+npm --prefix App install package.json
+npm --prefix App run build
+Date=$(date +'%A-%m-%d-%Y-%H-%M-%S')
+Channel="Preview-"$Date
+firebase hosting:channel:deploy $Channel --expires 2d
+```
 
-### `npm test`
+### [Manual] Deploy App to Production
+PowerShell / Bash
+```PowerShell
+npm --prefix App install package.json
+npm --prefix App run build
+firebase deploy --only hosting
+```
+# Deploy Functions 📦
+###  Deploy Functions to Production
+1. Create a Pull Request to merge a new feature branch into the Main branch.
+2. Merge the Pull Request into the Main branch.
+3. Firebase Hosting GitHub Action will deploy the new changes to the production environment.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### [Manual] Deploy Functions to Production
+PowerShell / Bash
+```PowerShell
+npm --prefix Functions ci
+npm --prefix Functions run lint
+firebase deploy --only functions
+```
