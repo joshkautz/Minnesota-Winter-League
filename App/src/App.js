@@ -1,6 +1,11 @@
+import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+/**
+ * The main component in React which acts as a container for all other components.
+ * @return {JSX.Element}
+ */
 function App() {
   return (
     <div className="App">

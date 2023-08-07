@@ -3,13 +3,25 @@ module.exports = {
     'browser': true,
     'es2021': true,
   },
-  'extends': 'google',
+  'extends': [
+    'plugin:react/recommended',
+    'google',
+  ],
   'overrides': [
   ],
   'parserOptions': {
     'ecmaVersion': 'latest',
     'sourceType': 'module',
   },
+  'plugins': [
+    'react',
+  ],
   'rules': {
+    'max-len': 0,
+  },
+  'settings': {
+    'react': {
+      'version': 'detect',
+    },
   },
 };
