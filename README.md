@@ -15,40 +15,8 @@ To begin development on the Functions, open `./Functions/index.js` in your IDE a
 1. After testing the features at the Preview Channel URL, merge the Pull Request into the Main branch.
 2. Firebase Hosting GitHub Action will build and deploy the new changes to the Live Channel on Firebase Hosting.
 
-### [Manual] Deploy App to Preview Channel
-PowerShell
-```PowerShell
-# From project root
-npm --prefix App install package.json
-npm --prefix App run build
-$Date = Get-Date -Format "dddd-MM-dd-yyyy-HH-mm-ss"
-$Channel = "Preview-" + $Date
-firebase hosting:channel:deploy $Channel --expires 2d
-```
-
-Bash
-```Bash
-# From project root
-npm --prefix App install package.json
-npm --prefix App run build
-Date=$(date +'%A-%m-%d-%Y-%H-%M-%S')
-Channel="Preview-"$Date
-firebase hosting:channel:deploy $Channel --expires 2d
-```
-
-### [Manual] Deploy App to Production
-PowerShell / Bash
-```PowerShell
-firebase deploy --only hosting
-```
 # Deploy Functions 📦
 ###  Deploy Functions to Production
 1. Create a Pull Request to merge a new feature branch into the Main branch.
 2. Merge the Pull Request into the Main branch.
 3. Firebase Hosting GitHub Action will deploy the new changes to the production environment.
-
-### [Manual] Deploy Functions to Production
-PowerShell / Bash
-```PowerShell
-firebase deploy --only functions
-```
