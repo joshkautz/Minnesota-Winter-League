@@ -10,7 +10,8 @@
         "firebase-debug.*.log"
       ],
       "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint"
+        "npm --prefix Functions ci",
+        "npx eslint Functions"
       ]
     }
   ],
@@ -19,6 +20,11 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
+    "predeploy": [
+      "npm --prefix App ci",
+      "npx eslint App",
+      "npm --prefix App run build"
+    ],
     "public": "App/build",
     "ignore": [
       "firebase.json",

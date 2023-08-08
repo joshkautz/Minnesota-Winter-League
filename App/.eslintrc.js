@@ -17,6 +17,7 @@ module.exports = {
     'react',
   ],
   'rules': {
+    'linebreak-style': 'off',
     'max-len': 0,
   },
   'settings': {

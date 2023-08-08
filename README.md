@@ -39,8 +39,6 @@ firebase hosting:channel:deploy $Channel --expires 2d
 ### [Manual] Deploy App to Production
 PowerShell / Bash
 ```PowerShell
-npm --prefix App install package.json
-npm --prefix App run build
 firebase deploy --only hosting
 ```
 # Deploy Functions 📦
@@ -52,7 +50,5 @@ firebase deploy --only hosting
 ### [Manual] Deploy Functions to Production
 PowerShell / Bash
 ```PowerShell
-npm --prefix Functions ci
-npm --prefix Functions run lint
 firebase deploy --only functions
 ```
