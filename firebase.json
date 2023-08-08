@@ -9,10 +9,8 @@
         "firebase-debug.log",
         "firebase-debug.*.log"
       ],
-      "predeploy": [
-        "npm --prefix Functions ci",
-        "npx eslint Functions"
-      ]
+      "predeploy": [],
+      "postdeploy": []
     }
   ],
   "firestore": {
@@ -20,11 +18,6 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "predeploy": [
-      "npm --prefix App ci",
-      "npx eslint App",
-      "npm --prefix App run build"
-    ],
     "public": "App/build",
     "ignore": [
       "firebase.json",
@@ -56,7 +49,9 @@
         ],
         "source": "**/*.@(js|css)"
       }
-    ]
+    ],
+    "predeploy": [],
+    "postdeploy": []
   },
   "storage": {
     "rules": "storage.rules"
