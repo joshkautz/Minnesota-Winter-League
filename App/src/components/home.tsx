@@ -1,10 +1,7 @@
 export const Home = () => {
-  const scrollTest = Array.from({ length: 100 })
   return (
-    <div className='flex flex-col items-center flex-1'>
-      {scrollTest.map(() => (
-        <div>hello</div>
-      ))}
+    <div className='my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'>
+      Home
     </div>
   )
 }

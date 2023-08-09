@@ -1,14 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
 export const Schedule = () => {
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Schedule</CardTitle>
-        </CardHeader>
-        <CardContent>content</CardContent>
-      </Card>
+    <div className='my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'>
+      Schedule
     </div>
   )
 }
