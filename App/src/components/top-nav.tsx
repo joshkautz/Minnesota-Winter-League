@@ -1,4 +1,4 @@
-import { Cross1Icon, HamburgerMenuIcon } from '@radix-ui/react-icons'
+import { HamburgerMenuIcon } from '@radix-ui/react-icons'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
@@ -25,9 +25,7 @@ export const TopNav = ({
         <div className='hidden mr-4 md:flex'>
           <Link to='/' className='flex items-center mr-6 space-x-2'>
             <div className='w-6 h-6 rounded-full bg-primary' />
-            <span className='hidden font-bold sm:inline-block'>
-              Winter League
-            </span>
+            <span className='hidden font-bold sm:inline-block'>{title}</span>
           </Link>
           <nav className='flex items-center space-x-6 text-sm font-medium'>
             {content.map((entry) => (
