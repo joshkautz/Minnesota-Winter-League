@@ -1,5 +1,6 @@
 import { TopNav } from './top-nav'
 import { Outlet } from 'react-router-dom'
+import { UserForm } from './user-form'
 
 const content = [
   { label: 'Home', path: '/', alt: 'home page' },
@@ -10,9 +11,10 @@ const content = [
 
 export const Layout = () => {
   return (
-    <div className='flex flex-col items-stretch justify-start min-h-screen'>
+    <div className='flex flex-col items-center justify-start min-h-screen'>
       <TopNav title={'Minnesota Winter League'} content={content} />
       <Outlet />
+      <UserForm />
     </div>
   )
 }

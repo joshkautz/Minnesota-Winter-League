@@ -15,8 +15,8 @@ function App() {
           <Route path={'/schedule'} element={<Schedule />} />
           <Route path={'/standings'} element={<Standings />} />
           <Route path={'/teams'} element={<Teams />} />
-          <Route path={'*'} element={<FourOhFour />} />
         </Route>
+        <Route path={'*'} element={<FourOhFour />} />
       </Routes>
     </div>
   )
