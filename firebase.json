@@ -9,9 +9,8 @@
         "firebase-debug.log",
         "firebase-debug.*.log"
       ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint"
-      ]
+      "predeploy": [],
+      "postdeploy": []
     }
   ],
   "firestore": {
@@ -50,7 +49,9 @@
         ],
         "source": "**/*.@(js|css)"
       }
-    ]
+    ],
+    "predeploy": [],
+    "postdeploy": []
   },
   "storage": {
     "rules": "storage.rules"

@@ -19,9 +19,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Build App
+      - name: Lint & Build App
         run: |
           npm --prefix App ci
+          npx eslint App
           npm --prefix App run build
 
       - name: Deploy to Firebase Hosting Live Channel
@@ -46,7 +47,7 @@ jobs:
       - name: Lint Functions
         run: |
           npm --prefix Functions ci
-          npm --prefix Functions run lint
+          npx eslint Functions
 
       - name: Deploy to Firebase Functions
         env:
