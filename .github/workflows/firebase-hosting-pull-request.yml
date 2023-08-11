@@ -18,13 +18,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-        
-      - name: Lint & Build App
+
+      - name: Format & Lint & Build App
         run: |
-          npm --prefix App ci
+          npm ci --prefix App
           npx eslint App
-          npm --prefix App run build
-    
+          npx prettier App --check
+          npm run build --prefix App
+
       - name: Deploy to Firebase Hosting Preview Channel.
         env:
           GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MINNESOTA_WINTER_LEAGUE }}
