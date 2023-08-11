@@ -19,11 +19,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Lint & Build App
+      - name: Format & Lint & Build App
         run: |
-          npm --prefix App ci
+          npm ci --prefix App
           npx eslint App
-          npm --prefix App run build
+          npx prettier App --check
+          npm run build --prefix App
 
       - name: Deploy to Firebase Hosting Live Channel
         env:

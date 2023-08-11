@@ -4,13 +4,13 @@ import { render, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 
 describe('App test', () => {
-  test('render without errors', () => {
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    )
+	test('render without errors', () => {
+		render(
+			<BrowserRouter>
+				<App />
+			</BrowserRouter>
+		)
 
-    expect(screen.getByText(/Minnesota Winter League/i)).toBeDefined()
-  })
+		expect(screen.getByText(/Minnesota Winter League/i)).toBeDefined()
+	})
 })
