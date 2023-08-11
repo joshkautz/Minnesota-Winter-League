@@ -1,9 +1,10 @@
 import { HamburgerMenuIcon } from '@radix-ui/react-icons'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { ScrollArea } from './ui/scroll-area'
+import { AuthContext } from '@/contexts/auth-context'
 
 export const TopNav = ({
   content,
@@ -11,7 +12,9 @@ export const TopNav = ({
 }: {
   content: { label: string; path: string; alt: string }[]
   title: string
-}) => {
+  }) => {
+  const authContext = useContext(AuthContext);
+  
   const [open, setOpen] = useState(false)
 
   const handleClick = () => {
@@ -30,6 +33,7 @@ export const TopNav = ({
           <nav className='flex items-center space-x-6 text-sm font-medium'>
             {content.map((entry) => (
               <Link
+                key={entry.path}
                 to={entry.path}
                 className={
                   'transition-colors hover:text-foreground/80 text-foreground/60'
@@ -38,6 +42,15 @@ export const TopNav = ({
                 {entry.label}
               </Link>
             ))}
+
+            <Link
+              key={'auth'}
+              to={'#'}
+              className={'transition-colors hover:text-foreground/80 text-foreground/60'}
+            >
+              {authContext?.authValue ? 'authenticated' : 'unauthenticated'}
+            </Link>
+            
           </nav>
         </div>
 
@@ -62,10 +75,21 @@ export const TopNav = ({
             <ScrollArea className='my-4 h-[calc(100vh-8rem)] pb-10 pl-6'>
               <div className='flex flex-col space-y-3'>
                 {content.map((entry) => (
-                  <Link to={entry.path} onClick={handleClick}>
+                  <Link
+                    key={entry.path}
+                    to={entry.path}
+                    onClick={handleClick}
+                  >
                     {entry.label}
                   </Link>
                 ))}
+                <Link
+                  key={'auth'}
+                  to={'#'}
+                  className={'transition-colors hover:text-foreground/80 text-foreground/60'}
+                >
+                  {authContext?.authValue ? 'authenticated' : 'unauthenticated'}
+                </Link>
               </div>
             </ScrollArea>
           </SheetContent>
