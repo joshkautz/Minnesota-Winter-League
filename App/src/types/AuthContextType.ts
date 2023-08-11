@@ -1,12 +1,12 @@
 // types.AuthContextType.ts
-import { Auth, User } from 'firebase/auth';
+import { Auth, AuthError, User } from 'firebase/auth';
 
 export type AuthContextType = {
     auth: Auth,
     authValue: User | null | undefined,
     authLoading: boolean,
     authError: Error | undefined,
-    signOut: Promise<boolean>,
+    signOut:  () => Promise<boolean>,
     signOutLoading: boolean,
-    signOutError: Error,
+    signOutError: AuthError | Error | undefined,
 };
