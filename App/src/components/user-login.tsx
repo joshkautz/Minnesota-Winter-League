@@ -34,8 +34,8 @@ export const UserLogin = () => {
 		toast({
 			title: 'You submitted the following values:',
 			description: (
-				<pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-					<code className="text-white">{JSON.stringify(data, null, 2)}</code>
+				<pre className={'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}>
+					<code className={'text-white'}>{JSON.stringify(data, null, 2)}</code>
 				</pre>
 			),
 		})
@@ -43,7 +43,10 @@ export const UserLogin = () => {
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className={'w-full space-y-6'}
+			>
 				<FormField
 					control={form.control}
 					name={'email'}

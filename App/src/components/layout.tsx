@@ -1,11 +1,9 @@
-import { TopNav } from './top-nav'
-import { Outlet } from 'react-router-dom'
-import { UserForm } from './user-form'
-import { AuthContext } from '@/firebase/auth-context'
 import { useContext, useState } from 'react'
+import { Outlet } from 'react-router-dom'
+import { TopNav } from '@/components/top-nav'
+import { AuthContext } from '@/firebase/auth-context'
 import { cn } from '@/lib/utils'
-import { Button } from './ui/button'
-// import { User, handleSignOut, handleLogin } from '@/firebase/auth'
+import { Button } from '@/components/ui/button'
 import { AuthButton } from '@/components/auth-button'
 
 const content = [
@@ -20,7 +18,6 @@ export const Layout = () => {
 	/* TEMP CODE */
 	const [debugOpen, setDebugOpen] = useState(false)
 	/* END TEMP */
-
 	return (
 		<div className={'flex flex-col items-center justify-start min-h-screen'}>
 			<TopNav title={'Minnesota Winter League'} content={content} />
@@ -43,7 +40,6 @@ export const Layout = () => {
 				<pre>{JSON.stringify(authContext, null, 2)}</pre>
 			</div>
 			{/* END TEMP */}
-			{!authContext.user && <UserForm />}
 		</div>
 	)
 }

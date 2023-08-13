@@ -1,6 +1,6 @@
 import { User, handleSignOut, handleLogin } from '@/firebase/auth'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { Button } from './ui/button'
+import { Button } from '@/components/ui/button'
 
 export const AuthButton = ({
 	loading,
