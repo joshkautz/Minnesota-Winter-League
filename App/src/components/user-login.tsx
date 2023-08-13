@@ -1,5 +1,3 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -15,23 +13,24 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
+import { handleLogin } from '@/firebase/auth'
 
-const FormSchema = z.object({
-	username: z.string().min(2, {
+const LoginSchema = z.object({
+	email: z.string().min(2, {
 		message: 'Username must be at least 2 characters.',
 	}),
-
 	password: z.string().min(8, {
 		message: 'Password must be at least 8 characters.',
 	}),
 })
 
 export const UserLogin = () => {
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
+	const form = useForm<z.infer<typeof LoginSchema>>({
+		resolver: zodResolver(LoginSchema),
 	})
 
-	const onSubmit = (data: z.infer<typeof FormSchema>) => {
+	const onSubmit = (data: z.infer<typeof LoginSchema>) => {
+		handleLogin(data)
 		toast({
 			title: 'You submitted the following values:',
 			description: (
@@ -47,12 +46,12 @@ export const UserLogin = () => {
 			<form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
 				<FormField
 					control={form.control}
-					name="username"
+					name={'email'}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Username</FormLabel>
+							<FormLabel>Email</FormLabel>
 							<FormControl>
-								<Input placeholder="Username or email" {...field} />
+								<Input placeholder={'Email'} {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -60,7 +59,7 @@ export const UserLogin = () => {
 				/>
 				<FormField
 					control={form.control}
-					name="password"
+					name={'password'}
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Password</FormLabel>
@@ -71,7 +70,7 @@ export const UserLogin = () => {
 						</FormItem>
 					)}
 				/>
-				<Button type="submit">Login</Button>
+				<Button type={'submit'}>Login</Button>
 			</form>
 		</Form>
 	)
