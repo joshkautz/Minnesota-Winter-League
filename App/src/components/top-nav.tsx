@@ -1,12 +1,13 @@
-import { HamburgerMenuIcon, ReloadIcon } from '@radix-ui/react-icons'
+import { HamburgerMenuIcon } from '@radix-ui/react-icons'
 import { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { ScrollArea } from './ui/scroll-area'
 import { AuthContext } from '@/firebase/auth-context'
-import { User } from '@firebase/auth'
-import { handleLogin, handleSignOut } from '@/firebase/auth'
+// import { handleLogin, handleSignOut } from '@/firebase/auth'
+import { UserAvatar } from './user-avatar'
+import { AuthButton } from './auth-button'
 
 export const TopNav = ({
 	content,
@@ -21,30 +22,6 @@ export const TopNav = ({
 
 	const handleClick = () => {
 		setOpen(!open)
-	}
-
-	const AuthButton = ({
-		loading,
-		user,
-	}: {
-		loading: boolean
-		user: User | null | undefined
-	}) => {
-		if (loading) {
-			return (
-				<Button disabled>
-					<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-					Please wait
-				</Button>
-			)
-		}
-		if (user) {
-			return <Button onClick={handleSignOut}>Logout</Button>
-		}
-		if (!user) {
-			const testData = { email: 'admin@testing.com', password: '00000000' }
-			return <Button onClick={() => handleLogin(testData)}>Login</Button>
-		}
 	}
 
 	return (
@@ -72,7 +49,7 @@ export const TopNav = ({
 								{entry.label}
 							</Link>
 						))}
-						<AuthButton loading={loading} user={user} />
+						<UserAvatar handleClick={() => {}} />
 					</nav>
 				</div>
 

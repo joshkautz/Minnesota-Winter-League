@@ -2,15 +2,10 @@
 import { PropsWithChildren, createContext } from 'react'
 
 // Firebase Hooks
-import {
-	useAuthState,
-	// 	useCreateUserWithEmailAndPassword,
-	// 	useSignOut,
-} from 'react-firebase-hooks/auth'
+import { useAuthState } from 'react-firebase-hooks/auth'
 
 // Winter League
 import { auth, User } from '@/firebase/auth'
-// import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 
 interface AuthProps {
 	user: User | null | undefined

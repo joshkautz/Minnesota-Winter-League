@@ -5,6 +5,8 @@ import { AuthContext } from '@/firebase/auth-context'
 import { useContext, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
+// import { User, handleSignOut, handleLogin } from '@/firebase/auth'
+import { AuthButton } from '@/components/auth-button'
 
 const content = [
 	{ label: 'Home', path: '/', alt: 'home page' },
@@ -24,6 +26,11 @@ export const Layout = () => {
 			<TopNav title={'Minnesota Winter League'} content={content} />
 			<Outlet />
 			{/* TEMP CODE */}
+			<AuthButton
+				className={'mb-2'}
+				loading={authContext.loading}
+				user={authContext.user}
+			/>
 			<Button onClick={() => setDebugOpen(!debugOpen)}>
 				{debugOpen ? 'Hide Context' : 'Show Context'}
 			</Button>
