@@ -5,6 +5,7 @@ import { createContext, useEffect } from 'react'
 import {
 	useAuthState,
 	useCreateUserWithEmailAndPassword,
+	useSignInWithEmailAndPassword,
 	useSignOut,
 } from 'react-firebase-hooks/auth'
 
@@ -23,17 +24,17 @@ const AuthContextProvider = ({ children }: Props) => {
 		createUserWithEmailAndPasswordLoading,
 		createUserWithEmailAndPasswordError,
 	] = useCreateUserWithEmailAndPassword(auth)
+	const [
+		signInWithEmailAndPassword,
+		signInWithEmailAndPasswordUser,
+		signInWithEmailAndPasswordLoading,
+		signInWithEmailAndPasswordError,
+	] = useSignInWithEmailAndPassword(auth)
 	const [signOut, signOutLoading, signOutError] = useSignOut(auth)
 
-	console.log(authValue, authLoading, authError)
-
 	useEffect(() => {
-		console.log(
-			createUserWithEmailAndPasswordUser,
-			createUserWithEmailAndPasswordLoading,
-			createUserWithEmailAndPasswordError
-		)
-	}, [createUserWithEmailAndPasswordUser])
+		console.log(authValue, authLoading, authError)
+	}, [authValue])
 
 	return (
 		<AuthContext.Provider
@@ -48,6 +49,10 @@ const AuthContextProvider = ({ children }: Props) => {
 					createUserWithEmailAndPasswordLoading,
 				createUserWithEmailAndPasswordError:
 					createUserWithEmailAndPasswordError,
+				signInWithEmailAndPassword: signInWithEmailAndPassword,
+				signInWithEmailAndPasswordUser: signInWithEmailAndPasswordUser,
+				signInWithEmailAndPasswordLoading: signInWithEmailAndPasswordLoading,
+				signInWithEmailAndPasswordError: signInWithEmailAndPasswordError,
 				signOut: signOut,
 				signOutLoading: signOutLoading,
 				signOutError: signOutError,

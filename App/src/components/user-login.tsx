@@ -1,5 +1,5 @@
 'use client'
-
+import { useContext, useCallback } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
+import { AuthContext } from '@/contexts/auth-context'
 
 const FormSchema = z.object({
 	username: z.string().min(2, {
@@ -27,6 +28,12 @@ const FormSchema = z.object({
 })
 
 export const UserLogin = () => {
+	const authContext = useContext(AuthContext)
+
+	const onLoginHandler = useCallback(() => {
+		authContext?.signInWithEmailAndPassword('josh@joshkautz.com', 'password')
+	}, [])
+
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	})
@@ -71,7 +78,9 @@ export const UserLogin = () => {
 						</FormItem>
 					)}
 				/>
-				<Button type="submit">Login</Button>
+				<Button type="submit" onClick={onLoginHandler}>
+					Login
+				</Button>
 			</form>
 		</Form>
 	)

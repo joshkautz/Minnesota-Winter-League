@@ -21,6 +21,10 @@ export const TopNav = ({
 		setOpen(!open)
 	}
 
+	const onSignOutHandler = () => {
+		authContext?.signOut()
+	}
+
 	return (
 		<header className="sticky top-0 z-50 w-full border-b supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur">
 			<div className="container flex items-center h-14">
@@ -49,6 +53,7 @@ export const TopNav = ({
 							className={
 								'transition-colors hover:text-foreground/80 text-foreground/60'
 							}
+							onClick={onSignOutHandler}
 						>
 							{authContext?.authValue ? 'authenticated' : 'unauthenticated'}
 						</Link>
@@ -86,6 +91,7 @@ export const TopNav = ({
 									className={
 										'transition-colors hover:text-foreground/80 text-foreground/60'
 									}
+									onClick={onSignOutHandler}
 								>
 									{authContext?.authValue ? 'authenticated' : 'unauthenticated'}
 								</Link>

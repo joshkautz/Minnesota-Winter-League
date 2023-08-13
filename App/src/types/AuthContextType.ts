@@ -13,6 +13,13 @@ export type AuthContextType = {
 	createUserWithEmailAndPasswordUser: UserCredential | undefined
 	createUserWithEmailAndPasswordLoading: boolean
 	createUserWithEmailAndPasswordError: AuthError | undefined
+	signInWithEmailAndPassword: (
+		email: string,
+		password: string
+	) => Promise<UserCredential | undefined>
+	signInWithEmailAndPasswordUser: UserCredential | undefined
+	signInWithEmailAndPasswordLoading: boolean
+	signInWithEmailAndPasswordError: AuthError | undefined
 	signOut: () => Promise<boolean>
 	signOutLoading: boolean
 	signOutError: AuthError | Error | undefined
