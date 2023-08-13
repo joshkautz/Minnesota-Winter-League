@@ -87,7 +87,7 @@ export const TopNav = ({
 									// Mostly placeholder links for now will refine later.
 									<>
 										<Separator />
-										<Link to={'#'}>Update Profile</Link>
+										<Link to={'/profile'}>Update Profile</Link>
 										<Link to={'#'}>View Roster</Link>
 										<Link to={'#'}>Invite Players</Link>
 										<Separator />

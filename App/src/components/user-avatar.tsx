@@ -19,6 +19,7 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { handleSignOut } from '@/firebase/auth'
+import { Link } from 'react-router-dom'
 
 export const UserAvatar = () => {
 	const { user, loading } = useContext(AuthContext)
@@ -59,7 +60,9 @@ export const UserAvatar = () => {
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<DropdownMenuItem>Profile</DropdownMenuItem>
+						<DropdownMenuItem>
+							<Link to={'/profile'}>Profile</Link>
+						</DropdownMenuItem>
 						<DropdownMenuItem>Team</DropdownMenuItem>
 						<DropdownMenuItem>Schedule</DropdownMenuItem>
 					</DropdownMenuGroup>
