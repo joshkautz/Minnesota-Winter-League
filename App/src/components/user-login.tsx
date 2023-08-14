@@ -1,5 +1,3 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -15,28 +13,33 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
+import { handleLogin } from '@/firebase/auth'
 
-const FormSchema = z.object({
-	username: z.string().min(2, {
+const loginSchema = z.object({
+	email: z.string().min(2, {
 		message: 'Username must be at least 2 characters.',
 	}),
-
 	password: z.string().min(8, {
 		message: 'Password must be at least 8 characters.',
 	}),
 })
 
+type LoginSchema = z.infer<typeof loginSchema>
+
 export const UserLogin = () => {
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
+	const form = useForm<LoginSchema>({
+		resolver: zodResolver(loginSchema),
 	})
 
-	const onSubmit = (data: z.infer<typeof FormSchema>) => {
+	const onSubmit = async (data: LoginSchema) => {
+		const res = await handleLogin(data)
+
 		toast({
-			title: 'You submitted the following values:',
+			title: res.message,
+			variant: res.success ? 'default' : 'destructive',
 			description: (
-				<pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-					<code className="text-white">{JSON.stringify(data, null, 2)}</code>
+				<pre className={'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}>
+					<code className={'text-white'}>{JSON.stringify(data, null, 2)}</code>
 				</pre>
 			),
 		})
@@ -44,15 +47,18 @@ export const UserLogin = () => {
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className={'w-full space-y-6'}
+			>
 				<FormField
 					control={form.control}
-					name="username"
+					name={'email'}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Username</FormLabel>
+							<FormLabel>Email</FormLabel>
 							<FormControl>
-								<Input placeholder="Username or email" {...field} />
+								<Input placeholder={'Email'} {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -60,7 +66,7 @@ export const UserLogin = () => {
 				/>
 				<FormField
 					control={form.control}
-					name="password"
+					name={'password'}
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Password</FormLabel>
@@ -71,7 +77,7 @@ export const UserLogin = () => {
 						</FormItem>
 					)}
 				/>
-				<Button type="submit">Login</Button>
+				<Button type={'submit'}>Login</Button>
 			</form>
 		</Form>
 	)

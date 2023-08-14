@@ -11,12 +11,12 @@ import { UserLogin } from './user-login'
 
 export const UserForm = () => {
 	return (
-		<Tabs defaultValue="signup" className="w-[400px]">
-			<TabsList className="grid w-full grid-cols-2">
-				<TabsTrigger value="signup">Sign up</TabsTrigger>
-				<TabsTrigger value="login">Login</TabsTrigger>
+		<Tabs defaultValue={'signup'} className={'min-w-[340px]'}>
+			<TabsList className={'grid w-full grid-cols-2'}>
+				<TabsTrigger value={'signup'}>Sign up</TabsTrigger>
+				<TabsTrigger value={'login'}>Login</TabsTrigger>
 			</TabsList>
-			<TabsContent value="signup">
+			<TabsContent value={'signup'}>
 				<Card>
 					<CardHeader>
 						<CardTitle>Sign up</CardTitle>
@@ -29,7 +29,7 @@ export const UserForm = () => {
 					</CardContent>
 				</Card>
 			</TabsContent>
-			<TabsContent value="login">
+			<TabsContent value={'login'}>
 				<Card>
 					<CardHeader>
 						<CardTitle>Login</CardTitle>

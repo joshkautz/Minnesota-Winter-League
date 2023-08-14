@@ -1,10 +1,13 @@
 import { HamburgerMenuIcon } from '@radix-ui/react-icons'
 import { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from './ui/button'
+import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
-import { ScrollArea } from './ui/scroll-area'
-import { AuthContext } from '@/contexts/auth-context'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { AuthContext } from '@/firebase/auth-context'
+import { UserAvatar } from '@/components/user-avatar'
+import { AuthButton } from '@/components/auth-button'
+import { Separator } from '@/components/ui/separator'
 
 export const TopNav = ({
 	content,
@@ -13,8 +16,7 @@ export const TopNav = ({
 	content: { label: string; path: string; alt: string }[]
 	title: string
 }) => {
-	const authContext = useContext(AuthContext)
-
+	const { user, loading } = useContext(AuthContext)
 	const [open, setOpen] = useState(false)
 
 	const handleClick = () => {
@@ -22,15 +24,19 @@ export const TopNav = ({
 	}
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur">
-			<div className="container flex items-center h-14">
+		<header
+			className={
+				'sticky top-0 z-50 w-full border-b supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur'
+			}
+		>
+			<div className={'container flex items-center h-14'}>
 				{/* Nav */}
-				<div className="hidden mr-4 md:flex">
-					<Link to="/" className="flex items-center mr-6 space-x-2">
-						<div className="w-6 h-6 rounded-full bg-primary" />
-						<span className="hidden font-bold sm:inline-block">{title}</span>
+				<div className={'hidden mr-4 md:flex'}>
+					<Link to={'/'} className={'flex items-center mr-6 space-x-2'}>
+						<div className={'w-6 h-6 rounded-full bg-primary'} />
+						<span className={'hidden font-bold sm:inline-block'}>{title}</span>
 					</Link>
-					<nav className="flex items-center space-x-6 text-sm font-medium">
+					<nav className={'flex items-center space-x-6 text-sm font-medium'}>
 						{content.map((entry) => (
 							<Link
 								key={entry.path}
@@ -42,16 +48,7 @@ export const TopNav = ({
 								{entry.label}
 							</Link>
 						))}
-
-						<Link
-							key={'auth'}
-							to={'#'}
-							className={
-								'transition-colors hover:text-foreground/80 text-foreground/60'
-							}
-						>
-							{authContext?.authValue ? 'authenticated' : 'unauthenticated'}
-						</Link>
+						<UserAvatar />
 					</nav>
 				</div>
 
@@ -59,36 +56,48 @@ export const TopNav = ({
 				<Sheet open={open} onOpenChange={setOpen}>
 					<SheetTrigger asChild>
 						<Button
-							variant="ghost"
-							className="px-0 mr-2 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+							variant={'ghost'}
+							className={
+								'px-0 mr-2 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden'
+							}
 						>
-							<HamburgerMenuIcon className="w-5 h-5" />
-							<span className="sr-only">Toggle Menu</span>
+							<HamburgerMenuIcon className={'w-5 h-5'} />
+							<span className={'sr-only'}>Toggle Menu</span>
 						</Button>
 					</SheetTrigger>
-					<SheetContent side={'top'} className="pr-0">
-						<Link to="/" className="flex items-center" onClick={handleClick}>
-							<div className="w-6 h-6 rounded-full bg-primary" />
-							<span className="hidden font-bold sm:inline-block">
-								Winter League
+					<SheetContent side={'top'} className={'pr-0'}>
+						<Link
+							to={'/'}
+							className={'flex items-center'}
+							onClick={handleClick}
+						>
+							<div className={'w-6 h-6 rounded-full bg-primary'} />
+							<span className={'ml-1 hidden font-bold sm:inline-block'}>
+								Minnesota Winter League
 							</span>
 						</Link>
-						<ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-							<div className="flex flex-col space-y-3">
+						<ScrollArea className={'my-4 h-[calc(100vh-8rem)] pb-10 px-6'}>
+							<div className={'flex flex-col space-y-3'}>
 								{content.map((entry) => (
 									<Link key={entry.path} to={entry.path} onClick={handleClick}>
 										{entry.label}
 									</Link>
 								))}
-								<Link
-									key={'auth'}
-									to={'#'}
-									className={
-										'transition-colors hover:text-foreground/80 text-foreground/60'
-									}
-								>
-									{authContext?.authValue ? 'authenticated' : 'unauthenticated'}
-								</Link>
+								{user && (
+									// Mostly placeholder links for now will refine later.
+									<>
+										<Separator />
+										<Link to={'/profile'}>Update Profile</Link>
+										<Link to={'#'}>View Roster</Link>
+										<Link to={'#'}>Invite Players</Link>
+										<Separator />
+										<Link to={'#'}>GitHub</Link>
+										<Link to={'#'}>Support</Link>
+										<Link to={'#'}>API</Link>
+										<Separator />
+									</>
+								)}
+								<AuthButton loading={loading} user={user} />
 							</div>
 						</ScrollArea>
 					</SheetContent>
