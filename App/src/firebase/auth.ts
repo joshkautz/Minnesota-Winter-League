@@ -20,7 +20,13 @@ const handleLogin = ({
 	email: string
 	password: string
 }) => {
-	signInWithEmailAndPassword(auth, email, password)
+	return signInWithEmailAndPassword(auth, email, password)
+		.then(() => {
+			return { success: true, message: 'Login successful!' }
+		})
+		.catch((err) => {
+			return { success: false, message: `Login failed: ${err}` }
+		})
 }
 
 const handleSignUp = ({

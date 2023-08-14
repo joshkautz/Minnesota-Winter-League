@@ -20,10 +20,15 @@ import { useContext } from 'react'
 import { ReloadIcon } from '@radix-ui/react-icons'
 
 /* WILL HAVE ADDITIONAL FIELDS IN FUTURE */
-const FormSchema = z.object({
-	username: z.string().min(2, {
-		message: 'Username must be at least 2 characters.',
-	}),
+const signupSchema = z.object({
+	username: z
+		.string()
+		.min(2, {
+			message: 'Username must be at least 2 characters.',
+		})
+		.max(30, {
+			message: 'Username must not be longer than 30 characters.',
+		}),
 	// first: z.string().min(2, {
 	// 	message: 'Must be at least 2 characters.',
 	// }),
@@ -40,13 +45,15 @@ const FormSchema = z.object({
 	}),
 })
 
+type SignupSchema = z.infer<typeof signupSchema>
+
 export const UserSignup = () => {
 	const { loading } = useContext(AuthContext)
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
+	const form = useForm<SignupSchema>({
+		resolver: zodResolver(signupSchema),
 	})
 
-	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+	const onSubmit = async (data: SignupSchema) => {
 		const res = await handleSignUp({
 			email: data.email,
 			password: data.password,
@@ -54,6 +61,7 @@ export const UserSignup = () => {
 
 		toast({
 			title: res.message,
+			variant: res.success ? 'default' : 'destructive',
 			description: (
 				<pre className={'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}>
 					<code className={'text-white'}>{JSON.stringify(data, null, 2)}</code>

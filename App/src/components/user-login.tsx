@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
 import { handleLogin } from '@/firebase/auth'
 
-const LoginSchema = z.object({
+const loginSchema = z.object({
 	email: z.string().min(2, {
 		message: 'Username must be at least 2 characters.',
 	}),
@@ -24,15 +24,19 @@ const LoginSchema = z.object({
 	}),
 })
 
+type LoginSchema = z.infer<typeof loginSchema>
+
 export const UserLogin = () => {
-	const form = useForm<z.infer<typeof LoginSchema>>({
-		resolver: zodResolver(LoginSchema),
+	const form = useForm<LoginSchema>({
+		resolver: zodResolver(loginSchema),
 	})
 
-	const onSubmit = (data: z.infer<typeof LoginSchema>) => {
-		handleLogin(data)
+	const onSubmit = async (data: LoginSchema) => {
+		const res = await handleLogin(data)
+
 		toast({
-			title: 'You submitted the following values:',
+			title: res.message,
+			variant: res.success ? 'default' : 'destructive',
 			description: (
 				<pre className={'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}>
 					<code className={'text-white'}>{JSON.stringify(data, null, 2)}</code>
