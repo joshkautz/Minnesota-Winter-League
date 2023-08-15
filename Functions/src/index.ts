@@ -61,3 +61,30 @@ export const createUser = region(REGIONS.CENTRAL)
 			return error
 		}
 	})
+
+/**
+ * Firebase Authentication - Delete `User` and `Customer` Firestore Documents.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
+ */
+
+export const deleteUser = region(REGIONS.CENTRAL)
+	.auth.user()
+	.onDelete((user) => {
+		try {
+			const firestore = getFirestore()
+			const userDocumentReference = firestore
+				.collection(COLLECTIONS.USERS)
+				.doc(user.uid)
+			const customerDocumentReference = firestore
+				.collection(COLLECTIONS.CUSTOMERS)
+				.doc(user.uid)
+			return Promise.all([
+				firestore.recursiveDelete(userDocumentReference),
+				firestore.recursiveDelete(customerDocumentReference),
+			])
+		} catch (error) {
+			logger.error(error)
+			return error
+		}
+	})

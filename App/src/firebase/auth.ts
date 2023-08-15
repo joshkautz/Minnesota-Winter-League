@@ -4,6 +4,7 @@ import {
 	signOut,
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword,
+	sendEmailVerification,
 } from 'firebase/auth'
 import { app } from './app.ts'
 
@@ -37,8 +38,17 @@ const handleSignUp = ({
 	password: string
 }) => {
 	return createUserWithEmailAndPassword(auth, email, password)
-		.then(() => {
-			return { success: true, message: 'Account successfully created!' }
+		.then((userCredential) => {
+			return sendEmailVerification(userCredential.user)
+				.then(() => {
+          return { success: true, message: 'Account successfully created!' }
+				})
+				.catch((err) => {
+					return {
+						success: false,
+						message: `Unable to Send Email Verification. Failed with: ${err}`,
+					}
+				})
 		})
 		.catch((err) => {
 			return {
