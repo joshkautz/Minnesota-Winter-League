@@ -20,9 +20,7 @@ export const UserForm = () => {
 				<Card>
 					<CardHeader>
 						<CardTitle>Sign up</CardTitle>
-						<CardDescription>
-							Create a new account
-						</CardDescription>
+						<CardDescription>Create a new account</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<UserSignup />
@@ -33,9 +31,7 @@ export const UserForm = () => {
 				<Card>
 					<CardHeader>
 						<CardTitle>Login</CardTitle>
-						<CardDescription>
-							Welcome back
-						</CardDescription>
+						<CardDescription>Welcome back</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<UserLogin />

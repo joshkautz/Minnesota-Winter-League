@@ -41,7 +41,7 @@ const handleSignUp = ({
 		.then((userCredential) => {
 			return sendEmailVerification(userCredential.user)
 				.then(() => {
-          return { success: true, message: 'Account successfully created!' }
+					return { success: true, message: 'Account successfully created!' }
 				})
 				.catch((err) => {
 					return {
