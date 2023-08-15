@@ -27,7 +27,7 @@ const COLLECTIONS = {
 	CUSTOMERS: 'customers',
 }
 
-initializeApp();
+initializeApp()
 
 /**
  * Firebase Authentication - Create `User` and `Customer` Firestore Documents.
