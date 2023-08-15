@@ -4,7 +4,7 @@
 # Reference
 # https://github.com/marketplace/actions/deploy-to-firebase-hosting
 
-name: Deploy to Firebase Hosting Live Channel
+name: Deploy to Production
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   App:
-    name: Checkout and Build and Deploy to Firebase Hosting Live Channel
+    name: Deploy to Firebase Hosting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -48,7 +48,7 @@ jobs:
           firebase deploy --only hosting
 
   Functions:
-    name: Checkout and Lint and Deploy to Firebase Functions
+    name: Deploy to Firebase Functions
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
