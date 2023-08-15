@@ -82,6 +82,3 @@ jobs:
 
           # Deploy to Firebase Functions
           firebase deploy --debug --only functions
-
-          # Check logs
-          firebase functions:log
