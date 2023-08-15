@@ -1,4 +1,4 @@
-import { initializeApp } from './initializeApp';
+import { initializeApp } from './initializeApp'
 
 /**
  * Import function triggers from their respective submodules:
@@ -16,33 +16,41 @@ import { logger, region } from 'firebase-functions'
  * privileged environments (such as servers or cloud) in Node.js.
  */
 
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore } from 'firebase-admin/firestore'
 
 const REGIONS = {
-  CENTRAL: 'us-central1',
+	CENTRAL: 'us-central1',
 }
 
 const COLLECTIONS = {
-  USERS: 'users',
-  CUSTOMERS: 'customers',
+	USERS: 'users',
+	CUSTOMERS: 'customers',
 }
+
+initializeApp();
 
 /**
  * Firebase Authentication - Create `User` and `Customer` Firestore Documents.
- * 
+ *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_creation Trigger a function on user creation.}
-*/
+ */
 
-export const createUser = region(REGIONS.CENTRAL).auth.user().onCreate((user) => {
-  try {
-    const firestore = getFirestore();
-    const userDocumentReference = firestore.collection(COLLECTIONS.USERS).doc(user.uid);
-    const customerDocumentReference = firestore.collection(COLLECTIONS.CUSTOMERS).doc(user.uid);
-    return Promise.all([
-      userDocumentReference.create({}),
-      customerDocumentReference.create({})
-    ]);
-  } catch (error) {
-    logger.error(error);
-  }
-});
+export const createUser = region(REGIONS.CENTRAL)
+	.auth.user()
+	.onCreate((user) => {
+		try {
+			const firestore = getFirestore()
+			const userDocumentReference = firestore
+				.collection(COLLECTIONS.USERS)
+				.doc(user.uid)
+			const customerDocumentReference = firestore
+				.collection(COLLECTIONS.CUSTOMERS)
+				.doc(user.uid)
+			return Promise.all([
+				userDocumentReference.create({}),
+				customerDocumentReference.create({}),
+			])
+		} catch (error) {
+			logger.error(error)
+		}
+	})
