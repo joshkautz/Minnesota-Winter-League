@@ -20,9 +20,7 @@ export const UserForm = () => {
 				<Card>
 					<CardHeader>
 						<CardTitle>Sign up</CardTitle>
-						<CardDescription>
-							Enter your account details here. Click Sign up when you're done.
-						</CardDescription>
+						<CardDescription>Create a new account</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<UserSignup />
@@ -33,9 +31,7 @@ export const UserForm = () => {
 				<Card>
 					<CardHeader>
 						<CardTitle>Login</CardTitle>
-						<CardDescription>
-							Welcome back! After entering your information, click Login.
-						</CardDescription>
+						<CardDescription>Welcome back</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<UserLogin />

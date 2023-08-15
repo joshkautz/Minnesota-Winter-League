@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import {
 	Form,
 	FormControl,
-	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -19,27 +18,8 @@ import { AuthContext } from '@/firebase/auth-context'
 import { useContext } from 'react'
 import { ReloadIcon } from '@radix-ui/react-icons'
 
-/* WILL HAVE ADDITIONAL FIELDS IN FUTURE */
 const signupSchema = z.object({
-	username: z
-		.string()
-		.min(2, {
-			message: 'Username must be at least 2 characters.',
-		})
-		.max(30, {
-			message: 'Username must not be longer than 30 characters.',
-		}),
-	// first: z.string().min(2, {
-	// 	message: 'Must be at least 2 characters.',
-	// }),
-	// last: z.string().min(2, {
-	// 	message: 'Must be at least 2 characters.',
-	// }),
-	email: z.string().email({ message: 'Must use a valid email address.' }),
-	// usau: z.coerce
-	// 	.number()
-	// 	.min(100000, { message: 'Must enter a valid USAU id.' })
-	// 	.max(999999, { message: 'Must enter a valid USAU id.' }),
+	email: z.string().email(),
 	password: z.string().min(8, {
 		message: 'Password must be at least 8 characters.',
 	}),
@@ -78,48 +58,6 @@ export const UserSignup = () => {
 			>
 				<FormField
 					control={form.control}
-					name={'username'}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Username</FormLabel>
-							<FormControl>
-								<Input placeholder={'Username'} {...field} />
-							</FormControl>
-							<FormDescription>
-								This is your public display name.
-							</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				{/* <FormField
-					control={form.control}
-					name="first"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>First</FormLabel>
-							<FormControl>
-								<Input placeholder="First name" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="last"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Last</FormLabel>
-							<FormControl>
-								<Input placeholder="Last name" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/> */}
-				<FormField
-					control={form.control}
 					name={'email'}
 					render={({ field }) => (
 						<FormItem>
@@ -152,7 +90,7 @@ export const UserSignup = () => {
 						<FormItem>
 							<FormLabel>Password</FormLabel>
 							<FormControl>
-								<Input type={'password'} {...field} />
+								<Input type={'password'} placeholder={'Password'} {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>

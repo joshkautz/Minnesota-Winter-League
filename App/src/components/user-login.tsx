@@ -16,9 +16,7 @@ import { toast } from '@/components/ui/use-toast'
 import { handleLogin } from '@/firebase/auth'
 
 const loginSchema = z.object({
-	email: z.string().min(2, {
-		message: 'Username must be at least 2 characters.',
-	}),
+	email: z.string().email(),
 	password: z.string().min(8, {
 		message: 'Password must be at least 8 characters.',
 	}),
@@ -71,7 +69,7 @@ export const UserLogin = () => {
 						<FormItem>
 							<FormLabel>Password</FormLabel>
 							<FormControl>
-								<Input type={'password'} {...field} />
+								<Input type={'password'} placeholder={'Password'} {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
