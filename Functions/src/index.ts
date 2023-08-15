@@ -52,5 +52,6 @@ export const createUser = region(REGIONS.CENTRAL)
 			])
 		} catch (error) {
 			logger.error(error)
+			return error
 		}
 	})
