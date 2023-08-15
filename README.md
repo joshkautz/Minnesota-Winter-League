@@ -1,5 +1,7 @@
 <h1>🥏 Minnesota Winter League</h1>
 
+![Production GitHub Workflow Status](https://github.com/joshkautz/Minnesota-Winter-League/actions/workflows/firebase-hosting-merge.yml/badge.svg "Production GitHub Workflow Status")
+
 # Development 💻
 
 To begin development on the App, open `./App/` in your IDE and run `npm run start` to begin local development.
