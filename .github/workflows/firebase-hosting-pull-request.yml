@@ -4,7 +4,7 @@
 # Reference:
 # "Deploy to Firebase Hosting" GitHub Action: https://github.com/marketplace/actions/deploy-to-firebase-hosting
 
-name: Deploy to Firebase Hosting Preview Channel
+name: Deploy to Testing
 
 on: pull_request
 
@@ -12,19 +12,28 @@ permissions: write-all
 
 jobs:
   App:
-    name: Checkout and Build and Deploy to Firebase Hosting Preview Channel
+    name: Deploy to Firebase Hosting
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Format & Lint & Build App
-        run: |
-          npm ci --prefix App
-          npx eslint App
-          npx prettier App --check
-          npm run build --prefix App
+      - name: Install App dependencies
+        working-directory: ./App
+        run: npm ci
+
+      - name: Format App
+        working-directory: ./App
+        run: npx prettier . --check
+
+      - name: Lint App
+        working-directory: ./App
+        run: npx eslint .
+
+      - name: Build App
+        working-directory: ./App
+        run: npx tsc && npx vite build
 
       - name: Deploy to Firebase Hosting Preview Channel.
         env:
@@ -54,13 +63,24 @@ jobs:
           gh pr comment $GITHUB_PR --body "Here is your Preview Channel URL: $PREVIEW_CHANNEL_URL"
 
   Functions:
-    name: Checkout and Lint Firebase Functions
+    name: Deploy to Firebase Functions
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Install Functions dependencies
+        working-directory: ./Functions
+        run: npm ci
+
+      - name: Format Functions
+        working-directory: ./Functions
+        run: npx prettier . --check
+
       - name: Lint Functions
-        run: |
-          npm --prefix Functions ci
-          npx eslint Functions
+        working-directory: ./Functions
+        run: npx eslint .
+
+      - name: Build Functions
+        working-directory: ./Functions
+        run: npx tsc

@@ -1,59 +1,55 @@
 {
-  "functions": [
-    {
-      "source": "Functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log"
-      ],
-      "predeploy": [],
-      "postdeploy": []
-    }
-  ],
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "hosting": {
-    "public": "App/build",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
-    "headers": [
-      {
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=604800"
-          }
-        ],
-        "source": "**/*.@(jpg|jpeg|gif|png)"
-      },
-      {
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=86400"
-          }
-        ],
-        "source": "**/*.@(js|css)"
-      }
-    ],
-    "predeploy": [],
-    "postdeploy": []
-  },
-  "storage": {
-    "rules": "storage.rules"
-  }
+	"functions": [
+		{
+			"source": "Functions",
+			"codebase": "default",
+			"ignore": [
+				"node_modules",
+				".git",
+				"firebase-debug.log",
+				"firebase-debug.*.log"
+			],
+			"predeploy": [],
+			"postdeploy": []
+		}
+	],
+	"firestore": {
+		"rules": "firestore.rules",
+		"indexes": "firestore.indexes.json"
+	},
+	"hosting": {
+		"public": "App/build",
+		"ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+		"rewrites": [
+			{
+				"source": "**",
+				"destination": "/index.html"
+			}
+		],
+		"headers": [
+			{
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "max-age=604800"
+					}
+				],
+				"source": "**/*.@(jpg|jpeg|gif|png)"
+			},
+			{
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "max-age=86400"
+					}
+				],
+				"source": "**/*.@(js|css)"
+			}
+		],
+		"predeploy": [],
+		"postdeploy": []
+	},
+	"storage": {
+		"rules": "storage.rules"
+	}
 }
