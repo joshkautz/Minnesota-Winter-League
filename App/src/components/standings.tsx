@@ -8,8 +8,9 @@ import {
 	TableBody,
 	TableCell,
 } from './ui/table'
+import { toCamelCase } from '@/lib/utils'
 
-const sampleData = [
+export const sampleData = [
 	{
 		teamName: 'The Fighting Crabs',
 		teamImage:
@@ -48,7 +49,7 @@ const sampleData = [
 	{
 		teamName: 'Lucky Duck Gang',
 		teamImage:
-			'https://upload.wikimedia.org/wikipedia/commons/8/8e/Rubber_duckies_So_many_ducks.jpg',
+			'https://i.pinimg.com/1200x/5e/94/cd/5e94cda047e50cd6e02a3333417199eb.jpg',
 		win: Math.floor(Math.random() * 11),
 		loss: Math.floor(Math.random() * 11),
 		pointsFor: Math.floor(Math.random() * 51),
@@ -82,7 +83,7 @@ export const Standings = () => {
 		<div className="container">
 			<div
 				className={
-					'my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'
+					'max-w-min my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'
 				}
 			>
 				Standings
@@ -109,7 +110,7 @@ export const Standings = () => {
 								<TableRow key={index}>
 									<TableCell className="font-medium">{index + 1}</TableCell>
 									<TableCell>
-										<Link to={'#'}>
+										<Link to={`/teams/${toCamelCase(teamName)}`}>
 											<div className="flex items-center justify-start gap-2">
 												<img className="w-auto h-8" src={teamImage} />
 												<span>{teamName}</span>
