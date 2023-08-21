@@ -23,11 +23,11 @@ const handleLogin = async ({
 	password: string
 }) => {
 	try {
-    await signInWithEmailAndPassword(auth, email, password)
-    return { success: true, message: 'Login successful!' }
-  } catch (err) {
-    return { success: false, message: `Login failed: ${err}` }
-  }
+		await signInWithEmailAndPassword(auth, email, password)
+		return { success: true, message: 'Login successful!' }
+	} catch (err) {
+		return { success: false, message: `Login failed: ${err}` }
+	}
 }
 
 const handleSignUp = async ({
@@ -38,22 +38,26 @@ const handleSignUp = async ({
 	password: string
 }) => {
 	try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-    try {
-      await sendEmailVerification(userCredential.user)
-      return { success: true, message: 'Account successfully created!' }
-    } catch (err) {
-      return {
-        success: false,
-        message: `Unable to Send Email Verification. Failed with: ${err}`,
-      }
-    }
-  } catch (err) {
-    return {
-      success: false,
-      message: `Unable to create account. Failed with: ${err}`,
-    }
-  }
+		const userCredential = await createUserWithEmailAndPassword(
+			auth,
+			email,
+			password
+		)
+		try {
+			await sendEmailVerification(userCredential.user)
+			return { success: true, message: 'Account successfully created!' }
+		} catch (err) {
+			return {
+				success: false,
+				message: `Unable to Send Email Verification. Failed with: ${err}`,
+			}
+		}
+	} catch (err) {
+		return {
+			success: false,
+			message: `Unable to create account. Failed with: ${err}`,
+		}
+	}
 }
 
 export { auth, type User, handleSignOut, handleSignUp, handleLogin }
