@@ -6,6 +6,7 @@ import {
 	createUserWithEmailAndPassword,
 	sendEmailVerification,
 } from 'firebase/auth'
+
 import { app } from './app.ts'
 
 const auth = getAuth(app)
@@ -14,48 +15,45 @@ const handleSignOut = () => {
 	signOut(auth)
 }
 
-const handleLogin = ({
+const handleLogin = async ({
 	email,
 	password,
 }: {
 	email: string
 	password: string
 }) => {
-	return signInWithEmailAndPassword(auth, email, password)
-		.then(() => {
-			return { success: true, message: 'Login successful!' }
-		})
-		.catch((err) => {
-			return { success: false, message: `Login failed: ${err}` }
-		})
+	try {
+    await signInWithEmailAndPassword(auth, email, password)
+    return { success: true, message: 'Login successful!' }
+  } catch (err) {
+    return { success: false, message: `Login failed: ${err}` }
+  }
 }
 
-const handleSignUp = ({
+const handleSignUp = async ({
 	email,
 	password,
 }: {
 	email: string
 	password: string
 }) => {
-	return createUserWithEmailAndPassword(auth, email, password)
-		.then((userCredential) => {
-			return sendEmailVerification(userCredential.user)
-				.then(() => {
-					return { success: true, message: 'Account successfully created!' }
-				})
-				.catch((err) => {
-					return {
-						success: false,
-						message: `Unable to Send Email Verification. Failed with: ${err}`,
-					}
-				})
-		})
-		.catch((err) => {
-			return {
-				success: false,
-				message: `Unable to create account. Failed with: ${err}`,
-			}
-		})
+	try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+    try {
+      await sendEmailVerification(userCredential.user)
+      return { success: true, message: 'Account successfully created!' }
+    } catch (err) {
+      return {
+        success: false,
+        message: `Unable to Send Email Verification. Failed with: ${err}`,
+      }
+    }
+  } catch (err) {
+    return {
+      success: false,
+      message: `Unable to create account. Failed with: ${err}`,
+    }
+  }
 }
 
 export { auth, type User, handleSignOut, handleSignUp, handleLogin }

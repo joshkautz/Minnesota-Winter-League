@@ -1,6 +1,6 @@
 const config = {
 	apiKey: 'AIzaSyD9BRnmHEKSLpc73jY0FxCWjPbwewblCWE',
-	authDomain: 'minnesota-winter-league.firebaseapp.com',
+	authDomain: 'winter.mplsmallard.com',
 	projectId: 'minnesota-winter-league',
 	storageBucket: 'minnesota-winter-league.appspot.com',
 	messagingSenderId: '756702616854',

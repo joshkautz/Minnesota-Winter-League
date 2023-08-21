@@ -14,32 +14,30 @@ import {
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { updateProfile } from 'firebase/auth'
-import { User } from '@/firebase/auth'
+import { updateUserDoc } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
 
 const profileSchema = z.object({
-	username: z
-		.string()
-		.min(2, {
-			message: 'Username must be at least 2 characters.',
-		})
-		.max(30, {
-			message: 'Username must not be longer than 30 characters.',
-		}),
+	firstname: z.string(),
+	lastname: z.string(),
+	registered: z.boolean(),
+	team: z.string(),
 	email: z.string().email(),
-	photoURL: z.string().url({ message: 'Please enter a valid URL.' }).optional(),
 })
 
 type ProfileSchema = z.infer<typeof profileSchema>
 
 export const Profile = () => {
-	const { user } = useContext(AuthContext)
+	const { user, firestoreValue } = useContext(AuthContext)
+
+	console.log(firestoreValue)
 
 	const defaultValues: ProfileSchema = {
-		username: user?.displayName ?? '',
-		email: user?.email ?? '',
-		photoURL: user?.photoURL ?? '',
+		firstname: firestoreValue?.firstname ?? '',
+		lastname: firestoreValue?.lastname ?? '',
+		registered: firestoreValue?.registered ?? '',
+		team: firestoreValue?.team ?? '',
+		email: firestoreValue?.email ?? '',
 	}
 
 	const form = useForm<ProfileSchema>({
@@ -49,9 +47,9 @@ export const Profile = () => {
 	})
 
 	const onSubmit = (data: ProfileSchema) => {
-		updateProfile(user as User, {
-			displayName: data.username,
-			photoURL: data.photoURL,
+		updateUserDoc(user, {
+			firstname: data.firstname,
+			lastname: data.lastname,
 		})
 			.then(() => {
 				toast({
@@ -79,17 +77,46 @@ export const Profile = () => {
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 					<FormField
 						control={form.control}
-						name="username"
+						name="firstname"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Username</FormLabel>
+								<FormLabel>First Name</FormLabel>
 								<FormControl>
 									<Input {...field} />
 								</FormControl>
 								<FormDescription>
-									This is your public display name. It can be your real name or
-									a pseudonym.
+									This is your publicly displayed name.
 								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="lastname"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Last Name</FormLabel>
+								<FormControl>
+									<Input {...field} />
+								</FormControl>
+								<FormDescription>
+									This is your publicly displayed name.
+								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="registered"
+						render={() => (
+							<FormItem>
+								<FormLabel>Registered</FormLabel>
+								<FormControl>
+									<Input disabled />
+								</FormControl>
+								<FormDescription>You can register via Stripe.</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -104,7 +131,7 @@ export const Profile = () => {
 									<Input disabled {...field} />
 								</FormControl>
 								<FormDescription>
-									You can manage verified email addresses only.
+									You cannot change email addresses yet.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>
@@ -112,15 +139,16 @@ export const Profile = () => {
 					/>
 					<FormField
 						control={form.control}
-						name="photoURL"
+						name="team"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Profile Image</FormLabel>
+								<FormLabel>Team</FormLabel>
 								<FormControl>
 									<Input {...field} />
 								</FormControl>
 								<FormDescription>
-									Input a URL to serve as your profile image.
+									You can leave a team at will. But you must be invited to join
+									a team, or have your request accepted.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>
