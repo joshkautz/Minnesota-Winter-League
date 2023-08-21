@@ -62,6 +62,63 @@ jobs:
           # Use GitHub CLI to comment the new Firebase Hosting Preview Channel URL.
           gh pr comment $GITHUB_PR --body "Here is your Preview Channel URL: $PREVIEW_CHANNEL_URL"
 
+      - name: Add Firebase Hosting Preview Channel URL to API Key restrictions
+        env:
+          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MINNESOTA_WINTER_LEAGUE }}
+          PROJECT_NUMBER: 756702616854
+          KEY_ID: 38baec1a-f61c-481e-a9d4-d0ddaba7cbb8
+        run: |
+          # Install Firebase Tools.
+          curl -sL https://firebase.tools | bash
+          echo "$GCP_SA_KEY" > /opt/gcp_key.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/opt/gcp_key.json
+
+          # Add default referrers.
+          allowedReferrers="localhost winter.mplsmallard.com minnesota-winter-league.firebaseapp.com minnesota-winter-league.web.app"
+          echo $allowedReferrers
+
+          # Add preview channels.
+          validChannels=$(firebase hosting:channel:list --json | jq -r '.result.channels[].url')
+          validChannels=$(for i in ${validChannels}; do echo "$(basename $i) " ; done;)
+
+          for i in ${validChannels}
+          do
+            add=true
+            for j in ${allowedReferrers}
+            do
+              if [ "$i" = "$j" ]
+              then
+                echo "$i already exists in allowedReferrers"
+                add=false
+                break
+              fi
+            done
+            if [ "$add" = true ]
+            then
+              echo "Adding $i to allowedReferrers"
+              allowedReferrers+=" $i"
+            fi
+          done
+
+          # Format data for gcurl.
+          allowedReferrers=$(for i in ${allowedReferrers}; do echo "\"$i\","; done;)
+          allowedReferrers=${allowedReferrers::-1}
+          echo $allowedReferrers
+
+          # Install Google's OAuth Tool.
+          wget https://storage.googleapis.com/oauth2l/latest/linux_amd64.tgz
+          tar -xvzf linux_amd64.tgz
+
+          # Prepare Google Service Account credentials for gcurl.
+          echo "$GCP_SA_KEY" > /opt/gcp_key.json
+
+          # Create gcurl command.
+          shopt -s expand_aliases
+          alias gcurl='curl -H "$(./linux_amd64/oauth2l header --json /opt/gcp_key.json cloud-platform userinfo.email)" -H "Content-Type: application/json"'
+
+          # Update Google API Key website restrictions.
+          gcurl https://apikeys.googleapis.com/v2/projects/${PROJECT_NUMBER}/locations/global/keys/${KEY_ID}?updateMask=restrictions --request PATCH --data '{ "restrictions" : { "browserKeyRestrictions" : { "allowedReferrers" : [ '"$allowedReferrers"' ]}}}'
+
   Functions:
     name: Deploy to Firebase Functions
     runs-on: ubuntu-latest
