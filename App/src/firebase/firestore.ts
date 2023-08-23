@@ -5,10 +5,13 @@ import {
 	FirestoreError,
 	updateDoc,
 	UpdateData,
+	getDocs,
+	collection,
+	QuerySnapshot,
 } from 'firebase/firestore'
 
-import { app } from './app.ts'
-import { User } from './auth.ts'
+import { app } from './app'
+import { User } from './auth'
 
 interface UserDocumentData {
 	email: string
@@ -33,4 +36,27 @@ const updateUserDoc = async (
 		: undefined
 }
 
-export { userDocRef, updateUserDoc, type DocumentData, type FirestoreError }
+const getAllTeams = async (): Promise<DocumentData[]> => {
+	try {
+		const teamsCollectionRef = collection(firestore, 'teams')
+		const querySnapshot: QuerySnapshot = await getDocs(teamsCollectionRef)
+		const teamsData: DocumentData[] = []
+
+		querySnapshot.forEach((doc) => {
+			teamsData.push({ id: doc.id, ...doc.data() })
+		})
+
+		return teamsData
+	} catch (error) {
+		console.error('Error fetching teams:', error)
+		throw error
+	}
+}
+
+export {
+	userDocRef,
+	updateUserDoc,
+	type DocumentData,
+	type FirestoreError,
+	getAllTeams,
+}
