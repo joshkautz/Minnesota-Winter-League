@@ -7,28 +7,28 @@ import { Standings } from '@/components/standings'
 import { Teams } from '@/components/teams'
 import { ProtectedRoute } from '@/components/protected-route'
 import { Profile } from '@/components/profile'
+import { TeamProfile } from './components/team-profile'
 
 function App() {
 	return (
-		<div>
-			<Routes>
-				<Route path={'/'} element={<Layout />}>
-					<Route index element={<Home />} />
-					<Route path={'/schedule'} element={<Schedule />} />
-					<Route path={'/standings'} element={<Standings />} />
-					<Route path={'/teams'} element={<Teams />} />
-					<Route
-						path={'/profile'}
-						element={
-							<ProtectedRoute>
-								<Profile />
-							</ProtectedRoute>
-						}
-					/>
-				</Route>
-				<Route path={'*'} element={<FourOhFour />} />
-			</Routes>
-		</div>
+		<Routes>
+			<Route path={'/'} element={<Layout />}>
+				<Route index element={<Home />} />
+				<Route path={'/schedule'} element={<Schedule />} />
+				<Route path={'/standings'} element={<Standings />} />
+				<Route path={'/teams'} element={<Teams />} />
+				<Route path={'/teams/:name'} element={<TeamProfile />} />
+				<Route
+					path={'/profile'}
+					element={
+						<ProtectedRoute>
+							<Profile />
+						</ProtectedRoute>
+					}
+				/>
+			</Route>
+			<Route path={'*'} element={<FourOhFour />} />
+		</Routes>
 	)
 }
 
