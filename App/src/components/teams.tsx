@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom'
-import { toCamelCase } from '@/lib/utils'
+import { Link, useNavigate } from 'react-router-dom'
+import { cn, toCamelCase } from '@/lib/utils'
 import { useTeams } from '@/hooks/use-teams'
 import { Button } from './ui/button'
+import { Alert, AlertTitle, AlertDescription } from './ui/alert'
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 
 const LoadingState = () => {
 	return (
@@ -24,6 +26,7 @@ const EmptyState = () => {
 
 export const Teams = () => {
 	const { teams, isLoading, error, refetch } = useTeams()
+	const navigate = useNavigate()
 
 	return (
 		<div className={'container'}>
@@ -38,9 +41,27 @@ export const Teams = () => {
 				<LoadingState />
 			) : error ? (
 				// offer refetch option here
-				<div>
-					Something went wrong <Button onClick={refetch}>click to retry</Button>
-				</div>
+				<Alert className={cn('max-w-[600px] mx-auto')}>
+					<ExclamationTriangleIcon className="w-4 h-4" />
+					<AlertTitle>Unable to retrieve team data</AlertTitle>
+					<AlertDescription>
+						There was a connection issue on our end. Please try again. If this
+						issue persists, contact{' '}
+						<span className="underline">mn winter league.</span>
+					</AlertDescription>
+					<div className="flex justify-end gap-2 mt-2">
+						<Button
+							size={'sm'}
+							variant={'outline'}
+							onClick={() => navigate('/')}
+						>
+							Home
+						</Button>
+						<Button size={'sm'} onClick={refetch}>
+							Retry
+						</Button>
+					</div>
+				</Alert>
 			) : teams.length > 0 ? (
 				<div className={'flex flex-row flex-wrap justify-evenly'}>
 					{teams.map(({ id, name, logo }) => {
@@ -48,7 +69,7 @@ export const Teams = () => {
 							<div
 								key={id}
 								className={
-									'ring group relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center'
+									'group relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center'
 								}
 							>
 								<Link
@@ -57,14 +78,14 @@ export const Teams = () => {
 								>
 									<img
 										className={
-											'ring h-auto w-auto max-w-[180px] sm:max-w-[275px] max-h-[200px] mx-auto'
+											'h-auto w-auto max-w-[180px] sm:max-w-[275px] max-h-[200px] mx-auto'
 										}
 										src={logo}
 									/>
 								</Link>
 								<span
 									className={
-										'absolute left-0 text-sm font-semibold text-center transition-all duration-300 opacity-0 sm:text-base bottom-2 sm:bottom-0 min-w-max right-2/3 text-primary group-hover:right-0 group-hover:opacity-100'
+										'absolute left-0 text-sm font-semibold text-center transition-all duration-300 opacity-0 sm:text-base bottom-2 sm:bottom-0 min-w-max right-0 sm:right-2/3 text-primary sm:group-hover:right-0 group-hover:opacity-100'
 									}
 								>
 									{name}
