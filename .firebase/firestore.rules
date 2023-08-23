@@ -6,6 +6,12 @@ service cloud.firestore {
       allow get, list:
       if true;
     }
+
+    // Anyone can READ anything in the `/teams` collection and subcollections.
+    match /teams/{document=**} {
+      allow get, list:
+      if true;
+    }
     
     // UPDATE: Must be authenticated.
     // Can only update their own.
