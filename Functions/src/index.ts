@@ -47,7 +47,8 @@ export const createUser = region(REGIONS.CENTRAL)
 				.collection(COLLECTIONS.CUSTOMERS)
 				.doc(user.uid)
 			return Promise.all([
-				userDocumentReference.create({
+        userDocumentReference.create({
+          captain: false,
 					firstname: '',
 					lastname: '',
 					email: user.email,
