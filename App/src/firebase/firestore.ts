@@ -7,6 +7,8 @@ import {
 	UpdateData,
 	getDocs,
 	collection,
+	where,
+	query,
 	QuerySnapshot,
 } from 'firebase/firestore'
 
@@ -53,10 +55,53 @@ const getAllTeams = async (): Promise<DocumentData[]> => {
 	}
 }
 
+const getOfferData = async (
+	userRef: User | null | undefined,
+	firestoreValue: DocumentData | undefined
+): Promise<DocumentData[]> => {
+	const offers: DocumentData[] = []
+
+	if (!userRef || !firestoreValue) {
+		// no offers for unauthenticated
+		return offers
+	}
+
+	const { captain, team } = firestoreValue
+
+	if (!captain && team) {
+		// no offers for rostered players
+		return offers
+	}
+
+	try {
+		const offersRef = collection(firestore, 'offers')
+		const captainFilter = where('team', '==', team)
+		const playerFilter = where('player', '==', userRef)
+
+		const q = query(
+			offersRef,
+			captain ? captainFilter : playerFilter,
+			where('status', '==', 'pending')
+		)
+
+		const offersSnapshot: QuerySnapshot<DocumentData> = await getDocs(q)
+
+		offersSnapshot.forEach((doc) => {
+			offers.push(doc.data())
+		})
+
+		return offers
+	} catch (error) {
+		console.error('Error fetching offer data:', error)
+		throw error
+	}
+}
+
 export {
 	userDocRef,
 	updateUserDoc,
 	type DocumentData,
 	type FirestoreError,
 	getAllTeams,
+	getOfferData,
 }

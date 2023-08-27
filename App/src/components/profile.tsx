@@ -28,7 +28,7 @@ const profileSchema = z.object({
 type ProfileSchema = z.infer<typeof profileSchema>
 
 export const Profile = () => {
-	const { user, firestoreValue } = useContext(AuthContext)
+	const { user, firestoreValue, offers } = useContext(AuthContext)
 
 	console.log(firestoreValue)
 
@@ -157,6 +157,8 @@ export const Profile = () => {
 					<Button type="submit">Update profile</Button>
 				</form>
 			</Form>
+
+			<div>{JSON.stringify(offers)}</div>
 		</>
 	)
 }

@@ -8,6 +8,7 @@ import { useDocumentData } from 'react-firebase-hooks/firestore'
 // Winter League
 import { auth, User } from '@/firebase/auth'
 import { userDocRef, DocumentData, FirestoreError } from '@/firebase/firestore'
+import { useOffers } from '@/hooks/use-offers'
 
 interface AuthProps {
 	user: User | null | undefined
@@ -16,6 +17,7 @@ interface AuthProps {
 	firestoreValue: DocumentData | undefined
 	firestoreLoading: boolean
 	firestoreError: FirestoreError | undefined
+	offers: DocumentData[]
 }
 const AuthContext = createContext<AuthProps>({} as AuthProps)
 
@@ -24,6 +26,8 @@ const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [firestoreValue, firestoreLoading, firestoreError] = useDocumentData(
 		userDocRef(authValue)
 	)
+
+	const { offers } = useOffers(authValue, firestoreValue)
 
 	return (
 		<AuthContext.Provider
@@ -34,6 +38,7 @@ const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 				firestoreValue: firestoreValue,
 				firestoreLoading: firestoreLoading,
 				firestoreError: firestoreError,
+				offers: offers,
 			}}
 		>
 			{children}
