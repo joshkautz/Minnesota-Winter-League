@@ -7,7 +7,11 @@ import { useDocumentData } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import { auth, User } from '@/firebase/auth'
-import { playerDocRef, DocumentData, FirestoreError } from '@/firebase/firestore'
+import {
+	playerDocRef,
+	DocumentData,
+	FirestoreError,
+} from '@/firebase/firestore'
 
 interface AuthProps {
 	user: User | null | undefined

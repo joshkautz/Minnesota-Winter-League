@@ -14,7 +14,7 @@ import { app } from './app'
 import { User } from './auth'
 
 interface PlayerDocumentData {
-  captain: boolean
+	captain: boolean
 	email: string
 	firstname: string
 	lastname: string
