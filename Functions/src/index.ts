@@ -23,31 +23,31 @@ const REGIONS = {
 }
 
 const COLLECTIONS = {
-	USERS: 'users',
+	PLAYERS: 'players',
 	CUSTOMERS: 'customers',
 }
 
 initializeApp()
 
 /**
- * Firebase Authentication - Create `User` and `Customer` Firestore Documents.
+ * Firebase Authentication - Create `Player` and `Customer` Firestore Documents.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_creation Trigger a function on user creation.}
  */
 
-export const createUser = region(REGIONS.CENTRAL)
+export const createPlayer = region(REGIONS.CENTRAL)
 	.auth.user()
 	.onCreate((user) => {
 		try {
 			const firestore = getFirestore()
-			const userDocumentReference = firestore
-				.collection(COLLECTIONS.USERS)
+			const playerDocumentReference = firestore
+				.collection(COLLECTIONS.PLAYERS)
 				.doc(user.uid)
 			const customerDocumentReference = firestore
 				.collection(COLLECTIONS.CUSTOMERS)
 				.doc(user.uid)
 			return Promise.all([
-				userDocumentReference.create({
+				playerDocumentReference.create({
 					captain: false,
 					firstname: '',
 					lastname: '',
@@ -64,24 +64,24 @@ export const createUser = region(REGIONS.CENTRAL)
 	})
 
 /**
- * Firebase Authentication - Delete `User` and `Customer` Firestore Documents.
+ * Firebase Authentication - Delete `Player` and `Customer` Firestore Documents.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
  */
 
-export const deleteUser = region(REGIONS.CENTRAL)
+export const deletePlayer = region(REGIONS.CENTRAL)
 	.auth.user()
 	.onDelete((user) => {
 		try {
 			const firestore = getFirestore()
-			const userDocumentReference = firestore
-				.collection(COLLECTIONS.USERS)
+			const playerDocumentReference = firestore
+				.collection(COLLECTIONS.PLAYERS)
 				.doc(user.uid)
 			const customerDocumentReference = firestore
 				.collection(COLLECTIONS.CUSTOMERS)
 				.doc(user.uid)
 			return Promise.all([
-				firestore.recursiveDelete(userDocumentReference),
+				firestore.recursiveDelete(playerDocumentReference),
 				firestore.recursiveDelete(customerDocumentReference),
 			])
 		} catch (error) {

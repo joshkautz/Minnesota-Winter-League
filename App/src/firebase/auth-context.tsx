@@ -7,7 +7,11 @@ import { useDocumentData } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import { auth, User } from '@/firebase/auth'
-import { userDocRef, DocumentData, FirestoreError } from '@/firebase/firestore'
+import {
+	playerDocRef,
+	DocumentData,
+	FirestoreError,
+} from '@/firebase/firestore'
 
 interface AuthProps {
 	user: User | null | undefined
@@ -22,7 +26,7 @@ const AuthContext = createContext<AuthProps>({} as AuthProps)
 const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [authValue, authLoading, authError] = useAuthState(auth)
 	const [firestoreValue, firestoreLoading, firestoreError] = useDocumentData(
-		userDocRef(authValue)
+		playerDocRef(authValue)
 	)
 
 	return (
