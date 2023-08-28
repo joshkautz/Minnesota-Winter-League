@@ -10,10 +10,12 @@ import {
 	where,
 	query,
 	QuerySnapshot,
+	getDoc,
 } from 'firebase/firestore'
 
 import { app } from './app'
 import { User } from './auth'
+import { OfferType } from '@/hooks/use-offers'
 
 interface UserDocumentData {
 	email: string
@@ -55,11 +57,11 @@ const getAllTeams = async (): Promise<DocumentData[]> => {
 	}
 }
 
-const getOfferData = async (
+const getOfferTeamAndPlayerData = async (
 	userRef: User | null | undefined,
 	firestoreValue: DocumentData | undefined
-): Promise<DocumentData[]> => {
-	const offers: DocumentData[] = []
+) => {
+	const offers: OfferType[] = []
 
 	if (!userRef || !firestoreValue) {
 		// no offers for unauthenticated
@@ -86,11 +88,26 @@ const getOfferData = async (
 
 		const offersSnapshot: QuerySnapshot<DocumentData> = await getDocs(q)
 
-		offersSnapshot.forEach((doc) => {
-			offers.push(doc.data())
-		})
+		const offersWithPlayerAndTeamData = await Promise.all(
+			offersSnapshot.docs.map(async (offerDoc) => {
+				const offerData = offerDoc.data()
 
-		return offers
+				const playerDocRef = doc(firestore, 'users', offerData.player.id)
+				const teamDocRef = doc(firestore, 'teams', offerData.team.id)
+				const playerSnapshot = await getDoc(playerDocRef)
+				const teamSnapshot = await getDoc(teamDocRef)
+				const playerData = playerSnapshot.data()
+				const teamData = teamSnapshot.data()
+
+				return {
+					offer: offerData,
+					player: playerData,
+					team: teamData,
+				}
+			})
+		)
+
+		return offersWithPlayerAndTeamData
 	} catch (error) {
 		console.error('Error fetching offer data:', error)
 		throw error
@@ -103,5 +120,5 @@ export {
 	type DocumentData,
 	type FirestoreError,
 	getAllTeams,
-	getOfferData,
+	getOfferTeamAndPlayerData,
 }

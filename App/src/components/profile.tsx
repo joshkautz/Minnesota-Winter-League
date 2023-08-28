@@ -16,6 +16,15 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { updateUserDoc } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
+import {
+	Table,
+	TableCaption,
+	TableHeader,
+	TableRow,
+	TableHead,
+	TableBody,
+	TableCell,
+} from './ui/table'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -65,10 +74,10 @@ export const Profile = () => {
 	}
 
 	return (
-		<>
+		<div className={'container'}>
 			<div
 				className={
-					'my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'
+					'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'
 				}
 			>
 				{user?.displayName ? `Hello ${user.displayName}` : 'Your Profile'}
@@ -157,8 +166,40 @@ export const Profile = () => {
 					<Button type="submit">Update profile</Button>
 				</form>
 			</Form>
+			<div className="flex flex-wrap max-w-full ring">
+				{/* {JSON.stringify(offers)} */}
+			</div>
 
-			<div>{JSON.stringify(offers)}</div>
-		</>
+			<Table>
+				<TableCaption>Offers</TableCaption>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Creator</TableHead>
+						<TableHead>Status</TableHead>
+						<TableHead>Player</TableHead>
+						<TableHead>Team</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{offers.length > 0 ? (
+						offers.map(
+							({ offer: { creator, status }, player, team }, index) => {
+								// const playerData = userDocRef(player.id)
+								return (
+									<TableRow key={index}>
+										<TableCell>{creator}</TableCell>
+										<TableCell>{status}</TableCell>
+										<TableCell>{player?.email}</TableCell>
+										<TableCell>{team?.name}</TableCell>
+									</TableRow>
+								)
+							}
+						)
+					) : (
+						<TableCell>No Data</TableCell>
+					)}
+				</TableBody>
+			</Table>
+		</div>
 	)
 }
