@@ -13,7 +13,8 @@ import {
 import { app } from './app'
 import { User } from './auth'
 
-interface UserDocumentData {
+interface PlayerDocumentData {
+  captain: boolean
 	email: string
 	firstname: string
 	lastname: string
@@ -23,16 +24,16 @@ interface UserDocumentData {
 
 const firestore = getFirestore(app)
 
-const userDocRef = (authValue: User | null | undefined) => {
-	return authValue ? doc(firestore, 'users', authValue.uid) : undefined
+const playerDocRef = (authValue: User | null | undefined) => {
+	return authValue ? doc(firestore, 'players', authValue.uid) : undefined
 }
 
-const updateUserDoc = async (
+const updatePlayerDoc = async (
 	authValue: User | null | undefined,
-	data: UpdateData<UserDocumentData>
+	data: UpdateData<PlayerDocumentData>
 ) => {
 	return authValue
-		? updateDoc(doc(firestore, 'users', authValue.uid), data)
+		? updateDoc(doc(firestore, 'players', authValue.uid), data)
 		: undefined
 }
 
@@ -54,8 +55,8 @@ const getAllTeams = async (): Promise<DocumentData[]> => {
 }
 
 export {
-	userDocRef,
-	updateUserDoc,
+	playerDocRef,
+	updatePlayerDoc,
 	type DocumentData,
 	type FirestoreError,
 	getAllTeams,
