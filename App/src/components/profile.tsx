@@ -14,8 +14,9 @@ import {
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { stripeRegistration, updatePlayerDoc } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
+import { stripeRegistration, updatePlayerDoc } from '@/firebase/firestore'
+import { sendVerificationEmail } from '@/firebase/auth'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -64,6 +65,10 @@ export const Profile = () => {
 
 	const registrationButtonOnClickHandler = () => {
 		stripeRegistration(user)
+	}
+
+	const sendVerificationEmailButtonOnClickHandler = () => {
+		sendVerificationEmail(user)
 	}
 
 	return (
@@ -160,6 +165,9 @@ export const Profile = () => {
 				</form>
 			</Form>
 			<Button onClick={registrationButtonOnClickHandler}>Register</Button>
+			<Button onClick={sendVerificationEmailButtonOnClickHandler}>
+				Send Verification Email
+			</Button>
 		</>
 	)
 }

@@ -60,4 +60,17 @@ const handleSignUp = async ({
 	}
 }
 
-export { auth, type User, handleSignOut, handleSignUp, handleLogin }
+const sendVerificationEmail = async (user: User | null | undefined) => {
+	if (user) {
+		return await sendEmailVerification(user)
+	}
+}
+
+export {
+	auth,
+	type User,
+	handleSignOut,
+	handleSignUp,
+	handleLogin,
+	sendVerificationEmail,
+}
