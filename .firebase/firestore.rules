@@ -1,8 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {  
-    // Anyone can READ anything in the `/users` collection and subcollections.
-    match /users/{document=**} {
+    // Anyone can READ anything in the `/players` collection and subcollections.
+    match /players/{document=**} {
       allow get, list:
       if true;
     }
@@ -16,7 +16,7 @@ service cloud.firestore {
     // UPDATE: Must be authenticated.
     // Can only update their own.
     // Can only update firstname, lastname, and team.
-    match /users/{uid}{
+    match /players/{uid}{
       allow update:
       if request.auth != null &&
       request.auth.uid == uid &&

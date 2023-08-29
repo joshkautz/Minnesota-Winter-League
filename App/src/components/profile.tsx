@@ -14,7 +14,7 @@ import {
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { updateUserDoc } from '@/firebase/firestore'
+import { updatePlayerDoc } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
 import {
 	Table,
@@ -56,7 +56,7 @@ export const Profile = () => {
 	})
 
 	const onSubmit = (data: ProfileSchema) => {
-		updateUserDoc(user, {
+		updatePlayerDoc(user, {
 			firstname: data.firstname,
 			lastname: data.lastname,
 		})
