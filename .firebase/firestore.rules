@@ -12,6 +12,12 @@ service cloud.firestore {
       allow get, list:
       if true;
     }
+
+    // Anyone can READ anything in the `/offers` collection and subcollections.
+    match /offers/{document=**} {
+      allow get, list:
+      if true;
+    }
     
     // UPDATE: Must be authenticated.
     // Can only update their own.
@@ -21,6 +27,34 @@ service cloud.firestore {
       if request.auth != null &&
       request.auth.uid == uid &&
       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['firstname', 'lastname', 'team'])
+    }
+
+    // Invertase Stripe Firebase Extension
+    match /customers/{uid} {
+      allow read: if request.auth.uid == uid;
+
+      match /checkout_sessions/{id} {
+        allow read, write: if request.auth.uid == uid;
+      }
+      match /subscriptions/{id} {
+        allow read: if request.auth.uid == uid;
+      }
+      match /payments/{id} {
+        allow read: if request.auth.uid == uid;
+      }
+    }
+
+    // Invertase Stripe Firebase Extension
+    match /products/{id} {
+      allow read: if true;
+
+      match /prices/{id} {
+        allow read: if true;
+      }
+
+      match /tax_rates/{id} {
+        allow read: if true;
+      }
     }
   }
 }
