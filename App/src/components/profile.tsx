@@ -14,7 +14,7 @@ import {
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { updatePlayerDoc } from '@/firebase/firestore'
+import { stripeRegistration, updatePlayerDoc } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
 
 const profileSchema = z.object({
@@ -29,8 +29,6 @@ type ProfileSchema = z.infer<typeof profileSchema>
 
 export const Profile = () => {
 	const { user, firestoreValue } = useContext(AuthContext)
-
-	console.log(firestoreValue)
 
 	const defaultValues: ProfileSchema = {
 		firstname: firestoreValue?.firstname ?? '',
@@ -62,6 +60,10 @@ export const Profile = () => {
 					variant: 'destructive',
 				})
 			})
+	}
+
+	const registrationButtonOnClickHandler = () => {
+		stripeRegistration(user)
 	}
 
 	return (
@@ -157,6 +159,7 @@ export const Profile = () => {
 					<Button type="submit">Update profile</Button>
 				</form>
 			</Form>
+			<Button onClick={registrationButtonOnClickHandler}>Register</Button>
 		</>
 	)
 }
