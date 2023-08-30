@@ -16,7 +16,7 @@ export const TopNav = ({
 	content: { label: string; path: string; alt: string }[]
 	title: string
 }) => {
-	const { user, loading } = useContext(AuthContext)
+	const { authStateUser, authStateLoading } = useContext(AuthContext)
 	const [open, setOpen] = useState(false)
 
 	const handleClick = () => {
@@ -83,7 +83,7 @@ export const TopNav = ({
 										{entry.label}
 									</Link>
 								))}
-								{user && (
+								{authStateUser && (
 									// Mostly placeholder links for now will refine later.
 									<>
 										<Separator />
@@ -97,7 +97,7 @@ export const TopNav = ({
 										<Separator />
 									</>
 								)}
-								<AuthButton loading={loading} user={user} />
+								<AuthButton loading={authStateLoading} user={authStateUser} />
 							</div>
 						</ScrollArea>
 					</SheetContent>

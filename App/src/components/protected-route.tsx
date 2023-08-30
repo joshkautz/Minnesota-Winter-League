@@ -3,9 +3,9 @@ import { PropsWithChildren, useContext } from 'react'
 import { Navigate } from 'react-router-dom'
 
 export const ProtectedRoute: React.FC<PropsWithChildren> = ({ children }) => {
-	const { user } = useContext(AuthContext)
+	const { authStateUser } = useContext(AuthContext)
 
-	if (!user) {
+	if (!authStateUser) {
 		return <Navigate to={'/'} />
 	}
 	return children

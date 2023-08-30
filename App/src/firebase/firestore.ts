@@ -11,6 +11,7 @@ import {
 	QuerySnapshot,
 	onSnapshot,
 	Unsubscribe,
+	DocumentSnapshot,
 } from 'firebase/firestore'
 
 import { app } from './app'
@@ -92,6 +93,7 @@ export {
 	updatePlayerDoc,
 	type DocumentData,
 	type FirestoreError,
+	type DocumentSnapshot,
 	getAllTeams,
 	stripeRegistration,
 }

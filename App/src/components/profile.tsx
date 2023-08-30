@@ -16,7 +16,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from './ui/use-toast'
 import { stripeRegistration, updatePlayerDoc } from '@/firebase/firestore'
-import { sendVerificationEmail } from '@/firebase/auth'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -29,14 +28,19 @@ const profileSchema = z.object({
 type ProfileSchema = z.infer<typeof profileSchema>
 
 export const Profile = () => {
-	const { user, firestoreValue } = useContext(AuthContext)
+	const {
+		authStateUser,
+		documentDataValue,
+		sendEmailVerification,
+		sendPasswordResetEmail,
+	} = useContext(AuthContext)
 
 	const defaultValues: ProfileSchema = {
-		firstname: firestoreValue?.firstname ?? '',
-		lastname: firestoreValue?.lastname ?? '',
-		registered: firestoreValue?.registered ?? '',
-		team: firestoreValue?.team ?? '',
-		email: firestoreValue?.email ?? '',
+		firstname: documentDataValue?.firstname ?? '',
+		lastname: documentDataValue?.lastname ?? '',
+		registered: documentDataValue?.registered ?? '',
+		team: documentDataValue?.team ?? '',
+		email: documentDataValue?.email ?? '',
 	}
 
 	const form = useForm<ProfileSchema>({
@@ -46,7 +50,7 @@ export const Profile = () => {
 	})
 
 	const onSubmit = (data: ProfileSchema) => {
-		updatePlayerDoc(user, {
+		updatePlayerDoc(authStateUser, {
 			firstname: data.firstname,
 			lastname: data.lastname,
 		})
@@ -64,11 +68,19 @@ export const Profile = () => {
 	}
 
 	const registrationButtonOnClickHandler = () => {
-		stripeRegistration(user)
+		stripeRegistration(authStateUser)
 	}
 
-	const sendVerificationEmailButtonOnClickHandler = () => {
-		sendVerificationEmail(user)
+	const sendEmailVerificationButtonOnClickHandler = () => {
+		sendEmailVerification()
+	}
+
+	const sendPasswordResetEmailButtonOnClickHandler = () => {
+		if (authStateUser) {
+			if (authStateUser.email) {
+				sendPasswordResetEmail(authStateUser.email)
+			}
+		}
 	}
 
 	return (
@@ -78,7 +90,9 @@ export const Profile = () => {
 					'my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'
 				}
 			>
-				{user?.displayName ? `Hello ${user.displayName}` : 'Your Profile'}
+				{authStateUser?.displayName
+					? `Hello ${authStateUser.displayName}`
+					: 'Your Profile'}
 			</div>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -165,8 +179,11 @@ export const Profile = () => {
 				</form>
 			</Form>
 			<Button onClick={registrationButtonOnClickHandler}>Register</Button>
-			<Button onClick={sendVerificationEmailButtonOnClickHandler}>
+			<Button onClick={sendEmailVerificationButtonOnClickHandler}>
 				Send Verification Email
+			</Button>
+			<Button onClick={sendPasswordResetEmailButtonOnClickHandler}>
+				Send Password Reset Email
 			</Button>
 		</>
 	)

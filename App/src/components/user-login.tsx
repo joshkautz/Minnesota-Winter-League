@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { useContext } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -13,28 +14,30 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
-import { handleLogin } from '@/firebase/auth'
+import { AuthContext } from '@/firebase/auth-context'
 
 const loginSchema = z.object({
 	email: z.string().email(),
-	password: z.string().min(8, {
-		message: 'Password must be at least 8 characters.',
-	}),
+	password: z.string(),
 })
 
 type LoginSchema = z.infer<typeof loginSchema>
 
 export const UserLogin = () => {
+	const { signInWithEmailAndPassword, signInWithEmailAndPasswordError } =
+		useContext(AuthContext)
 	const form = useForm<LoginSchema>({
 		resolver: zodResolver(loginSchema),
 	})
 
 	const onSubmit = async (data: LoginSchema) => {
-		const res = await handleLogin(data)
+		const res = await signInWithEmailAndPassword(data.email, data.password)
 
 		toast({
-			title: res.message,
-			variant: res.success ? 'default' : 'destructive',
+			title: res?.user
+				? 'Login successful!'
+				: `Login failed: ${signInWithEmailAndPasswordError}`,
+			variant: res?.user ? 'default' : 'destructive',
 			description: (
 				<pre className={'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}>
 					<code className={'text-white'}>{JSON.stringify(data, null, 2)}</code>

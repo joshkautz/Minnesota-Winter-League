@@ -1,7 +1,9 @@
-import { User, handleSignOut, handleLogin } from '@/firebase/auth'
+import { User } from '@/firebase/auth'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
 import { toast } from './ui/use-toast'
+import { useContext } from 'react'
+import { AuthContext } from '@/firebase/auth-context'
 
 export const AuthButton = ({
 	loading,
@@ -12,13 +14,21 @@ export const AuthButton = ({
 	user: User | null | undefined
 	className?: string
 }) => {
+	const { signInWithEmailAndPassword, signInWithEmailAndPasswordError, signOut } =
+		useContext(AuthContext)
+
 	const runMockLogin = async () => {
 		const testData = { email: 'admin@testing.com', password: '00000000' }
-		const res = await handleLogin(testData)
+		const res = await signInWithEmailAndPassword(
+			testData.email,
+			testData.password
+		)
 
 		toast({
-			title: res.message,
-			variant: res.success ? 'default' : 'destructive',
+			title: res?.user
+				? 'Login successful!'
+				: `Login failed: ${signInWithEmailAndPasswordError}`,
+			variant: res?.user ? 'default' : 'destructive',
 			description: (
 				<pre className={'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}>
 					<code className={'text-white'}>
@@ -39,7 +49,7 @@ export const AuthButton = ({
 	}
 	if (user) {
 		return (
-			<Button className={className} onClick={handleSignOut}>
+			<Button className={className} onClick={signOut}>
 				Logout
 			</Button>
 		)
