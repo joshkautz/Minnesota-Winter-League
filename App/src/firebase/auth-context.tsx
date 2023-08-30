@@ -15,7 +15,13 @@ import {
 import { useDocumentData } from 'react-firebase-hooks/firestore'
 
 // Winter League
-import { auth, User, UserCredential, AuthError, ActionCodeSettings } from '@/firebase/auth'
+import {
+	auth,
+	User,
+	UserCredential,
+	AuthError,
+	ActionCodeSettings,
+} from '@/firebase/auth'
 import {
 	playerDocRef,
 	DocumentData,
@@ -50,10 +56,13 @@ interface AuthProps {
 	signOutError: Error | AuthError | undefined
 	sendEmailVerification: () => Promise<boolean>
 	sendEmailVerificationSending: boolean
-  sendEmailVerificationError: Error | AuthError | undefined
-  sendPasswordResetEmail: (email: string, actionCodeSettings?: ActionCodeSettings | undefined) => Promise<boolean>
-  sendPasswordResetEmailSending: boolean
-  sendPasswordResetEmailError: Error | AuthError | undefined
+	sendEmailVerificationError: Error | AuthError | undefined
+	sendPasswordResetEmail: (
+		email: string,
+		actionCodeSettings?: ActionCodeSettings | undefined
+	) => Promise<boolean>
+	sendPasswordResetEmailSending: boolean
+	sendPasswordResetEmailError: Error | AuthError | undefined
 }
 const AuthContext = createContext<AuthProps>({} as AuthProps)
 
@@ -114,10 +123,10 @@ const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 				signOutError: signOutError,
 				sendEmailVerification: sendEmailVerification,
 				sendEmailVerificationSending: sendEmailVerificationSending,
-        sendEmailVerificationError: sendEmailVerificationError,
-        sendPasswordResetEmail: sendPasswordResetEmail,
-        sendPasswordResetEmailSending: sendPasswordResetEmailSending,
-        sendPasswordResetEmailError: sendPasswordResetEmailError,
+				sendEmailVerificationError: sendEmailVerificationError,
+				sendPasswordResetEmail: sendPasswordResetEmail,
+				sendPasswordResetEmailSending: sendPasswordResetEmailSending,
+				sendPasswordResetEmailError: sendPasswordResetEmailError,
 			}}
 		>
 			{children}

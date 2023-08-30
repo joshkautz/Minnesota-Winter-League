@@ -14,8 +14,11 @@ export const AuthButton = ({
 	user: User | null | undefined
 	className?: string
 }) => {
-	const { signInWithEmailAndPassword, signInWithEmailAndPasswordError, signOut } =
-		useContext(AuthContext)
+	const {
+		signInWithEmailAndPassword,
+		signInWithEmailAndPasswordError,
+		signOut,
+	} = useContext(AuthContext)
 
 	const runMockLogin = async () => {
 		const testData = { email: 'admin@testing.com', password: '00000000' }

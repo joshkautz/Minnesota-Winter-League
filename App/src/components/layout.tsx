@@ -26,8 +26,8 @@ export const Layout = () => {
 					<Button onClick={() => setDebugOpen(!debugOpen)}>
 						{debugOpen ? 'Hide Context' : 'Show Context'}
 					</Button>
-          {debugOpen && (
-            <textarea rows={25} cols={100}>
+					{debugOpen && (
+						<textarea rows={25} cols={100}>
 							{JSON.stringify(authContext, null, 2)}
 						</textarea>
 					)}
