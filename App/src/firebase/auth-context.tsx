@@ -25,7 +25,7 @@ import {
 import {
 	playerDocRef,
 	FirestoreError,
-  DocumentSnapshot,
+	DocumentSnapshot,
 } from '@/firebase/firestore'
 
 // interface PlayerDocumentData {
@@ -75,11 +75,8 @@ const AuthContext = createContext<AuthProps>({} as AuthProps)
 
 const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [authStateUser, authStateLoading, authStateError] = useAuthState(auth)
-	const [
-		documentDataSnapshot,
-		documentDataLoading,
-		documentDataError,
-	] = useDocument(playerDocRef(authStateUser))
+	const [documentDataSnapshot, documentDataLoading, documentDataError] =
+		useDocument(playerDocRef(authStateUser))
 	const [
 		createUserWithEmailAndPassword,
 		createUserWithEmailAndPasswordUser,
