@@ -1,6 +1,8 @@
 import {
 	addDoc,
 	doc,
+	query,
+	where,
 	getFirestore,
 	DocumentData,
 	FirestoreError,
@@ -13,6 +15,7 @@ import {
 	DocumentReference,
 	CollectionReference,
 	QuerySnapshot,
+	Query,
 } from 'firebase/firestore'
 
 import { app } from './app'
@@ -25,8 +28,15 @@ interface PlayerDocumentData {
 	firstname: string
 	lastname: string
 	registered: boolean
-	team: string
+	team: DocumentReference
 }
+
+// interface OfferDocumentData {
+// 	creator: 'player' | 'captain'
+// 	player: DocumentReference
+// 	status: 'pending' | 'accepted' | 'rejected'
+// 	team: DocumentReference
+// }
 
 const firestore = getFirestore(app)
 
@@ -47,6 +57,50 @@ const updatePlayerDoc = async (
 
 const teamsColRef = (): CollectionReference<DocumentData, DocumentData> => {
 	return collection(firestore, 'teams')
+}
+
+const outgoingOffersColRef = (
+	documentDataSnapshot: DocumentSnapshot<DocumentData, DocumentData> | undefined
+): Query<DocumentData, DocumentData> | undefined => {
+	if (!documentDataSnapshot) return undefined
+
+	// If the user is a captain, show all the invitations to join their team.
+	if (documentDataSnapshot.data()?.captain) {
+		return query(
+			collection(firestore, 'offers'),
+			where('team', '==', documentDataSnapshot.data()?.team),
+			where('creator', '==', 'captain')
+		)
+	}
+
+	// If the user is a player, show all their requests to join teams.
+	return query(
+		collection(firestore, 'offers'),
+		where('player', '==', documentDataSnapshot.ref),
+		where('creator', '==', 'player')
+	)
+}
+
+const incomingOffersColRef = (
+	documentDataSnapshot: DocumentSnapshot<DocumentData, DocumentData> | undefined
+): Query<DocumentData, DocumentData> | undefined => {
+	if (!documentDataSnapshot) return undefined
+
+	// If the user is a captain, show all the requests to join their team.
+	if (documentDataSnapshot.data()?.captain) {
+		return query(
+			collection(firestore, 'offers'),
+			where('team', '==', documentDataSnapshot.data()?.team),
+			where('creator', '==', 'player')
+		)
+	}
+
+	// If the user is a player, show all their invitations to join teams.
+	return query(
+		collection(firestore, 'offers'),
+		where('player', '==', documentDataSnapshot.ref),
+		where('creator', '==', 'captain')
+	)
 }
 
 const stripeRegistration = async (
@@ -80,11 +134,14 @@ const stripeRegistration = async (
 
 export {
 	teamsColRef,
+	outgoingOffersColRef,
+	incomingOffersColRef,
 	playerDocRef,
 	updatePlayerDoc,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,
 	type QuerySnapshot,
+	type DocumentReference,
 	stripeRegistration,
 }
