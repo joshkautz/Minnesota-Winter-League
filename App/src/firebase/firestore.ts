@@ -6,12 +6,13 @@ import {
 	FirestoreError,
 	updateDoc,
 	UpdateData,
-	getDocs,
 	collection,
-	QuerySnapshot,
 	onSnapshot,
 	Unsubscribe,
 	DocumentSnapshot,
+	DocumentReference,
+	CollectionReference,
+	QuerySnapshot,
 } from 'firebase/firestore'
 
 import { app } from './app'
@@ -29,7 +30,9 @@ interface PlayerDocumentData {
 
 const firestore = getFirestore(app)
 
-const playerDocRef = (authValue: User | null | undefined) => {
+const playerDocRef = (
+	authValue: User | null | undefined
+): DocumentReference<DocumentData, DocumentData> | undefined => {
 	return authValue ? doc(firestore, 'players', authValue.uid) : undefined
 }
 
@@ -42,21 +45,8 @@ const updatePlayerDoc = async (
 		: undefined
 }
 
-const getAllTeams = async (): Promise<DocumentData[]> => {
-	try {
-		const teamsCollectionRef = collection(firestore, 'teams')
-		const querySnapshot: QuerySnapshot = await getDocs(teamsCollectionRef)
-		const teamsData: DocumentData[] = []
-
-		querySnapshot.forEach((doc) => {
-			teamsData.push({ id: doc.id, ...doc.data() })
-		})
-
-		return teamsData
-	} catch (error) {
-		console.error('Error fetching teams:', error)
-		throw error
-	}
+const teamsColRef = (): CollectionReference<DocumentData, DocumentData> => {
+	return collection(firestore, 'teams')
 }
 
 const stripeRegistration = async (
@@ -89,11 +79,12 @@ const stripeRegistration = async (
 }
 
 export {
+	teamsColRef,
 	playerDocRef,
 	updatePlayerDoc,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,
-	getAllTeams,
+	type QuerySnapshot,
 	stripeRegistration,
 }
