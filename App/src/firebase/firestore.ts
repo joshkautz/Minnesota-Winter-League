@@ -40,6 +40,30 @@ interface PlayerDocumentData {
 
 const firestore = getFirestore(app)
 
+const invitePlayerToJoinTeam = async (
+	playerRef: DocumentReference,
+	teamRef: DocumentReference
+): Promise<DocumentReference<DocumentData, DocumentData>> => {
+	return await addDoc(collection(firestore, 'offers'), {
+		creator: 'captain',
+		player: playerRef,
+		team: teamRef,
+		status: 'pending',
+	})
+}
+
+const requestToJoinTeam = async (
+	playerRef: DocumentReference,
+	teamRef: DocumentReference
+): Promise<DocumentReference<DocumentData, DocumentData>> => {
+	return await addDoc(collection(firestore, 'offers'), {
+		creator: 'player',
+		player: playerRef,
+		team: teamRef,
+		status: 'pending',
+	})
+}
+
 const playerDocRef = (
 	authValue: User | null | undefined
 ): DocumentReference<DocumentData, DocumentData> | undefined => {
@@ -133,6 +157,8 @@ const stripeRegistration = async (
 }
 
 export {
+	requestToJoinTeam,
+	invitePlayerToJoinTeam,
 	teamsColRef,
 	outgoingOffersColRef,
 	incomingOffersColRef,
