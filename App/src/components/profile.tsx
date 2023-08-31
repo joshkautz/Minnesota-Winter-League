@@ -30,17 +30,17 @@ type ProfileSchema = z.infer<typeof profileSchema>
 export const Profile = () => {
 	const {
 		authStateUser,
-		documentDataValue,
+		documentDataSnapshot,
 		sendEmailVerification,
 		sendPasswordResetEmail,
 	} = useContext(AuthContext)
 
 	const defaultValues: ProfileSchema = {
-		firstname: documentDataValue?.firstname ?? '',
-		lastname: documentDataValue?.lastname ?? '',
-		registered: documentDataValue?.registered ?? '',
-		team: documentDataValue?.team ?? '',
-		email: documentDataValue?.email ?? '',
+		firstname: documentDataSnapshot?.data()?.firstname ?? '',
+		lastname: documentDataSnapshot?.data()?.lastname ?? '',
+		registered: documentDataSnapshot?.data()?.registered ?? '',
+		team: documentDataSnapshot?.data()?.team ?? '',
+		email: documentDataSnapshot?.data()?.email ?? '',
 	}
 
 	const form = useForm<ProfileSchema>({

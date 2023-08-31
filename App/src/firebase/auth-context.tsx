@@ -12,7 +12,7 @@ import {
 	useSendEmailVerification,
 	useSignOut,
 } from 'react-firebase-hooks/auth'
-import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { useDocument } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import {
@@ -24,19 +24,26 @@ import {
 } from '@/firebase/auth'
 import {
 	playerDocRef,
-	DocumentData,
 	FirestoreError,
-	DocumentSnapshot,
+  DocumentSnapshot,
 } from '@/firebase/firestore'
+
+// interface PlayerDocumentData {
+// 	captain: boolean
+// 	email: string
+// 	firstname: string
+// 	lastname: string
+// 	registered: boolean
+// 	team: DocumentReference
+// }
 
 interface AuthProps {
 	authStateUser: User | null | undefined
 	authStateLoading: boolean
 	authStateError: Error | undefined
-	documentDataValue: DocumentData | undefined
+	documentDataSnapshot: DocumentSnapshot | undefined
 	documentDataLoading: boolean
 	documentDataError: FirestoreError | undefined
-	documentDataSnapshot: DocumentSnapshot | undefined
 	createUserWithEmailAndPassword: (
 		email: string,
 		password: string
@@ -69,11 +76,10 @@ const AuthContext = createContext<AuthProps>({} as AuthProps)
 const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [authStateUser, authStateLoading, authStateError] = useAuthState(auth)
 	const [
-		documentDataValue,
+		documentDataSnapshot,
 		documentDataLoading,
 		documentDataError,
-		documentDataSnapshot,
-	] = useDocumentData(playerDocRef(authStateUser))
+	] = useDocument(playerDocRef(authStateUser))
 	const [
 		createUserWithEmailAndPassword,
 		createUserWithEmailAndPasswordUser,
@@ -104,10 +110,9 @@ const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 				authStateUser: authStateUser,
 				authStateLoading: authStateLoading,
 				authStateError: authStateError,
-				documentDataValue: documentDataValue,
+				documentDataSnapshot: documentDataSnapshot,
 				documentDataLoading: documentDataLoading,
 				documentDataError: documentDataError,
-				documentDataSnapshot: documentDataSnapshot,
 				createUserWithEmailAndPassword: createUserWithEmailAndPassword,
 				createUserWithEmailAndPasswordUser: createUserWithEmailAndPasswordUser,
 				createUserWithEmailAndPasswordLoading:
