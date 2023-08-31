@@ -40,6 +40,18 @@ interface PlayerDocumentData {
 
 const firestore = getFirestore(app)
 
+const acceptOffer = async (offerRef: DocumentReference): Promise<void> => {
+	return await updateDoc(offerRef, {
+		status: 'accepted',
+	})
+}
+
+const rejectOffer = async (offerRef: DocumentReference): Promise<void> => {
+	return await updateDoc(offerRef, {
+		status: 'rejected',
+	})
+}
+
 const invitePlayerToJoinTeam = async (
 	playerRef: DocumentReference,
 	teamRef: DocumentReference
@@ -157,6 +169,8 @@ const stripeRegistration = async (
 }
 
 export {
+	acceptOffer,
+	rejectOffer,
 	requestToJoinTeam,
 	invitePlayerToJoinTeam,
 	teamsColRef,
