@@ -18,17 +18,16 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { handleSignOut } from '@/firebase/auth'
 import { Link } from 'react-router-dom'
 
 export const UserAvatar = () => {
-	const { user, loading } = useContext(AuthContext)
+	const { authStateUser, authStateLoading, signOut } = useContext(AuthContext)
 
-	if (loading) {
+	if (authStateLoading) {
 		return <ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
 	}
 
-	if (!user) {
+	if (!authStateUser) {
 		return (
 			<Dialog>
 				<DialogTrigger asChild>
@@ -41,17 +40,17 @@ export const UserAvatar = () => {
 		)
 	}
 
-	if (user) {
+	if (authStateUser) {
 		return (
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Avatar className={'cursor-pointer'}>
 						<AvatarImage
-							src={user.photoURL ?? undefined}
+							src={authStateUser.photoURL ?? undefined}
 							alt={'profile image'}
 						/>
 						<AvatarFallback>
-							{user.displayName?.slice(0, 2) ?? 'NA'}
+							{authStateUser.displayName?.slice(0, 2) ?? 'NA'}
 						</AvatarFallback>
 					</Avatar>
 				</DropdownMenuTrigger>
@@ -87,7 +86,7 @@ export const UserAvatar = () => {
 					<DropdownMenuItem disabled>Support</DropdownMenuItem>
 					<DropdownMenuItem disabled>API</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={handleSignOut}>Log out</DropdownMenuItem>
+					<DropdownMenuItem onClick={signOut}>Log out</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		)
