@@ -38,7 +38,6 @@ export const Home = () => {
 									.find((team) => team.id == offer.data().team.id)
 									?.data().name,
 							}
-							console.log(result)
 							return result
 						}
 					)
