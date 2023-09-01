@@ -26,7 +26,7 @@ const EmptyState = () => {
 }
 
 export const Teams = () => {
-	const { collectionDataValue, collectionDataLoading, collectionDataError } =
+	const { collectionDataSnapshot, collectionDataLoading, collectionDataError } =
 		useContext(TeamsContext)
 
 	const navigate = useNavigate()
@@ -65,25 +65,25 @@ export const Teams = () => {
 						</Button>
 					</div>
 				</Alert>
-			) : collectionDataValue && collectionDataValue.length > 0 ? (
+			) : collectionDataSnapshot && collectionDataSnapshot.size > 0 ? (
 				<div className={'flex flex-row flex-wrap justify-evenly'}>
-					{collectionDataValue.map(({ id, name, logo }) => {
+					{collectionDataSnapshot.docs.map((doc) => {
 						return (
 							<div
-								key={id}
+								key={doc.id}
 								className={
 									'group relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center'
 								}
 							>
 								<Link
 									className={'min-w-full'}
-									to={`/teams/${toCamelCase(name)}`}
+									to={`/teams/${toCamelCase(doc.data().name)}`}
 								>
 									<img
 										className={
 											'h-auto w-auto max-w-[180px] sm:max-w-[275px] max-h-[200px] mx-auto'
 										}
-										src={logo}
+										src={doc.data().logo}
 									/>
 								</Link>
 								<span
@@ -91,7 +91,7 @@ export const Teams = () => {
 										'absolute left-0 text-sm font-semibold text-center transition-all duration-300 opacity-0 sm:text-base bottom-2 sm:bottom-0 min-w-max right-0 sm:right-2/3 text-primary sm:group-hover:right-0 group-hover:opacity-100'
 									}
 								>
-									{name}
+									{doc.data().name}
 								</span>
 							</div>
 						)
