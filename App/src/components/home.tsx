@@ -16,10 +16,20 @@ interface OfferType {
 }
 
 export const Home = () => {
-	const { outgoingOffersCollectionDataSnapshot } = useContext(OffersContext)
+	const {
+		outgoingOffersCollectionDataSnapshot,
+		incomingOffersCollectionDataSnapshot,
+	} = useContext(OffersContext)
 	const { collectionDataSnapshot } = useContext(TeamsContext)
-	const [offers, setOffers] = useState(
+
+	const [outgoingOffers, setOutgoingOffers] = useState(
 		outgoingOffersCollectionDataSnapshot?.docs.map(
+			(offer) => offer.data() as OfferType
+		)
+	)
+
+	const [incomingOffers, setIncomingOffers] = useState(
+		incomingOffersCollectionDataSnapshot?.docs.map(
 			(offer) => offer.data() as OfferType
 		)
 	)
@@ -30,10 +40,11 @@ export const Home = () => {
 				const updatedOffers: OfferType[] = await Promise.all(
 					outgoingOffersCollectionDataSnapshot.docs.map(
 						async (offer: DocumentData) => {
+							const playerSnapshot = await getPlayerData(offer.data().player)
 							const result: OfferType = {
 								...offer.data(),
-								playerName: (await getPlayerData(offer.data().player)).data()
-									?.firstname,
+								playerName: `${playerSnapshot.data()
+									?.firstname} ${playerSnapshot.data()?.lastname}`,
 								teamName: collectionDataSnapshot?.docs
 									.find((team) => team.id == offer.data().team.id)
 									?.data().name,
@@ -43,12 +54,39 @@ export const Home = () => {
 					)
 				)
 
-				setOffers(updatedOffers)
+				setOutgoingOffers(updatedOffers)
 			}
 		}
 
 		updateOffers()
 	}, [outgoingOffersCollectionDataSnapshot, collectionDataSnapshot])
+
+	useEffect(() => {
+		const updateOffers = async () => {
+			if (incomingOffersCollectionDataSnapshot) {
+				const updatedOffers: OfferType[] = await Promise.all(
+					incomingOffersCollectionDataSnapshot.docs.map(
+						async (offer: DocumentData) => {
+							const playerSnapshot = await getPlayerData(offer.data().player)
+							const result: OfferType = {
+								...offer.data(),
+								playerName: `${playerSnapshot.data()
+									?.firstname} ${playerSnapshot.data()?.lastname}`,
+								teamName: collectionDataSnapshot?.docs
+									.find((team) => team.id == offer.data().team.id)
+									?.data().name,
+							}
+							return result
+						}
+					)
+				)
+
+				setIncomingOffers(updatedOffers)
+			}
+		}
+
+		updateOffers()
+	}, [incomingOffersCollectionDataSnapshot, collectionDataSnapshot])
 
 	return (
 		<>
@@ -60,11 +98,20 @@ export const Home = () => {
 				Home
 			</div>
 			<div>
-				{offers &&
-					offers.map((offer: DocumentData) => (
+				<b>Outgoing Offers (Invitations)</b>
+				{outgoingOffers &&
+					outgoingOffers.map((offer: DocumentData) => (
 						<div key={offer.player.id}>
-							Player: {offer.playerName}
-							Team: {offer.teamName}
+							Player: {offer.playerName} | Team: {offer.teamName}
+						</div>
+					))}
+			</div>
+			<div>
+				<b>Incoming Offers (Requests)</b>
+				{incomingOffers &&
+					incomingOffers.map((offer: DocumentData) => (
+						<div key={offer.player.id}>
+							Player: {offer.playerName} | Team: {offer.teamName}
 						</div>
 					))}
 			</div>
