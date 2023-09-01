@@ -1,17 +1,6 @@
-import {
-	JSXElementConstructor,
-	ReactElement,
-	ReactNode,
-	ReactPortal,
-	useContext,
-	useEffect,
-	useState,
-} from 'react'
+import { useContext } from 'react'
 import { OffersContext } from '@/firebase/offers-context'
-import { DocumentReference, getDoc } from '@firebase/firestore'
-import { useDocumentData } from 'react-firebase-hooks/firestore'
-import { DocumentData, getPlayerData, playerDocRef } from '@/firebase/firestore'
-import { TeamsContext } from '@/firebase/teams-context'
+import { DocumentData } from '@/firebase/firestore'
 import { Button } from './ui/button'
 
 const Notification = ({ item }: { item: DocumentData }) => {
@@ -72,6 +61,10 @@ export const ManageOffers = () => {
 							<>
 								{invitations &&
 									invitations.docs.map((item, index) => {
+										return <Notification key={index} item={item.data()} />
+									})}
+								{requests &&
+									requests.docs.map((item, index) => {
 										return <Notification key={index} item={item.data()} />
 									})}
 							</>
