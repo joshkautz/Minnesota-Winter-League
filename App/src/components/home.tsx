@@ -24,12 +24,6 @@ export const Home = () => {
 		)
 	)
 
-	const getTeamName = (teamRef: DocumentReference) => {
-		return collectionDataSnapshot?.docs
-			.find((team) => team.id == teamRef.id)
-			?.data().name
-	}
-
 	useEffect(() => {
 		const updateOffers = async () => {
 			if (outgoingOffersCollectionDataSnapshot) {
@@ -40,6 +34,9 @@ export const Home = () => {
 								...offer.data(),
 								playerName: (await getPlayerData(offer.data().player)).data()
 									?.firstname,
+								teamName: collectionDataSnapshot?.docs
+									.find((team) => team.id == offer.data().team.id)
+									?.data().name,
 							}
 							console.log(result)
 							return result
@@ -52,7 +49,7 @@ export const Home = () => {
 		}
 
 		updateOffers()
-	}, [outgoingOffersCollectionDataSnapshot])
+	}, [outgoingOffersCollectionDataSnapshot, collectionDataSnapshot])
 
 	return (
 		<>
@@ -68,7 +65,7 @@ export const Home = () => {
 					offers.map((offer: DocumentData) => (
 						<div key={offer.player.id}>
 							Player: {offer.playerName}
-							Team: {getTeamName(offer.team)}
+							Team: {offer.teamName}
 						</div>
 					))}
 			</div>
