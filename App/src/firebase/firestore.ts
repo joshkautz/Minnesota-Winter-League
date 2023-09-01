@@ -1,24 +1,25 @@
 import {
 	addDoc,
 	doc,
+	query,
+	where,
 	getFirestore,
 	DocumentData,
 	FirestoreError,
 	updateDoc,
 	UpdateData,
-	getDocs,
 	collection,
-	where,
-	query,
-	QuerySnapshot,
-	getDoc,
 	onSnapshot,
 	Unsubscribe,
+	DocumentSnapshot,
+	DocumentReference,
+	CollectionReference,
+	QuerySnapshot,
+	Query,
 } from 'firebase/firestore'
 
 import { app } from './app'
 import { User } from './auth'
-import { OfferType } from '@/hooks/use-offers'
 import { Products } from './stripe'
 
 interface PlayerDocumentData {
@@ -27,12 +28,45 @@ interface PlayerDocumentData {
 	firstname: string
 	lastname: string
 	registered: boolean
-	team: string
+	team: DocumentReference
 }
+
+// interface OfferDocumentData {
+// 	creator: 'player' | 'captain'
+// 	player: DocumentReference
+// 	status: 'pending' | 'accepted' | 'rejected'
+// 	team: DocumentReference
+// }
 
 const firestore = getFirestore(app)
 
-const playerDocRef = (authValue: User | null | undefined) => {
+const invitePlayerToJoinTeam = async (
+	playerRef: DocumentReference,
+	teamRef: DocumentReference
+): Promise<DocumentReference<DocumentData, DocumentData>> => {
+	return await addDoc(collection(firestore, 'offers'), {
+		creator: 'captain',
+		player: playerRef,
+		team: teamRef,
+		status: 'pending',
+	})
+}
+
+const requestToJoinTeam = async (
+	playerRef: DocumentReference,
+	teamRef: DocumentReference
+): Promise<DocumentReference<DocumentData, DocumentData>> => {
+	return await addDoc(collection(firestore, 'offers'), {
+		creator: 'player',
+		player: playerRef,
+		team: teamRef,
+		status: 'pending',
+	})
+}
+
+const playerDocRef = (
+	authValue: User | null | undefined
+): DocumentReference<DocumentData, DocumentData> | undefined => {
 	return authValue ? doc(firestore, 'players', authValue.uid) : undefined
 }
 
@@ -45,78 +79,52 @@ const updatePlayerDoc = async (
 		: undefined
 }
 
-const getAllTeams = async (): Promise<DocumentData[]> => {
-	try {
-		const teamsCollectionRef = collection(firestore, 'teams')
-		const querySnapshot: QuerySnapshot = await getDocs(teamsCollectionRef)
-		const teamsData: DocumentData[] = []
-
-		querySnapshot.forEach((doc) => {
-			teamsData.push({ id: doc.id, ...doc.data() })
-		})
-
-		return teamsData
-	} catch (error) {
-		console.error('Error fetching teams:', error)
-		throw error
-	}
+const teamsColRef = (): CollectionReference<DocumentData, DocumentData> => {
+	return collection(firestore, 'teams')
 }
 
-const getOfferTeamAndPlayerData = async (
-	userRef: User | null | undefined,
-	firestoreValue: DocumentData | undefined
-) => {
-	const offers: OfferType[] = []
+const outgoingOffersColRef = (
+	documentDataSnapshot: DocumentSnapshot<DocumentData, DocumentData> | undefined
+): Query<DocumentData, DocumentData> | undefined => {
+	if (!documentDataSnapshot) return undefined
 
-	if (!userRef || !firestoreValue) {
-		// no offers for unauthenticated
-		return offers
-	}
-
-	const { captain, team } = firestoreValue
-
-	if (!captain && team) {
-		// no offers for rostered players
-		return offers
-	}
-
-	try {
-		const offersRef = collection(firestore, 'offers')
-		const captainFilter = where('team', '==', team)
-		const playerFilter = where('player', '==', userRef)
-
-		const q = query(
-			offersRef,
-			captain ? captainFilter : playerFilter,
-			where('status', '==', 'pending')
+	// If the user is a captain, show all the invitations to join their team.
+	if (documentDataSnapshot.data()?.captain) {
+		return query(
+			collection(firestore, 'offers'),
+			where('team', '==', documentDataSnapshot.data()?.team),
+			where('creator', '==', 'captain')
 		)
-
-		const offersSnapshot: QuerySnapshot<DocumentData> = await getDocs(q)
-
-		const offersWithPlayerAndTeamData = await Promise.all(
-			offersSnapshot.docs.map(async (offerDoc) => {
-				const offerData = offerDoc.data()
-
-				const playerDocRef = doc(firestore, 'users', offerData.player.id)
-				const teamDocRef = doc(firestore, 'teams', offerData.team.id)
-				const playerSnapshot = await getDoc(playerDocRef)
-				const teamSnapshot = await getDoc(teamDocRef)
-				const playerData = playerSnapshot.data()
-				const teamData = teamSnapshot.data()
-
-				return {
-					offer: offerData,
-					player: playerData,
-					team: teamData,
-				}
-			})
-		)
-
-		return offersWithPlayerAndTeamData
-	} catch (error) {
-		console.error('Error fetching offer data:', error)
-		throw error
 	}
+
+	// If the user is a player, show all their requests to join teams.
+	return query(
+		collection(firestore, 'offers'),
+		where('player', '==', documentDataSnapshot.ref),
+		where('creator', '==', 'player')
+	)
+}
+
+const incomingOffersColRef = (
+	documentDataSnapshot: DocumentSnapshot<DocumentData, DocumentData> | undefined
+): Query<DocumentData, DocumentData> | undefined => {
+	if (!documentDataSnapshot) return undefined
+
+	// If the user is a captain, show all the requests to join their team.
+	if (documentDataSnapshot.data()?.captain) {
+		return query(
+			collection(firestore, 'offers'),
+			where('team', '==', documentDataSnapshot.data()?.team),
+			where('creator', '==', 'player')
+		)
+	}
+
+	// If the user is a player, show all their invitations to join teams.
+	return query(
+		collection(firestore, 'offers'),
+		where('player', '==', documentDataSnapshot.ref),
+		where('creator', '==', 'captain')
+	)
 }
 
 const stripeRegistration = async (
@@ -149,11 +157,17 @@ const stripeRegistration = async (
 }
 
 export {
+	requestToJoinTeam,
+	invitePlayerToJoinTeam,
+	teamsColRef,
+	outgoingOffersColRef,
+	incomingOffersColRef,
 	playerDocRef,
 	updatePlayerDoc,
 	type DocumentData,
 	type FirestoreError,
-	getAllTeams,
-	getOfferTeamAndPlayerData,
+	type DocumentSnapshot,
+	type QuerySnapshot,
+	type DocumentReference,
 	stripeRegistration,
 }

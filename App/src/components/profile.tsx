@@ -14,8 +14,8 @@ import {
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { stripeRegistration, updatePlayerDoc } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
+import { stripeRegistration, updatePlayerDoc } from '@/firebase/firestore'
 import {
 	Table,
 	TableCaption,
@@ -37,14 +37,19 @@ const profileSchema = z.object({
 type ProfileSchema = z.infer<typeof profileSchema>
 
 export const Profile = () => {
-	const { user, firestoreValue, offers } = useContext(AuthContext)
+	const {
+		authStateUser,
+		documentDataSnapshot,
+		sendEmailVerification,
+		sendPasswordResetEmail,
+	} = useContext(AuthContext)
 
 	const defaultValues: ProfileSchema = {
-		firstname: firestoreValue?.firstname ?? '',
-		lastname: firestoreValue?.lastname ?? '',
-		registered: firestoreValue?.registered ?? '',
-		team: firestoreValue?.team ?? '',
-		email: firestoreValue?.email ?? '',
+		firstname: documentDataSnapshot?.data()?.firstname ?? '',
+		lastname: documentDataSnapshot?.data()?.lastname ?? '',
+		registered: documentDataSnapshot?.data()?.registered ?? '',
+		team: documentDataSnapshot?.data()?.team ?? '',
+		email: documentDataSnapshot?.data()?.email ?? '',
 	}
 
 	const form = useForm<ProfileSchema>({
@@ -54,7 +59,7 @@ export const Profile = () => {
 	})
 
 	const onSubmit = (data: ProfileSchema) => {
-		updatePlayerDoc(user, {
+		updatePlayerDoc(authStateUser, {
 			firstname: data.firstname,
 			lastname: data.lastname,
 		})
@@ -72,7 +77,19 @@ export const Profile = () => {
 	}
 
 	const registrationButtonOnClickHandler = () => {
-		stripeRegistration(user)
+		stripeRegistration(authStateUser)
+	}
+
+	const sendEmailVerificationButtonOnClickHandler = () => {
+		sendEmailVerification()
+	}
+
+	const sendPasswordResetEmailButtonOnClickHandler = () => {
+		if (authStateUser) {
+			if (authStateUser.email) {
+				sendPasswordResetEmail(authStateUser.email)
+			}
+		}
 	}
 
 	return (
@@ -82,7 +99,9 @@ export const Profile = () => {
 					'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'
 				}
 			>
-				{user?.displayName ? `Hello ${user.displayName}` : 'Your Profile'}
+				{authStateUser?.displayName
+					? `Hello ${authStateUser.displayName}`
+					: 'Your Profile'}
 			</div>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -183,7 +202,7 @@ export const Profile = () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{offers.length > 0 ? (
+					{/* {offers.length > 0 ? (
 						offers.map(
 							({ offer: { creator, status }, player, team }, index) => {
 								// const playerData = userDocRef(player.id)
@@ -199,10 +218,16 @@ export const Profile = () => {
 						)
 					) : (
 						<TableCell>No Data</TableCell>
-					)}
+					)} */}
 				</TableBody>
 			</Table>
 			<Button onClick={registrationButtonOnClickHandler}>Register</Button>
+			<Button onClick={sendEmailVerificationButtonOnClickHandler}>
+				Send Verification Email
+			</Button>
+			<Button onClick={sendPasswordResetEmailButtonOnClickHandler}>
+				Send Password Reset Email
+			</Button>
 		</div>
 	)
 }

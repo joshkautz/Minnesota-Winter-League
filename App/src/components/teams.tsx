@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { cn, toCamelCase } from '@/lib/utils'
-import { useTeams } from '@/hooks/use-teams'
 import { Button } from './ui/button'
 import { Alert, AlertTitle, AlertDescription } from './ui/alert'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import { useContext } from 'react'
+import { TeamsContext } from '@/firebase/teams-context'
 
 const LoadingState = () => {
 	return (
@@ -25,7 +26,9 @@ const EmptyState = () => {
 }
 
 export const Teams = () => {
-	const { teams, isLoading, error, refetch } = useTeams()
+	const { collectionDataValue, collectionDataLoading, collectionDataError } =
+		useContext(TeamsContext)
+
 	const navigate = useNavigate()
 
 	return (
@@ -37,9 +40,9 @@ export const Teams = () => {
 			>
 				Teams
 			</div>
-			{isLoading ? (
+			{collectionDataLoading ? (
 				<LoadingState />
-			) : error ? (
+			) : collectionDataError ? (
 				// offer refetch option here
 				<Alert className={cn('max-w-[600px] mx-auto')}>
 					<ExclamationTriangleIcon className="w-4 h-4" />
@@ -57,14 +60,14 @@ export const Teams = () => {
 						>
 							Home
 						</Button>
-						<Button size={'sm'} onClick={refetch}>
+						<Button size={'sm'} onClick={() => {}}>
 							Retry
 						</Button>
 					</div>
 				</Alert>
-			) : teams.length > 0 ? (
+			) : collectionDataValue && collectionDataValue.length > 0 ? (
 				<div className={'flex flex-row flex-wrap justify-evenly'}>
-					{teams.map(({ id, name, logo }) => {
+					{collectionDataValue.map(({ id, name, logo }) => {
 						return (
 							<div
 								key={id}
