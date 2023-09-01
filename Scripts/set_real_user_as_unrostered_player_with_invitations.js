@@ -47,15 +47,6 @@ await firestore
 
 await new Promise((r) => setTimeout(r, 1000))
 
-/////////////////////////////// Delete Offers ///////////////////////////////
-
-const offersSnapshot = await firestore.collection('offers').get()
-for (let i = 0; i < offersSnapshot.size; i++) {
-	await offersSnapshot.docs[i].ref.delete()
-
-	await new Promise((r) => setTimeout(r, 1000))
-}
-
 /////////////////////////////// Create Offers ///////////////////////////////
 
 const offers = []
