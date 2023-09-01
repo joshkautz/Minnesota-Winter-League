@@ -56,18 +56,21 @@ await firestore
 
 await new Promise((r) => setTimeout(r, 1000))
 
-/////////////////////////////// Create Offers ///////////////////////////////
+/////////////////////////////// Delete Offers ///////////////////////////////
 
-// Delete all offers
-const offersSnapshot = await firestore.collection('offers').get()
+const offersSnapshot = await firestore
+	.collection('offers')
+	.where('player', '==', playerReference)
+	.get()
 for (let i = 0; i < offersSnapshot.size; i++) {
 	await offersSnapshot.docs[i].ref.delete()
 
 	await new Promise((r) => setTimeout(r, 1000))
 }
 
-const offers = []
+/////////////////////////////// Create Offers ///////////////////////////////
 
+const offers = []
 const unrosteredPlayers = []
 const unrosteredPlayersSnapshot = await firestore
 	.collection('players')
