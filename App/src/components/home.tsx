@@ -88,7 +88,7 @@ export const Home = () => {
 
 		updateOffers()
 	}, [incomingOffersCollectionDataSnapshot, collectionDataSnapshot])
-	console.log(incomingOffers)
+
 	return (
 		<div className="container">
 			<div

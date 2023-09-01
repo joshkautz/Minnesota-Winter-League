@@ -16,6 +16,7 @@ const IncomingRequest = ({
 	const statusColor =
 		item.status === 'pending' ? 'bg-primary' : 'bg-transparent'
 
+const Notification = ({ item }: { item: DocumentData }) => {
 	return (
 		<div className="flex items-end gap-2 py-2">
 			<span
