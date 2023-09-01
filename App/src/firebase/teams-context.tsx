@@ -2,7 +2,7 @@
 import { PropsWithChildren, createContext } from 'react'
 
 // Firebase Hooks
-import { useCollectionData } from 'react-firebase-hooks/firestore'
+import { useCollection } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import {
@@ -13,29 +13,26 @@ import {
 } from '@/firebase/firestore'
 
 interface AuthProps {
-	collectionDataValue: DocumentData[] | undefined
+	collectionDataSnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined
 	collectionDataLoading: boolean
 	collectionDataError: FirestoreError | undefined
-	collectionDataSnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined
 }
 
 const TeamsContext = createContext<AuthProps>({} as AuthProps)
 
 const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [
-		collectionDataValue,
+		collectionDataSnapshot,
 		collectionDataLoading,
 		collectionDataError,
-		collectionDataSnapshot,
-	] = useCollectionData(teamsColRef())
+	] = useCollection(teamsColRef())
 
 	return (
 		<TeamsContext.Provider
 			value={{
-				collectionDataValue: collectionDataValue,
+				collectionDataSnapshot: collectionDataSnapshot,
 				collectionDataLoading: collectionDataLoading,
 				collectionDataError: collectionDataError,
-				collectionDataSnapshot: collectionDataSnapshot,
 			}}
 		>
 			{children}
