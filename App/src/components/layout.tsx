@@ -27,9 +27,12 @@ export const Layout = () => {
 						{debugOpen ? 'Hide Context' : 'Show Context'}
 					</Button>
 					{debugOpen && (
-						<textarea rows={25} cols={100}>
-							{JSON.stringify(authContext, null, 2)}
-						</textarea>
+						<textarea
+							readOnly
+							rows={25}
+							cols={100}
+							value={JSON.stringify(authContext, null, 2)}
+						/>
 					)}
 				</>
 			)}
