@@ -16,15 +16,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from './ui/use-toast'
 import { stripeRegistration, updatePlayerDoc } from '@/firebase/firestore'
-import {
-	Table,
-	TableCaption,
-	TableHeader,
-	TableRow,
-	TableHead,
-	TableBody,
-	TableCell,
-} from './ui/table'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -187,40 +178,7 @@ export const Profile = () => {
 					<Button type="submit">Update profile</Button>
 				</form>
 			</Form>
-			<div className="flex flex-wrap max-w-full ring">
-				{/* {JSON.stringify(offers)} */}
-			</div>
 
-			<Table>
-				<TableCaption>Offers</TableCaption>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Creator</TableHead>
-						<TableHead>Status</TableHead>
-						<TableHead>Player</TableHead>
-						<TableHead>Team</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{/* {offers.length > 0 ? (
-						offers.map(
-							({ offer: { creator, status }, player, team }, index) => {
-								// const playerData = userDocRef(player.id)
-								return (
-									<TableRow key={index}>
-										<TableCell>{creator}</TableCell>
-										<TableCell>{status}</TableCell>
-										<TableCell>{player?.email}</TableCell>
-										<TableCell>{team?.name}</TableCell>
-									</TableRow>
-								)
-							}
-						)
-					) : (
-						<TableCell>No Data</TableCell>
-					)} */}
-				</TableBody>
-			</Table>
 			<Button onClick={registrationButtonOnClickHandler}>Register</Button>
 			<Button onClick={sendEmailVerificationButtonOnClickHandler}>
 				Send Verification Email

@@ -2,7 +2,7 @@
 import { PropsWithChildren, createContext, useContext } from 'react'
 
 // Firebase Hooks
-import { useCollectionData } from 'react-firebase-hooks/firestore'
+import { useCollection } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import {
@@ -15,13 +15,11 @@ import {
 import { AuthContext } from '@/firebase/auth-context'
 
 interface AuthProps {
-	outgoingOffersCollectionDataValue: DocumentData[] | undefined
 	outgoingOffersCollectionDataLoading: boolean
 	outgoingOffersCollectionDataError: FirestoreError | undefined
 	outgoingOffersCollectionDataSnapshot:
 		| QuerySnapshot<DocumentData, DocumentData>
 		| undefined
-	incomingOffersCollectionDataValue: DocumentData[] | undefined
 	incomingOffersCollectionDataLoading: boolean
 	incomingOffersCollectionDataError: FirestoreError | undefined
 	incomingOffersCollectionDataSnapshot:
@@ -35,29 +33,25 @@ const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const { documentDataSnapshot } = useContext(AuthContext)
 
 	const [
-		outgoingOffersCollectionDataValue,
+		outgoingOffersCollectionDataSnapshot,
 		outgoingOffersCollectionDataLoading,
 		outgoingOffersCollectionDataError,
-		outgoingOffersCollectionDataSnapshot,
-	] = useCollectionData(outgoingOffersColRef(documentDataSnapshot))
+	] = useCollection(outgoingOffersColRef(documentDataSnapshot))
 
 	const [
-		incomingOffersCollectionDataValue,
+		incomingOffersCollectionDataSnapshot,
 		incomingOffersCollectionDataLoading,
 		incomingOffersCollectionDataError,
-		incomingOffersCollectionDataSnapshot,
-	] = useCollectionData(incomingOffersColRef(documentDataSnapshot))
+	] = useCollection(incomingOffersColRef(documentDataSnapshot))
 
 	return (
 		<OffersContext.Provider
 			value={{
-				outgoingOffersCollectionDataValue: outgoingOffersCollectionDataValue,
 				outgoingOffersCollectionDataLoading:
 					outgoingOffersCollectionDataLoading,
 				outgoingOffersCollectionDataError: outgoingOffersCollectionDataError,
 				outgoingOffersCollectionDataSnapshot:
 					outgoingOffersCollectionDataSnapshot,
-				incomingOffersCollectionDataValue: incomingOffersCollectionDataValue,
 				incomingOffersCollectionDataLoading:
 					incomingOffersCollectionDataLoading,
 				incomingOffersCollectionDataError: incomingOffersCollectionDataError,

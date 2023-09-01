@@ -12,9 +12,9 @@ const LoadingState = () => {
 			{[1, 2, 3, 4].map((placeholder) => (
 				<div
 					key={placeholder}
-					className="ring animate-pulse relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center"
+					className="animate-pulse relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center"
 				>
-					<div className="bg-gray-200 h-[200px] w-[100%] sm:w-[275px] max-w-[180px] sm:max-w-[275px]"></div>
+					<div className="bg-gray-100 h-[200px] w-[100%] sm:w-[275px] max-w-[180px] sm:max-w-[275px]"></div>
 				</div>
 			))}
 		</div>

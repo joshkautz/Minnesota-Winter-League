@@ -89,7 +89,9 @@ export const TopNav = ({
 										<Separator />
 										<Link to={'/profile'}>Update Profile</Link>
 										<Link to={'#'}>View Roster</Link>
-										<Link to={'#'}>Invite Players</Link>
+										<Link onClick={() => setOpen(!open)} to={'/invites'}>
+											View Notifications
+										</Link>
 										<Separator />
 										<Link to={'#'}>GitHub</Link>
 										<Link to={'#'}>Support</Link>

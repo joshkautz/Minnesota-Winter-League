@@ -3,6 +3,7 @@ import {
 	doc,
 	query,
 	where,
+	getDoc,
 	getFirestore,
 	DocumentData,
 	FirestoreError,
@@ -62,6 +63,12 @@ const requestToJoinTeam = async (
 		team: teamRef,
 		status: 'pending',
 	})
+}
+
+const getPlayerData = async (
+	playerDocRef: DocumentReference
+): Promise<DocumentSnapshot<DocumentData, DocumentData>> => {
+	return await getDoc(playerDocRef)
 }
 
 const playerDocRef = (
@@ -157,6 +164,7 @@ const stripeRegistration = async (
 }
 
 export {
+	getPlayerData,
 	requestToJoinTeam,
 	invitePlayerToJoinTeam,
 	teamsColRef,
@@ -164,10 +172,10 @@ export {
 	incomingOffersColRef,
 	playerDocRef,
 	updatePlayerDoc,
+	stripeRegistration,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,
 	type QuerySnapshot,
 	type DocumentReference,
-	stripeRegistration,
 }

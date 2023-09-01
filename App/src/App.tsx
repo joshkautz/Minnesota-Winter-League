@@ -8,6 +8,7 @@ import { Teams } from '@/components/teams'
 import { ProtectedRoute } from '@/components/protected-route'
 import { Profile } from '@/components/profile'
 import { TeamProfile } from './components/team-profile'
+import { ManageOffers } from './components/manage-offers'
 
 function App() {
 	return (
@@ -23,6 +24,14 @@ function App() {
 					element={
 						<ProtectedRoute>
 							<Profile />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path={'/invites'}
+					element={
+						<ProtectedRoute>
+							<ManageOffers />
 						</ProtectedRoute>
 					}
 				/>
