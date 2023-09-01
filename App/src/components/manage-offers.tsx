@@ -4,7 +4,6 @@ import { DocumentData } from '@/firebase/firestore'
 import { Button } from './ui/button'
 
 const Notification = ({ item }: { item: DocumentData }) => {
-	console.log(item)
 	return (
 		<div className={'ring flex flex-row flex-wrap justify-center gap-8'}>
 			<div className="ring max-w-[600px] flex-1 basis-80">Players</div>
