@@ -53,10 +53,8 @@ const Notification = ({ item }: { item: DocumentData }) => {
 
 export const ManageOffers = () => {
 	const {
-		incomingOffersCollectionDataSnapshot: invitations,
 		outgoingOffersCollectionDataLoading,
 		incomingOffersCollectionDataLoading,
-		outgoingOffersCollectionDataSnapshot: requests,
 	} = useContext(OffersContext)
 	const isLoading =
 		incomingOffersCollectionDataLoading || outgoingOffersCollectionDataLoading
@@ -70,27 +68,6 @@ export const ManageOffers = () => {
 			>
 				Manage Invites
 			</div>
-			<div className={'ring flex flex-row flex-wrap justify-center gap-8'}>
-				<div className="ring max-w-[600px] flex-1 basis-80">Players</div>
-				<div className="ring max-w-[600px] flex-1 basis-80">
-					<div>
-						{isLoading ? (
-							<div>Loading Data</div>
-						) : (
-							<>
-								{/* {invitations &&
-									invitations.docs.map((item, index) => {
-										return <Notification key={index} item={item.data()} />
-									})}
-								{requests &&
-									requests.docs.map((item, index) => {
-										return <Notification key={index} item={item.data()} />
-									})} */}
-							</>
-						)}
-					</div>
-				</div>
-			</div>
-		</div>
+    </div>
 	)
 }
