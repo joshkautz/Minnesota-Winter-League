@@ -15,16 +15,16 @@ import {
 import { AuthContext } from '@/firebase/auth-context'
 
 interface AuthProps {
+	outgoingOffersCollectionDataSnapshot:
+		| QuerySnapshot<DocumentData, DocumentData>
+		| undefined
 	outgoingOffersCollectionDataLoading: boolean
 	outgoingOffersCollectionDataError: FirestoreError | undefined
-	outgoingOffersCollectionDataSnapshot:
+	incomingOffersCollectionDataSnapshot:
 		| QuerySnapshot<DocumentData, DocumentData>
 		| undefined
 	incomingOffersCollectionDataLoading: boolean
 	incomingOffersCollectionDataError: FirestoreError | undefined
-	incomingOffersCollectionDataSnapshot:
-		| QuerySnapshot<DocumentData, DocumentData>
-		| undefined
 }
 
 const OffersContext = createContext<AuthProps>({} as AuthProps)
@@ -47,16 +47,16 @@ const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	return (
 		<OffersContext.Provider
 			value={{
+				outgoingOffersCollectionDataSnapshot:
+					outgoingOffersCollectionDataSnapshot,
 				outgoingOffersCollectionDataLoading:
 					outgoingOffersCollectionDataLoading,
 				outgoingOffersCollectionDataError: outgoingOffersCollectionDataError,
-				outgoingOffersCollectionDataSnapshot:
-					outgoingOffersCollectionDataSnapshot,
+				incomingOffersCollectionDataSnapshot:
+					incomingOffersCollectionDataSnapshot,
 				incomingOffersCollectionDataLoading:
 					incomingOffersCollectionDataLoading,
 				incomingOffersCollectionDataError: incomingOffersCollectionDataError,
-				incomingOffersCollectionDataSnapshot:
-					incomingOffersCollectionDataSnapshot,
 			}}
 		>
 			{children}
