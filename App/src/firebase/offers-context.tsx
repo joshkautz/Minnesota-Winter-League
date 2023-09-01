@@ -20,8 +20,7 @@ interface AuthProps {
 		| undefined
 	outgoingOffersCollectionDataLoading: boolean
 	outgoingOffersCollectionDataError: FirestoreError | undefined
-
-	incomingOffersCollectionDataSnapshot:
+  incomingOffersCollectionDataSnapshot:
 		| QuerySnapshot<DocumentData, DocumentData>
 		| undefined
 	incomingOffersCollectionDataLoading: boolean
@@ -48,14 +47,15 @@ const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	return (
 		<OffersContext.Provider
 			value={{
-				outgoingOffersCollectionDataSnapshot:
+
+        outgoingOffersCollectionDataSnapshot:
 					outgoingOffersCollectionDataSnapshot,
 				outgoingOffersCollectionDataLoading:
 					outgoingOffersCollectionDataLoading,
 				outgoingOffersCollectionDataError: outgoingOffersCollectionDataError,
 				incomingOffersCollectionDataSnapshot:
 					incomingOffersCollectionDataSnapshot,
-				incomingOffersCollectionDataLoading:
+        incomingOffersCollectionDataLoading:
 					incomingOffersCollectionDataLoading,
 				incomingOffersCollectionDataError: incomingOffersCollectionDataError,
 			}}

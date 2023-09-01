@@ -84,10 +84,10 @@ export const Profile = () => {
 	}
 
 	return (
-		<>
+		<div className={'container'}>
 			<div
 				className={
-					'my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'
+					'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500'
 				}
 			>
 				{authStateUser?.displayName
@@ -178,6 +178,7 @@ export const Profile = () => {
 					<Button type="submit">Update profile</Button>
 				</form>
 			</Form>
+
 			<Button onClick={registrationButtonOnClickHandler}>Register</Button>
 			<Button onClick={sendEmailVerificationButtonOnClickHandler}>
 				Send Verification Email
@@ -185,6 +186,6 @@ export const Profile = () => {
 			<Button onClick={sendPasswordResetEmailButtonOnClickHandler}>
 				Send Password Reset Email
 			</Button>
-		</>
+		</div>
 	)
 }

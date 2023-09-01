@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 				<BrowserRouter>
 					<App />
 					<Toaster />
-				</BrowserRouter>{' '}
+				</BrowserRouter>
 			</OffersContextProvider>
 		</TeamsContextProvider>
 	</AuthContextProvider>

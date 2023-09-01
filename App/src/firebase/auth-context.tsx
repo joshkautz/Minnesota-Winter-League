@@ -28,15 +28,6 @@ import {
 	DocumentSnapshot,
 } from '@/firebase/firestore'
 
-// interface PlayerDocumentData {
-// 	captain: boolean
-// 	email: string
-// 	firstname: string
-// 	lastname: string
-// 	registered: boolean
-// 	team: DocumentReference
-// }
-
 interface AuthProps {
 	authStateUser: User | null | undefined
 	authStateLoading: boolean

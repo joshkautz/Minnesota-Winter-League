@@ -178,6 +178,7 @@ const stripeRegistration = async (
 export {
 	acceptOffer,
 	rejectOffer,
+	getPlayerData,
 	requestToJoinTeam,
 	invitePlayerToJoinTeam,
 	teamsColRef,
@@ -185,7 +186,6 @@ export {
 	incomingOffersColRef,
 	playerDocRef,
 	updatePlayerDoc,
-	getPlayerData,
 	stripeRegistration,
 	type DocumentData,
 	type FirestoreError,

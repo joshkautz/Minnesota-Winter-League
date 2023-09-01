@@ -59,10 +59,16 @@ export const UserAvatar = () => {
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<DropdownMenuItem>
-							<Link to={'/profile'}>Profile</Link>
-						</DropdownMenuItem>
-						<DropdownMenuItem>Team</DropdownMenuItem>
+						<Link to={'/profile'}>
+							<DropdownMenuItem className={'cursor-pointer'}>
+								Profile
+							</DropdownMenuItem>
+						</Link>
+						<Link to={'/invites'}>
+							<DropdownMenuItem className={'cursor-pointer'}>
+								View Notifications
+							</DropdownMenuItem>
+						</Link>
 						<DropdownMenuItem>Schedule</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
