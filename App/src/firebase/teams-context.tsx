@@ -21,11 +21,8 @@ interface AuthProps {
 const TeamsContext = createContext<AuthProps>({} as AuthProps)
 
 const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const [
-		collectionDataSnapshot,
-		collectionDataLoading,
-		collectionDataError,
-	] = useCollection(teamsColRef())
+	const [collectionDataSnapshot, collectionDataLoading, collectionDataError] =
+		useCollection(teamsColRef())
 
 	return (
 		<TeamsContext.Provider
