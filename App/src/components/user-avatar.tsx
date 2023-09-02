@@ -19,9 +19,15 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Link } from 'react-router-dom'
+import { OffersContext } from '@/firebase/offers-context'
 
 export const UserAvatar = () => {
 	const { authStateUser, authStateLoading, signOut } = useContext(AuthContext)
+	const { incomingOffersCollectionDataSnapshot } = useContext(OffersContext)
+
+	const hasPendingOffers = incomingOffersCollectionDataSnapshot?.docs.filter(
+		(entry) => entry.data().status === 'pending'
+	).length
 
 	if (authStateLoading) {
 		return <ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
@@ -44,7 +50,14 @@ export const UserAvatar = () => {
 		return (
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Avatar className={'cursor-pointer'}>
+					<Avatar className={'cursor-pointer overflow-visible'}>
+						{hasPendingOffers && (
+							<span
+								className={
+									'z-10 absolute top-0 right-0 w-2 h-2 translate-y-1 rounded-full bg-primary'
+								}
+							/>
+						)}
 						<AvatarImage
 							src={authStateUser.photoURL ?? undefined}
 							alt={'profile image'}
@@ -65,8 +78,15 @@ export const UserAvatar = () => {
 							</DropdownMenuItem>
 						</Link>
 						<Link to={'/invites'}>
-							<DropdownMenuItem className={'cursor-pointer'}>
-								View Notifications
+							<DropdownMenuItem className={'cursor-pointer gap-1'}>
+								View Notifications{' '}
+								{hasPendingOffers && (
+									<span
+										className={
+											'self-start w-2 h-2 translate-y-1 rounded-full bg-primary'
+										}
+									/>
+								)}
 							</DropdownMenuItem>
 						</Link>
 						<DropdownMenuItem>Schedule</DropdownMenuItem>
