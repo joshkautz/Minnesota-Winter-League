@@ -179,13 +179,14 @@ export const ManageOffers = () => {
 					title={'Pending requests'}
 					description={getOfferMessage(incomingPending, 'incoming')}
 				>
-					{incomingOffers?.map((incomingOffer: DocumentData) => {
+					{incomingOffers?.map((incomingOffer: DocumentData, index) => {
 						const statusColor =
 							incomingOffer.status === 'pending'
 								? 'bg-primary'
 								: 'bg-muted-foreground'
 						return (
 							<NotificationCardItem
+								key={`incomingOffer-row-${index}`}
 								offer={incomingOffer}
 								statusColor={statusColor}
 								message={'would like to join'}
@@ -199,8 +200,9 @@ export const ManageOffers = () => {
 					title={'Sent invites'}
 					description={getOfferMessage(outgoingPending, 'outgoing')}
 				>
-					{outgoingOffers?.map((outgoingOffer: DocumentData) => (
+					{outgoingOffers?.map((outgoingOffer: DocumentData, index) => (
 						<NotificationCardItem
+							key={`outgoingOffer-row-${index}`}
 							offer={outgoingOffer}
 							statusColor={'bg-transparent'}
 							message={'invite sent for'}
