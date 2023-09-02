@@ -1,22 +1,55 @@
-import { useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 import { OffersContext } from '@/firebase/offers-context'
-import { DocumentData } from '@/firebase/firestore'
+import {
+	DocumentData,
+	DocumentReference,
+	acceptOffer,
+	rejectOffer,
+} from '@/firebase/firestore'
 import { Button } from './ui/button'
 import { cn } from '@/lib/utils'
+import { toast } from './ui/use-toast'
+import { TeamsContext } from '@/firebase/teams-context'
+import { useOfferData } from '@/lib/use-offer-data'
+import {
+	Card,
+	CardHeader,
+	CardTitle,
+	CardDescription,
+	CardContent,
+} from './ui/card'
 
-const IncomingRequest = ({
-	item,
-	handleAccept,
-	handleReject,
+const NotificationCard = ({
+	title,
+	description,
+	children,
 }: {
-	item: DocumentData
-	handleAccept: (arg: DocumentData) => void
-	handleReject: (arg: DocumentData) => void
+	title: string
+	description?: string
+	children: ReactNode
 }) => {
-	const statusColor =
-		item.status === 'pending' ? 'bg-primary' : 'bg-transparent'
+	return (
+		<Card className=" max-w-[600px] flex-1 basis-80">
+			<CardHeader>
+				<CardTitle>{title}</CardTitle>
+				{description && <CardDescription>{description}</CardDescription>}
+			</CardHeader>
+			<CardContent>{children}</CardContent>
+		</Card>
+	)
+}
 
-const Notification = ({ item }: { item: DocumentData }) => {
+const NotificationCardItem = ({
+	offer,
+	statusColor,
+	message,
+	actionOptions,
+}: {
+	offer: DocumentData
+	statusColor: string
+	message: string
+	actionOptions: { title: string; action: (arg: DocumentReference) => void }[]
+}) => {
 	return (
 		<div className="flex items-end gap-2 py-2">
 			<span
@@ -26,26 +59,24 @@ const Notification = ({ item }: { item: DocumentData }) => {
 				)}
 			/>
 			<div className="mr-2">
-				<p>{item.playerName}</p>
+				<p>{offer.playerName}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-					requested to join {item.teamName}
+					{message} {offer.teamName}
 				</p>
 			</div>
 			<div className="flex justify-end flex-1 gap-2">
-				<Button
-					size={'sm'}
-					variant={'outline'}
-					onClick={() => handleAccept(item)}
-				>
-					Accept
-				</Button>
-				<Button
-					size={'sm'}
-					variant={'outline'}
-					onClick={() => handleReject(item)}
-				>
-					Reject
-				</Button>
+				{actionOptions.map(({ title, action }, index) => (
+					<Button
+						key={`action-${index}-${title}`}
+						size={'sm'}
+						variant={'outline'}
+						onClick={() => {
+							action(offer.player.id)
+						}}
+					>
+						{title}
+					</Button>
+				))}
 			</div>
 		</div>
 	)
@@ -53,11 +84,82 @@ const Notification = ({ item }: { item: DocumentData }) => {
 
 export const ManageOffers = () => {
 	const {
-		outgoingOffersCollectionDataLoading,
-		incomingOffersCollectionDataLoading,
+		outgoingOffersCollectionDataSnapshot,
+		incomingOffersCollectionDataSnapshot,
 	} = useContext(OffersContext)
-	const isLoading =
-		incomingOffersCollectionDataLoading || outgoingOffersCollectionDataLoading
+	const { collectionDataSnapshot } = useContext(TeamsContext)
+
+	const { offerData: outgoingOffers } = useOfferData(
+		outgoingOffersCollectionDataSnapshot,
+		collectionDataSnapshot
+	)
+	const { offerData: incomingOffers } = useOfferData(
+		incomingOffersCollectionDataSnapshot,
+		collectionDataSnapshot
+	)
+
+	const getOfferMessage = (
+		num: number | undefined,
+		type: 'incoming' | 'outgoing'
+	) => {
+		const term = type === 'incoming' ? 'request' : 'invite'
+		if (!num || num === 0) {
+			return `no ${term}s pending at this time.`
+		}
+		if (num === 1) {
+			return `you have one pending ${term}.`
+		}
+		return `you have ${num} pending ${term}s.`
+	}
+
+	// The toasts need some attention and im not getting the ref quite right yet
+	const handleCancel = (ref: DocumentReference) => {
+		rejectOffer(ref)
+			.then(() => {
+				toast({
+					title: 'Invite Rejected',
+					description: 'success',
+					variant: 'default',
+				})
+			})
+			.catch(() => {
+				toast({
+					title: 'Unable to reject invite',
+					description: 'failure',
+					variant: 'destructive',
+				})
+			})
+	}
+	// The toasts need some attention and im not getting the ref quite right yet
+	const handleAccept = (ref: DocumentReference) => {
+		acceptOffer(ref)
+			.then(() => {
+				toast({
+					title: 'Invite accepted',
+					description: 'success',
+					variant: 'default',
+				})
+			})
+			.catch(() => {
+				toast({
+					title: 'Unable to accept invite',
+					description: 'failure',
+					variant: 'destructive',
+				})
+			})
+	}
+
+	const outgoingPending = outgoingOffers?.filter(
+		(offer) => offer.status === 'pending'
+	).length
+	const incomingPending = incomingOffers?.filter(
+		(offer) => offer.status === 'pending'
+	).length
+	const outgoingActions = [{ title: 'Cancel', action: handleCancel }]
+	const incomingActions = [
+		{ title: 'Accept', action: handleAccept },
+		{ title: 'Reject', action: handleCancel },
+	]
 
 	return (
 		<div className={'container'}>
@@ -68,6 +170,45 @@ export const ManageOffers = () => {
 			>
 				Manage Invites
 			</div>
-    </div>
+			{/* I think eventually left panel will be list of teams (if player) and list of unrostered players (if captain) */}
+			{/* and will stack the different types of invites on the right */}
+			{/* For now though, just incoming and ougoing :) */}
+			<div className={'flex flex-row flex-wrap justify-center gap-8'}>
+				{/* INCOMING */}
+				<NotificationCard
+					title={'Pending requests'}
+					description={getOfferMessage(incomingPending, 'incoming')}
+				>
+					{incomingOffers?.map((incomingOffer: DocumentData) => {
+						const statusColor =
+							incomingOffer.status === 'pending'
+								? 'bg-primary'
+								: 'bg-muted-foreground'
+						return (
+							<NotificationCardItem
+								offer={incomingOffer}
+								statusColor={statusColor}
+								message={'would like to join'}
+								actionOptions={incomingActions}
+							/>
+						)
+					})}
+				</NotificationCard>
+				{/* OUTGOING */}
+				<NotificationCard
+					title={'Sent invites'}
+					description={getOfferMessage(outgoingPending, 'outgoing')}
+				>
+					{outgoingOffers?.map((outgoingOffer: DocumentData) => (
+						<NotificationCardItem
+							offer={outgoingOffer}
+							statusColor={'bg-transparent'}
+							message={'invite sent for'}
+							actionOptions={outgoingActions}
+						/>
+					))}
+				</NotificationCard>
+			</div>
+		</div>
 	)
 }
