@@ -70,6 +70,9 @@ const NotificationCardItem = ({
 						key={`action-${index}-${title}`}
 						size={'sm'}
 						variant={'outline'}
+						//
+						// I know this is not right, I do not know where the ref is rn
+						//
 						onClick={() => {
 							action(offer.player.id)
 						}}
@@ -171,8 +174,7 @@ export const ManageOffers = () => {
 				Manage Invites
 			</div>
 			{/* I think eventually left panel will be list of teams (if player) and list of unrostered players (if captain) */}
-			{/* and will stack the different types of invites on the right */}
-			{/* For now though, just incoming and ougoing :) */}
+			{/* eventually will stack the different types of invites on the right */}
 			<div className={'flex flex-row flex-wrap justify-center gap-8'}>
 				{/* INCOMING */}
 				<NotificationCard
