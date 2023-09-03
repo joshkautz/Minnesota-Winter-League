@@ -7,23 +7,24 @@ export interface OfferType {
 	player: DocumentReference
 	team: DocumentReference
 	status: 'pending' | 'accepted' | 'rejected'
-	playerName: DocumentData
-	teamName: DocumentData
+	playerName: string
+	teamName: string
+	ref: DocumentReference
 }
 
 type SnapshotType = QuerySnapshot<DocumentData, DocumentData> | undefined
 
-export const useOfferData = (
+export const useOffer = (
 	offerSnapshot: SnapshotType,
 	teamSnapshot: SnapshotType
 ) => {
-	const [offerData, setOfferData] = useState<OfferType[] | undefined>()
+	const [offer, setOffer] = useState<OfferType[] | undefined>()
 
 	useEffect(() => {
 		const updateOffers = async () => {
 			if (offerSnapshot) {
 				const updatedOffers: OfferType[] = await Promise.all(
-					offerSnapshot.docs.map(async (offer: DocumentData) => {
+					offerSnapshot.docs.map(async (offer: DocumentData, index: number) => {
 						const playerSnapshot = await getPlayerData(offer.data().player)
 						const result: OfferType = {
 							...offer.data(),
@@ -32,17 +33,18 @@ export const useOfferData = (
 							teamName: teamSnapshot?.docs
 								.find((team) => team.id == offer.data().team.id)
 								?.data().name,
+							ref: offerSnapshot.docs[index].ref,
 						}
 						return result
 					})
 				)
 
-				setOfferData(updatedOffers)
+				setOffer(updatedOffers)
 			}
 		}
 
 		updateOffers()
 	}, [offerSnapshot, teamSnapshot])
 
-	return { offerData }
+	return { offer: offer }
 }

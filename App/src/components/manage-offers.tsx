@@ -1,7 +1,6 @@
 import { ReactNode, useContext } from 'react'
 import { OffersContext } from '@/firebase/offers-context'
 import {
-	DocumentData,
 	DocumentReference,
 	acceptOffer,
 	rejectOffer,
@@ -10,7 +9,7 @@ import { Button } from './ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from './ui/use-toast'
 import { TeamsContext } from '@/firebase/teams-context'
-import { useOfferData } from '@/lib/use-offer-data'
+import { OfferType, useOffer } from '@/lib/use-offer'
 import {
 	Card,
 	CardHeader,
@@ -45,7 +44,7 @@ const NotificationCardItem = ({
 	message,
 	actionOptions,
 }: {
-	offer: DocumentData
+	offer: OfferType
 	statusColor: string
 	message: string
 	actionOptions: { title: string; action: (arg: DocumentReference) => void }[]
@@ -74,7 +73,7 @@ const NotificationCardItem = ({
 						// I know this is not right, I do not know where the ref is rn
 						//
 						onClick={() => {
-							action(offer.player.id)
+							action(offer.ref)
 						}}
 					>
 						{title}
@@ -92,11 +91,11 @@ export const ManageOffers = () => {
 	} = useContext(OffersContext)
 	const { collectionDataSnapshot } = useContext(TeamsContext)
 
-	const { offerData: outgoingOffers } = useOfferData(
+	const { offer: outgoingOffers } = useOffer(
 		outgoingOffersCollectionDataSnapshot,
 		collectionDataSnapshot
 	)
-	const { offerData: incomingOffers } = useOfferData(
+	const { offer: incomingOffers } = useOffer(
 		incomingOffersCollectionDataSnapshot,
 		collectionDataSnapshot
 	)
@@ -181,7 +180,7 @@ export const ManageOffers = () => {
 					title={'Pending requests'}
 					description={getOfferMessage(incomingPending, 'incoming')}
 				>
-					{incomingOffers?.map((incomingOffer: DocumentData, index) => {
+					{incomingOffers?.map((incomingOffer: OfferType, index) => {
 						const statusColor =
 							incomingOffer.status === 'pending'
 								? 'bg-primary'
@@ -202,7 +201,7 @@ export const ManageOffers = () => {
 					title={'Sent invites'}
 					description={getOfferMessage(outgoingPending, 'outgoing')}
 				>
-					{outgoingOffers?.map((outgoingOffer: DocumentData, index) => (
+					{outgoingOffers?.map((outgoingOffer: OfferType, index) => (
 						<NotificationCardItem
 							key={`outgoingOffer-row-${index}`}
 							offer={outgoingOffer}
