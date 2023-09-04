@@ -4,6 +4,7 @@ import {
 	query,
 	where,
 	getDoc,
+	getDocs,
 	getFirestore,
 	DocumentData,
 	FirestoreError,
@@ -175,6 +176,22 @@ const stripeRegistration = async (
 	})
 }
 
+const unrosteredPlayerList = async () => {
+	const q = query(collection(firestore, 'players'), where('team', '==', null))
+	const unrosteredPlayersSnapshot = await getDocs(q)
+
+	const mappedData = unrosteredPlayersSnapshot.docs.map(
+		(unrosteredPlayer, index) => {
+			return {
+				...unrosteredPlayer.data(),
+				ref: unrosteredPlayersSnapshot.docs[index].ref,
+			}
+		}
+	)
+
+	return mappedData
+}
+
 export {
 	acceptOffer,
 	rejectOffer,
@@ -187,6 +204,7 @@ export {
 	playerDocRef,
 	updatePlayerDoc,
 	stripeRegistration,
+	unrosteredPlayerList,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,

@@ -51,10 +51,10 @@ export const UserAvatar = () => {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Avatar className={'cursor-pointer overflow-visible'}>
-						{hasPendingOffers && (
+						{!!hasPendingOffers && (
 							<span
 								className={
-									'z-10 absolute top-0 right-0 w-2 h-2 translate-y-1 rounded-full bg-primary'
+									'z-10 absolute bottom-0 right-0 w-2 h-2 translate-y-1 rounded-full bg-primary'
 								}
 							/>
 						)}
@@ -80,7 +80,7 @@ export const UserAvatar = () => {
 						<Link to={'/invites'}>
 							<DropdownMenuItem className={'cursor-pointer gap-1'}>
 								View Notifications{' '}
-								{hasPendingOffers && (
+								{!!hasPendingOffers && (
 									<span
 										className={
 											'self-start w-2 h-2 translate-y-1 rounded-full bg-primary'
