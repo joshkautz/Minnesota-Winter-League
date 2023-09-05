@@ -4,7 +4,6 @@ import {
 	query,
 	where,
 	getDoc,
-	getDocs,
 	getFirestore,
 	DocumentData,
 	FirestoreError,
@@ -103,6 +102,10 @@ const teamsColRef = (): CollectionReference<DocumentData, DocumentData> => {
 	return collection(firestore, 'teams')
 }
 
+const unrosteredPlayersColRef = (): Query<DocumentData, DocumentData> => {
+	return query(collection(firestore, 'players'), where('team', '==', null))
+}
+
 const outgoingOffersColRef = (
 	documentDataSnapshot: DocumentSnapshot<DocumentData, DocumentData> | undefined
 ): Query<DocumentData, DocumentData> | undefined => {
@@ -176,22 +179,6 @@ const stripeRegistration = async (
 	})
 }
 
-const unrosteredPlayerList = async () => {
-	const q = query(collection(firestore, 'players'), where('team', '==', null))
-	const unrosteredPlayersSnapshot = await getDocs(q)
-
-	const mappedData = unrosteredPlayersSnapshot.docs.map(
-		(unrosteredPlayer, index) => {
-			return {
-				...unrosteredPlayer.data(),
-				ref: unrosteredPlayersSnapshot.docs[index].ref,
-			}
-		}
-	)
-
-	return mappedData
-}
-
 export {
 	acceptOffer,
 	rejectOffer,
@@ -204,7 +191,7 @@ export {
 	playerDocRef,
 	updatePlayerDoc,
 	stripeRegistration,
-	unrosteredPlayerList,
+	unrosteredPlayersColRef,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,

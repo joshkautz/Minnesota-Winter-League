@@ -4,10 +4,10 @@ import {
 	DocumentReference,
 	acceptOffer,
 	rejectOffer,
-	unrosteredPlayerList,
 	DocumentData,
 	invitePlayerToJoinTeam,
 	getPlayerData,
+	unrosteredPlayersColRef,
 } from '@/firebase/firestore'
 import { Button } from './ui/button'
 import { cn } from '@/lib/utils'
@@ -35,6 +35,7 @@ import {
 import { ScrollArea } from './ui/scroll-area'
 import { Skeleton } from './ui/skeleton'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
+import { useCollection } from 'react-firebase-hooks/firestore'
 
 // This file is really long and will need to be cleaned up later.
 // For now the "/invites" route will render different display panels based on Captain & team status
@@ -91,11 +92,13 @@ const NotificationCardItem = ({
 				/>
 			)}
 			<div className="mr-2">
-				<p>{isOfferType ? data.playerName : data.lastname}</p>
+				<p>
+					{isOfferType ? data.playerName : `${data.firstname} ${data.lastname}`}
+				</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
 					{isOfferType
 						? `${message} ${data.teamName}`
-						: `${data.firstname} would like to join your team.`}
+						: `is looking for a team.`}
 				</p>
 			</div>
 			<div className="flex justify-end flex-1 gap-2">
@@ -217,7 +220,7 @@ export const ManageOffers = () => {
 	const { collectionDataSnapshot } = useContext(TeamsContext)
 	const { documentDataSnapshot } = useContext(AuthContext)
 	const isCaptain = documentDataSnapshot?.data()?.captain
-	const isUnrostered = !isCaptain && documentDataSnapshot?.data()?.team === null
+	const isUnrostered = documentDataSnapshot?.data()?.team === null
 
 	const { offer: outgoingOffers } = useOffer(
 		outgoingOffersCollectionDataSnapshot,
@@ -310,20 +313,11 @@ export const ManageOffers = () => {
 	]
 	const unrosteredActions = [{ title: 'Invite', action: handleInvite }]
 
-	const [unrosteredPlayers, setUnrosteredPlayers] = useState<DocumentData[]>([])
-
-	useEffect(() => {
-		const fetchUnrosteredPlayers = async () => {
-			try {
-				const unrosteredPlayers = await unrosteredPlayerList()
-				setUnrosteredPlayers(unrosteredPlayers)
-			} catch (error) {
-				console.error('Error fetching unrostered players:', error)
-			}
-		}
-
-		fetchUnrosteredPlayers()
-	}, [])
+	const [
+		unrosteredPlayersCollectionSnapshot,
+		// unrosteredPlayersCollectionLoading,
+		// unrosteredPlayersCollectionError,
+	] = useCollection(isCaptain ? unrosteredPlayersColRef() : undefined)
 
 	const teamSnapshot = collectionDataSnapshot?.docs.find(
 		(team) => team.id === documentDataSnapshot?.data()?.team.id
@@ -371,14 +365,16 @@ export const ManageOffers = () => {
 							description={'players elligible for team roster invitations.'}
 							scrollArea
 						>
-							{unrosteredPlayers &&
-								unrosteredPlayers.map((freeAgent, index) => (
-									<NotificationCardItem
-										key={`freeAgent-row-${index}`}
-										data={freeAgent}
-										actionOptions={unrosteredActions}
-									/>
-								))}
+							{unrosteredPlayersCollectionSnapshot &&
+								unrosteredPlayersCollectionSnapshot.docs.map(
+									(documentSnapshot, index) => (
+										<NotificationCardItem
+											key={`freeAgent-row-${index}`}
+											data={documentSnapshot.data()}
+											actionOptions={unrosteredActions}
+										/>
+									)
+								)}
 						</NotificationCard>
 					)}
 				</div>
