@@ -33,7 +33,7 @@ await firestore.collection('players').doc(playerID).update({
 	team: null,
 })
 
-await new Promise((r) => setTimeout(r, 1000))
+await new Promise((r) => setTimeout(r, 500))
 
 /////////////////////////////// Update Team ///////////////////////////////
 
@@ -45,7 +45,7 @@ await firestore
 		roster: FieldValue.arrayRemove(playerReference),
 	})
 
-await new Promise((r) => setTimeout(r, 1000))
+await new Promise((r) => setTimeout(r, 500))
 
 /////////////////////////////// Create Offers ///////////////////////////////
 
@@ -85,7 +85,7 @@ for (let i = 0; i < 10; i++) {
 		status: 'pending',
 	})
 
-	await new Promise((r) => setTimeout(r, 1000))
+	await new Promise((r) => setTimeout(r, 500))
 }
 
 // Create Invitation offers.
@@ -99,5 +99,5 @@ for (let i = 0; i < 10; i++) {
 		status: 'pending',
 	})
 
-	await new Promise((r) => setTimeout(r, 1000))
+	await new Promise((r) => setTimeout(r, 500))
 }

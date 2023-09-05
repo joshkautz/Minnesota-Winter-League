@@ -41,7 +41,7 @@ for (let players = 0; players < 500; players++) {
         team: null,
     });
 
-    await new Promise((r) => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 500));
 } 
 
 /////////////////////////////// Create Teams ///////////////////////////////
@@ -109,7 +109,7 @@ for (let teams = 1; teams <= 12; teams++) {
         registered: false,
     });
   
-    await new Promise((r) => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 500));
   }
 
 /////////////////////////////// Update Players ///////////////////////////////
@@ -127,7 +127,7 @@ for (let i = 0; i < teams.length; i++) {
             captain: true,
         });
   
-        await new Promise((r) => setTimeout(r, 1000));
+        await new Promise((r) => setTimeout(r, 500));
     }
   
     // Update each player on the roster to have a team reference.
@@ -136,6 +136,6 @@ for (let i = 0; i < teams.length; i++) {
             team: teams[i].ref,
         });
   
-        await new Promise((r) => setTimeout(r, 1000));
+        await new Promise((r) => setTimeout(r, 500));
     }
 }
