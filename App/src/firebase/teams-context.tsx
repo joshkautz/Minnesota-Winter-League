@@ -13,23 +13,26 @@ import {
 } from '@/firebase/firestore'
 
 interface AuthProps {
-	collectionDataSnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined
-	collectionDataLoading: boolean
-	collectionDataError: FirestoreError | undefined
+	teamsQuerySnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined
+	teamsQuerySnapshotLoading: boolean
+	teamsQuerySnapshotError: FirestoreError | undefined
 }
 
 const TeamsContext = createContext<AuthProps>({} as AuthProps)
 
 const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const [collectionDataSnapshot, collectionDataLoading, collectionDataError] =
-		useCollection(teamsColRef())
+	const [
+		teamsQuerySnapshot,
+		teamsQuerySnapshotLoading,
+		teamsQuerySnapshotError,
+	] = useCollection(teamsColRef())
 
 	return (
 		<TeamsContext.Provider
 			value={{
-				collectionDataSnapshot: collectionDataSnapshot,
-				collectionDataLoading: collectionDataLoading,
-				collectionDataError: collectionDataError,
+				teamsQuerySnapshot: teamsQuerySnapshot,
+				teamsQuerySnapshotLoading: teamsQuerySnapshotLoading,
+				teamsQuerySnapshotError: teamsQuerySnapshotError,
 			}}
 		>
 			{children}

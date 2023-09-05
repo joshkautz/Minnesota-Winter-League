@@ -15,16 +15,16 @@ import {
 import { AuthContext } from '@/firebase/auth-context'
 
 interface AuthProps {
-	outgoingOffersCollectionDataSnapshot:
+	outgoingOffersQuerySnapshot:
 		| QuerySnapshot<DocumentData, DocumentData>
 		| undefined
-	outgoingOffersCollectionDataLoading: boolean
-	outgoingOffersCollectionDataError: FirestoreError | undefined
-	incomingOffersCollectionDataSnapshot:
+	outgoingOffersQuerySnapshotLoading: boolean
+	outgoingOffersQuerySnapshotError: FirestoreError | undefined
+	incomingOffersQuerySnapshot:
 		| QuerySnapshot<DocumentData, DocumentData>
 		| undefined
-	incomingOffersCollectionDataLoading: boolean
-	incomingOffersCollectionDataError: FirestoreError | undefined
+	incomingOffersQuerySnapshotLoading: boolean
+	incomingOffersQuerySnapshotError: FirestoreError | undefined
 }
 
 const OffersContext = createContext<AuthProps>({} as AuthProps)
@@ -33,30 +33,26 @@ const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const { documentDataSnapshot } = useContext(AuthContext)
 
 	const [
-		outgoingOffersCollectionDataSnapshot,
-		outgoingOffersCollectionDataLoading,
-		outgoingOffersCollectionDataError,
+		outgoingOffersQuerySnapshot,
+		outgoingOffersQuerySnapshotLoading,
+		outgoingOffersQuerySnapshotError,
 	] = useCollection(outgoingOffersColRef(documentDataSnapshot))
 
 	const [
-		incomingOffersCollectionDataSnapshot,
-		incomingOffersCollectionDataLoading,
-		incomingOffersCollectionDataError,
+		incomingOffersQuerySnapshot,
+		incomingOffersQuerySnapshotLoading,
+		incomingOffersQuerySnapshotError,
 	] = useCollection(incomingOffersColRef(documentDataSnapshot))
 
 	return (
 		<OffersContext.Provider
 			value={{
-				outgoingOffersCollectionDataSnapshot:
-					outgoingOffersCollectionDataSnapshot,
-				outgoingOffersCollectionDataLoading:
-					outgoingOffersCollectionDataLoading,
-				outgoingOffersCollectionDataError: outgoingOffersCollectionDataError,
-				incomingOffersCollectionDataSnapshot:
-					incomingOffersCollectionDataSnapshot,
-				incomingOffersCollectionDataLoading:
-					incomingOffersCollectionDataLoading,
-				incomingOffersCollectionDataError: incomingOffersCollectionDataError,
+				outgoingOffersQuerySnapshot: outgoingOffersQuerySnapshot,
+				outgoingOffersQuerySnapshotLoading: outgoingOffersQuerySnapshotLoading,
+				outgoingOffersQuerySnapshotError: outgoingOffersQuerySnapshotError,
+				incomingOffersQuerySnapshot: incomingOffersQuerySnapshot,
+				incomingOffersQuerySnapshotLoading: incomingOffersQuerySnapshotLoading,
+				incomingOffersQuerySnapshotError: incomingOffersQuerySnapshotError,
 			}}
 		>
 			{children}

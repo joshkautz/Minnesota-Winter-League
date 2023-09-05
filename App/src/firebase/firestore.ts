@@ -83,6 +83,34 @@ const getPlayerData = async (
 	return await getDoc(playerDocRef)
 }
 
+const getOffersForUnrosteredPlayer = (
+	playerDocRef: DocumentReference<DocumentData, DocumentData>,
+	teamDocRef: DocumentReference<DocumentData, DocumentData>
+): Query<DocumentData, DocumentData> => {
+	return query(
+		collection(firestore, 'offers'),
+		where('team', '==', teamDocRef),
+		where('player', '==', playerDocRef)
+	)
+}
+
+const getOffersListener = (
+	teamDocRef: DocumentReference<DocumentData, DocumentData>,
+	playerDocRef: DocumentReference<DocumentData, DocumentData>,
+	action: (arg: QuerySnapshot<DocumentData, DocumentData>) => void
+) => {
+	return onSnapshot(
+		query(
+			collection(firestore, 'offers'),
+			where('team', '==', teamDocRef),
+			where('player', '==', playerDocRef)
+		),
+		(querySnapshot) => {
+			action(querySnapshot)
+		}
+	)
+}
+
 const playerDocRef = (
 	authValue: User | null | undefined
 ): DocumentReference<DocumentData, DocumentData> | undefined => {
@@ -102,7 +130,18 @@ const teamsColRef = (): CollectionReference<DocumentData, DocumentData> => {
 	return collection(firestore, 'teams')
 }
 
-const unrosteredPlayersColRef = (): Query<DocumentData, DocumentData> => {
+const offersForUnrosteredPlayersQuery = (
+	teamDocRef: DocumentReference<DocumentData, DocumentData>,
+	playerDocRef: DocumentReference<DocumentData, DocumentData>
+): Query<DocumentData, DocumentData> => {
+	return query(
+		collection(firestore, 'offers'),
+		where('team', '==', teamDocRef),
+		where('player', '==', playerDocRef)
+	)
+}
+
+const unrosteredPlayersQuery = (): Query<DocumentData, DocumentData> => {
 	return query(collection(firestore, 'players'), where('team', '==', null))
 }
 
@@ -186,12 +225,15 @@ export {
 	requestToJoinTeam,
 	invitePlayerToJoinTeam,
 	teamsColRef,
-	outgoingOffersColRef,
+  outgoingOffersColRef,
+  offersForUnrosteredPlayersQuery,
 	incomingOffersColRef,
 	playerDocRef,
 	updatePlayerDoc,
+	getOffersListener,
 	stripeRegistration,
-	unrosteredPlayersColRef,
+	unrosteredPlayersQuery,
+	getOffersForUnrosteredPlayer,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,

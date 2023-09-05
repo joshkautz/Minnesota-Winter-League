@@ -7,7 +7,8 @@ import {
 	DocumentData,
 	invitePlayerToJoinTeam,
 	getPlayerData,
-	unrosteredPlayersColRef,
+	unrosteredPlayersQuery,
+	offersForUnrosteredPlayersQuery,
 } from '@/firebase/firestore'
 import { Button } from './ui/button'
 import { cn } from '@/lib/utils'
@@ -36,7 +37,10 @@ import { ScrollArea } from './ui/scroll-area'
 import { Skeleton } from './ui/skeleton'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 import { useCollection } from 'react-firebase-hooks/firestore'
-import { QueryDocumentSnapshot } from '@firebase/firestore'
+import {
+	UnrosteredPlayer,
+	useUnrosteredPlayers,
+} from '@/lib/use-unrostered-players'
 
 // This file is really long and will need to be cleaned up later.
 // For now the "/invites" route will render different display panels based on Captain & team status
@@ -120,29 +124,31 @@ const NotificationCardItem = ({
 	)
 }
 
-interface PlayerType {
-	captain: boolean
-	email: string
-	firstname: string
-	lastname: string
-	registered: boolean
-	team: DocumentReference | null
-}
-
 interface UnrosteredPlayerNotificationCardItemProps {
-	snapshot: QueryDocumentSnapshot<PlayerType, DocumentData>
+	unrosteredPlayer: UnrosteredPlayer
 	statusColor?: string
-  message?: string
-  isDisabled: boolean
+	message?: string
 	actionOptions: { title: string; action: (arg: DocumentReference) => void }[]
 }
 
 const UnrosteredPlayerNotificationCardItem = ({
-	snapshot,
-  statusColor,
-  isDisabled,
+	unrosteredPlayer,
+	statusColor,
 	actionOptions,
 }: UnrosteredPlayerNotificationCardItemProps) => {
+	const { documentDataSnapshot } = useContext(AuthContext)
+
+	const [
+		offersForUnrosteredPlayersQuerySnapshot,
+		// offersForUnrosteredPlayersQuerySnapshotLoading,
+		// offersForUnrosteredPlayersQuerySnapshotError,
+	] = useCollection(
+		offersForUnrosteredPlayersQuery(
+			documentDataSnapshot?.data()?.team,
+			unrosteredPlayer.ref
+		)
+	)
+
 	return (
 		<div className="flex items-end gap-2 py-2">
 			{statusColor && (
@@ -154,20 +160,20 @@ const UnrosteredPlayerNotificationCardItem = ({
 				/>
 			)}
 			<div className="mr-2">
-				<p>{`${snapshot.data().firstname} ${snapshot.data().lastname}`}</p>
+				<p>{`${unrosteredPlayer.firstname} ${unrosteredPlayer.lastname}`}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
 					{`is looking for a team.`}
 				</p>
 			</div>
 			<div className="flex justify-end flex-1 gap-2">
 				{actionOptions.map(({ title, action }, index) => (
-          <Button
-            disabled={isDisabled}
+					<Button
+						disabled={offersForUnrosteredPlayersQuerySnapshot && offersForUnrosteredPlayersQuerySnapshot.size > 0}
 						key={`action-${index}-${title}`}
 						size={'sm'}
 						variant={'outline'}
 						onClick={() => {
-							action(snapshot.ref)
+							action(unrosteredPlayer.ref)
 						}}
 					>
 						{title}
@@ -272,23 +278,27 @@ const PlayerInfo = ({
 }
 
 export const ManageOffers = () => {
-	const {
-		outgoingOffersCollectionDataSnapshot,
-		incomingOffersCollectionDataSnapshot,
-	} = useContext(OffersContext)
-	const { collectionDataSnapshot } = useContext(TeamsContext)
+	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
+		useContext(OffersContext)
+	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { documentDataSnapshot } = useContext(AuthContext)
 	const isCaptain = documentDataSnapshot?.data()?.captain
 	const isUnrostered = documentDataSnapshot?.data()?.team === null
 
-	const { offer: outgoingOffers } = useOffer(
-		outgoingOffersCollectionDataSnapshot,
-		collectionDataSnapshot
+	const outgoingOffers = useOffer(
+		outgoingOffersQuerySnapshot,
+		teamsQuerySnapshot
 	)
-	const { offer: incomingOffers } = useOffer(
-		incomingOffersCollectionDataSnapshot,
-		collectionDataSnapshot
+	const incomingOffers = useOffer(
+		incomingOffersQuerySnapshot,
+		teamsQuerySnapshot
 	)
+
+	const [unrosteredPlayersQuerySnapshot] = useCollection(
+		isCaptain ? unrosteredPlayersQuery() : undefined
+	)
+
+	const unrosteredPlayers = useUnrosteredPlayers(unrosteredPlayersQuerySnapshot)
 
 	const getOfferMessage = (
 		num: number | undefined,
@@ -372,13 +382,7 @@ export const ManageOffers = () => {
 	]
 	const unrosteredActions = [{ title: 'Invite', action: handleInvite }]
 
-	const [
-		unrosteredPlayersCollectionSnapshot,
-		// unrosteredPlayersCollectionLoading,
-		// unrosteredPlayersCollectionError
-	] = useCollection(isCaptain ? unrosteredPlayersColRef() : undefined)
-
-	const teamSnapshot = collectionDataSnapshot?.docs.find(
+	const teamSnapshot = teamsQuerySnapshot?.docs.find(
 		(team) => team.id === documentDataSnapshot?.data()?.team.id
 	)
 
@@ -401,7 +405,7 @@ export const ManageOffers = () => {
 							title={'Team list'}
 							description={'request to join a team below'}
 						>
-							{collectionDataSnapshot?.docs.map((team) => (
+							{teamsQuerySnapshot?.docs.map((team) => (
 								<TeamInfo teamData={team.data()} />
 							))}
 						</NotificationCard>
@@ -424,18 +428,12 @@ export const ManageOffers = () => {
 							description={'players elligible for team roster invitations.'}
 							scrollArea
 						>
-							{unrosteredPlayersCollectionSnapshot &&
-								unrosteredPlayersCollectionSnapshot.docs.map(
-									(documentSnapshot, index) => (
+							{unrosteredPlayers &&
+								unrosteredPlayers?.map(
+									(unrosteredPlayer: UnrosteredPlayer, index) => (
 										<UnrosteredPlayerNotificationCardItem
 											key={`freeAgent-row-${index}`}
-											snapshot={
-												documentSnapshot as QueryDocumentSnapshot<
-													PlayerType,
-													DocumentData
-												>
-											}
-											isDisabled={false} // TODO: Disable the invite button if there is an outstanding invite to this player for this team.
+											unrosteredPlayer={unrosteredPlayer}
 											actionOptions={unrosteredActions}
 										/>
 									)
