@@ -168,7 +168,10 @@ const UnrosteredPlayerNotificationCardItem = ({
 			<div className="flex justify-end flex-1 gap-2">
 				{actionOptions.map(({ title, action }, index) => (
 					<Button
-						disabled={offersForUnrosteredPlayersQuerySnapshot && offersForUnrosteredPlayersQuerySnapshot.size > 0}
+						disabled={
+							offersForUnrosteredPlayersQuerySnapshot &&
+							offersForUnrosteredPlayersQuerySnapshot.size > 0
+						}
 						key={`action-${index}-${title}`}
 						size={'sm'}
 						variant={'outline'}
