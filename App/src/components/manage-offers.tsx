@@ -36,6 +36,7 @@ import { ScrollArea } from './ui/scroll-area'
 import { Skeleton } from './ui/skeleton'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 import { useCollection } from 'react-firebase-hooks/firestore'
+import { QueryDocumentSnapshot } from '@firebase/firestore'
 
 // This file is really long and will need to be cleaned up later.
 // For now the "/invites" route will render different display panels based on Captain & team status
@@ -109,6 +110,64 @@ const NotificationCardItem = ({
 						variant={'outline'}
 						onClick={() => {
 							action(data.ref)
+						}}
+					>
+						{title}
+					</Button>
+				))}
+			</div>
+		</div>
+	)
+}
+
+interface PlayerType {
+	captain: boolean
+	email: string
+	firstname: string
+	lastname: string
+	registered: boolean
+	team: DocumentReference | null
+}
+
+interface UnrosteredPlayerNotificationCardItemProps {
+	snapshot: QueryDocumentSnapshot<PlayerType, DocumentData>
+	statusColor?: string
+  message?: string
+  isDisabled: boolean
+	actionOptions: { title: string; action: (arg: DocumentReference) => void }[]
+}
+
+const UnrosteredPlayerNotificationCardItem = ({
+	snapshot,
+  statusColor,
+  isDisabled,
+	actionOptions,
+}: UnrosteredPlayerNotificationCardItemProps) => {
+	return (
+		<div className="flex items-end gap-2 py-2">
+			{statusColor && (
+				<span
+					className={cn(
+						'flex flex-shrink-0 content-center self-start w-2 h-2 mt-2 mr-2 translate-y-1 rounded-full',
+						statusColor
+					)}
+				/>
+			)}
+			<div className="mr-2">
+				<p>{`${snapshot.data().firstname} ${snapshot.data().lastname}`}</p>
+				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
+					{`is looking for a team.`}
+				</p>
+			</div>
+			<div className="flex justify-end flex-1 gap-2">
+				{actionOptions.map(({ title, action }, index) => (
+          <Button
+            disabled={isDisabled}
+						key={`action-${index}-${title}`}
+						size={'sm'}
+						variant={'outline'}
+						onClick={() => {
+							action(snapshot.ref)
 						}}
 					>
 						{title}
@@ -316,7 +375,7 @@ export const ManageOffers = () => {
 	const [
 		unrosteredPlayersCollectionSnapshot,
 		// unrosteredPlayersCollectionLoading,
-		// unrosteredPlayersCollectionError,
+		// unrosteredPlayersCollectionError
 	] = useCollection(isCaptain ? unrosteredPlayersColRef() : undefined)
 
 	const teamSnapshot = collectionDataSnapshot?.docs.find(
@@ -368,9 +427,15 @@ export const ManageOffers = () => {
 							{unrosteredPlayersCollectionSnapshot &&
 								unrosteredPlayersCollectionSnapshot.docs.map(
 									(documentSnapshot, index) => (
-										<NotificationCardItem
+										<UnrosteredPlayerNotificationCardItem
 											key={`freeAgent-row-${index}`}
-											data={documentSnapshot.data()}
+											snapshot={
+												documentSnapshot as QueryDocumentSnapshot<
+													PlayerType,
+													DocumentData
+												>
+											}
+											isDisabled={false} // TODO: Disable the invite button if there is an outstanding invite to this player for this team.
 											actionOptions={unrosteredActions}
 										/>
 									)
