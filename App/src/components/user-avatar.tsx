@@ -50,7 +50,7 @@ export const UserAvatar = () => {
 		return (
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Avatar className={'cursor-pointer overflow-visible'}>
+					<Avatar className={'overflow-visible cursor-default'}>
 						{!!hasPendingOffers && (
 							<span
 								className={
@@ -73,12 +73,10 @@ export const UserAvatar = () => {
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						<Link to={'/profile'}>
-							<DropdownMenuItem className={'cursor-pointer'}>
-								Profile
-							</DropdownMenuItem>
+							<DropdownMenuItem>Profile</DropdownMenuItem>
 						</Link>
 						<Link to={'/invites'}>
-							<DropdownMenuItem className={'cursor-pointer gap-1'}>
+							<DropdownMenuItem className={'gap-1'}>
 								View Notifications{' '}
 								{!!hasPendingOffers && (
 									<span

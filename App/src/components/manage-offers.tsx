@@ -33,7 +33,11 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { ScrollArea } from './ui/scroll-area'
+import { Skeleton } from './ui/skeleton'
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 
+// This file is really long and will need to be cleaned up later.
+// For now the "/invites" route will render different display panels based on Captain & team status
 const NotificationCard = ({
 	title,
 	description,
@@ -112,7 +116,39 @@ const NotificationCardItem = ({
 	)
 }
 
-const PlayerInfo = ({ playerRef }: { playerRef: DocumentReference }) => {
+const TeamInfo = ({ teamData }: { teamData: DocumentData }) => {
+	return (
+		<div className="flex items-end gap-2 py-2">
+			<Avatar>
+				<AvatarImage src={teamData.logo ?? undefined} alt={'team logo'} />
+				<AvatarFallback>{teamData.name?.slice(0, 2) ?? 'NA'}</AvatarFallback>
+			</Avatar>
+			<div className="mr-2">
+				<p>{teamData.name}</p>
+				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
+					team details here
+				</p>
+			</div>
+			<div className="flex justify-end flex-1 gap-2">
+				<Button
+					size={'sm'}
+					variant={'default'}
+					onClick={() => console.log('request to join')}
+				>
+					Join
+				</Button>
+			</div>
+		</div>
+	)
+}
+
+const PlayerInfo = ({
+	playerRef,
+	isDisabled,
+}: {
+	playerRef: DocumentReference
+	isDisabled: boolean
+}) => {
 	const [playerData, setPlayerData] = useState<DocumentData | null | undefined>(
 		null
 	)
@@ -149,10 +185,14 @@ const PlayerInfo = ({ playerRef }: { playerRef: DocumentReference }) => {
 							<DropdownMenuContent className={'w-56'}>
 								<DropdownMenuLabel>More actions</DropdownMenuLabel>
 								<DropdownMenuSeparator />
-								<DropdownMenuGroup className="cursor-pointer">
+								<DropdownMenuGroup>
 									<DropdownMenuItem>View profile</DropdownMenuItem>
-									<DropdownMenuItem>Promote to captain</DropdownMenuItem>
-									<DropdownMenuItem>Remove from team</DropdownMenuItem>
+									<DropdownMenuItem disabled={isDisabled}>
+										Promote to captain
+									</DropdownMenuItem>
+									<DropdownMenuItem disabled={isDisabled}>
+										Remove from team
+									</DropdownMenuItem>
 								</DropdownMenuGroup>
 							</DropdownMenuContent>
 						</DropdownMenu>
@@ -161,7 +201,7 @@ const PlayerInfo = ({ playerRef }: { playerRef: DocumentReference }) => {
 			) : (
 				<div className="flex items-end gap-2 py-2">
 					<div className="mr-2">
-						<p>loading...</p>
+						<Skeleton className="h-4 w-[250px]" />
 					</div>
 				</div>
 			)}
@@ -298,10 +338,20 @@ export const ManageOffers = () => {
 			>
 				Manage Invites
 			</div>
-			<div className={'flex flex-row flex-wrap justify-center gap-8'}>
+			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
+				{/* LEFT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
+					{/* TEAM LIST IF UNROSTERED */}
+					{/* TEAM ROSTER IF ROSTERED */}
 					{isUnrostered ? (
-						<div>Teams List</div>
+						<NotificationCard
+							title={'Team list'}
+							description={'request to join a team below'}
+						>
+							{collectionDataSnapshot?.docs.map((team) => (
+								<TeamInfo teamData={team.data()} />
+							))}
+						</NotificationCard>
 					) : (
 						<NotificationCard
 							title={teamSnapshot?.data()?.name}
@@ -310,10 +360,11 @@ export const ManageOffers = () => {
 							{teamSnapshot
 								?.data()
 								.roster.map((playerRef: DocumentReference) => (
-									<PlayerInfo playerRef={playerRef} />
+									<PlayerInfo isDisabled={!isCaptain} playerRef={playerRef} />
 								))}
 						</NotificationCard>
 					)}
+					{/* UNROSTERED PLAYER LIST IF TEAM CAPTAIN */}
 					{isCaptain && (
 						<NotificationCard
 							title={'Unrostered players'}
@@ -331,7 +382,9 @@ export const ManageOffers = () => {
 						</NotificationCard>
 					)}
 				</div>
+				{/* RIGHT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
+					{/* INCOMING OFFERS */}
 					<NotificationCard
 						title={'Pending requests'}
 						description={getOfferMessage(incomingPending, 'incoming')}
@@ -352,7 +405,7 @@ export const ManageOffers = () => {
 							)
 						})}
 					</NotificationCard>
-					{/* OUTGOING */}
+					{/* OUTGOING OFFERS*/}
 					<NotificationCard
 						title={'Sent invites'}
 						description={getOfferMessage(outgoingPending, 'outgoing')}
