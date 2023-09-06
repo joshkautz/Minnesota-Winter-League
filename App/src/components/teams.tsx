@@ -26,8 +26,11 @@ const EmptyState = () => {
 }
 
 export const Teams = () => {
-	const { teamsQuerySnapshot, teamsQuerySnapshotLoading, teamsQuerySnapshotError } =
-		useContext(TeamsContext)
+	const {
+		teamsQuerySnapshot,
+		teamsQuerySnapshotLoading,
+		teamsQuerySnapshotError,
+	} = useContext(TeamsContext)
 
 	const navigate = useNavigate()
 
