@@ -14,14 +14,18 @@ import { TeamRosterPlayer } from './team-roster-player'
 import { AuthContext } from '@/firebase/auth-context'
 import { toast } from './ui/use-toast'
 
-export const TeamRequestCard = ({
-	userRef,
-}: {
-	userRef: DocumentReference
-}) => {
+export const TeamRequestCard = () => {
+	const { documentDataSnapshot } = useContext(AuthContext)
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
+	if (!documentDataSnapshot) {
+		return
+	}
+
+	const userRef = documentDataSnapshot?.ref
+
 	const handleRequest = (teamRef: DocumentReference) => {
+		console.log(userRef, teamRef)
 		requestToJoinTeam(userRef, teamRef)
 			.then(() => {
 				toast({
@@ -47,8 +51,9 @@ export const TeamRequestCard = ({
 		>
 			{teamsQuerySnapshot?.docs.map((team) => (
 				<TeamDetail
+					key={team.id}
 					handleRequest={handleRequest}
-					teamData={team.data()}
+					teamData={team}
 					userRef={userRef}
 				/>
 			))}
@@ -66,7 +71,7 @@ const TeamDetail = ({
 	userRef: DocumentReference
 }) => {
 	const [offersForUnrosteredPlayersQuerySnapshot] = useCollection(
-		offersForUnrosteredPlayersQuery(teamData.team, userRef)
+		offersForUnrosteredPlayersQuery(teamData.ref, userRef)
 	)
 
 	const isDisabled =
@@ -76,11 +81,16 @@ const TeamDetail = ({
 	return (
 		<div className="flex items-end gap-2 py-2">
 			<Avatar>
-				<AvatarImage src={teamData.logo ?? undefined} alt={'team logo'} />
-				<AvatarFallback>{teamData.name?.slice(0, 2) ?? 'NA'}</AvatarFallback>
+				<AvatarImage
+					src={teamData.data().logo ?? undefined}
+					alt={'team logo'}
+				/>
+				<AvatarFallback>
+					{teamData.data().name?.slice(0, 2) ?? 'NA'}
+				</AvatarFallback>
 			</Avatar>
 			<div className="mr-2">
-				<p>{teamData.name}</p>
+				<p>{teamData.data().name}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
 					team details here
 				</p>
@@ -90,7 +100,7 @@ const TeamDetail = ({
 					size={'sm'}
 					variant={'default'}
 					disabled={isDisabled}
-					onClick={() => handleRequest(teamData.team)}
+					onClick={() => handleRequest(teamData.ref)}
 				>
 					Request to join
 				</Button>
@@ -115,9 +125,18 @@ export const TeamRosterCard = () => {
 		>
 			{teamSnapshot
 				?.data()
-				.roster.map((playerRef: DocumentReference) => (
-					<TeamRosterPlayer isDisabled={!isCaptain} playerRef={playerRef} />
-				))}
+				.roster.map(
+					(
+						playerRef: DocumentReference<DocumentData, DocumentData>,
+						index: number
+					) => (
+						<TeamRosterPlayer
+							key={`team-${index}`}
+							isDisabled={!isCaptain}
+							playerRef={playerRef}
+						/>
+					)
+				)}
 		</NotificationCard>
 	)
 }

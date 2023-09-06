@@ -105,11 +105,7 @@ export const ManageOffers = () => {
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
-					{isUnrostered ? (
-						<TeamRequestCard userRef={documentDataSnapshot?.data()?.ref} />
-					) : (
-						<TeamRosterCard />
-					)}
+					{isUnrostered ? <TeamRequestCard /> : <TeamRosterCard />}
 					{isCaptain && <UnrosteredPlayerList />}
 				</div>
 				{/* RIGHT SIDE PANEL */}
