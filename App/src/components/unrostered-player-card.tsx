@@ -89,7 +89,8 @@ export const UnrosteredPlayerList = () => {
 			.catch(() => {
 				toast({
 					title: 'Unable to send invite',
-					description: 'failure',
+					description:
+						'Something went wrong on our end. Please try again later.',
 					variant: 'destructive',
 				})
 			})
