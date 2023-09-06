@@ -3,10 +3,11 @@ import {
 	doc,
 	query,
 	where,
-	getDoc,
+  getDoc,
 	getFirestore,
 	DocumentData,
-	FirestoreError,
+  FirestoreError,
+  arrayRemove,
 	updateDoc,
 	UpdateData,
 	collection,
@@ -28,38 +29,49 @@ interface PlayerDocumentData {
 	firstname: string
 	lastname: string
 	registered: boolean
-	team: DocumentReference
+	team: DocumentReference<DocumentData, DocumentData>
 }
 
 const firestore = getFirestore(app)
 
-const acceptOffer = async (offerRef: DocumentReference): Promise<void> => {
+const acceptOffer = async (offerRef: DocumentReference<DocumentData, DocumentData>): Promise<void> => {
 	return await updateDoc(offerRef, {
 		status: 'accepted',
 	})
 }
 
-const rejectOffer = async (offerRef: DocumentReference): Promise<void> => {
+const rejectOffer = async (offerRef: DocumentReference<DocumentData, DocumentData>): Promise<void> => {
 	return await updateDoc(offerRef, {
 		status: 'rejected',
 	})
 }
 
-const createTeam = async (playerRef: DocumentReference): Promise<void> => {
-	await addDoc(collection(firestore, 'teams'), {
+const createTeam = async (playerRef: DocumentReference<DocumentData, DocumentData>): Promise<DocumentReference<DocumentData, DocumentData>> => {
+	return await addDoc(collection(firestore, 'teams'), {
 		captains: [playerRef],
 		logo: '',
 		name: '',
 		registered: false,
 		roster: [playerRef],
 	})
+}
 
-	// await updateDoc(playerRef, { captain: true, team: teamRef })
+const leaveTeam = async (playerRef: DocumentReference<DocumentData, DocumentData>, teamRef: DocumentReference<DocumentData, DocumentData>): Promise<[void, void]> => {
+  return await Promise.all([
+    updateDoc(playerRef, {
+      captain: false,
+      team: null,
+    }),
+    updateDoc(teamRef, {
+      captains: arrayRemove(playerRef),
+      roster: arrayRemove(playerRef),
+    })
+  ])
 }
 
 const invitePlayerToJoinTeam = async (
-	playerRef: DocumentReference,
-	teamRef: DocumentReference
+	playerRef: DocumentReference<DocumentData, DocumentData>,
+	teamRef: DocumentReference<DocumentData, DocumentData>
 ): Promise<DocumentReference<DocumentData, DocumentData>> => {
 	return await addDoc(collection(firestore, 'offers'), {
 		creator: 'captain',
@@ -70,8 +82,8 @@ const invitePlayerToJoinTeam = async (
 }
 
 const requestToJoinTeam = async (
-	playerRef: DocumentReference,
-	teamRef: DocumentReference
+	playerRef: DocumentReference<DocumentData, DocumentData>,
+	teamRef: DocumentReference<DocumentData, DocumentData>
 ): Promise<DocumentReference<DocumentData, DocumentData>> => {
 	return await addDoc(collection(firestore, 'offers'), {
 		creator: 'player',
@@ -233,7 +245,8 @@ export {
 	offersForUnrosteredPlayersQuery,
 	incomingOffersQuery,
 	playerDocRef,
-	updatePlayerDoc,
+  updatePlayerDoc,
+  leaveTeam,
 	getOffersListener,
 	createTeam,
 	stripeRegistration,
