@@ -15,14 +15,14 @@ import { AuthContext } from '@/firebase/auth-context'
 import { toast } from './ui/use-toast'
 
 export const TeamRequestCard = () => {
-	const { documentDataSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useContext(AuthContext)
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
-	if (!documentDataSnapshot) {
+	if (!documentSnapshot) {
 		return
 	}
 
-	const userRef = documentDataSnapshot?.ref
+	const userRef = documentSnapshot?.ref
 
 	const handleRequest = (teamRef: DocumentReference) => {
 		console.log(userRef, teamRef)
@@ -34,7 +34,8 @@ export const TeamRequestCard = () => {
 					variant: 'default',
 				})
 			})
-			.catch(() => {
+      .catch((error) => {
+        console.log(error)
 				toast({
 					title: 'Unable to send request',
 					description:
@@ -111,12 +112,12 @@ const TeamDetail = ({
 
 export const TeamRosterCard = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
-	const { documentDataSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useContext(AuthContext)
 
 	const teamSnapshot = teamsQuerySnapshot?.docs.find(
-		(team) => team.id === documentDataSnapshot?.data()?.team?.id
+		(team) => team.id === documentSnapshot?.data()?.team?.id
 	)
-	const isCaptain = documentDataSnapshot?.data()?.captain
+	const isCaptain = documentSnapshot?.data()?.captain
 
 	return (
 		<NotificationCard

@@ -69,13 +69,13 @@ const UnrosteredPlayerDetail = ({
 }
 
 export const UnrosteredPlayerList = () => {
-	const { documentDataSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useContext(AuthContext)
 	const [unrosteredPlayersQuerySnapshot] = useCollection(
 		unrosteredPlayersQuery()
 	)
 	const unrosteredPlayers = useUnrosteredPlayers(unrosteredPlayersQuerySnapshot)
 
-	const teamRef = documentDataSnapshot?.data()?.team
+	const teamRef = documentSnapshot?.data()?.team
 
 	const handleInvite = (playerRef: DocumentReference) => {
 		invitePlayerToJoinTeam(playerRef, teamRef)
@@ -86,7 +86,9 @@ export const UnrosteredPlayerList = () => {
 					variant: 'default',
 				})
 			})
-			.catch(() => {
+      .catch((error) => {
+        console.log(error)
+
 				toast({
 					title: 'Unable to send invite',
 					description:

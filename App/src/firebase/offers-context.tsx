@@ -6,8 +6,8 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import {
-	outgoingOffersColRef,
-	incomingOffersColRef,
+	outgoingOffersQuery,
+	incomingOffersQuery,
 	DocumentData,
 	FirestoreError,
 	QuerySnapshot,
@@ -30,19 +30,21 @@ interface AuthProps {
 const OffersContext = createContext<AuthProps>({} as AuthProps)
 
 const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const { documentDataSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useContext(AuthContext)
 
 	const [
 		outgoingOffersQuerySnapshot,
 		outgoingOffersQuerySnapshotLoading,
 		outgoingOffersQuerySnapshotError,
-	] = useCollection(outgoingOffersColRef(documentDataSnapshot))
+  ] = useCollection(outgoingOffersQuery(documentSnapshot))
 
 	const [
 		incomingOffersQuerySnapshot,
 		incomingOffersQuerySnapshotLoading,
 		incomingOffersQuerySnapshotError,
-	] = useCollection(incomingOffersColRef(documentDataSnapshot))
+  ] = useCollection(incomingOffersQuery(documentSnapshot))
+  
+  console.log(incomingOffersQuerySnapshot?.size,outgoingOffersQuerySnapshot?.size)
 
 	return (
 		<OffersContext.Provider

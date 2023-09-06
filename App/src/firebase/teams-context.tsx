@@ -6,10 +6,10 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import {
-	teamsColRef,
 	DocumentData,
 	FirestoreError,
 	QuerySnapshot,
+  teamsQuery,
 } from '@/firebase/firestore'
 
 interface AuthProps {
@@ -25,7 +25,7 @@ const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		teamsQuerySnapshot,
 		teamsQuerySnapshotLoading,
 		teamsQuerySnapshotError,
-	] = useCollection(teamsColRef())
+	] = useCollection(teamsQuery())
 
 	return (
 		<TeamsContext.Provider
