@@ -1,32 +1,138 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {  
-    // Anyone can READ anything in the `/players` collection and subcollections.
+  match /databases/{database}/documents {
+  	function authenticatedUser() {
+			return /databases/$(database)/documents/players/$(request.auth.uid);
+    }
+		function authenticatedUserIsCaptain() {
+			return get(authenticatedUser()).data.captain == false;
+    }
+    function authenticatedUserIsOnTeam() {
+			return get(authenticatedUser()).data.team == null;
+    }
+    
+    // PLAYERS [Read]: Always
     match /players/{document=**} {
       allow get, list:
       if true;
     }
 
-    // Anyone can READ anything in the `/teams` collection and subcollections.
+    // PLAYERS [Update]:
+    // Authenticated.
+    // Email is verified.
+    // Authenticated user is updating their own document.
+    // Only Firstname or Lastname is updated.
+    match /players/{uid}{
+      allow update:
+      if request.auth != null &&
+      request.auth.token.email_verified == true &&
+      request.auth.uid == uid &&
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['firstname', 'lastname'])
+    }
+
+    // TEAMS [Read]: Always
     match /teams/{document=**} {
       allow get, list:
       if true;
     }
+    
+    // TEAMS [Create]:
+    // Authenticated.
+    // Email is verified.
+    // Authenticated user is not a captain.
+    // Authenticated user is not on a team.
+    // Authenticated user is listed as a captain for the team.
+    // Authenticated user is listed as a player for the team.
+    match /teams/{document=**}{
+      allow create:
+      if request.auth != null &&
+      request.auth.token.email_verified == true &&
+      authenticatedUserIsCaptain() &&
+ 			authenticatedUserIsOnTeam() &&
+      authenticatedUser() in request.resource.data.captains &&
+      authenticatedUser() in request.resource.data.roster
+ 		}
 
-    // Anyone can READ anything in the `/offers` collection and subcollections.
+    // OFFERS [Read]:
+    // Authenticated.
+    // Email is verified.
+    // One of the following:
+    //  - Authenticated user is a captain of the team in the Offer.
+    //  - Authenticated user is the player in the Offer.
     match /offers/{document=**} {
       allow get, list:
-      if true;
+      if request.auth != null &&
+      request.auth.token.email_verified == true &&
+      (
+      	authenticatedUser() in get(resource.data.team).data.captains ||
+        request.auth.uid == get(resource.data.player).id
+      )
     }
-    
-    // UPDATE: Must be authenticated.
-    // Can only update their own.
-    // Can only update firstname, lastname, and team.
-    match /players/{uid}{
+
+    // OFFERS [Create]:
+    // Authenticated.
+    // Email is verified.
+    // The Status is Pending.
+    // One of the following:
+    //  - Authenticated user is a captain of the team in the Offer, and the creator is Captain.
+    //  - Authenticated user is the player in the Offer, and the creator is Player.
+    match /offers/{document=**} {
+      allow create:
+      if request.auth != null &&
+      request.auth.token.email_verified == true &&
+			request.resource.data.status == 'pending' &&
+      (
+        // Authenticated user is a captain of the team in the Offer, and the creator is Captain.
+        (
+					authenticatedUser() in get(request.resource.data.team).data.captains &&
+          request.resource.data.creator == 'captain'
+        ) ||
+        // Authenticated user is the player in the Offer, and the creator is Player.
+        (
+          request.auth.uid == get(request.resource.data.player).id &&
+          request.resource.data.creator == 'player'
+        )
+      )
+    }
+
+    // OFFERS [Update]:
+    // Authenticated.
+    // Email is verified.
+    // Only Status is updated.
+    // One of the following:
+    //  - Authenticated user is a captain of the team in the Offer, and the creator is Player.
+    //  - Authenticated user is a captain of the team in the Offer, and the creator is Captain, and the status is Rejected.
+    //  - Authenticated user is the player in the Offer, and the creator is Captain.
+    //  - Authenticated user is the player in the Offer, and the creator is Player, and the status is Rejected.
+    match /offers/{document=**}{
       allow update:
       if request.auth != null &&
-      request.auth.uid == uid &&
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['firstname', 'lastname', 'team'])
+      request.auth.token.email_verified == true &&
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+				(
+          // Authenticated user is a captain of the team in the Offer, and the creator is Player.
+          (
+            authenticatedUser() in get(resource.data.team).data.captains &&
+            resource.data.creator == 'player'
+          ) ||
+          // Authenticated user is a captain of the team in the Offer, and the creator is Captain, and the status is Rejected.
+          (
+            authenticatedUser() in get(resource.data.team).data.captains &&
+            resource.data.creator == 'captain' &&
+            request.resource.data.status == 'rejected'
+          ) ||
+          // Authenticated user is the player in the Offer, and the creator is Captain.
+          (
+            request.auth.uid == get(resource.data.player).id &&
+            resource.data.creator == 'captain'
+          ) ||
+          // Authenticated user is the player in the Offer, and the creator is Player, and the status is Rejected.
+          (
+            request.auth.uid == get(resource.data.player).id &&
+            resource.data.creator == 'player' &&
+            request.resource.data.status == 'rejected'
+          )
+        )
     }
 
     // Invertase Stripe Firebase Extension

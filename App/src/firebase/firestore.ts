@@ -32,13 +32,6 @@ interface PlayerDocumentData {
 	team: DocumentReference
 }
 
-// interface OfferDocumentData {
-// 	creator: 'player' | 'captain'
-// 	player: DocumentReference
-// 	status: 'pending' | 'accepted' | 'rejected'
-// 	team: DocumentReference
-// }
-
 const firestore = getFirestore(app)
 
 const acceptOffer = async (offerRef: DocumentReference): Promise<void> => {
@@ -51,6 +44,18 @@ const rejectOffer = async (offerRef: DocumentReference): Promise<void> => {
 	return await updateDoc(offerRef, {
 		status: 'rejected',
 	})
+}
+
+const createTeam = async (playerRef: DocumentReference): Promise<void> => {
+	await addDoc(collection(firestore, 'teams'), {
+		captains: [playerRef],
+		logo: '',
+		name: '',
+		registered: false,
+		roster: [playerRef],
+	})
+
+	// await updateDoc(playerRef, { captain: true, team: teamRef })
 }
 
 const invitePlayerToJoinTeam = async (
@@ -231,6 +236,7 @@ export {
 	playerDocRef,
 	updatePlayerDoc,
 	getOffersListener,
+	createTeam,
 	stripeRegistration,
 	unrosteredPlayersQuery,
 	getOffersForUnrosteredPlayer,
