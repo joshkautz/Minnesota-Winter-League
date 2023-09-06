@@ -81,26 +81,14 @@ unrosteredPlayersSnapshot.forEach((doc) => {
 })
 
 const getUnrosteredPlayer = () => {
-	return unrosteredPlayers[Math.floor(Math.random() * unrosteredPlayers.length)]
-}
-
-const getOffer = () => {
-	const player = getUnrosteredPlayer()
-
-	const offer = JSON.stringify({
-		team: team.id,
-		player: player.id,
-	})
-
-	if (offers.includes(offer)) return getOffer()
-
-	offers.push(offer)
-	return { player }
+	const i = Math.floor(Math.random() * unrosteredPlayers.length)
+	players.splice(i, 1)
+	return unrosteredPlayers[i]
 }
 
 // Create Request offers.
 for (let i = 0; i < 10; i++) {
-	const { player } = getOffer()
+	const player = getUnrosteredPlayer()
 
 	await firestore.collection('offers').add({
 		creator: 'player',
@@ -114,7 +102,7 @@ for (let i = 0; i < 10; i++) {
 
 // Create Invitation offers.
 for (let i = 0; i < 10; i++) {
-	const { player } = getOffer()
+	const player = getUnrosteredPlayer()
 
 	await firestore.collection('offers').add({
 		creator: 'captain',
