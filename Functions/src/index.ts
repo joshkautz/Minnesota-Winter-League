@@ -9,7 +9,7 @@ import { initializeApp } from './initializeApp'
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import { Change, EventContext, logger, region } from 'firebase-functions'
+import { Change, logger, region } from 'firebase-functions'
 
 /**
  * The Firebase Admin Node.js SDK enables access to Firebase services from

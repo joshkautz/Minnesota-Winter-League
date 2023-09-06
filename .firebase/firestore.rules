@@ -10,6 +10,9 @@ service cloud.firestore {
     function authenticatedUserIsOnTeam() {
 			return get(authenticatedUser()).data.team == null;
     }
+    function affectedKeys() {
+    	return request.resource.data.diff(resource.data).affectedKeys();
+    }
     
     // PLAYERS [Read]: Always
     match /players/{document=**} {
@@ -27,7 +30,7 @@ service cloud.firestore {
       if request.auth != null &&
       request.auth.token.email_verified == true &&
       request.auth.uid == uid &&
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['firstname', 'lastname'])
+      affectedKeys().hasOnly(['firstname', 'lastname'])
     }
 
     // TEAMS [Read]: Always
@@ -108,7 +111,7 @@ service cloud.firestore {
       allow update:
       if request.auth != null &&
       request.auth.token.email_verified == true &&
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+      affectedKeys().hasOnly(['status']) &&
 				(
           // Authenticated user is a captain of the team in the Offer, and the creator is Player.
           (
