@@ -42,7 +42,6 @@ for (let players = 0; players < 100; players++) {
 	})
 
 	await new Promise((r) => setTimeout(r, 250))
-}
 
 /////////////////////////////// Create Teams ///////////////////////////////
 

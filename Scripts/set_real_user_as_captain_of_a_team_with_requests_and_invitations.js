@@ -44,7 +44,7 @@ await playerReference.update({
 	team: team.ref,
 })
 
-await new Promise((r) => setTimeout(r, 1000))
+await new Promise((r) => setTimeout(r, 500))
 
 await firestore
 	.collection('teams')
@@ -54,7 +54,7 @@ await firestore
 		roster: FieldValue.arrayUnion(playerReference),
 	})
 
-await new Promise((r) => setTimeout(r, 1000))
+await new Promise((r) => setTimeout(r, 500))
 
 /////////////////////////////// Delete Offers ///////////////////////////////
 
@@ -65,7 +65,7 @@ const offersSnapshot = await firestore
 for (let i = 0; i < offersSnapshot.size; i++) {
 	await offersSnapshot.docs[i].ref.delete()
 
-	await new Promise((r) => setTimeout(r, 1000))
+	await new Promise((r) => setTimeout(r, 500))
 }
 
 /////////////////////////////// Create Offers ///////////////////////////////
@@ -97,7 +97,7 @@ for (let i = 0; i < 10; i++) {
 		status: 'pending',
 	})
 
-	await new Promise((r) => setTimeout(r, 1000))
+	await new Promise((r) => setTimeout(r, 500))
 }
 
 // Create Invitation offers.
@@ -111,5 +111,5 @@ for (let i = 0; i < 10; i++) {
 		status: 'pending',
 	})
 
-	await new Promise((r) => setTimeout(r, 1000))
+	await new Promise((r) => setTimeout(r, 500))
 }
