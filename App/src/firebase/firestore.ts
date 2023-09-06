@@ -3,11 +3,11 @@ import {
 	doc,
 	query,
 	where,
-  getDoc,
+	getDoc,
 	getFirestore,
 	DocumentData,
-  FirestoreError,
-  arrayRemove,
+	FirestoreError,
+	arrayRemove,
 	updateDoc,
 	UpdateData,
 	collection,
@@ -34,19 +34,25 @@ interface PlayerDocumentData {
 
 const firestore = getFirestore(app)
 
-const acceptOffer = async (offerRef: DocumentReference<DocumentData, DocumentData>): Promise<void> => {
+const acceptOffer = async (
+	offerRef: DocumentReference<DocumentData, DocumentData>
+): Promise<void> => {
 	return await updateDoc(offerRef, {
 		status: 'accepted',
 	})
 }
 
-const rejectOffer = async (offerRef: DocumentReference<DocumentData, DocumentData>): Promise<void> => {
+const rejectOffer = async (
+	offerRef: DocumentReference<DocumentData, DocumentData>
+): Promise<void> => {
 	return await updateDoc(offerRef, {
 		status: 'rejected',
 	})
 }
 
-const createTeam = async (playerRef: DocumentReference<DocumentData, DocumentData>): Promise<DocumentReference<DocumentData, DocumentData>> => {
+const createTeam = async (
+	playerRef: DocumentReference<DocumentData, DocumentData>
+): Promise<DocumentReference<DocumentData, DocumentData>> => {
 	return await addDoc(collection(firestore, 'teams'), {
 		captains: [playerRef],
 		logo: '',
@@ -56,17 +62,20 @@ const createTeam = async (playerRef: DocumentReference<DocumentData, DocumentDat
 	})
 }
 
-const leaveTeam = async (playerRef: DocumentReference<DocumentData, DocumentData>, teamRef: DocumentReference<DocumentData, DocumentData>): Promise<[void, void]> => {
-  return await Promise.all([
-    updateDoc(playerRef, {
-      captain: false,
-      team: null,
-    }),
-    updateDoc(teamRef, {
-      captains: arrayRemove(playerRef),
-      roster: arrayRemove(playerRef),
-    })
-  ])
+const leaveTeam = async (
+	playerRef: DocumentReference<DocumentData, DocumentData>,
+	teamRef: DocumentReference<DocumentData, DocumentData>
+): Promise<[void, void]> => {
+	return await Promise.all([
+		updateDoc(playerRef, {
+			captain: false,
+			team: null,
+		}),
+		updateDoc(teamRef, {
+			captains: arrayRemove(playerRef),
+			roster: arrayRemove(playerRef),
+		}),
+	])
 }
 
 const invitePlayerToJoinTeam = async (
@@ -245,8 +254,8 @@ export {
 	offersForUnrosteredPlayersQuery,
 	incomingOffersQuery,
 	playerDocRef,
-  updatePlayerDoc,
-  leaveTeam,
+	updatePlayerDoc,
+	leaveTeam,
 	getOffersListener,
 	createTeam,
 	stripeRegistration,
