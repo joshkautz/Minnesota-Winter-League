@@ -9,7 +9,7 @@ import { initializeApp } from './initializeApp'
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import { Change, logger, region } from 'firebase-functions'
+import { Change, EventContext, logger, region } from 'firebase-functions'
 
 /**
  * The Firebase Admin Node.js SDK enables access to Firebase services from
@@ -150,6 +150,31 @@ export const rejectOffer = region(REGIONS.CENTRAL)
 			}
 
 			return
+		} catch (error) {
+			logger.error(error)
+			return error
+		}
+	})
+
+/**
+ * Firebase Firestore - Update the `Players` Firestore Document for the player when they create a new `Team` Firestore Document.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_new_document_is_created_2 Trigger a function when a document is created.}
+ */
+
+export const updatePlayer = region(REGIONS.CENTRAL)
+	.firestore.document('teams/{teamId}')
+	.onCreate(async (snapshot: QueryDocumentSnapshot) => {
+		try {
+			const teamRef = snapshot.ref
+			const playerRef = snapshot.data().captains.pop() as DocumentReference
+
+			return Promise.all([
+				playerRef.update({
+					captain: true,
+					team: teamRef,
+				}),
+			])
 		} catch (error) {
 			logger.error(error)
 			return error
