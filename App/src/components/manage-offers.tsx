@@ -386,7 +386,7 @@ export const ManageOffers = () => {
 	const unrosteredActions = [{ title: 'Invite', action: handleInvite }]
 
 	const teamSnapshot = teamsQuerySnapshot?.docs.find(
-		(team) => team.id === documentDataSnapshot?.data()?.team.id
+		(team) => team.id === documentDataSnapshot?.data()?.team?.id
 	)
 
 	return (

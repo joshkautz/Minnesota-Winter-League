@@ -26,7 +26,7 @@ const EmptyState = () => {
 }
 
 export const Teams = () => {
-	const { collectionDataSnapshot, collectionDataLoading, collectionDataError } =
+	const { teamsQuerySnapshot, teamsQuerySnapshotLoading, teamsQuerySnapshotError } =
 		useContext(TeamsContext)
 
 	const navigate = useNavigate()
@@ -40,9 +40,9 @@ export const Teams = () => {
 			>
 				Teams
 			</div>
-			{collectionDataLoading ? (
+			{teamsQuerySnapshotLoading ? (
 				<LoadingState />
-			) : collectionDataError ? (
+			) : teamsQuerySnapshotError ? (
 				// offer refetch option here
 				<Alert className={cn('max-w-[600px] mx-auto')}>
 					<ExclamationTriangleIcon className="w-4 h-4" />
@@ -65,9 +65,9 @@ export const Teams = () => {
 						</Button>
 					</div>
 				</Alert>
-			) : collectionDataSnapshot && collectionDataSnapshot.size > 0 ? (
+			) : teamsQuerySnapshot && teamsQuerySnapshot.size > 0 ? (
 				<div className={'flex flex-row flex-wrap justify-evenly'}>
-					{collectionDataSnapshot.docs.map((doc) => {
+					{teamsQuerySnapshot.docs.map((doc) => {
 						return (
 							<div
 								key={doc.id}
