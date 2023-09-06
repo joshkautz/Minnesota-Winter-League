@@ -36,15 +36,18 @@ const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		outgoingOffersQuerySnapshot,
 		outgoingOffersQuerySnapshotLoading,
 		outgoingOffersQuerySnapshotError,
-  ] = useCollection(outgoingOffersQuery(documentSnapshot))
+	] = useCollection(outgoingOffersQuery(documentSnapshot))
 
 	const [
 		incomingOffersQuerySnapshot,
 		incomingOffersQuerySnapshotLoading,
 		incomingOffersQuerySnapshotError,
-  ] = useCollection(incomingOffersQuery(documentSnapshot))
-  
-  console.log(incomingOffersQuerySnapshot?.size,outgoingOffersQuerySnapshot?.size)
+	] = useCollection(incomingOffersQuery(documentSnapshot))
+
+	console.log(
+		incomingOffersQuerySnapshot?.size,
+		outgoingOffersQuerySnapshot?.size
+	)
 
 	return (
 		<OffersContext.Provider

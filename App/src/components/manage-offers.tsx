@@ -28,23 +28,23 @@ export const ManageOffers = () => {
 	const incomingOffers = useOffer(
 		incomingOffersQuerySnapshot,
 		teamsQuerySnapshot
-  )
+	)
 
-  const getOfferMessage = (
-    isCaptain: boolean | undefined,
+	const getOfferMessage = (
+		isCaptain: boolean | undefined,
 		num: number | undefined,
 		type: 'incoming' | 'outgoing'
-  ) => {
-    if (isCaptain) {
-      const term = type === 'incoming' ? 'request' : 'invite'
-      if (!num || num === 0) {
-        return `no ${term}s pending at this time.`
-      }
-      if (num === 1) {
-        return `you have one pending ${term}.`
-      }
-      return `you have ${num} pending ${term}s.`
-    }
+	) => {
+		if (isCaptain) {
+			const term = type === 'incoming' ? 'request' : 'invite'
+			if (!num || num === 0) {
+				return `no ${term}s pending at this time.`
+			}
+			if (num === 1) {
+				return `you have one pending ${term}.`
+			}
+			return `you have ${num} pending ${term}s.`
+		}
 
 		const term = type === 'incoming' ? 'invite' : 'request'
 		if (!num || num === 0) {
@@ -125,7 +125,11 @@ export const ManageOffers = () => {
 					{/* INCOMING OFFERS */}
 					<NotificationCard
 						title={isCaptain ? 'Pending requests' : 'Pending invites'}
-						description={getOfferMessage(isCaptain, incomingPending, 'incoming')}
+						description={getOfferMessage(
+							isCaptain,
+							incomingPending,
+							'incoming'
+						)}
 					>
 						{incomingOffers?.map((incomingOffer: OfferType, index) => {
 							const statusColor =
@@ -137,7 +141,9 @@ export const ManageOffers = () => {
 									key={`incomingOffer-row-${index}`}
 									data={incomingOffer}
 									statusColor={statusColor}
-									message={isCaptain ? 'would like to join' : 'would like you to join'}
+									message={
+										isCaptain ? 'would like to join' : 'would like you to join'
+									}
 									actionOptions={incomingActions}
 								/>
 							)
@@ -146,7 +152,11 @@ export const ManageOffers = () => {
 					{/* OUTGOING OFFERS*/}
 					<NotificationCard
 						title={isCaptain ? 'Sent invites' : 'Sent requests'}
-						description={getOfferMessage(isCaptain, outgoingPending, 'outgoing')}
+						description={getOfferMessage(
+							isCaptain,
+							outgoingPending,
+							'outgoing'
+						)}
 					>
 						{outgoingOffers?.map((outgoingOffer: OfferType, index) => (
 							<NotificationCardItem

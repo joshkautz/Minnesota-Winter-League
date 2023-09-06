@@ -3,7 +3,7 @@ import {
 	doc,
 	query,
 	where,
-  getDoc,
+	getDoc,
 	getFirestore,
 	DocumentData,
 	FirestoreError,
@@ -177,7 +177,7 @@ const incomingOffersQuery = (
 	if (!documentSnapshot) return undefined
 
 	// If the user is a captain, show all the requests to join their team.
-  if (documentSnapshot.data()?.captain) {
+	if (documentSnapshot.data()?.captain) {
 		return query(
 			collection(firestore, 'offers'),
 			where('team', '==', documentSnapshot.data()?.team),

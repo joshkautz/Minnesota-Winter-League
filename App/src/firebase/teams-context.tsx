@@ -9,7 +9,7 @@ import {
 	DocumentData,
 	FirestoreError,
 	QuerySnapshot,
-  teamsQuery,
+	teamsQuery,
 } from '@/firebase/firestore'
 
 interface AuthProps {

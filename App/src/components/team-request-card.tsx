@@ -34,8 +34,8 @@ export const TeamRequestCard = () => {
 					variant: 'default',
 				})
 			})
-      .catch((error) => {
-        console.log(error)
+			.catch((error) => {
+				console.log(error)
 				toast({
 					title: 'Unable to send request',
 					description:
