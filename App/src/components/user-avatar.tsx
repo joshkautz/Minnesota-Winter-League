@@ -23,9 +23,9 @@ import { OffersContext } from '@/firebase/offers-context'
 
 export const UserAvatar = () => {
 	const { authStateUser, authStateLoading, signOut } = useContext(AuthContext)
-	const { incomingOffersCollectionDataSnapshot } = useContext(OffersContext)
+	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
-	const hasPendingOffers = incomingOffersCollectionDataSnapshot?.docs.filter(
+	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
 		(entry) => entry.data().status === 'pending'
 	).length
 
