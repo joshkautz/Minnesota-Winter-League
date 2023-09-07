@@ -39,7 +39,7 @@ initializeApp()
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_creation Trigger a function on user creation.}
  */
 
-export const createPlayer = region(REGIONS.CENTRAL)
+export const OnUserCreated = region(REGIONS.CENTRAL)
 	.auth.user()
 	.onCreate((user) => {
 		try {
@@ -69,7 +69,7 @@ export const createPlayer = region(REGIONS.CENTRAL)
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
  */
 
-export const deletePlayer = region(REGIONS.CENTRAL)
+export const OnUserDeleted = region(REGIONS.CENTRAL)
 	.auth.user()
 	.onDelete((user) => {
 		try {
@@ -90,7 +90,7 @@ export const deletePlayer = region(REGIONS.CENTRAL)
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
 
-export const acceptOffer = region(REGIONS.CENTRAL)
+export const OnOfferAccepted = region(REGIONS.CENTRAL)
 	.firestore.document('offers/{offerId}')
 	.onUpdate(async (change) => {
 		try {
@@ -134,7 +134,7 @@ export const acceptOffer = region(REGIONS.CENTRAL)
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
 
-export const rejectOffer = region(REGIONS.CENTRAL)
+export const OnOfferRejected = region(REGIONS.CENTRAL)
 	.firestore.document('offers/{offerId}')
 	.onUpdate(async (change: Change<QueryDocumentSnapshot>) => {
 		try {
@@ -162,7 +162,7 @@ export const rejectOffer = region(REGIONS.CENTRAL)
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_new_document_is_created_2 Trigger a function when a document is created.}
  */
 
-export const updatePlayer = region(REGIONS.CENTRAL)
+export const OnTeamCreated = region(REGIONS.CENTRAL)
 	.firestore.document('teams/{teamId}')
 	.onCreate(async (snapshot: QueryDocumentSnapshot) => {
 		try {
