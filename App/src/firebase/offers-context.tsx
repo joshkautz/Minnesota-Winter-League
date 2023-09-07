@@ -6,8 +6,8 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import {
-	outgoingOffersColRef,
-	incomingOffersColRef,
+	outgoingOffersQuery,
+	incomingOffersQuery,
 	DocumentData,
 	FirestoreError,
 	QuerySnapshot,
@@ -15,48 +15,49 @@ import {
 import { AuthContext } from '@/firebase/auth-context'
 
 interface AuthProps {
-	outgoingOffersCollectionDataSnapshot:
+	outgoingOffersQuerySnapshot:
 		| QuerySnapshot<DocumentData, DocumentData>
 		| undefined
-	outgoingOffersCollectionDataLoading: boolean
-	outgoingOffersCollectionDataError: FirestoreError | undefined
-	incomingOffersCollectionDataSnapshot:
+	outgoingOffersQuerySnapshotLoading: boolean
+	outgoingOffersQuerySnapshotError: FirestoreError | undefined
+	incomingOffersQuerySnapshot:
 		| QuerySnapshot<DocumentData, DocumentData>
 		| undefined
-	incomingOffersCollectionDataLoading: boolean
-	incomingOffersCollectionDataError: FirestoreError | undefined
+	incomingOffersQuerySnapshotLoading: boolean
+	incomingOffersQuerySnapshotError: FirestoreError | undefined
 }
 
 const OffersContext = createContext<AuthProps>({} as AuthProps)
 
 const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const { documentDataSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useContext(AuthContext)
 
 	const [
-		outgoingOffersCollectionDataSnapshot,
-		outgoingOffersCollectionDataLoading,
-		outgoingOffersCollectionDataError,
-	] = useCollection(outgoingOffersColRef(documentDataSnapshot))
+		outgoingOffersQuerySnapshot,
+		outgoingOffersQuerySnapshotLoading,
+		outgoingOffersQuerySnapshotError,
+	] = useCollection(outgoingOffersQuery(documentSnapshot))
 
 	const [
-		incomingOffersCollectionDataSnapshot,
-		incomingOffersCollectionDataLoading,
-		incomingOffersCollectionDataError,
-	] = useCollection(incomingOffersColRef(documentDataSnapshot))
+		incomingOffersQuerySnapshot,
+		incomingOffersQuerySnapshotLoading,
+		incomingOffersQuerySnapshotError,
+	] = useCollection(incomingOffersQuery(documentSnapshot))
+
+	console.log(
+		incomingOffersQuerySnapshot?.size,
+		outgoingOffersQuerySnapshot?.size
+	)
 
 	return (
 		<OffersContext.Provider
 			value={{
-				outgoingOffersCollectionDataSnapshot:
-					outgoingOffersCollectionDataSnapshot,
-				outgoingOffersCollectionDataLoading:
-					outgoingOffersCollectionDataLoading,
-				outgoingOffersCollectionDataError: outgoingOffersCollectionDataError,
-				incomingOffersCollectionDataSnapshot:
-					incomingOffersCollectionDataSnapshot,
-				incomingOffersCollectionDataLoading:
-					incomingOffersCollectionDataLoading,
-				incomingOffersCollectionDataError: incomingOffersCollectionDataError,
+				outgoingOffersQuerySnapshot: outgoingOffersQuerySnapshot,
+				outgoingOffersQuerySnapshotLoading: outgoingOffersQuerySnapshotLoading,
+				outgoingOffersQuerySnapshotError: outgoingOffersQuerySnapshotError,
+				incomingOffersQuerySnapshot: incomingOffersQuerySnapshot,
+				incomingOffersQuerySnapshotLoading: incomingOffersQuerySnapshotLoading,
+				incomingOffersQuerySnapshotError: incomingOffersQuerySnapshotError,
 			}}
 		>
 			{children}

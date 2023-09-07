@@ -32,9 +32,9 @@ interface AuthProps {
 	authStateUser: User | null | undefined
 	authStateLoading: boolean
 	authStateError: Error | undefined
-	documentDataSnapshot: DocumentSnapshot | undefined
-	documentDataLoading: boolean
-	documentDataError: FirestoreError | undefined
+	documentSnapshot: DocumentSnapshot | undefined
+	documentSnapshotLoading: boolean
+	documentSnapshotError: FirestoreError | undefined
 	createUserWithEmailAndPassword: (
 		email: string,
 		password: string
@@ -66,7 +66,7 @@ const AuthContext = createContext<AuthProps>({} as AuthProps)
 
 const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [authStateUser, authStateLoading, authStateError] = useAuthState(auth)
-	const [documentDataSnapshot, documentDataLoading, documentDataError] =
+	const [documentSnapshot, documentSnapshotLoading, documentSnapshotError] =
 		useDocument(playerDocRef(authStateUser))
 	const [
 		createUserWithEmailAndPassword,
@@ -98,9 +98,9 @@ const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 				authStateUser: authStateUser,
 				authStateLoading: authStateLoading,
 				authStateError: authStateError,
-				documentDataSnapshot: documentDataSnapshot,
-				documentDataLoading: documentDataLoading,
-				documentDataError: documentDataError,
+				documentSnapshot: documentSnapshot,
+				documentSnapshotLoading: documentSnapshotLoading,
+				documentSnapshotError: documentSnapshotError,
 				createUserWithEmailAndPassword: createUserWithEmailAndPassword,
 				createUserWithEmailAndPasswordUser: createUserWithEmailAndPasswordUser,
 				createUserWithEmailAndPasswordLoading:

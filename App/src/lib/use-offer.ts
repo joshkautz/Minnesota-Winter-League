@@ -12,11 +12,9 @@ export interface OfferType {
 	ref: DocumentReference
 }
 
-type SnapshotType = QuerySnapshot<DocumentData, DocumentData> | undefined
-
 export const useOffer = (
-	offerSnapshot: SnapshotType,
-	teamSnapshot: SnapshotType
+	offerSnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined,
+	teamSnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined
 ) => {
 	const [offer, setOffer] = useState<OfferType[] | undefined>()
 
@@ -46,5 +44,5 @@ export const useOffer = (
 		updateOffers()
 	}, [offerSnapshot, teamSnapshot])
 
-	return { offer: offer }
+	return offer
 }

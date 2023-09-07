@@ -1,110 +1,52 @@
-import { ReactNode, useContext } from 'react'
+import { useContext } from 'react'
 import { OffersContext } from '@/firebase/offers-context'
 import {
 	DocumentReference,
 	acceptOffer,
 	rejectOffer,
 } from '@/firebase/firestore'
-import { Button } from './ui/button'
-import { cn } from '@/lib/utils'
 import { toast } from './ui/use-toast'
-import { TeamsContext } from '@/firebase/teams-context'
 import { OfferType, useOffer } from '@/lib/use-offer'
-import {
-	Card,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-	CardContent,
-} from './ui/card'
-
-const NotificationCard = ({
-	title,
-	description,
-	children,
-}: {
-	title: string
-	description?: string
-	children: ReactNode
-}) => {
-	return (
-		<Card className=" max-w-[600px] flex-1 basis-80">
-			<CardHeader>
-				<CardTitle>{title}</CardTitle>
-				{description && <CardDescription>{description}</CardDescription>}
-			</CardHeader>
-			<CardContent>{children}</CardContent>
-		</Card>
-	)
-}
-
-const NotificationCardItem = ({
-	offer,
-	statusColor,
-	message,
-	actionOptions,
-}: {
-	offer: OfferType
-	statusColor: string
-	message: string
-	actionOptions: { title: string; action: (arg: DocumentReference) => void }[]
-}) => {
-	return (
-		<div className="flex items-end gap-2 py-2">
-			<span
-				className={cn(
-					'flex flex-shrink-0 content-center self-start w-2 h-2 mt-2 mr-2 translate-y-1 rounded-full',
-					statusColor
-				)}
-			/>
-			<div className="mr-2">
-				<p>{offer.playerName}</p>
-				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-					{message} {offer.teamName}
-				</p>
-			</div>
-			<div className="flex justify-end flex-1 gap-2">
-				{actionOptions.map(({ title, action }, index) => (
-					<Button
-						key={`action-${index}-${title}`}
-						size={'sm'}
-						variant={'outline'}
-						//
-						// I know this is not right, I do not know where the ref is rn
-						//
-						onClick={() => {
-							action(offer.ref)
-						}}
-					>
-						{title}
-					</Button>
-				))}
-			</div>
-		</div>
-	)
-}
+import { AuthContext } from '@/firebase/auth-context'
+import { NotificationCard, NotificationCardItem } from './notification-card'
+import { TeamRequestCard, TeamRosterCard } from './team-request-card'
+import { UnrosteredPlayerList } from './unrostered-player-card'
+import { TeamsContext } from '@/firebase/teams-context'
 
 export const ManageOffers = () => {
-	const {
-		outgoingOffersCollectionDataSnapshot,
-		incomingOffersCollectionDataSnapshot,
-	} = useContext(OffersContext)
-	const { collectionDataSnapshot } = useContext(TeamsContext)
+	const { teamsQuerySnapshot } = useContext(TeamsContext)
+	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
+		useContext(OffersContext)
+	const { documentSnapshot } = useContext(AuthContext)
+	const isCaptain = documentSnapshot?.data()?.captain
+	const isUnrostered = documentSnapshot?.data()?.team === null
 
-	const { offer: outgoingOffers } = useOffer(
-		outgoingOffersCollectionDataSnapshot,
-		collectionDataSnapshot
+	const outgoingOffers = useOffer(
+		outgoingOffersQuerySnapshot,
+		teamsQuerySnapshot
 	)
-	const { offer: incomingOffers } = useOffer(
-		incomingOffersCollectionDataSnapshot,
-		collectionDataSnapshot
+	const incomingOffers = useOffer(
+		incomingOffersQuerySnapshot,
+		teamsQuerySnapshot
 	)
 
 	const getOfferMessage = (
+		isCaptain: boolean | undefined,
 		num: number | undefined,
 		type: 'incoming' | 'outgoing'
 	) => {
-		const term = type === 'incoming' ? 'request' : 'invite'
+		if (isCaptain) {
+			const term = type === 'incoming' ? 'request' : 'invite'
+			if (!num || num === 0) {
+				return `no ${term}s pending at this time.`
+			}
+			if (num === 1) {
+				return `you have one pending ${term}.`
+			}
+			return `you have ${num} pending ${term}s.`
+		}
+
+		const term = type === 'incoming' ? 'invite' : 'request'
 		if (!num || num === 0) {
 			return `no ${term}s pending at this time.`
 		}
@@ -114,9 +56,8 @@ export const ManageOffers = () => {
 		return `you have ${num} pending ${term}s.`
 	}
 
-	// The toasts need some attention and im not getting the ref quite right yet
-	const handleCancel = (ref: DocumentReference) => {
-		rejectOffer(ref)
+	const handleReject = (offerRef: DocumentReference) => {
+		rejectOffer(offerRef)
 			.then(() => {
 				toast({
 					title: 'Invite Rejected',
@@ -132,9 +73,9 @@ export const ManageOffers = () => {
 				})
 			})
 	}
-	// The toasts need some attention and im not getting the ref quite right yet
-	const handleAccept = (ref: DocumentReference) => {
-		acceptOffer(ref)
+
+	const handleAccept = (offerRef: DocumentReference) => {
+		acceptOffer(offerRef)
 			.then(() => {
 				toast({
 					title: 'Invite accepted',
@@ -157,10 +98,11 @@ export const ManageOffers = () => {
 	const incomingPending = incomingOffers?.filter(
 		(offer) => offer.status === 'pending'
 	).length
-	const outgoingActions = [{ title: 'Cancel', action: handleCancel }]
+
+	const outgoingActions = [{ title: 'Cancel', action: handleReject }]
 	const incomingActions = [
 		{ title: 'Accept', action: handleAccept },
-		{ title: 'Reject', action: handleCancel },
+		{ title: 'Reject', action: handleReject },
 	]
 
 	return (
@@ -172,45 +114,61 @@ export const ManageOffers = () => {
 			>
 				Manage Invites
 			</div>
-			{/* I think eventually left panel will be list of teams (if player) and list of unrostered players (if captain) */}
-			{/* eventually will stack the different types of invites on the right */}
-			<div className={'flex flex-row flex-wrap justify-center gap-8'}>
-				{/* INCOMING */}
-				<NotificationCard
-					title={'Pending requests'}
-					description={getOfferMessage(incomingPending, 'incoming')}
-				>
-					{incomingOffers?.map((incomingOffer: OfferType, index) => {
-						const statusColor =
-							incomingOffer.status === 'pending'
-								? 'bg-primary'
-								: 'bg-muted-foreground'
-						return (
+			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
+				{/* LEFT SIDE PANEL */}
+				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
+					{isUnrostered ? <TeamRequestCard /> : <TeamRosterCard />}
+					{isCaptain && <UnrosteredPlayerList />}
+				</div>
+				{/* RIGHT SIDE PANEL */}
+				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
+					{/* INCOMING OFFERS */}
+					<NotificationCard
+						title={isCaptain ? 'Pending requests' : 'Pending invites'}
+						description={getOfferMessage(
+							isCaptain,
+							incomingPending,
+							'incoming'
+						)}
+					>
+						{incomingOffers?.map((incomingOffer: OfferType, index) => {
+							const statusColor =
+								incomingOffer.status === 'pending'
+									? 'bg-primary'
+									: 'bg-muted-foreground'
+							return (
+								<NotificationCardItem
+									key={`incomingOffer-row-${index}`}
+									data={incomingOffer}
+									statusColor={statusColor}
+									message={
+										isCaptain ? 'would like to join' : 'would like you to join'
+									}
+									actionOptions={incomingActions}
+								/>
+							)
+						})}
+					</NotificationCard>
+					{/* OUTGOING OFFERS*/}
+					<NotificationCard
+						title={isCaptain ? 'Sent invites' : 'Sent requests'}
+						description={getOfferMessage(
+							isCaptain,
+							outgoingPending,
+							'outgoing'
+						)}
+					>
+						{outgoingOffers?.map((outgoingOffer: OfferType, index) => (
 							<NotificationCardItem
-								key={`incomingOffer-row-${index}`}
-								offer={incomingOffer}
-								statusColor={statusColor}
-								message={'would like to join'}
-								actionOptions={incomingActions}
+								key={`outgoingOffer-row-${index}`}
+								data={outgoingOffer}
+								statusColor={'bg-muted-foreground'}
+								message={isCaptain ? 'invite sent for' : 'request sent for'}
+								actionOptions={outgoingActions}
 							/>
-						)
-					})}
-				</NotificationCard>
-				{/* OUTGOING */}
-				<NotificationCard
-					title={'Sent invites'}
-					description={getOfferMessage(outgoingPending, 'outgoing')}
-				>
-					{outgoingOffers?.map((outgoingOffer: OfferType, index) => (
-						<NotificationCardItem
-							key={`outgoingOffer-row-${index}`}
-							offer={outgoingOffer}
-							statusColor={'bg-transparent'}
-							message={'invite sent for'}
-							actionOptions={outgoingActions}
-						/>
-					))}
-				</NotificationCard>
+						))}
+					</NotificationCard>
+				</div>
 			</div>
 		</div>
 	)
