@@ -11,9 +11,10 @@ import {
 	QuerySnapshot,
 	teamsQuery,
 } from '@/firebase/firestore'
+import { TeamData } from '@/lib/interfaces'
 
 interface AuthProps {
-	teamsQuerySnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined
+	teamsQuerySnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
 	teamsQuerySnapshotLoading: boolean
 	teamsQuerySnapshotError: FirestoreError | undefined
 }

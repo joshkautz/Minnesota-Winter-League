@@ -1,30 +1,21 @@
-import { DocumentReference, getPlayerData } from '@/firebase/firestore'
+import { getPlayerSnapshot } from '@/firebase/firestore'
 import { QuerySnapshot, DocumentData } from '@firebase/firestore'
 import { useEffect, useState } from 'react'
-
-export interface OfferType {
-	creator: 'player' | 'captain'
-	player: DocumentReference
-	team: DocumentReference
-	status: 'pending' | 'accepted' | 'rejected'
-	playerName: string
-	teamName: string
-	ref: DocumentReference
-}
+import { ExtendedOfferData, OfferData, TeamData } from './interfaces'
 
 export const useOffer = (
-	offerSnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined,
-	teamSnapshot: QuerySnapshot<DocumentData, DocumentData> | undefined
-) => {
-	const [offer, setOffer] = useState<OfferType[] | undefined>()
+	offerSnapshot: QuerySnapshot<OfferData, DocumentData> | undefined,
+	teamSnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
+): ExtendedOfferData[] | undefined => {
+	const [offer, setOffer] = useState<ExtendedOfferData[] | undefined>()
 
 	useEffect(() => {
 		const updateOffers = async () => {
 			if (offerSnapshot) {
-				const updatedOffers: OfferType[] = await Promise.all(
+				const updatedOffers: ExtendedOfferData[] = await Promise.all(
 					offerSnapshot.docs.map(async (offer: DocumentData, index: number) => {
-						const playerSnapshot = await getPlayerData(offer.data().player)
-						const result: OfferType = {
+						const playerSnapshot = await getPlayerSnapshot(offer.data().player)
+						const result: ExtendedOfferData = {
 							...offer.data(),
 							playerName: `${playerSnapshot.data()
 								?.firstname} ${playerSnapshot.data()?.lastname}`,

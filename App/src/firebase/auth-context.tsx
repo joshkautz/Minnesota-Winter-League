@@ -23,16 +23,18 @@ import {
 	ActionCodeSettings,
 } from '@/firebase/auth'
 import {
-	playerDocRef,
+	getPlayerRef,
 	FirestoreError,
 	DocumentSnapshot,
+	DocumentData,
 } from '@/firebase/firestore'
+import { PlayerData } from '@/lib/interfaces'
 
 interface AuthProps {
 	authStateUser: User | null | undefined
 	authStateLoading: boolean
 	authStateError: Error | undefined
-	documentSnapshot: DocumentSnapshot | undefined
+	documentSnapshot: DocumentSnapshot<PlayerData, DocumentData> | undefined
 	documentSnapshotLoading: boolean
 	documentSnapshotError: FirestoreError | undefined
 	createUserWithEmailAndPassword: (
@@ -67,7 +69,7 @@ const AuthContext = createContext<AuthProps>({} as AuthProps)
 const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [authStateUser, authStateLoading, authStateError] = useAuthState(auth)
 	const [documentSnapshot, documentSnapshotLoading, documentSnapshotError] =
-		useDocument(playerDocRef(authStateUser))
+		useDocument(getPlayerRef(authStateUser))
 	const [
 		createUserWithEmailAndPassword,
 		createUserWithEmailAndPasswordUser,
@@ -98,7 +100,9 @@ const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 				authStateUser: authStateUser,
 				authStateLoading: authStateLoading,
 				authStateError: authStateError,
-				documentSnapshot: documentSnapshot,
+				documentSnapshot: documentSnapshot as
+					| DocumentSnapshot<PlayerData, DocumentData>
+					| undefined,
 				documentSnapshotLoading: documentSnapshotLoading,
 				documentSnapshotError: documentSnapshotError,
 				createUserWithEmailAndPassword: createUserWithEmailAndPassword,

@@ -1,41 +1,31 @@
-import { DocumentReference } from '@/firebase/firestore'
 import { QuerySnapshot, DocumentData } from '@firebase/firestore'
 import { useEffect, useState } from 'react'
-
-export interface UnrosteredPlayer {
-	captain: boolean
-	email: string
-	firstname: string
-	lastname: string
-	registered: boolean
-	team: DocumentReference | null
-	ref: DocumentReference
-	offers: []
-}
+import { ExtendedPlayerData, PlayerData } from './interfaces'
 
 export const useUnrosteredPlayers = (
 	unrosteredPlayersQuerySnapshot:
-		| QuerySnapshot<DocumentData, DocumentData>
+		| QuerySnapshot<PlayerData, DocumentData>
 		| undefined
-): UnrosteredPlayer[] | undefined => {
+): ExtendedPlayerData[] | undefined => {
 	const [unrosteredPlayers, setUnrosteredPlayers] = useState<
-		UnrosteredPlayer[] | undefined
+		ExtendedPlayerData[] | undefined
 	>()
 
 	useEffect(() => {
 		const updateUnrosteredPlayers = async () => {
 			if (unrosteredPlayersQuerySnapshot) {
-				const updatedUnrosteredPlayers: UnrosteredPlayer[] = await Promise.all(
-					unrosteredPlayersQuerySnapshot.docs.map(
-						async (unrosteredPlayer: DocumentData, index: number) => {
-							const result: UnrosteredPlayer = {
-								...unrosteredPlayer.data(),
-								ref: unrosteredPlayersQuerySnapshot.docs[index].ref,
+				const updatedUnrosteredPlayers: ExtendedPlayerData[] =
+					await Promise.all(
+						unrosteredPlayersQuerySnapshot.docs.map(
+							async (unrosteredPlayer: DocumentData, index: number) => {
+								const result: ExtendedPlayerData = {
+									...unrosteredPlayer.data(),
+									ref: unrosteredPlayersQuerySnapshot.docs[index].ref,
+								}
+								return result
 							}
-							return result
-						}
+						)
 					)
-				)
 
 				setUnrosteredPlayers(updatedUnrosteredPlayers)
 			}

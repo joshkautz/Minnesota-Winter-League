@@ -1,7 +1,9 @@
 import {
 	DocumentReference,
 	DocumentData,
-	getPlayerData,
+	getPlayerSnapshot,
+	promoteToCaptain,
+	removePlayerFromTeam,
 } from '@/firebase/firestore'
 import {
 	DropdownMenu,
@@ -13,25 +15,27 @@ import {
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
+import { AuthContext } from '@/firebase/auth-context'
+import { PlayerData } from '@/lib/interfaces'
 
 export const TeamRosterPlayer = ({
 	playerRef,
 	isDisabled,
 }: {
-	playerRef: DocumentReference
+	playerRef: DocumentReference<PlayerData, DocumentData>
 	isDisabled: boolean
 }) => {
-	const [playerData, setPlayerData] = useState<DocumentData | null | undefined>(
-		null
-	)
+	const { documentSnapshot } = useContext(AuthContext)
+
+	const [playerData, setPlayerData] = useState<PlayerData | null | undefined>()
 
 	useEffect(() => {
 		async function fetchPlayerData() {
 			try {
-				const data = await getPlayerData(playerRef)
+				const data = await getPlayerSnapshot(playerRef)
 				setPlayerData(data.data())
 			} catch (error) {
 				console.error('Error fetching player data:', error)
@@ -40,6 +44,14 @@ export const TeamRosterPlayer = ({
 
 		fetchPlayerData()
 	}, [playerRef])
+
+	const promoteToCaptainOnClickHandler = async () => {
+		promoteToCaptain(playerRef, documentSnapshot!.data()!.team)
+	}
+
+	const removeFromTeamOnClickHandler = async () => {
+		removePlayerFromTeam(playerRef, documentSnapshot!.data()!.team)
+	}
 
 	return (
 		<div>
@@ -62,10 +74,16 @@ export const TeamRosterPlayer = ({
 								<DropdownMenuSeparator />
 								<DropdownMenuGroup>
 									<DropdownMenuItem>View profile</DropdownMenuItem>
-									<DropdownMenuItem disabled={isDisabled}>
+									<DropdownMenuItem
+										disabled={isDisabled}
+										onClick={promoteToCaptainOnClickHandler}
+									>
 										Promote to captain
 									</DropdownMenuItem>
-									<DropdownMenuItem disabled={isDisabled}>
+									<DropdownMenuItem
+										disabled={isDisabled}
+										onClick={removeFromTeamOnClickHandler}
+									>
 										Remove from team
 									</DropdownMenuItem>
 								</DropdownMenuGroup>

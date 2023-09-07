@@ -1,17 +1,19 @@
 import { useContext } from 'react'
 import { OffersContext } from '@/firebase/offers-context'
 import {
+	DocumentData,
 	DocumentReference,
 	acceptOffer,
 	rejectOffer,
 } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
-import { OfferType, useOffer } from '@/lib/use-offer'
+import { useOffer } from '@/lib/use-offer'
 import { AuthContext } from '@/firebase/auth-context'
 import { NotificationCard, NotificationCardItem } from './notification-card'
 import { TeamRequestCard, TeamRosterCard } from './team-request-card'
 import { UnrosteredPlayerList } from './unrostered-player-card'
 import { TeamsContext } from '@/firebase/teams-context'
+import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
 
 export const ManageOffers = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -56,7 +58,9 @@ export const ManageOffers = () => {
 		return `you have ${num} pending ${term}s.`
 	}
 
-	const handleReject = (offerRef: DocumentReference) => {
+	const handleReject = (
+		offerRef: DocumentReference<OfferData, DocumentData>
+	) => {
 		rejectOffer(offerRef)
 			.then(() => {
 				toast({
@@ -74,7 +78,9 @@ export const ManageOffers = () => {
 			})
 	}
 
-	const handleAccept = (offerRef: DocumentReference) => {
+	const handleAccept = (
+		offerRef: DocumentReference<OfferData, DocumentData>
+	) => {
 		acceptOffer(offerRef)
 			.then(() => {
 				toast({
@@ -131,7 +137,7 @@ export const ManageOffers = () => {
 							'incoming'
 						)}
 					>
-						{incomingOffers?.map((incomingOffer: OfferType, index) => {
+						{incomingOffers?.map((incomingOffer: ExtendedOfferData, index) => {
 							const statusColor =
 								incomingOffer.status === 'pending'
 									? 'bg-primary'
@@ -158,7 +164,7 @@ export const ManageOffers = () => {
 							'outgoing'
 						)}
 					>
-						{outgoingOffers?.map((outgoingOffer: OfferType, index) => (
+						{outgoingOffers?.map((outgoingOffer: ExtendedOfferData, index) => (
 							<NotificationCardItem
 								key={`outgoingOffer-row-${index}`}
 								data={outgoingOffer}

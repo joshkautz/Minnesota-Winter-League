@@ -1,6 +1,7 @@
 import {
 	DocumentData,
 	DocumentReference,
+	QueryDocumentSnapshot,
 	offersForUnrosteredPlayersQuery,
 	requestToJoinTeam,
 } from '@/firebase/firestore'
@@ -13,6 +14,7 @@ import { Button } from './ui/button'
 import { TeamRosterPlayer } from './team-roster-player'
 import { AuthContext } from '@/firebase/auth-context'
 import { toast } from './ui/use-toast'
+import { PlayerData, TeamData } from '@/lib/interfaces'
 
 export const TeamRequestCard = () => {
 	const { documentSnapshot } = useContext(AuthContext)
@@ -22,11 +24,10 @@ export const TeamRequestCard = () => {
 		return
 	}
 
-	const userRef = documentSnapshot?.ref
-
-	const handleRequest = (teamRef: DocumentReference) => {
-		console.log(userRef, teamRef)
-		requestToJoinTeam(userRef, teamRef)
+	const handleRequest = (
+		teamRef: DocumentReference<TeamData, DocumentData>
+	) => {
+		requestToJoinTeam(documentSnapshot?.ref, teamRef)
 			.then(() => {
 				toast({
 					title: 'Request sent',
@@ -50,12 +51,12 @@ export const TeamRequestCard = () => {
 			title={'Team list'}
 			description={'request to join a team below'}
 		>
-			{teamsQuerySnapshot?.docs.map((team) => (
+			{teamsQuerySnapshot?.docs.map((teamSnapshot) => (
 				<TeamDetail
-					key={team.id}
+					key={teamSnapshot.id}
 					handleRequest={handleRequest}
-					teamData={team}
-					userRef={userRef}
+					teamSnapshot={teamSnapshot}
+					playerRef={documentSnapshot?.ref}
 				/>
 			))}
 		</NotificationCard>
@@ -64,15 +65,15 @@ export const TeamRequestCard = () => {
 
 const TeamDetail = ({
 	handleRequest,
-	teamData,
-	userRef,
+	teamSnapshot,
+	playerRef,
 }: {
-	handleRequest: (teamRef: DocumentReference) => void
-	teamData: DocumentData
-	userRef: DocumentReference
+	handleRequest: (teamRef: DocumentReference<TeamData, DocumentData>) => void
+	teamSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+	playerRef: DocumentReference<PlayerData, DocumentData>
 }) => {
 	const [offersForUnrosteredPlayersQuerySnapshot] = useCollection(
-		offersForUnrosteredPlayersQuery(teamData.ref, userRef)
+		offersForUnrosteredPlayersQuery(playerRef, teamSnapshot.ref)
 	)
 
 	const isDisabled =
@@ -83,15 +84,15 @@ const TeamDetail = ({
 		<div className="flex items-end gap-2 py-2">
 			<Avatar>
 				<AvatarImage
-					src={teamData.data().logo ?? undefined}
+					src={teamSnapshot.data().logo ?? undefined}
 					alt={'team logo'}
 				/>
 				<AvatarFallback>
-					{teamData.data().name?.slice(0, 2) ?? 'NA'}
+					{teamSnapshot.data().name?.slice(0, 2) ?? 'NA'}
 				</AvatarFallback>
 			</Avatar>
 			<div className="mr-2">
-				<p>{teamData.data().name}</p>
+				<p>{teamSnapshot.data().name}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
 					team details here
 				</p>
@@ -101,7 +102,7 @@ const TeamDetail = ({
 					size={'sm'}
 					variant={'default'}
 					disabled={isDisabled}
-					onClick={() => handleRequest(teamData.ref)}
+					onClick={() => handleRequest(teamSnapshot.ref)}
 				>
 					Request to join
 				</Button>
@@ -121,14 +122,14 @@ export const TeamRosterCard = () => {
 
 	return (
 		<NotificationCard
-			title={teamSnapshot?.data()?.name}
+			title={teamSnapshot?.data().name}
 			description={'your team roster'}
 		>
 			{teamSnapshot
 				?.data()
 				.roster.map(
 					(
-						playerRef: DocumentReference<DocumentData, DocumentData>,
+						playerRef: DocumentReference<PlayerData, DocumentData>,
 						index: number
 					) => (
 						<TeamRosterPlayer

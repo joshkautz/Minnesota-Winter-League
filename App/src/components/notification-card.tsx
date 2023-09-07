@@ -7,15 +7,18 @@ import {
 	CardContent,
 } from './ui/card'
 import { DocumentData, DocumentReference } from '@/firebase/firestore'
-import { OfferType } from '@/lib/use-offer'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
+import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
 
 interface NotificationCardItemProps {
-	data: OfferType | DocumentData
+	data: ExtendedOfferData | DocumentData
 	statusColor?: string
 	message?: string
-	actionOptions: { title: string; action: (arg: DocumentReference) => void }[]
+	actionOptions: {
+		title: string
+		action: (arg: DocumentReference<OfferData, DocumentData>) => void
+	}[]
 }
 export const NotificationCardItem = ({
 	data,
@@ -70,7 +73,7 @@ export const NotificationCard = ({
 	scrollArea,
 	className,
 }: {
-	title: string
+	title?: string
 	description?: string
 	scrollArea?: boolean
 	children: React.ReactNode

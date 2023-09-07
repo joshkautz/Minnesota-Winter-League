@@ -15,7 +15,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from './ui/use-toast'
-import { stripeRegistration, updatePlayerDoc } from '@/firebase/firestore'
+import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -50,7 +50,7 @@ export const Profile = () => {
 	})
 
 	const onSubmit = (data: ProfileSchema) => {
-		updatePlayerDoc(authStateUser, {
+		updatePlayer(authStateUser, {
 			firstname: data.firstname,
 			lastname: data.lastname,
 		})

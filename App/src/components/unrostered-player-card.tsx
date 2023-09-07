@@ -1,36 +1,34 @@
 import { AuthContext } from '@/firebase/auth-context'
 import {
+	DocumentData,
 	DocumentReference,
 	invitePlayerToJoinTeam,
 	offersForUnrosteredPlayersQuery,
 	unrosteredPlayersQuery,
 } from '@/firebase/firestore'
-import {
-	UnrosteredPlayer,
-	useUnrosteredPlayers,
-} from '@/lib/use-unrostered-players'
+import { useUnrosteredPlayers } from '@/lib/use-unrostered-players'
 import { cn } from '@/lib/utils'
 import { useContext } from 'react'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
+import { ExtendedPlayerData, PlayerData, TeamData } from '@/lib/interfaces'
 
-interface UnrosteredPlayerDetail {
-	teamRef: DocumentReference
-	unrosteredPlayer: UnrosteredPlayer
-	statusColor?: string
-	message?: string
-	handleInvite: (arg: DocumentReference) => void
-}
 const UnrosteredPlayerDetail = ({
 	teamRef,
 	unrosteredPlayer,
 	statusColor,
 	handleInvite,
-}: UnrosteredPlayerDetail) => {
+}: {
+	teamRef: DocumentReference<TeamData, DocumentData>
+	unrosteredPlayer: ExtendedPlayerData
+	statusColor?: string
+	message?: string
+	handleInvite: (arg: DocumentReference<PlayerData, DocumentData>) => void
+}) => {
 	const [offersForUnrosteredPlayersQuerySnapshot] = useCollection(
-		offersForUnrosteredPlayersQuery(teamRef, unrosteredPlayer.ref)
+		offersForUnrosteredPlayersQuery(unrosteredPlayer.ref, teamRef)
 	)
 
 	return (
@@ -75,10 +73,10 @@ export const UnrosteredPlayerList = () => {
 	)
 	const unrosteredPlayers = useUnrosteredPlayers(unrosteredPlayersQuerySnapshot)
 
-	const teamRef = documentSnapshot?.data()?.team
-
-	const handleInvite = (playerRef: DocumentReference) => {
-		invitePlayerToJoinTeam(playerRef, teamRef)
+	const handleInvite = (
+		playerRef: DocumentReference<PlayerData, DocumentData>
+	) => {
+		invitePlayerToJoinTeam(playerRef, documentSnapshot!.data()!.team)
 			.then(() => {
 				toast({
 					title: 'Invite sent!',
@@ -104,11 +102,11 @@ export const UnrosteredPlayerList = () => {
 			scrollArea
 			title={'Unrostered players'}
 		>
-			{unrosteredPlayers?.map((unrosteredPlayer: UnrosteredPlayer, index) => (
+			{unrosteredPlayers?.map((unrosteredPlayer: ExtendedPlayerData, index) => (
 				<UnrosteredPlayerDetail
 					key={`unrostered-player-${index}`}
 					handleInvite={handleInvite}
-					teamRef={teamRef}
+					teamRef={documentSnapshot!.data()!.team}
 					unrosteredPlayer={unrosteredPlayer}
 				/>
 			))}
