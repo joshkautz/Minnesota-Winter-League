@@ -20,8 +20,6 @@ import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
 const profileSchema = z.object({
 	firstname: z.string(),
 	lastname: z.string(),
-	registered: z.boolean(),
-	team: z.string(),
 	email: z.string().email(),
 })
 
@@ -38,8 +36,6 @@ export const Profile = () => {
 	const defaultValues: ProfileSchema = {
 		firstname: documentSnapshot?.data()?.firstname ?? '',
 		lastname: documentSnapshot?.data()?.lastname ?? '',
-		registered: documentSnapshot?.data()?.registered ?? '',
-		team: documentSnapshot?.data()?.team ?? '',
 		email: documentSnapshot?.data()?.email ?? '',
 	}
 
@@ -130,20 +126,6 @@ export const Profile = () => {
 					/>
 					<FormField
 						control={form.control}
-						name="registered"
-						render={() => (
-							<FormItem>
-								<FormLabel>Registered</FormLabel>
-								<FormControl>
-									<Input disabled />
-								</FormControl>
-								<FormDescription>You can register via Stripe.</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
 						name="email"
 						render={({ field }) => (
 							<FormItem>
@@ -153,23 +135,6 @@ export const Profile = () => {
 								</FormControl>
 								<FormDescription>
 									You cannot change email addresses yet.
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name="team"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Team</FormLabel>
-								<FormControl>
-									<Input {...field} />
-								</FormControl>
-								<FormDescription>
-									You can leave a team at will. But you must be invited to join
-									a team, or have your request accepted.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>
