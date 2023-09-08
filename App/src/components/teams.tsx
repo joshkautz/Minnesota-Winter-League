@@ -14,7 +14,7 @@ const LoadingState = () => {
 					key={placeholder}
 					className="animate-pulse relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center"
 				>
-					<div className="bg-gray-100 h-[200px] w-[100%] sm:w-[275px] max-w-[180px] sm:max-w-[275px]"></div>
+					<div className="bg-primary/10 rounded-md h-[200px] w-[100%] sm:w-[275px] max-w-[180px] sm:max-w-[275px]"></div>
 				</div>
 			))}
 		</div>
