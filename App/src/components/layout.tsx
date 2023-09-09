@@ -23,7 +23,7 @@ export const Layout = () => {
 			{/* TEMP CODE */}
 			{process.env.NODE_ENV !== 'production' && (
 				<>
-					<Button onClick={() => setDebugOpen(!debugOpen)}>
+					<Button className="my-8" onClick={() => setDebugOpen(!debugOpen)}>
 						{debugOpen ? 'Hide Context' : 'Show Context'}
 					</Button>
 					{debugOpen && (

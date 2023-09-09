@@ -1,7 +1,7 @@
 import { TeamsContext } from '@/firebase/teams-context'
-import { toTitleCase } from '@/lib/utils'
+import { toCamelCase, toTitleCase } from '@/lib/utils'
 import { useContext } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { NotificationCard } from './notification-card'
 import { DocumentReference, DocumentData } from '@/firebase/firestore'
 import { PlayerData } from '@/lib/interfaces'
@@ -25,13 +25,19 @@ export const TeamProfile = () => {
 
 	const playerList = teamData?.data().roster
 
-	const sampleSchedule = teamsQuerySnapshot?.docs.map((team, index) => {
-		return { label: `Week ${index + 1} vs ${team.data().name}` }
-	})
+	const sampleSchedule = teamsQuerySnapshot?.docs
+		.map((team) => {
+			return {
+				date: 'Week',
+				score: '-',
+				opponent: team.data().name,
+			}
+		})
+		.filter((game) => game.opponent !== teamData?.data().name)
 
 	return (
 		<div className={'container'}>
-			<div className={'w-[250px] my-8 mx-auto'}>
+			<div className={'h-[250px] w-[250px] my-8 mx-auto'}>
 				{teamData?.data().logo ? (
 					<img
 						src={teamData?.data().logo}
@@ -64,13 +70,27 @@ export const TeamProfile = () => {
 					)}
 				</NotificationCard>
 				<NotificationCard
-					title={'Upcoming games'}
+					title={'Record'}
 					description={'2023 Minnesota Winter League'}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
 				>
 					<div className="flex flex-col items-end gap-2 py-2">
-						{sampleSchedule?.map((x) => (
-							<p className="w-full py-2">{x.label}</p>
+						{sampleSchedule?.map((row, index) => (
+							<div className="flex items-center justify-between w-full h-8">
+								<p className="flex-1">
+									{row.date} {index + 1}
+								</p>
+								<p className="flex-1 text-center">{row.score}</p>
+								<div className="flex-[3]">
+									<Link
+										className="flex flex-col transition duration-300 group w-max"
+										to={`/teams/${toCamelCase(row.opponent)}`}
+									>
+										{row.opponent}
+										<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
+									</Link>
+								</div>
+							</div>
 						))}
 					</div>
 				</NotificationCard>
