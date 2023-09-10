@@ -37,7 +37,7 @@ export const TeamProfile = () => {
 
 	return (
 		<div className={'container'}>
-			<div className={'h-[250px] w-[250px] my-8 mx-auto'}>
+			<div className={'max-h-[250px] w-[250px] my-8 mx-auto'}>
 				{teamData?.data().logo ? (
 					<img
 						src={teamData?.data().logo}
