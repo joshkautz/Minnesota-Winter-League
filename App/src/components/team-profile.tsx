@@ -22,6 +22,9 @@ export const TeamProfile = () => {
 	const teamData = teamsQuerySnapshot?.docs.find(
 		(team) => lowerCaseNoSpace(team.data().name) === lowerCaseNoSpace(name)
 	)
+	const isOnTeam = teamData
+		?.data()
+		.roster.some((player) => player.id === documentSnapshot?.id)
 
 	const playerList = teamData?.data().roster
 
@@ -63,7 +66,7 @@ export const TeamProfile = () => {
 						) => (
 							<TeamRosterPlayer
 								key={`team-${index}`}
-								isDisabled={!isCaptain}
+								isDisabled={!isOnTeam || !isCaptain}
 								playerRef={playerRef}
 							/>
 						)
