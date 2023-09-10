@@ -45,11 +45,6 @@ const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		incomingOffersQuerySnapshotError,
 	] = useCollection(incomingOffersQuery(documentSnapshot))
 
-	console.log(
-		incomingOffersQuerySnapshot?.size,
-		outgoingOffersQuerySnapshot?.size
-	)
-
 	return (
 		<OffersContext.Provider
 			value={{

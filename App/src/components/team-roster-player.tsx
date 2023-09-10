@@ -14,7 +14,7 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
-import { DotsVerticalIcon } from '@radix-ui/react-icons'
+import { DotsVerticalIcon, StarFilledIcon } from '@radix-ui/react-icons'
 import { useState, useEffect, useContext } from 'react'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
@@ -57,10 +57,11 @@ export const TeamRosterPlayer = ({
 		<div>
 			{playerData ? (
 				<div className="flex items-end gap-2 py-2">
-					<div className="mr-2">
-						<p>
-							{playerData.firstname} {playerData.lastname}
+					<div className="flex flex-row items-center">
+						<p className="mr-2">
+							{playerData.firstname} {playerData.lastname}{' '}
 						</p>
+						{playerData.captain && <StarFilledIcon className="text-primary" />}
 					</div>
 					<div className="flex justify-end flex-1 gap-2">
 						<DropdownMenu>
@@ -75,13 +76,13 @@ export const TeamRosterPlayer = ({
 								<DropdownMenuGroup>
 									<DropdownMenuItem>View profile</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={isDisabled}
+										disabled={isDisabled || playerData.captain}
 										onClick={promoteToCaptainOnClickHandler}
 									>
 										Promote to captain
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={isDisabled}
+										disabled={isDisabled || playerData.captain}
 										onClick={removeFromTeamOnClickHandler}
 									>
 										Remove from team

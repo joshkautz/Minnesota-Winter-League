@@ -5,16 +5,23 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
+import { Card, CardContent, CardHeader } from './ui/card'
 
 const LoadingState = () => {
 	return (
-		<div className="flex flex-row flex-wrap justify-evenly">
+		<div className={'flex flex-row flex-wrap justify-evenly'}>
 			{[1, 2, 3, 4].map((placeholder) => (
 				<div
 					key={placeholder}
-					className="animate-pulse relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center"
+					className={
+						'animate-pulse relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center'
+					}
 				>
-					<div className="bg-gray-100 h-[200px] w-[100%] sm:w-[275px] max-w-[180px] sm:max-w-[275px]"></div>
+					<div
+						className={
+							'bg-primary/10 rounded-md h-[200px] w-[100%] sm:w-[275px] max-w-[180px] sm:max-w-[275px]'
+						}
+					></div>
 				</div>
 			))}
 		</div>
@@ -48,14 +55,14 @@ export const Teams = () => {
 			) : teamsQuerySnapshotError ? (
 				// offer refetch option here
 				<Alert className={cn('max-w-[600px] mx-auto')}>
-					<ExclamationTriangleIcon className="w-4 h-4" />
+					<ExclamationTriangleIcon className={'w-4 h-4'} />
 					<AlertTitle>Unable to retrieve team data</AlertTitle>
 					<AlertDescription>
 						There was a connection issue on our end. Please try again. If this
 						issue persists, contact{' '}
-						<span className="underline">mn winter league.</span>
+						<span className={'underline'}>mn winter league.</span>
 					</AlertDescription>
-					<div className="flex justify-end gap-2 mt-2">
+					<div className={'flex justify-end gap-2 mt-2'}>
 						<Button
 							size={'sm'}
 							variant={'outline'}
@@ -69,34 +76,37 @@ export const Teams = () => {
 					</div>
 				</Alert>
 			) : teamsQuerySnapshot && teamsQuerySnapshot.size > 0 ? (
-				<div className={'flex flex-row flex-wrap justify-evenly'}>
+				<div className={'flex flex-row flex-wrap justify-evenly gap-y-8'}>
 					{teamsQuerySnapshot.docs.map((doc) => {
 						return (
-							<div
-								key={doc.id}
-								className={
-									'group relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center'
-								}
-							>
-								<Link
-									className={'min-w-full'}
-									to={`/teams/${toCamelCase(doc.data().name)}`}
-								>
-									<img
-										className={
-											'h-auto w-auto max-w-[180px] sm:max-w-[275px] max-h-[200px] mx-auto'
-										}
-										src={doc.data().logo}
-									/>
-								</Link>
-								<span
-									className={
-										'absolute left-0 text-sm font-semibold text-center transition-all duration-300 opacity-0 sm:text-base bottom-2 sm:bottom-0 min-w-max right-0 sm:right-2/3 text-primary sm:group-hover:right-0 group-hover:opacity-100'
-									}
-								>
-									{doc.data().name}
-								</span>
-							</div>
+							<Link to={`/teams/${toCamelCase(doc.data().name)}`}>
+								<Card className={'group'}>
+									<CardHeader className={'p-0'}>
+										<div
+											className={
+												'w-[250px] h-[250px] overflow-hidden rounded-md rounded-b-none'
+											}
+										>
+											<img
+												src={doc.data().logo}
+												className={
+													'h-auto w-auto object-contain transition duration-300 bg-muted group-hover:scale-105 aspect-square'
+												}
+											/>
+										</div>
+									</CardHeader>
+									<CardContent className={'flex items-end justify-center pt-6'}>
+										<p className={'flex flex-col'}>
+											{doc.data().name}
+											<span
+												className={
+													'max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary'
+												}
+											></span>
+										</p>
+									</CardContent>
+								</Card>
+							</Link>
 						)
 					})}
 				</div>
