@@ -151,7 +151,7 @@ export const OnOfferAccepted: CloudFunction<Change<QueryDocumentSnapshot>> =
 						.where('player', '==', newValue.player)
 						.get()
 
-					return Promise.all(offers.docs.map((offer) => offer.ref.delete()))
+					return Promise.all(offers.docs.map((offer: QueryDocumentSnapshot) => offer.ref.delete()))
 				}
 
 				return
@@ -172,8 +172,8 @@ export const OnOfferRejected: CloudFunction<Change<QueryDocumentSnapshot>> =
 		.firestore.document('offers/{offerId}')
 		.onUpdate((change: Change<QueryDocumentSnapshot>) => {
 			try {
-				const newValue = change.after.data()
-				const previousValue = change.before.data()
+				const newValue = change.after.data() as Offer
+				const previousValue = change.before.data() as Offer
 
 				if (
 					newValue.status === 'rejected' &&
