@@ -1,5 +1,6 @@
 import {
 	addDoc,
+	deleteDoc,
 	doc,
 	query,
 	where,
@@ -68,6 +69,12 @@ const createTeam = (
 		registered: false,
 		roster: [playerRef],
 	}) as Promise<DocumentReference<TeamData, DocumentData>>
+}
+
+const deleteTeam = (
+	teamRef: DocumentReference<TeamData, DocumentData>
+): Promise<void> => {
+	return deleteDoc(doc(firestore, 'teams', teamRef.id)) as Promise<void>
 }
 
 const removePlayerFromTeam = (
@@ -280,6 +287,7 @@ export {
 	updatePlayer,
 	leaveTeam,
 	createTeam,
+	deleteTeam,
 	stripeRegistration,
 	unrosteredPlayersQuery,
 	promoteToCaptain,

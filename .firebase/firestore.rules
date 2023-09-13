@@ -1,19 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-  	function authenticatedUser() {
-			return /databases/$(database)/documents/players/$(request.auth.uid);
-    }
-		function authenticatedUserIsCaptain() {
-			return get(authenticatedUser()).data.captain == false;
-    }
-    function authenticatedUserIsOnTeam() {
-			return get(authenticatedUser()).data.team == null;
-    }
-    function affectedKeys() {
-    	return request.resource.data.diff(resource.data).affectedKeys();
-    }
-    
+ 
     // PLAYERS [Read]: Always
     match /players/{document=**} {
       allow get, list:
@@ -25,12 +13,12 @@ service cloud.firestore {
     // Email is verified.
     // Authenticated user is updating their own document.
     // Only Firstname or Lastname is updated.
-    match /players/{uid}{
+    match /players/{uid} {
       allow update:
       if request.auth != null &&
       request.auth.token.email_verified == true &&
       request.auth.uid == uid &&
-      affectedKeys().hasOnly(['firstname', 'lastname'])
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['firstname', 'lastname'])
     }
 
     // TEAMS [Read]: Always
@@ -42,18 +30,35 @@ service cloud.firestore {
     // TEAMS [Create]:
     // Authenticated.
     // Email is verified.
-    // Authenticated user is not a captain.
-    // Authenticated user is not on a team.
+    // Authenticated user's captain value is false.
+    // Authenticated user's team value is null.
     // Authenticated user is listed as a captain for the team.
     // Authenticated user is listed as a player for the team.
-    match /teams/{document=**}{
+    match /teams/{document=**} {
       allow create:
       if request.auth != null &&
       request.auth.token.email_verified == true &&
-      authenticatedUserIsCaptain() &&
- 			authenticatedUserIsOnTeam() &&
-      authenticatedUser() in request.resource.data.captains &&
-      authenticatedUser() in request.resource.data.roster
+      get(/databases/$(database)/documents/players/$(request.auth.uid)).data.captain == false &&
+ 			get(/databases/$(database)/documents/players/$(request.auth.uid)).data.team == null &&
+      /databases/$(database)/documents/players/$(request.auth.uid) in request.resource.data.captains &&
+      /databases/$(database)/documents/players/$(request.auth.uid) in request.resource.data.roster
+ 		}
+
+    // TEAMS [Delete]:
+    // Authenticated.
+    // Email is verified.
+    // Authenticated user's captain value is true.
+    // Authenticated user's team value is the team being deleted.
+    // Authenticated user is listed as a captain for the team.
+    // Authenticated user is listed as a player for the team.
+    match /teams/{document=**} {
+      allow delete:
+      if request.auth != null &&
+      request.auth.token.email_verified == true &&
+      get(/databases/$(database)/documents/players/$(request.auth.uid)).data.captain == true &&
+ 			get(/databases/$(database)/documents/players/$(request.auth.uid)).data.team == resource['__name__'] &&
+      /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.captains &&
+      /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.roster
  		}
 
     // OFFERS [Read]:
@@ -67,7 +72,7 @@ service cloud.firestore {
       if request.auth != null &&
       request.auth.token.email_verified == true &&
       (
-      	authenticatedUser() in get(resource.data.team).data.captains ||
+      	/databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains ||
         request.auth.uid == get(resource.data.player).id
       )
     }
@@ -87,7 +92,7 @@ service cloud.firestore {
       (
         // Authenticated user is a captain of the team in the Offer, and the creator is Captain.
         (
-					authenticatedUser() in get(request.resource.data.team).data.captains &&
+					/databases/$(database)/documents/players/$(request.auth.uid) in get(request.resource.data.team).data.captains &&
           request.resource.data.creator == 'captain'
         ) ||
         // Authenticated user is the player in the Offer, and the creator is Player.
@@ -107,20 +112,20 @@ service cloud.firestore {
     //  - Authenticated user is a captain of the team in the Offer, and the creator is Captain, and the status is Rejected.
     //  - Authenticated user is the player in the Offer, and the creator is Captain.
     //  - Authenticated user is the player in the Offer, and the creator is Player, and the status is Rejected.
-    match /offers/{document=**}{
+    match /offers/{document=**} {
       allow update:
       if request.auth != null &&
       request.auth.token.email_verified == true &&
-      affectedKeys().hasOnly(['status']) &&
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
 				(
           // Authenticated user is a captain of the team in the Offer, and the creator is Player.
           (
-            authenticatedUser() in get(resource.data.team).data.captains &&
+            /databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains &&
             resource.data.creator == 'player'
           ) ||
           // Authenticated user is a captain of the team in the Offer, and the creator is Captain, and the status is Rejected.
           (
-            authenticatedUser() in get(resource.data.team).data.captains &&
+            /databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains &&
             resource.data.creator == 'captain' &&
             request.resource.data.status == 'rejected'
           ) ||
