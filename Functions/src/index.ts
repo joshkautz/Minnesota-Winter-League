@@ -23,6 +23,7 @@ import {
  */
 
 import {
+	DocumentData,
 	DocumentReference,
 	FieldValue,
 	getFirestore,
@@ -39,6 +40,30 @@ const COLLECTIONS = {
 }
 
 initializeApp()
+
+interface Player extends DocumentData {
+	captain: boolean
+	email: string
+	firstname: string
+	lastname: string
+	registered: boolean
+	team: DocumentReference<Team> | null
+}
+
+interface Team extends DocumentData {
+	captains: DocumentReference<Player>[]
+	logo: string
+	name: string
+	registered: boolean
+	roster: DocumentReference<Player>[]
+}
+
+interface Offer extends DocumentData {
+	creator: string
+	player: DocumentReference<Player>
+	status: string
+	team: DocumentReference<Team>
+}
 
 /**
  * Firebase Authentication - Create the new `Players` Firestore Documents for the player.
@@ -175,10 +200,12 @@ export const OnTeamCreated: CloudFunction<QueryDocumentSnapshot> = region(
 	REGIONS.CENTRAL
 )
 	.firestore.document('teams/{teamId}')
-	.onCreate((snapshot: QueryDocumentSnapshot) => {
+	.onCreate((queryDocumentSnapshot: QueryDocumentSnapshot) => {
 		try {
-			const teamRef = snapshot.ref
-			const playerRef = snapshot.data().captains.pop() as DocumentReference
+			const teamRef = queryDocumentSnapshot.ref
+			const playerRef = queryDocumentSnapshot
+				.data()
+				.captains.pop() as DocumentReference
 
 			return Promise.all([
 				playerRef.update({
@@ -221,3 +248,53 @@ export const OnPaymentCreated: CloudFunction<QueryDocumentSnapshot> = region(
 			}
 		}
 	)
+
+/**
+ * Firebase Firestore - Delete the `Teams` Firestore Document for the player.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
+ */
+
+export const OnTeamDeleted: CloudFunction<QueryDocumentSnapshot> = region(
+	REGIONS.CENTRAL
+)
+	.firestore.document('teams/{teamId}')
+	.onDelete(async (queryDocumentSnapshot: QueryDocumentSnapshot) => {
+		try {
+			const promises = []
+
+			// Update all `Players` left on the deleted team.
+			const team = queryDocumentSnapshot.data() as Team
+
+			promises.push(
+				team.roster.map((player) =>
+					player.update({
+						team: null,
+					})
+				)
+			)
+
+			promises.push(
+				team.captains.map((player) =>
+					player.update({
+						captain: false,
+						team: null,
+					})
+				)
+			)
+
+			// Delete all `Offers` left or the team.
+			const firestore = getFirestore()
+			const offers = await firestore
+				.collection('offers')
+				.where('team', '==', queryDocumentSnapshot.ref)
+				.get()
+
+			promises.push(offers.docs.map((offer) => offer.ref.delete()))
+
+			return Promise.all(promises)
+		} catch (error) {
+			logger.error(error)
+			return error
+		}
+	})

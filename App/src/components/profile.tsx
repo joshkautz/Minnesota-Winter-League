@@ -15,7 +15,12 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from './ui/use-toast'
-import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
+import {
+	createTeam,
+	deleteTeam,
+	stripeRegistration,
+	updatePlayer,
+} from '@/firebase/firestore'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -75,6 +80,21 @@ export const Profile = () => {
 		if (authStateUser) {
 			if (authStateUser.email) {
 				sendPasswordResetEmail(authStateUser.email)
+			}
+		}
+	}
+
+	const createTeamButtonOnClickHandler = () => {
+		if (documentSnapshot) {
+			createTeam(documentSnapshot.ref)
+		}
+	}
+
+	const deleteTeamButtonOnClickHandler = () => {
+		if (documentSnapshot) {
+			const data = documentSnapshot.data()
+			if (data) {
+				deleteTeam(data.team)
 			}
 		}
 	}
@@ -143,14 +163,20 @@ export const Profile = () => {
 					<Button type="submit">Update profile</Button>
 				</form>
 			</Form>
-
 			<Button onClick={registrationButtonOnClickHandler}>Register</Button>
+			<br />
 			<Button onClick={sendEmailVerificationButtonOnClickHandler}>
 				Send Verification Email
 			</Button>
+			<br />
 			<Button onClick={sendPasswordResetEmailButtonOnClickHandler}>
 				Send Password Reset Email
 			</Button>
+			<br />{' '}
+			<Button onClick={createTeamButtonOnClickHandler}>Create Team</Button>
+			<br />
+			<Button onClick={deleteTeamButtonOnClickHandler}>Delete Team</Button>
+			<br />
 		</div>
 	)
 }
