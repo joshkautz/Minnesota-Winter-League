@@ -180,3 +180,21 @@ export const OnTeamCreated = region(REGIONS.CENTRAL)
 			return error
 		}
 	})
+
+/**
+ * Firebase Firestore - Update the `Players` Firestore Document for the player when a new `Customers` `Payments` Firestore Document is created.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_new_document_is_created_2 Trigger a function when a document is created.}
+ */
+
+export const OnPaymentCreated = region(REGIONS.CENTRAL).firestore.document('customers/{uid}/payments/{sid}').onCreate((queryDocumentSnapshot, eventContext) => {
+  try {
+    const firestore = getFirestore();
+    return firestore.collection('players').doc(eventContext.params.uid).update({
+      registered: true
+    });
+  } catch (error) {
+    logger.error(error);
+    return error
+  }
+});
