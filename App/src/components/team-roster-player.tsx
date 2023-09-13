@@ -46,11 +46,21 @@ export const TeamRosterPlayer = ({
 	}, [playerRef])
 
 	const promoteToCaptainOnClickHandler = async () => {
-		promoteToCaptain(playerRef, documentSnapshot!.data()!.team)
+		if (documentSnapshot) {
+			const data = documentSnapshot.data()
+			if (data) {
+				promoteToCaptain(playerRef, data.team)
+			}
+		}
 	}
 
 	const removeFromTeamOnClickHandler = async () => {
-		removePlayerFromTeam(playerRef, documentSnapshot!.data()!.team)
+		if (documentSnapshot) {
+			const data = documentSnapshot.data()
+			if (data) {
+				removePlayerFromTeam(playerRef, data.team)
+			}
+		}
 	}
 
 	return (

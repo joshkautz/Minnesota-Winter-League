@@ -82,13 +82,13 @@ const removePlayerFromTeam = (
 	teamRef: DocumentReference<TeamData, DocumentData>
 ): Promise<[void, void]> => {
 	return Promise.all([
-		// Remove the team from the player.
+		// Update the player.
 		updateDoc(playerRef, {
 			captain: false,
 			team: null,
 		}),
 
-		// Remove the player from the team.
+		// Update the team.
 		updateDoc(teamRef, {
 			captains: arrayRemove(playerRef),
 			roster: arrayRemove(playerRef),
