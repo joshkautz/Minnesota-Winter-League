@@ -151,7 +151,11 @@ export const OnOfferAccepted: CloudFunction<Change<QueryDocumentSnapshot>> =
 						.where('player', '==', newValue.player)
 						.get()
 
-					return Promise.all(offers.docs.map((offer: QueryDocumentSnapshot) => offer.ref.delete()))
+					return Promise.all(
+						offers.docs.map((offer: QueryDocumentSnapshot) =>
+							offer.ref.delete()
+						)
+					)
 				}
 
 				return
