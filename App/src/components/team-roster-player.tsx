@@ -73,34 +73,36 @@ export const TeamRosterPlayer = ({
 						</p>
 						{playerData.captain && <StarFilledIcon className="text-primary" />}
 					</div>
-					<div className="flex justify-end flex-1 gap-2">
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button size={'sm'} variant={'ghost'}>
-									<DotsVerticalIcon />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className={'w-56'}>
-								<DropdownMenuLabel>More actions</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<DropdownMenuGroup>
-									<DropdownMenuItem>View profile</DropdownMenuItem>
-									<DropdownMenuItem
-										disabled={isDisabled || playerData.captain}
-										onClick={promoteToCaptainOnClickHandler}
-									>
-										Promote to captain
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										disabled={isDisabled || playerData.captain}
-										onClick={removeFromTeamOnClickHandler}
-									>
-										Remove from team
-									</DropdownMenuItem>
-								</DropdownMenuGroup>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
+					{/* If not a captain, no need to show */}
+					{!isDisabled && (
+						<div className="flex justify-end flex-1 gap-2">
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button size={'sm'} variant={'ghost'}>
+										<DotsVerticalIcon />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent className={'w-56'}>
+									<DropdownMenuLabel>More actions</DropdownMenuLabel>
+									<DropdownMenuSeparator />
+									<DropdownMenuGroup>
+										<DropdownMenuItem
+											disabled={isDisabled || playerData.captain}
+											onClick={promoteToCaptainOnClickHandler}
+										>
+											Promote to captain
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											disabled={isDisabled || playerData.captain}
+											onClick={removeFromTeamOnClickHandler}
+										>
+											Remove from team
+										</DropdownMenuItem>
+									</DropdownMenuGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					)}
 				</div>
 			) : (
 				<div className="flex items-end gap-2 py-2">

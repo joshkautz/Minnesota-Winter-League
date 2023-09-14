@@ -66,36 +66,6 @@ interface Offer extends DocumentData {
 }
 
 /**
- * Firebase Authentication - Create the new `Players` Firestore Documents for the player.
- *
- * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_creation Trigger a function on user creation.}
- */
-
-export const OnUserCreated: CloudFunction<UserRecord> = region(REGIONS.CENTRAL)
-	.auth.user()
-	.onCreate((user: UserRecord) => {
-		try {
-			const firestore = getFirestore()
-			const playerDocumentReference = firestore
-				.collection(COLLECTIONS.PLAYERS)
-				.doc(user.uid)
-			return Promise.all([
-				playerDocumentReference.create({
-					captain: false,
-					firstname: '',
-					lastname: '',
-					email: user.email,
-					registered: false,
-					team: null,
-				}),
-			])
-		} catch (error) {
-			logger.error(error)
-			return error
-		}
-	})
-
-/**
  * Firebase Authentication - Delete the `Players` Firestore Document for the player.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}

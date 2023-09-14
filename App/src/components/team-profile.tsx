@@ -79,7 +79,10 @@ export const TeamProfile = () => {
 				>
 					<div className="flex flex-col items-end gap-2 py-2">
 						{sampleSchedule?.map((row, index) => (
-							<div className="flex items-center justify-between w-full h-8">
+							<div
+								key={`row-${index}`}
+								className="flex items-center justify-between w-full h-8"
+							>
 								<p className="flex-1">
 									{row.date} {index + 1}
 								</p>

@@ -93,10 +93,6 @@ export const TopNav = ({
 											View Notifications
 										</Link>
 										<Separator />
-										<Link to={'#'}>GitHub</Link>
-										<Link to={'#'}>Support</Link>
-										<Link to={'#'}>API</Link>
-										<Separator />
 									</>
 								)}
 								<AuthButton loading={authStateLoading} user={authStateUser} />

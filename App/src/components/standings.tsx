@@ -9,65 +9,18 @@ import {
 	TableCell,
 } from './ui/table'
 import { toCamelCase } from '@/lib/utils'
-
-export const sampleData = [
-	{
-		teamName: 'The Fighting Crabs',
-		teamImage:
-			'https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_2.0/c_scale,w_400/ncom/en_US/games/switch/f/fight-crab-switch/description-image',
-		win: Math.floor(Math.random() * 11),
-		loss: Math.floor(Math.random() * 11),
-		pointsFor: Math.floor(Math.random() * 51),
-		pointsAgainst: Math.floor(Math.random() * 51),
-	},
-	{
-		teamName: 'Angry Moose Friends',
-		teamImage:
-			'https://st5.depositphotos.com/2927609/65112/v/450/depositphotos_651121230-stock-illustration-deer-logo-design-cute-angry.jpg',
-		win: Math.floor(Math.random() * 11),
-		loss: Math.floor(Math.random() * 11),
-		pointsFor: Math.floor(Math.random() * 51),
-		pointsAgainst: Math.floor(Math.random() * 51),
-	},
-	{
-		teamName: 'Killer Bees',
-		teamImage:
-			'https://assets.pokemon.com/assets/cms2/img/pokedex/full/015.png',
-		win: Math.floor(Math.random() * 11),
-		loss: Math.floor(Math.random() * 11),
-		pointsFor: Math.floor(Math.random() * 51),
-		pointsAgainst: Math.floor(Math.random() * 51),
-	},
-	{
-		teamName: 'Sad Boy Frogs',
-		teamImage: 'https://m.media-amazon.com/images/I/61UhhuendiS.jpg',
-		win: Math.floor(Math.random() * 11),
-		loss: Math.floor(Math.random() * 11),
-		pointsFor: Math.floor(Math.random() * 51),
-		pointsAgainst: Math.floor(Math.random() * 51),
-	},
-	{
-		teamName: 'Lucky Duck Gang',
-		teamImage:
-			'https://i.pinimg.com/1200x/5e/94/cd/5e94cda047e50cd6e02a3333417199eb.jpg',
-		win: Math.floor(Math.random() * 11),
-		loss: Math.floor(Math.random() * 11),
-		pointsFor: Math.floor(Math.random() * 51),
-		pointsAgainst: Math.floor(Math.random() * 51),
-	},
-	{
-		teamName: 'Philosopher Wolf',
-		teamImage:
-			'https://st2.depositphotos.com/1807998/10717/v/950/depositphotos_107171036-stock-illustration-hipster-wolf-portrait-with-glasses.jpg',
-		win: Math.floor(Math.random() * 11),
-		loss: Math.floor(Math.random() * 11),
-		pointsFor: Math.floor(Math.random() * 51),
-		pointsAgainst: Math.floor(Math.random() * 51),
-	},
-]
+import { useContext } from 'react'
+import { TeamsContext } from '@/firebase/teams-context'
+import { getStandingsRef } from '@/firebase/firestore'
+import { useDocument } from 'react-firebase-hooks/firestore'
 
 export const Standings = () => {
-	const sortedData = sampleData.sort((a, b) => b.win - a.win || a.loss - b.loss)
+	const { teamsQuerySnapshot } = useContext(TeamsContext)
+
+	const [standingsSnapshot, standingsSnapshotLoading, standingsSnapshotError] =
+		useDocument(getStandingsRef())
+
+	// const sortedData = sampleData.sort((a, b) => b.win - a.win || a.loss - b.loss)
 
 	const getColor = (value: number) => {
 		if (value > 9) {
@@ -100,31 +53,47 @@ export const Standings = () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{sortedData.map(
-						(
-							{ teamImage, teamName, win, loss, pointsAgainst, pointsFor },
-							index
-						) => {
-							const plusMinus = pointsFor - pointsAgainst
+					{standingsSnapshotLoading ? (
+						<TableRow>
+							<TableCell>Loading...</TableCell>
+						</TableRow>
+					) : standingsSnapshotError ? (
+						<TableRow>
+							<TableCell>Error</TableCell>
+						</TableRow>
+					) : !standingsSnapshot?.data()?.standings ? (
+						<TableRow>
+							<TableCell>No data</TableCell>
+						</TableRow>
+					) : (
+						standingsSnapshot?.data()?.standings.map((data, index) => {
+							const teamData = teamsQuerySnapshot?.docs
+								.find((team) => team.id === data.team.id)
+								?.data()
 							return (
 								<TableRow key={index}>
-									<TableCell className="font-medium">{index + 1}</TableCell>
+									<TableCell className="font-medium ">{index + 1}</TableCell>
 									<TableCell>
-										<Link to={`/teams/${toCamelCase(teamName)}`}>
-											<div className="flex items-center justify-start gap-2">
-												<img className="w-auto h-8" src={teamImage} />
-												<span>{teamName}</span>
+										<Link to={`/teams/${toCamelCase(teamData?.name ?? '')}`}>
+											<div className="flex items-center justify-start gap-2 ">
+												<div className="w-16 flex justify-start">
+													<img
+														className="w-auto h-8 max-w-16"
+														src={teamData?.logo}
+													/>
+												</div>
+												<span>{teamData?.name}</span>
 											</div>
 										</Link>
 									</TableCell>
-									<TableCell>{win}</TableCell>
-									<TableCell>{loss}</TableCell>
-									<TableCell className={getColor(plusMinus)}>
-										{plusMinus}
+									<TableCell>{data.wins}</TableCell>
+									<TableCell>{data.losses}</TableCell>
+									<TableCell className={getColor(data.differential)}>
+										{data.differential}
 									</TableCell>
 								</TableRow>
 							)
-						}
+						})
 					)}
 				</TableBody>
 			</Table>

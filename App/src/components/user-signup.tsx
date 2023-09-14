@@ -16,8 +16,11 @@ import { toast } from '@/components/ui/use-toast'
 import { AuthContext } from '@/firebase/auth-context'
 import { useContext } from 'react'
 import { ReloadIcon } from '@radix-ui/react-icons'
+import { createPlayer } from '@/firebase/firestore'
 
 const signupSchema = z.object({
+	firstname: z.string().min(2),
+	lastname: z.string().min(2),
 	email: z.string().email(),
 	password: z.string(),
 })
@@ -36,6 +39,13 @@ export const UserSignup = () => {
 
 	const onSubmit = async (data: SignupSchema) => {
 		const res = await createUserWithEmailAndPassword(data.email, data.password)
+		if (res)
+			await createPlayer(
+				res.user.uid,
+				data.firstname,
+				data.lastname,
+				data.email
+			)
 
 		toast({
 			title: res?.user
@@ -58,31 +68,55 @@ export const UserSignup = () => {
 			>
 				<FormField
 					control={form.control}
-					name={'email'}
+					name={'firstname'}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Email</FormLabel>
+							<FormLabel>First name</FormLabel>
 							<FormControl>
-								<Input placeholder={'Email'} {...field} />
+								<Input
+									placeholder={'First name'}
+									{...field}
+									value={field.value ?? ''}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
 					)}
 				/>
-				{/* <FormField
+				<FormField
 					control={form.control}
-					name="usau"
+					name={'lastname'}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>USAU id</FormLabel>
+							<FormLabel>Last name</FormLabel>
 							<FormControl>
-								<Input placeholder="USAU id" {...field} />
+								<Input
+									placeholder={'Last name'}
+									{...field}
+									value={field.value ?? ''}
+								/>
 							</FormControl>
-							<FormDescription>Maybe?</FormDescription>
 							<FormMessage />
 						</FormItem>
 					)}
-				/> */}
+				/>
+				<FormField
+					control={form.control}
+					name={'email'}
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Email</FormLabel>
+							<FormControl>
+								<Input
+									placeholder={'Email'}
+									{...field}
+									value={field.value ?? ''}
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 				<FormField
 					control={form.control}
 					name="password"
@@ -90,7 +124,12 @@ export const UserSignup = () => {
 						<FormItem>
 							<FormLabel>Password</FormLabel>
 							<FormControl>
-								<Input type={'password'} placeholder={'Password'} {...field} />
+								<Input
+									type={'password'}
+									placeholder={'Password'}
+									{...field}
+									value={field.value ?? ''}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -101,7 +140,7 @@ export const UserSignup = () => {
 						<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
 					</Button>
 				) : (
-					<Button type={'submit'}>Signup</Button>
+					<Button type={'submit'}>Sign up</Button>
 				)}
 			</form>
 		</Form>

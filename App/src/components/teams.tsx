@@ -79,7 +79,10 @@ export const Teams = () => {
 				<div className={'flex flex-row flex-wrap justify-evenly gap-y-8'}>
 					{teamsQuerySnapshot.docs.map((doc) => {
 						return (
-							<Link to={`/teams/${toCamelCase(doc.data().name)}`}>
+							<Link
+								key={`link-${doc.id}`}
+								to={`/teams/${toCamelCase(doc.data().name)}`}
+							>
 								<Card className={'group'}>
 									<CardHeader className={'p-0'}>
 										<div

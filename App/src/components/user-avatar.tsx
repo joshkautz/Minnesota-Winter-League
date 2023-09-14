@@ -106,10 +106,6 @@ export const UserAvatar = () => {
 						<DropdownMenuItem>New Team</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem disabled>GitHub</DropdownMenuItem>
-					<DropdownMenuItem disabled>Support</DropdownMenuItem>
-					<DropdownMenuItem disabled>API</DropdownMenuItem>
-					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={signOut}>Log out</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

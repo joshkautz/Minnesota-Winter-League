@@ -45,3 +45,12 @@ export interface CheckoutSessionData extends DocumentData {
 	success_url: string
 	url: string
 }
+
+export interface StandingsData extends DocumentData {
+	standings: {
+		differential: number
+		losses: number
+		team: DocumentReference<TeamData, DocumentData>
+		wins: number
+	}[]
+}

@@ -38,11 +38,7 @@ export const UserLogin = () => {
 				? 'Login successful!'
 				: `Login failed: ${signInWithEmailAndPasswordError}`,
 			variant: res?.user ? 'default' : 'destructive',
-			description: (
-				<pre className={'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}>
-					<code className={'text-white'}>{JSON.stringify(data, null, 2)}</code>
-				</pre>
-			),
+			description: res?.user ? `Welcome back` : `Invalid email or password`,
 		})
 	}
 
@@ -59,7 +55,11 @@ export const UserLogin = () => {
 						<FormItem>
 							<FormLabel>Email</FormLabel>
 							<FormControl>
-								<Input placeholder={'Email'} {...field} />
+								<Input
+									placeholder={'Email'}
+									{...field}
+									value={field.value ?? ''}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -72,7 +72,12 @@ export const UserLogin = () => {
 						<FormItem>
 							<FormLabel>Password</FormLabel>
 							<FormControl>
-								<Input type={'password'} placeholder={'Password'} {...field} />
+								<Input
+									type={'password'}
+									placeholder={'Password'}
+									{...field}
+									value={field.value ?? ''}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>

@@ -5,6 +5,7 @@ import {
 	query,
 	where,
 	getDoc,
+	setDoc,
 	getFirestore,
 	DocumentData,
 	FirestoreError,
@@ -29,6 +30,7 @@ import {
 	CheckoutSessionData,
 	OfferData,
 	PlayerData,
+	StandingsData,
 	TeamData,
 } from '@/lib/interfaces'
 
@@ -69,6 +71,22 @@ const createTeam = (
 		registered: false,
 		roster: [playerRef],
 	}) as Promise<DocumentReference<TeamData, DocumentData>>
+}
+
+const createPlayer = (
+	uid: string,
+	firstname: string,
+	lastname: string,
+	email: string
+): Promise<void> => {
+	return setDoc(doc(firestore, 'players', uid), {
+		captain: false,
+		firstname: firstname,
+		lastname: lastname,
+		email: email,
+		registered: false,
+		team: null,
+	})
 }
 
 const deleteTeam = (
@@ -167,6 +185,15 @@ const getPlayerRef = (
 	if (!authValue) return undefined
 	return doc(firestore, 'players', authValue.uid) as DocumentReference<
 		PlayerData,
+		DocumentData
+	>
+}
+
+const getStandingsRef = ():
+	| DocumentReference<StandingsData, DocumentData>
+	| undefined => {
+	return doc(firestore, 'standings', 'standings') as DocumentReference<
+		StandingsData,
 		DocumentData
 	>
 }
@@ -282,6 +309,7 @@ export {
 	teamsQuery,
 	outgoingOffersQuery,
 	offersForUnrosteredPlayersQuery,
+	createPlayer,
 	incomingOffersQuery,
 	getPlayerRef,
 	updatePlayer,
@@ -292,6 +320,7 @@ export {
 	unrosteredPlayersQuery,
 	promoteToCaptain,
 	removePlayerFromTeam,
+	getStandingsRef,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,

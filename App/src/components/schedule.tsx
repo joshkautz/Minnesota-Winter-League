@@ -32,7 +32,10 @@ const ScheduleCard = ({
 			</CardHeader>
 			<CardContent>
 				{gameDetails.map((game, index) => (
-					<div className={'flex items-center justify-start max-h-10'}>
+					<div
+						key={`schedule-row-${index}`}
+						className={'flex items-center justify-start max-h-10'}
+					>
 						<div className={'flex-[1]'}>Field {index + 1}</div>
 						<div className={'flex-[4] flex justify-center gap-4 items-center'}>
 							<div className={'flex-1'}>
@@ -181,7 +184,11 @@ export const Schedule = () => {
 			</div>
 			<div className={'flex flex-wrap gap-8'}>
 				{sampleData.map((data, index) => (
-					<ScheduleCard gameDetails={data} title={`Week ${index + 1}`} />
+					<ScheduleCard
+						key={`schedule-card-${index}`}
+						gameDetails={data}
+						title={`Week ${index + 1}`}
+					/>
 				))}
 			</div>
 		</div>
