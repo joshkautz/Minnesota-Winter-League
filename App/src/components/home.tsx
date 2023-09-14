@@ -52,8 +52,8 @@ export const Home = () => {
 						skill levels. At the end of the season, the top teams will compete
 						in a playoff tournament to determine the league champion!
 					</p>
-        </section>
-        <br></br>
+				</section>
+				<br></br>
 				<section id="individual-players">
 					<h2>Individual Players</h2>
 					<p>
