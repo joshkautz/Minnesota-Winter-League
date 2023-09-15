@@ -20,8 +20,6 @@ export const Standings = () => {
 	const [standingsSnapshot, standingsSnapshotLoading, standingsSnapshotError] =
 		useDocument(getStandingsRef())
 
-	// const sortedData = sampleData.sort((a, b) => b.win - a.win || a.loss - b.loss)
-
 	const getColor = (value: number) => {
 		if (value > 9) {
 			return 'text-green-600'

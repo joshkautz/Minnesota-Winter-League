@@ -54,3 +54,12 @@ export interface StandingsData extends DocumentData {
 		wins: number
 	}[]
 }
+
+export interface GamesData extends DocumentData {
+	away: DocumentReference<TeamData, DocumentData>
+	awayScore: number
+	date: Timestamp
+	field: number
+	home: DocumentReference<TeamData, DocumentData>
+	homeScore: number
+}

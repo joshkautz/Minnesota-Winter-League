@@ -11,6 +11,7 @@ import {
 	FirestoreError,
 	arrayRemove,
 	arrayUnion,
+	orderBy,
 	updateDoc,
 	UpdateData,
 	collection,
@@ -28,6 +29,7 @@ import { User } from './auth'
 import { Products } from './stripe'
 import {
 	CheckoutSessionData,
+	GamesData,
 	OfferData,
 	PlayerData,
 	StandingsData,
@@ -198,6 +200,13 @@ const getStandingsRef = ():
 	>
 }
 
+const gamesQuery = (): Query<GamesData, DocumentData> => {
+	return query(collection(firestore, 'games'), orderBy('date')) as Query<
+		GamesData,
+		DocumentData
+	>
+}
+
 const updatePlayer = (
 	authValue: User | null | undefined,
 	data: UpdateData<PlayerDocumentData>
@@ -307,6 +316,7 @@ export {
 	requestToJoinTeam,
 	invitePlayerToJoinTeam,
 	teamsQuery,
+	gamesQuery,
 	outgoingOffersQuery,
 	offersForUnrosteredPlayersQuery,
 	createPlayer,

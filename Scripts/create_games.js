@@ -49,7 +49,7 @@ for (let i = 1; i <= numberOfTeams / 2; i++) {
     away: away.ref,
     homeScore: null,
     awayScore: null,
-    date: Timestamp.fromDate(new Date(Date.parse('18 Nov 2023 18:15:00 CST'))),
+    date: Timestamp.fromDate(new Date(Date.parse('11 Nov 2023 20:20:00 CST'))),
     field: i.toString(),
   })
 

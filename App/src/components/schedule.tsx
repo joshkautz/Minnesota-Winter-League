@@ -7,172 +7,114 @@ import {
 	CardTitle,
 } from './ui/card'
 import { TeamsContext } from '@/firebase/teams-context'
+import { useCollection } from 'react-firebase-hooks/firestore'
+import {
+	DocumentData,
+	QueryDocumentSnapshot,
+	gamesQuery,
+} from '@/firebase/firestore'
+import { GamesData } from '@/lib/interfaces'
 
-interface OpponentDetails {
-	logo?: string
-	score: number | null
-}
+// {
+//   status: 'completed',
+//   opponentOne: {
+//     logo: teamsQuerySnapshot?.docs[0].data().logo,
+//     score: 11,
+//   },
+//   opponentTwo: {
+//     logo: teamsQuerySnapshot?.docs[1].data().logo,
+//     score: 15,
+//   },
+// }
 
 const ScheduleCard = ({
-	gameDetails,
+	games,
 	title,
 }: {
-	gameDetails: {
-		status: string
-		opponentOne: OpponentDetails
-		opponentTwo: OpponentDetails
-	}[]
+	games: GamesData[]
 	title: string
 }) => {
+	const { teamsQuerySnapshot } = useContext(TeamsContext)
+
 	return (
 		<Card className={'flex-1 flex-shrink-0 basis-80'}>
 			<CardHeader>
 				<CardTitle>{title}</CardTitle>
-				<CardDescription>Saturday, 11/24</CardDescription>
+				<CardDescription>
+					{games[0].date.toDate().toLocaleString(undefined, {
+						weekday: 'long', // Full weekday name
+						month: 'long', // Full month name
+						day: 'numeric', // Day of the month
+						hour: 'numeric', // Hour (1-12)
+						minute: '2-digit', // Minute (2-digit)
+						hour12: true, // Use 12-hour clock format (AM/PM)
+					})}
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				{gameDetails.map((game, index) => (
-					<div
-						key={`schedule-row-${index}`}
-						className={'flex items-center justify-start max-h-10'}
-					>
-						<div className={'flex-[1]'}>Field {index + 1}</div>
-						<div className={'flex-[4] flex justify-center gap-4 items-center'}>
-							<div className={'flex-1'}>
-								<img
-									className={'mx-auto max-h-10'}
-									src={game.opponentOne.logo}
-								/>
-							</div>
-							<p className={'flex-1  text-center'}>
-								{game.status === 'pending'
-									? 'vs'
-									: `${game.opponentOne.score} - ${game.opponentTwo.score}`}
-							</p>
-							<div className={'items-center flex-1'}>
-								<img
-									className={'mx-auto max-h-10'}
-									src={game.opponentTwo.logo}
-								/>
+				{games.map((game, index) => {
+					const homeTeam = teamsQuerySnapshot?.docs
+						.find((team) => team.id === game.home.id)
+						?.data()
+					const awayTeam = teamsQuerySnapshot?.docs
+						.find((team) => team.id === game.away.id)
+						?.data()
+					return (
+						<div
+							key={`schedule-row-${index}`}
+							className={'flex items-center justify-start max-h-10'}
+						>
+							<div className={'flex-[1]'}>Field {index + 1}</div>
+							<div
+								className={'flex-[4] flex justify-center gap-4 items-center'}
+							>
+								<div className={'flex-1'}>
+									<img className={'mx-auto max-h-10'} src={homeTeam?.logo} />
+								</div>
+								<p className={'flex-1  text-center'}>
+									{game.date.toDate() > new Date()
+										? 'vs'
+										: !game.homeScore || !game.awayScore
+										? 'vs'
+										: `${game.homeScore} - ${game.awayScore}`}
+								</p>
+								<div className={'items-center flex-1'}>
+									<img className={'mx-auto max-h-10'} src={awayTeam?.logo} />
+								</div>
 							</div>
 						</div>
-					</div>
-				))}
+					)
+				})}
 			</CardContent>
 		</Card>
 	)
 }
 
 export const Schedule = () => {
-	const { teamsQuerySnapshot } = useContext(TeamsContext)
+	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
+		useCollection(gamesQuery())
 
-	const sampleData = [
-		[
-			{
-				status: 'completed',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[0].data().logo,
-					score: 11,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[1].data().logo,
-					score: 15,
-				},
-			},
-			{
-				status: 'completed',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[2].data().logo,
-					score: 12,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[3].data().logo,
-					score: 13,
-				},
-			},
-			{
-				status: 'completed',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[1].data().logo,
-					score: 15,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[2].data().logo,
-					score: 8,
-				},
-			},
-		],
-		[
-			{
-				status: 'pending',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[0].data().logo,
-					score: null,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[1].data().logo,
-					score: null,
-				},
-			},
-			{
-				status: 'pending',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[2].data().logo,
-					score: null,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[3].data().logo,
-					score: null,
-				},
-			},
-			{
-				status: 'pending',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[1].data().logo,
-					score: null,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[2].data().logo,
-					score: null,
-				},
-			},
-		],
-		[
-			{
-				status: 'pending',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[0].data().logo,
-					score: null,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[1].data().logo,
-					score: null,
-				},
-			},
-			{
-				status: 'pending',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[2].data().logo,
-					score: null,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[3].data().logo,
-					score: null,
-				},
-			},
-			{
-				status: 'pending',
-				opponentOne: {
-					logo: teamsQuerySnapshot?.docs[1].data().logo,
-					score: null,
-				},
-				opponentTwo: {
-					logo: teamsQuerySnapshot?.docs[2].data().logo,
-					score: null,
-				},
-			},
-		],
-	]
+	const rounds: GamesData[][] = []
+	let previous: number = 0
+	let index: number = 0
+
+	gamesSnapshot?.docs.forEach(
+		(queryDocumentSnapshot: QueryDocumentSnapshot<GamesData, DocumentData>) => {
+			const time = queryDocumentSnapshot.data().date.toDate().getTime()
+			if (previous == 0) {
+				previous = time
+			}
+			if (previous !== time) {
+				previous = time
+				index++
+			}
+			if (!rounds[index]) {
+				rounds[index] = []
+			}
+			rounds[index].push(queryDocumentSnapshot.data())
+		}
+	)
+
 	return (
 		<div className="container">
 			<div
@@ -183,13 +125,21 @@ export const Schedule = () => {
 				Schedule
 			</div>
 			<div className={'flex flex-wrap gap-8'}>
-				{sampleData.map((data, index) => (
-					<ScheduleCard
-						key={`schedule-card-${index}`}
-						gameDetails={data}
-						title={`Week ${index + 1}`}
-					/>
-				))}
+				{gamesSnapshotLoading
+					? 'Loading...'
+					: gamesSnapshotError
+					? 'Error'
+					: !gamesSnapshot
+					? 'No data'
+					: rounds.map((games, index) => (
+							<ScheduleCard
+								key={`schedule-card-${index}`}
+								games={games}
+								title={`Week ${Math.ceil(
+									(index + 1) / (rounds.length / 2)
+								)} | Round ${(index % 4) + 1}`}
+							/>
+					  ))}
 			</div>
 		</div>
 	)
