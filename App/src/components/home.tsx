@@ -1,9 +1,11 @@
 import { SketchLogoIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { DomeSvg } from './ui/dome-svg'
+import { useAnchorScroll } from '@/lib/use-anchor-scroll'
 import { Link } from 'react-router-dom'
 
 export const Home = () => {
+	useAnchorScroll()
 	return (
 		<div className={'w-full'}>
 			<section id="welcome" className={'h-[80vh] max-h-[620px] container'}>

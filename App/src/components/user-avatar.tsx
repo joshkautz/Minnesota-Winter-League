@@ -21,7 +21,11 @@ import {
 import { Link } from 'react-router-dom'
 import { OffersContext } from '@/firebase/offers-context'
 
-export const UserAvatar = () => {
+export const UserAvatar = ({
+	userContent,
+}: {
+	userContent: { label: string; path: string; alt: string }[]
+}) => {
 	const { authStateUser, authStateLoading, signOut } = useContext(AuthContext)
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
@@ -72,61 +76,45 @@ export const UserAvatar = () => {
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<Link to={'/profile'}>
-							<DropdownMenuItem className={'focus:bg-secondary'}>
-								Profile
-							</DropdownMenuItem>
-						</Link>
-						<Link to={'/invites'}>
-							<DropdownMenuItem className={'gap-1 focus:bg-secondary'}>
-								View Notifications{' '}
-								{!!hasPendingOffers && (
-									<span
-										className={
-											'self-start w-2 h-2 translate-y-1 rounded-full bg-primary'
-										}
-									/>
-								)}
-							</DropdownMenuItem>
-						</Link>
-						<DropdownMenuItem className={'focus:bg-secondary'}>
-							Schedule
-						</DropdownMenuItem>
+						{userContent.map(({ label, path, alt }) => {
+							return (
+								<Link key={path} to={path} aria-label={alt}>
+									{path === '/invites' ? (
+										<DropdownMenuItem className={'gap-1'}>
+											{label}{' '}
+											{!!hasPendingOffers && (
+												<span
+													className={
+														'self-start w-2 h-2 translate-y-1 rounded-full bg-primary'
+													}
+												/>
+											)}
+										</DropdownMenuItem>
+									) : (
+										<DropdownMenuItem>{label}</DropdownMenuItem>
+									)}
+								</Link>
+							)
+						})}
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<DropdownMenuItem className={'focus:bg-secondary'}>
-							View Roster
-						</DropdownMenuItem>
+						<DropdownMenuItem>View Roster</DropdownMenuItem>
 						<DropdownMenuSub>
-							<DropdownMenuSubTrigger
-								className={'focus:bg-secondary data-[state=open]:bg-secondary'}
-							>
-								Invite Players
-							</DropdownMenuSubTrigger>
+							<DropdownMenuSubTrigger>Invite Players</DropdownMenuSubTrigger>
 							<DropdownMenuPortal>
 								<DropdownMenuSubContent>
-									<DropdownMenuItem className={'focus:bg-secondary'}>
-										Email
-									</DropdownMenuItem>
-									<DropdownMenuItem className={'focus:bg-secondary'}>
-										Message
-									</DropdownMenuItem>
+									<DropdownMenuItem>Email</DropdownMenuItem>
+									<DropdownMenuItem>Message</DropdownMenuItem>
 									<DropdownMenuSeparator />
-									<DropdownMenuItem className={'focus:bg-secondary'}>
-										More...
-									</DropdownMenuItem>
+									<DropdownMenuItem>More...</DropdownMenuItem>
 								</DropdownMenuSubContent>
 							</DropdownMenuPortal>
 						</DropdownMenuSub>
-						<DropdownMenuItem className={'focus:bg-secondary'}>
-							New Team
-						</DropdownMenuItem>
+						<DropdownMenuItem>New Team</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem className={'focus:bg-secondary'} onClick={signOut}>
-						Log out
-					</DropdownMenuItem>
+					<DropdownMenuItem onClick={signOut}>Log out</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		)

@@ -9,15 +9,42 @@ import { UserAvatar } from '@/components/user-avatar'
 import { AuthButton } from '@/components/auth-button'
 import { Separator } from '@/components/ui/separator'
 
-export const TopNav = ({
-	content,
-	title,
-}: {
-	content: { label: string; path: string; alt: string }[]
-	title: string
-}) => {
-	const { authStateUser, authStateLoading } = useContext(AuthContext)
+export const TopNav = ({ title }: { title: string }) => {
+	const { authStateUser, authStateLoading, documentSnapshot } =
+		useContext(AuthContext)
 	const [open, setOpen] = useState(false)
+
+	const isRostered = documentSnapshot?.data()?.team
+	const isCaptain = documentSnapshot?.data()?.captain
+
+	const navContent = [
+		{ label: 'Home', path: '/#welcome', alt: 'home page' },
+		{ label: 'Schedule', path: '/schedule', alt: 'league schedule' },
+		{ label: 'Standings', path: '/standings', alt: 'league standings' },
+		{ label: 'Teams', path: '/teams', alt: 'team list' },
+	]
+
+	const captainContent = [
+		{ label: 'Manage Team', path: '/invites', alt: 'team management' },
+	]
+	const rosteredContent = [
+		{ label: 'Your Team', path: '/myTeam', alt: 'team profile' },
+	]
+	const unrosteredContent = [
+		{ label: 'Join a Team', path: '/invites', alt: 'invite management' },
+		{ label: 'Create a Team', path: '/', alt: 'team creation' },
+	]
+
+	const userContent = [
+		{ label: 'Edit Profile', path: '/profile', alt: 'user profile' },
+		...(authStateUser
+			? isCaptain
+				? captainContent
+				: isRostered
+				? rosteredContent
+				: unrosteredContent
+			: []),
+	]
 
 	const handleClick = () => {
 		setOpen(!open)
@@ -31,13 +58,17 @@ export const TopNav = ({
 		>
 			<div className={'container flex items-center h-14'}>
 				{/* Nav */}
-				<div className={'hidden mr-4 md:flex'}>
+				<div className={'hidden mr-4 md:flex md:flex-1'}>
 					<Link to={'/'} className={'flex items-center mr-6 space-x-2'}>
 						{/* <div className={'w-6 h-6 rounded-full bg-primary'} /> */}
 						<span className={'hidden font-bold sm:inline-block'}>{title}</span>
 					</Link>
-					<nav className={'flex items-center space-x-6 text-sm font-medium'}>
-						{content.map((entry) => (
+					<nav
+						className={
+							'flex items-center justify-start space-x-6 text-sm font-medium flex-1'
+						}
+					>
+						{navContent.map((entry) => (
 							<Link
 								key={entry.path}
 								to={entry.path}
@@ -48,7 +79,9 @@ export const TopNav = ({
 								{entry.label}
 							</Link>
 						))}
-						<UserAvatar />
+						<div className="flex justify-end flex-1">
+							<UserAvatar userContent={userContent} />
+						</div>
 					</nav>
 				</div>
 
@@ -78,20 +111,30 @@ export const TopNav = ({
 						</Link>
 						<ScrollArea className={'my-4 h-[calc(100vh-8rem)] pb-10 px-6'}>
 							<div className={'flex flex-col space-y-3'}>
-								{content.map((entry) => (
-									<Link key={entry.path} to={entry.path} onClick={handleClick}>
-										{entry.label}
+								{navContent.map(({ path, label, alt }) => (
+									<Link
+										key={path}
+										to={path}
+										aria-label={alt}
+										onClick={handleClick}
+									>
+										{label}
 									</Link>
 								))}
 								{authStateUser && (
 									// Mostly placeholder links for now will refine later.
 									<>
 										<Separator />
-										<Link to={'/profile'}>Update Profile</Link>
-										<Link to={'#'}>View Roster</Link>
-										<Link onClick={() => setOpen(!open)} to={'/invites'}>
-											View Notifications
-										</Link>
+										{userContent.map(({ path, label, alt }) => (
+											<Link
+												key={path}
+												to={path}
+												aria-label={alt}
+												onClick={handleClick}
+											>
+												{label}
+											</Link>
+										))}
 										<Separator />
 									</>
 								)}
