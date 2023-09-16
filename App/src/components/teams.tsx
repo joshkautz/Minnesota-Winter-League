@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { cn, toCamelCase } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { Alert, AlertTitle, AlertDescription } from './ui/alert'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
