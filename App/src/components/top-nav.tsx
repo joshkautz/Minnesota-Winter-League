@@ -8,6 +8,7 @@ import { AuthContext } from '@/firebase/auth-context'
 import { UserAvatar } from '@/components/user-avatar'
 import { AuthButton } from '@/components/auth-button'
 import { Separator } from '@/components/ui/separator'
+import { ThemeToggle } from './ui/theme-toggle'
 
 export const TopNav = ({ title }: { title: string }) => {
 	const { authStateUser, authStateLoading, documentSnapshot } =
@@ -79,7 +80,11 @@ export const TopNav = ({ title }: { title: string }) => {
 								{entry.label}
 							</Link>
 						))}
-						<div className="flex justify-end flex-1">
+						<div className="flex items-center justify-end flex-1 gap-4">
+							<div>
+								<ThemeToggle />
+							</div>
+
 							<UserAvatar userContent={userContent} />
 						</div>
 					</nav>
