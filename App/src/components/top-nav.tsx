@@ -29,7 +29,7 @@ export const TopNav = ({ title }: { title: string }) => {
 		{ label: 'Manage Team', path: '/invites', alt: 'team management' },
 	]
 	const rosteredContent = [
-		{ label: 'Your Team', path: '/myTeam', alt: 'team profile' },
+		{ label: 'Your Team', path: '/team', alt: 'team profile' },
 	]
 	const unrosteredContent = [
 		{ label: 'Join a Team', path: '/invites', alt: 'invite management' },

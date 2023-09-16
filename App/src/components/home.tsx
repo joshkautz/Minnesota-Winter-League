@@ -173,6 +173,9 @@ export const Home = () => {
 								</div>
 							</div>
 						</div>
+						<div className={'flex flex-row gap-4'}>
+							<img src="/Map.png" />
+						</div>
 						<div className={'mt-8 text-2xl font-light '}>
 							Whether you're perfecting your throws, working on your defense, or
 							just out to have a great time,{' '}
@@ -283,25 +286,43 @@ export const Home = () => {
 				<p>Thank you for helping to make this league possible</p>
 				<div className="container flex items-center justify-center gap-8">
 					<div>
-						<img
-							src="https://pbs.twimg.com/profile_images/1639001836240752661/sgd0f6W2_400x400.jpg"
-							alt="League Sponsors"
-							width={100}
-						/>
+						<a
+							href="http://mplsmallard.com/"
+							target="_blank"
+							title="Minneapolis Mallard"
+						>
+							<img
+								src="https://pbs.twimg.com/profile_images/1639001836240752661/sgd0f6W2_400x400.jpg"
+								alt="Minneapolis Mallard"
+								width={100}
+							/>
+						</a>
 					</div>
 					<div>
-						<img
-							src="https://pbs.twimg.com/profile_images/1481722101824475143/c_dxHt-p_400x400.jpg"
-							alt="League Sponsors"
-							width={100}
-						/>
+						<a
+							href="https://theaudl.com/windchill"
+							target="_blank"
+							title="Minnesota Wind Chill"
+						>
+							<img
+								src="https://pbs.twimg.com/profile_images/1481722101824475143/c_dxHt-p_400x400.jpg"
+								alt="Minnesota Wind Chill"
+								width={100}
+							/>
+						</a>
 					</div>
 					<div>
-						<img
-							src="data:image/png;base64,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"
-							alt="League Sponsors"
-							width={100}
-						/>
+						<a
+							href="https://www.novacare.com/"
+							target="_blank"
+							title="NovaCare Rehabilitation"
+						>
+							<img
+								src="data:image/png;base64,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"
+								alt="NovaCare Rehabilitation"
+								width={100}
+							/>
+						</a>
 					</div>
 				</div>
 				<p>
