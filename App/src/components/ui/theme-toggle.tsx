@@ -12,9 +12,6 @@ import { LaptopIcon, MoonIcon, SunIcon } from '@radix-ui/react-icons'
 export const ThemeToggle = () => {
 	const themeContext = useContext(ThemeContext)
 
-	console.log(themeContext)
-	console.log('here')
-
 	if (!themeContext) {
 		return null
 	}
