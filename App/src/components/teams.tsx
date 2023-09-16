@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { cn, toCamelCase } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { Alert, AlertTitle, AlertDescription } from './ui/alert'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
@@ -79,10 +79,7 @@ export const Teams = () => {
 				<div className={'flex flex-row flex-wrap justify-evenly gap-y-8'}>
 					{teamsQuerySnapshot.docs.map((doc) => {
 						return (
-							<Link
-								key={`link-${doc.id}`}
-								to={`/teams/${toCamelCase(doc.data().name)}`}
-							>
+							<Link key={`link-${doc.id}`} to={`/teams/${doc.id}`}>
 								<Card className={'group'}>
 									<CardHeader className={'p-0'}>
 										<div

@@ -17,6 +17,7 @@ import {
 	collection,
 	onSnapshot,
 	Unsubscribe,
+	or,
 	DocumentSnapshot,
 	QueryDocumentSnapshot,
 	DocumentReference,
@@ -207,6 +208,18 @@ const gamesQuery = (): Query<GamesData, DocumentData> => {
 	>
 }
 
+const gamesByTeamQuery = (
+	teamRef: DocumentReference<TeamData, DocumentData> | undefined
+): Query<GamesData, DocumentData> | undefined => {
+	if (teamRef)
+		return query(
+			collection(firestore, 'games'),
+			or(where('home', '==', teamRef), where('away', '==', teamRef)),
+			orderBy('date', 'asc')
+		) as Query<GamesData, DocumentData>
+	return undefined
+}
+
 const updatePlayer = (
 	authValue: User | null | undefined,
 	data: UpdateData<PlayerDocumentData>
@@ -327,6 +340,7 @@ export {
 	createTeam,
 	deleteTeam,
 	stripeRegistration,
+	gamesByTeamQuery,
 	unrosteredPlayersQuery,
 	promoteToCaptain,
 	removePlayerFromTeam,

@@ -9,16 +9,22 @@ import { ProtectedRoute } from '@/components/protected-route'
 import { Profile } from '@/components/profile'
 import { TeamProfile } from './components/team-profile'
 import { ManageOffers } from './components/manage-offers'
+import { useContext } from 'react'
+import { AuthContext } from './firebase/auth-context'
 
 function App() {
+	const { documentSnapshot } = useContext(AuthContext)
+	documentSnapshot?.data()?.team
+
 	return (
 		<Routes>
 			<Route path={'/'} element={<Layout />}>
 				<Route index element={<Home />} />
 				<Route path={'/schedule'} element={<Schedule />} />
 				<Route path={'/standings'} element={<Standings />} />
+				<Route path={'/team'} element={<TeamProfile />} />
 				<Route path={'/teams'} element={<Teams />} />
-				<Route path={'/teams/:name'} element={<TeamProfile />} />
+				<Route path={'/teams/:id'} element={<TeamProfile />} />
 				<Route
 					path={'/profile'}
 					element={
