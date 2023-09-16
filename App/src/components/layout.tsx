@@ -11,7 +11,7 @@ const content = [
 export const Layout = () => {
 	return (
 		<div className={'flex flex-col items-center justify-start min-h-screen'}>
-			<TopNav title={'Minnesota Winter League'} content={content} />
+			<TopNav title={'🥏'} content={content} />
 			<Outlet />
 		</div>
 	)

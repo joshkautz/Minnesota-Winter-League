@@ -7,7 +7,7 @@ export const Home = () => {
 		<div className={'w-full'}>
 			<section id="welcome" className={'h-[80vh] max-h-[620px] container'}>
 				<div className={'flex flex-col gap-4 pt-16 pb-8 max-w-[680px]'}>
-					<p className={'text-5xl font-bold'}>Welcome To Winter League</p>
+					<p className={'text-5xl font-bold'}>Minneapolis Winter League</p>
 					<p className={'text-2xl font-light '}>
 						Get ready for action-packed evenings filled with thrilling frisbee
 						matches.
