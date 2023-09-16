@@ -73,10 +73,12 @@ export const UserAvatar = () => {
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						<Link to={'/profile'}>
-							<DropdownMenuItem>Profile</DropdownMenuItem>
+							<DropdownMenuItem className={'focus:bg-secondary'}>
+								Profile
+							</DropdownMenuItem>
 						</Link>
 						<Link to={'/invites'}>
-							<DropdownMenuItem className={'gap-1'}>
+							<DropdownMenuItem className={'gap-1 focus:bg-secondary'}>
 								View Notifications{' '}
 								{!!hasPendingOffers && (
 									<span
@@ -87,26 +89,44 @@ export const UserAvatar = () => {
 								)}
 							</DropdownMenuItem>
 						</Link>
-						<DropdownMenuItem>Schedule</DropdownMenuItem>
+						<DropdownMenuItem className={'focus:bg-secondary'}>
+							Schedule
+						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<DropdownMenuItem>View Roster</DropdownMenuItem>
+						<DropdownMenuItem className={'focus:bg-secondary'}>
+							View Roster
+						</DropdownMenuItem>
 						<DropdownMenuSub>
-							<DropdownMenuSubTrigger>Invite Players</DropdownMenuSubTrigger>
+							<DropdownMenuSubTrigger
+								className={'focus:bg-secondary data-[state=open]:bg-secondary'}
+							>
+								Invite Players
+							</DropdownMenuSubTrigger>
 							<DropdownMenuPortal>
 								<DropdownMenuSubContent>
-									<DropdownMenuItem>Email</DropdownMenuItem>
-									<DropdownMenuItem>Message</DropdownMenuItem>
+									<DropdownMenuItem className={'focus:bg-secondary'}>
+										Email
+									</DropdownMenuItem>
+									<DropdownMenuItem className={'focus:bg-secondary'}>
+										Message
+									</DropdownMenuItem>
 									<DropdownMenuSeparator />
-									<DropdownMenuItem>More...</DropdownMenuItem>
+									<DropdownMenuItem className={'focus:bg-secondary'}>
+										More...
+									</DropdownMenuItem>
 								</DropdownMenuSubContent>
 							</DropdownMenuPortal>
 						</DropdownMenuSub>
-						<DropdownMenuItem>New Team</DropdownMenuItem>
+						<DropdownMenuItem className={'focus:bg-secondary'}>
+							New Team
+						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={signOut}>Log out</DropdownMenuItem>
+					<DropdownMenuItem className={'focus:bg-secondary'} onClick={signOut}>
+						Log out
+					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		)

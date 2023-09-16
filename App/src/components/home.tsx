@@ -47,10 +47,10 @@ export const Home = () => {
 							}
 						/>
 					</div>
-					<div className={'flex flex-wrap items-center gap-20 mt-40'}>
+					<div className={'flex flex-wrap items-center gap-20 mt-40 w-full'}>
 						<Card
 							className={
-								'flex flex-col flex-1 basis-[400px] shrink-0 rounded-2xl'
+								'flex flex-col flex-1 basis-[320px] shrink-0 rounded-2xl'
 							}
 						>
 							<CardHeader>
@@ -92,7 +92,7 @@ export const Home = () => {
 						</Card>
 						<div
 							className={
-								'flex flex-col flex-1 gap-12 p-8 basis-[400px] shrink-0'
+								'flex flex-col flex-1 gap-12 p-8 basis-[320px] shrink-0'
 							}
 						>
 							<div className={'flex flex-col gap-4'}>
@@ -249,7 +249,7 @@ export const Home = () => {
 
 					<div
 						className={
-							'self-start w-[640px] h-1 rounded bg-gradient-to-r from-primary to-sky-300'
+							'self-start max-w-[640px] w-full h-1 rounded bg-gradient-to-r from-primary to-sky-300'
 						}
 					/>
 				</div>
@@ -261,11 +261,13 @@ export const Home = () => {
 			</div>
 
 			<footer className="bg-foreground text-background h-[400px] flex items-center justify-center">
-				<p>
-					Got questions or need assistance? Contact us at{' '}
-					<a href="mailto:contact@example.com">contact@example.com</a> or call{' '}
-					<a href="tel:+123456789">123-456-789</a>.
-				</p>
+				<div className="container flex items-center justify-center">
+					<p>
+						Got questions or need assistance? Contact us at{' '}
+						<a href="mailto:contact@example.com">contact@example.com</a> or call{' '}
+						<a href="tel:+123456789">123-456-789</a>.
+					</p>
+				</div>
 			</footer>
 		</div>
 	)

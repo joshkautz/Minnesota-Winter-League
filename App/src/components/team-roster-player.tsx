@@ -78,7 +78,11 @@ export const TeamRosterPlayer = ({
 						<div className="flex justify-end flex-1 gap-2">
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
-									<Button size={'sm'} variant={'ghost'}>
+									<Button
+										size={'sm'}
+										variant={'ghost'}
+										className="hover:bg-secondary"
+									>
 										<DotsVerticalIcon />
 									</Button>
 								</DropdownMenuTrigger>
@@ -87,12 +91,14 @@ export const TeamRosterPlayer = ({
 									<DropdownMenuSeparator />
 									<DropdownMenuGroup>
 										<DropdownMenuItem
+											className={'focus:bg-secondary'}
 											disabled={isDisabled || playerData.captain}
 											onClick={promoteToCaptainOnClickHandler}
 										>
 											Promote to captain
 										</DropdownMenuItem>
 										<DropdownMenuItem
+											className={'focus:bg-secondary'}
 											disabled={isDisabled || playerData.captain}
 											onClick={removeFromTeamOnClickHandler}
 										>
