@@ -13,8 +13,8 @@ import { useContext } from 'react'
 import { AuthContext } from './firebase/auth-context'
 
 function App() {
-  const { documentSnapshot } = useContext(AuthContext)
-  documentSnapshot ?.data()?.team
+	const { documentSnapshot } = useContext(AuthContext)
+	documentSnapshot?.data()?.team
 
 	return (
 		<Routes>
