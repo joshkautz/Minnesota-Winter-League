@@ -81,7 +81,7 @@ export const Teams = () => {
 						return (
 							<Link
 								key={`link-${doc.id}`}
-								to={`/teams/${toCamelCase(doc.data().name)}`}
+								to={`/teams/${doc.id}`}
 							>
 								<Card className={'group'}>
 									<CardHeader className={'p-0'}>

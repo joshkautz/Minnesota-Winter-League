@@ -8,7 +8,6 @@ import {
 	TableBody,
 	TableCell,
 } from './ui/table'
-import { toCamelCase } from '@/lib/utils'
 import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
 import { getStandingsRef } from '@/firebase/firestore'
@@ -65,6 +64,9 @@ export const Standings = () => {
 						</TableRow>
 					) : (
 						standingsSnapshot?.data()?.standings.map((data, index) => {
+							const team = teamsQuerySnapshot?.docs.find(
+								(team) => team.id === data.team.id
+							)
 							const teamData = teamsQuerySnapshot?.docs
 								.find((team) => team.id === data.team.id)
 								?.data()
@@ -72,7 +74,7 @@ export const Standings = () => {
 								<TableRow key={index}>
 									<TableCell className="font-medium ">{index + 1}</TableCell>
 									<TableCell>
-										<Link to={`/teams/${toCamelCase(teamData?.name ?? '')}`}>
+										<Link to={`/teams/${team?.id}`}>
 											<div className="flex items-center justify-start gap-2 ">
 												<div className="w-16 flex justify-start">
 													<img
