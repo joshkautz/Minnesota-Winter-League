@@ -1,5 +1,6 @@
 import { SketchLogoIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { DomeSvg } from './ui/dome-svg'
 
 export const Home = () => {
 	return (
@@ -21,6 +22,8 @@ export const Home = () => {
 						we can't wait to welcome you to the league.
 					</span>
 				</p>
+
+				<DomeSvg className="max-w-[720px] invisible absolute sm:visible sm:-translate-y-1/6 lg:-translate-y-[75%] lg:top-1/2 left-1/2" />
 			</section>
 
 			<div className="w-full min-h-screen text-background bg-foreground">
@@ -100,7 +103,7 @@ export const Home = () => {
 			<div className="">
 				<section
 					id="why-join"
-					className="bg-accent min-h-[600px] rounded-2xl  max-w-[1200px] mx-auto -mt-20 p-8 lg:py-24 lg:px-32"
+					className="bg-accent min-h-[600px] rounded-2xl  max-w-[1200px] mx-auto -mt-20 p-8 lg:py-24 lg:px-24"
 				>
 					<div className="flex flex-col gap-8 max-w-[800px] mx-auto">
 						<div className="text-4xl font-bold capitalize">Why Join Us?</div>
