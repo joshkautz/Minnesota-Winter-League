@@ -9,32 +9,36 @@ export const Home = () => {
 	return (
 		<div className={'w-full'}>
 			<section id="welcome" className={'h-[80vh] max-h-[620px] container'}>
-				<div className={'flex flex-col gap-4 pt-16 pb-8 max-w-[680px]'}>
-					<p className={'text-5xl font-bold'}>Minneapolis Winter League</p>
-					<p className={'text-2xl font-light '}>
-						Bundle up, lace up your cleats, and experience Minneapolis winter
-						ultimate like never before.
-					</p>
-				</div>
-				<div
-					className={
-						'w-[220px] h-1 rounded bg-gradient-to-r from-primary to-sky-300'
-					}
-				/>
-				<p className={'mt-12 max-w-[490px]'}>
-					Join us this season for unforgettable Saturday nights of organized
-					league play. Whether you're a seasoned club veteran, or a rookie in
-					college,{' '}
-					<span className={'font-bold'}>
-						we can't wait to welcome you to the league.
-					</span>
-				</p>
+				<div className="flex flex-col items-stretch h-full md:flex-row justify-stretch">
+					<div className="flex-1">
+						<div className={'flex flex-col gap-4 pt-16 pb-8 max-w-[680px]'}>
+							<p className={'text-5xl font-bold'}>Minneapolis Winter League</p>
+							<p className={'text-2xl font-light '}>
+								Bundle up, lace up your cleats, and experience Minneapolis
+								winter ultimate like never before.
+							</p>
+						</div>
+						<div
+							className={
+								'w-[220px] h-1 rounded bg-gradient-to-r from-primary to-sky-300'
+							}
+						/>
+						<div className="flex flex-col">
+							<p className={'mt-12 max-w-[490px] flex flex-1 flex-col'}>
+								Join us this season for unforgettable Saturday nights of
+								organized league play. Whether you're a seasoned club veteran,
+								or a rookie in college,{' '}
+								<span className={'font-bold'}>
+									we can't wait to welcome you to the league.
+								</span>
+							</p>
+						</div>
+					</div>
 
-				<DomeSvg
-					className={
-						'max-w-[720px] invisible absolute sm:visible sm:-translate-y-1/6 lg:-translate-y-[75%] lg:top-1/2 left-1/2'
-					}
-				/>
+					<DomeSvg
+						className={'max-w-[620px] invisible relative sm:visible flex-1'}
+					/>
+				</div>
 			</section>
 
 			<div className={'w-full min-h-screen text-background bg-foreground'}>
@@ -132,7 +136,7 @@ export const Home = () => {
 				<section
 					id="why-join"
 					className={
-						'bg-accent min-h-[600px] rounded-2xl max-w-[1200px] mx-auto -mt-20 p-8 lg:py-24 lg:px-24'
+						'bg-accent text-accent-foreground min-h-[600px] rounded-2xl max-w-[1200px] mx-auto -mt-20 p-8 lg:py-24 lg:px-24'
 					}
 				>
 					<div className={'flex flex-col gap-8 max-w-[800px] mx-auto'}>
