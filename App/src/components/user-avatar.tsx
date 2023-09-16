@@ -98,22 +98,6 @@ export const UserAvatar = ({
 						})}
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
-					<DropdownMenuGroup>
-						<DropdownMenuItem>View Roster</DropdownMenuItem>
-						<DropdownMenuSub>
-							<DropdownMenuSubTrigger>Invite Players</DropdownMenuSubTrigger>
-							<DropdownMenuPortal>
-								<DropdownMenuSubContent>
-									<DropdownMenuItem>Email</DropdownMenuItem>
-									<DropdownMenuItem>Message</DropdownMenuItem>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem>More...</DropdownMenuItem>
-								</DropdownMenuSubContent>
-							</DropdownMenuPortal>
-						</DropdownMenuSub>
-						<DropdownMenuItem>New Team</DropdownMenuItem>
-					</DropdownMenuGroup>
-					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={signOut}>Log out</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
