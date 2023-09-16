@@ -25,7 +25,7 @@ resource "google_project" "default" {
   # Use the provider that enables the setup of quota checks for a new project
   provider   = google-beta.no_user_project_override
 
-  name       = "Minnesota Winter League"
+  name       = "Minneapolis Winter League"
   project_id = "minnesota-winter-league"
   # Required for any service that requires the Blaze pricing plan
   # (like Firebase Authentication with GCIP)
@@ -132,7 +132,7 @@ resource "google_firestore_database" "default" {
 resource "google_firebase_web_app" "default" {
   provider     = google-beta
   project      = google_project.default.project_id
-  display_name = "Minnesota Winter League"
+  display_name = "Minneapolis Winter League"
 
   # The other App types (Android and Apple) use "DELETE" by default.
   # Web apps don't use "DELETE" by default due to backward-compatibility.

@@ -2,6 +2,7 @@ import { SketchLogoIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { DomeSvg } from './ui/dome-svg'
 import { useAnchorScroll } from '@/lib/use-anchor-scroll'
+import { Link } from 'react-router-dom'
 
 export const Home = () => {
 	useAnchorScroll()
@@ -9,10 +10,10 @@ export const Home = () => {
 		<div className={'w-full'}>
 			<section id="welcome" className={'h-[80vh] max-h-[620px] container'}>
 				<div className={'flex flex-col gap-4 pt-16 pb-8 max-w-[680px]'}>
-					<p className={'text-5xl font-bold'}>Welcome To Winter League</p>
+					<p className={'text-5xl font-bold'}>Minneapolis Winter League</p>
 					<p className={'text-2xl font-light '}>
-						Get ready for action-packed evenings filled with thrilling frisbee
-						matches.
+						Bundle up, lace up your cleats, and experience Minneapolis winter
+						ultimate like never before.
 					</p>
 				</div>
 				<div
@@ -21,9 +22,9 @@ export const Home = () => {
 					}
 				/>
 				<p className={'mt-12 max-w-[490px]'}>
-					Join us this season for unforgettable Saturday nights of frisbee
-					action. Whether you're in it for the love of the game, the chance to
-					win, or simply to enjoy the company of fellow frisbee enthusiasts,{' '}
+					Join us this season for unforgettable Saturday nights of organized
+					league play. Whether you're a seasoned club veteran, or a rookie in
+					college,{' '}
 					<span className={'font-bold'}>
 						we can't wait to welcome you to the league.
 					</span>
@@ -40,8 +41,8 @@ export const Home = () => {
 				<section id="league-details" className={'container pb-40'}>
 					<div className={'flex flex-col items-end gap-2 pt-24'}>
 						<p className={'text-4xl font-bold  max-w-[800px]'}>
-							Our league is all about sportsmanship, friendly competition, and a
-							whole lot of fun.
+							Our league is about community, growth, competition, and a whole
+							lot of fun.
 						</p>
 						<div
 							className={
@@ -56,11 +57,15 @@ export const Home = () => {
 							}
 						>
 							<CardHeader>
-								<CardTitle className={'text-2xl font-bold'}>
-									League Details
+								<CardTitle className={'text-2xl font-bold self-center'}>
+									Dates + Details
 								</CardTitle>
 							</CardHeader>
 							<CardContent className={'flex flex-col gap-4'}>
+								<div className={'flex'}>
+									<p className={'w-16 mr-2 font-bold'}>What:</p>
+									<span>5v5 Open Ultimate on Turf Fields</span>
+								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>When:</p>
 									<span>
@@ -69,13 +74,14 @@ export const Home = () => {
 									</span>
 								</div>
 								<div className={'flex'}>
-									<p className={'w-16 mr-2 font-bold'}>What:</p>
-									<span>5v5 Indoor Open Ultimate League</span>
-								</div>
-								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>Where:</p>
 									<span>
-										University of Minnesota | URW Sports Field Complex
+										<a
+											href="https://maps.app.goo.gl/avAamyReCbGmz8jWA"
+											target="_blank"
+										>
+											<u>University of Minnesota | URW Sports Field Complex</u>
+										</a>
 									</span>
 								</div>
 								<div className={'flex'}>
@@ -84,11 +90,11 @@ export const Home = () => {
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>Games:</p>
-									<span>Two 45-minute games every night</span>
+									<span>Two 40-minute games every Saturday</span>
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>Cost:</p>
-									<span>Just $60 per person for 6 nights of play</span>
+									<span>Just $10/person per night</span>
 								</div>
 							</CardContent>
 						</Card>
@@ -98,23 +104,23 @@ export const Home = () => {
 							}
 						>
 							<div className={'flex flex-col gap-4'}>
-								<p className={'text-2xl font-bold'}>Individual Players</p>
+								<p className={'text-2xl font-bold'}>Individuals</p>
 								<p>
 									If you're a solo player looking for a team, don't worry! We'll
-									help you find like-minded individuals to team up with and
-									create a squad that's ready to dominate the frisbee field.
+									help you find a team up to play with for the season!{' '}
+									<Link to={'/#how-to-register'}>
+										<u>Learn more about registration below.</u>
+									</Link>
 								</p>
 							</div>
 							<div className={'flex flex-col gap-4'}>
-								<p className={'text-2xl font-bold'}>Team Captains</p>
+								<p className={'text-2xl font-bold'}>Teams</p>
 								<p>
-									In its inaugural year, the league has room for 12 teams. Act
-									fast and register your team before space fills up. There is a
-									10-player minimum for teams, with no roster limit. Team
-									registration requires a flat $100 fee for participation. Team
-									captains, assemble your dream team and sign up together to
-									ensure your place in the league. Show off your strategic
-									skills and lead your team to victory!
+									Minneapolis Winter League has room for <b>12 teams.</b> Be
+									sure to register your team before space fills up. There is a
+									10-player minimum for teams, with no roster limit. The cost to
+									register a team is $100. Be sure to check the Teams page to
+									see how many teams are currently registered.
 								</p>
 							</div>
 						</div>
@@ -130,7 +136,7 @@ export const Home = () => {
 					}
 				>
 					<div className={'flex flex-col gap-8 max-w-[800px] mx-auto'}>
-						<div className={'text-4xl font-bold '}>Why Join Us?</div>
+						<div className={'text-4xl font-bold '}>Why Join?</div>
 						<div className={'flex flex-row gap-4'}>
 							<div className={''}>
 								<SketchLogoIcon className={'w-8 h-8'} />
@@ -138,9 +144,9 @@ export const Home = () => {
 							<div className={'flex flex-col gap-2'}>
 								<div className={'text-2xl font-bold'}>Friends</div>
 								<p>
-									Form your own team with friends or join as an individual, and
+									Form your own team with friends, or join as an individual, and
 									experience the camaraderie of sportsmanship against a variety
-									of competitors.
+									of players in the area.
 								</p>
 							</div>
 						</div>
@@ -153,12 +159,13 @@ export const Home = () => {
 								<div className={'text-2xl font-bold'}>Competition</div>
 								<div>
 									The league is open to all skill levels, and is focused on
-									making sure everone has valuable off-season opportunities to
-									continue playing, improving, and competing. Weekly play will
-									be organized, and results will be used to ensure that teams
-									are matched up against opponents of similar skill levels. At
-									the end of the season, the top teams will compete in a playoff
-									tournament to determine the league champion!
+									making sure everone has valuable opportunities during the
+									winter months to continue playing, improving, and competing.
+									Weekly play will be organized, and results will be used to
+									ensure that teams are matched up against opponents of similar
+									skill levels. At the end of the season, the top teams will
+									compete to determine the league champion, while the other
+									teams will continue with regular games!
 								</div>
 							</div>
 						</div>
@@ -166,7 +173,7 @@ export const Home = () => {
 							Whether you're perfecting your throws, working on your defense, or
 							just out to have a great time,{' '}
 							<span className={'font-bold'}>
-								The Saturday Frisbee League is the place to be.
+								Minneapolis Winter League is the place to be.
 							</span>
 						</div>
 					</div>
@@ -191,7 +198,7 @@ export const Home = () => {
 							>
 								1
 							</span>
-							<p>Click on the "Register" button.</p>
+							<p>Click on the "Login" button to register and log in.</p>
 						</div>
 						<div className={'w-full flex'}>
 							<span

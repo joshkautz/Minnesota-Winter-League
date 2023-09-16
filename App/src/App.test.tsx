@@ -11,6 +11,6 @@ describe('App test', () => {
 			</BrowserRouter>
 		)
 
-		expect(screen.getByText(/Minnesota Winter League/i)).toBeDefined()
+		expect(screen.getByText(/Minneapolis Winter League/i)).toBeDefined()
 	})
 })

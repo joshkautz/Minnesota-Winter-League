@@ -60,7 +60,7 @@ export const TopNav = ({ title }: { title: string }) => {
 				{/* Nav */}
 				<div className={'hidden mr-4 md:flex md:flex-1'}>
 					<Link to={'/'} className={'flex items-center mr-6 space-x-2'}>
-						<div className={'w-6 h-6 rounded-full bg-primary'} />
+						{/* <div className={'w-6 h-6 rounded-full bg-primary'} /> */}
 						<span className={'hidden font-bold sm:inline-block'}>{title}</span>
 					</Link>
 					<nav
@@ -104,10 +104,10 @@ export const TopNav = ({ title }: { title: string }) => {
 							className={'flex items-center'}
 							onClick={handleClick}
 						>
-							<div className={'w-6 h-6 rounded-full bg-primary'} />
-							<span className={'ml-1 hidden font-bold sm:inline-block'}>
-								Minnesota Winter League
-							</span>
+							{/* <div className={'w-6 h-6 rounded-full bg-primary'} /> */}
+							{/* <span className={'ml-1 hidden font-bold sm:inline-block'}>
+								Minneapolis Winter League
+							</span> */}
 						</Link>
 						<ScrollArea className={'my-4 h-[calc(100vh-8rem)] pb-10 px-6'}>
 							<div className={'flex flex-col space-y-3'}>

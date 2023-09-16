@@ -1,4 +1,4 @@
-<h1>🥏 Minnesota Winter League</h1>
+<h1>🥏 Minneapolis Winter League</h1>
 
 ![Production GitHub Workflow Status](https://github.com/joshkautz/Minnesota-Winter-League/actions/workflows/firebase-hosting-merge.yml/badge.svg "Production GitHub Workflow Status")
 

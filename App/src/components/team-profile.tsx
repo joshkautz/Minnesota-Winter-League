@@ -74,7 +74,7 @@ export const TeamProfile = () => {
 				</NotificationCard>
 				<NotificationCard
 					title={'Record'}
-					description={'2023 Minnesota Winter League'}
+					description={'2023 Minneapolis Winter League'}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
 				>
 					<div className="flex flex-col items-end gap-2 py-2">
