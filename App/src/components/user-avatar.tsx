@@ -21,7 +21,11 @@ import {
 import { Link } from 'react-router-dom'
 import { OffersContext } from '@/firebase/offers-context'
 
-export const UserAvatar = () => {
+export const UserAvatar = ({
+	userContent,
+}: {
+	userContent: { label: string; path: string; alt: string }[]
+}) => {
 	const { authStateUser, authStateLoading, signOut } = useContext(AuthContext)
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
@@ -72,22 +76,26 @@ export const UserAvatar = () => {
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<Link to={'/profile'}>
-							<DropdownMenuItem>Profile</DropdownMenuItem>
-						</Link>
-						<Link to={'/invites'}>
-							<DropdownMenuItem className={'gap-1'}>
-								View Notifications{' '}
-								{!!hasPendingOffers && (
-									<span
-										className={
-											'self-start w-2 h-2 translate-y-1 rounded-full bg-primary'
-										}
-									/>
-								)}
-							</DropdownMenuItem>
-						</Link>
-						<DropdownMenuItem>Schedule</DropdownMenuItem>
+						{userContent.map(({ label, path, alt }) => {
+							return (
+								<Link key={path} to={path} aria-label={alt}>
+									{path === '/invites' ? (
+										<DropdownMenuItem className={'gap-1'}>
+											{label}{' '}
+											{!!hasPendingOffers && (
+												<span
+													className={
+														'self-start w-2 h-2 translate-y-1 rounded-full bg-primary'
+													}
+												/>
+											)}
+										</DropdownMenuItem>
+									) : (
+										<DropdownMenuItem>{label}</DropdownMenuItem>
+									)}
+								</Link>
+							)
+						})}
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
