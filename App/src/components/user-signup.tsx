@@ -32,6 +32,7 @@ export const UserSignup = () => {
 		authStateLoading,
 		createUserWithEmailAndPassword,
 		createUserWithEmailAndPasswordError,
+		sendEmailVerification,
 	} = useContext(AuthContext)
 	const form = useForm<SignupSchema>({
 		resolver: zodResolver(signupSchema),
@@ -39,13 +40,15 @@ export const UserSignup = () => {
 
 	const onSubmit = async (data: SignupSchema) => {
 		const res = await createUserWithEmailAndPassword(data.email, data.password)
-		if (res)
+		if (res) {
+			await sendEmailVerification()
 			await createPlayer(
 				res.user.uid,
 				data.firstname,
 				data.lastname,
 				data.email
 			)
+		}
 
 		toast({
 			title: res?.user

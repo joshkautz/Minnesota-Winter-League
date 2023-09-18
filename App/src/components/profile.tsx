@@ -166,7 +166,7 @@ export const Profile = () => {
 			<Button onClick={registrationButtonOnClickHandler}>Register</Button>
 			<br />
 			<Button onClick={sendEmailVerificationButtonOnClickHandler}>
-				Send Verification Email
+				Re-Send Verification Email
 			</Button>
 			<br />
 			<Button onClick={sendPasswordResetEmailButtonOnClickHandler}>

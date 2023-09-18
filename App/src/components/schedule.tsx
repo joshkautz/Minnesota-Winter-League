@@ -15,18 +15,6 @@ import {
 } from '@/firebase/firestore'
 import { GamesData } from '@/lib/interfaces'
 
-// {
-//   status: 'completed',
-//   opponentOne: {
-//     logo: teamsQuerySnapshot?.docs[0].data().logo,
-//     score: 11,
-//   },
-//   opponentTwo: {
-//     logo: teamsQuerySnapshot?.docs[1].data().logo,
-//     score: 15,
-//   },
-// }
-
 const ScheduleCard = ({
 	games,
 	title,
@@ -119,7 +107,7 @@ export const Schedule = () => {
 		<div className="container">
 			<div
 				className={
-					'my-4 max-w-max text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
+					'my-4 mx-auto max-w-max text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
 				}
 			>
 				Schedule
