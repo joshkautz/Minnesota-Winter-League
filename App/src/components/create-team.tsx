@@ -1,7 +1,7 @@
 import { AuthContext } from '@/firebase/auth-context'
 // import { createTeam } from '@/firebase/firestore'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 // import { toast } from './ui/use-toast'
@@ -16,7 +16,12 @@ import {
 	FormMessage,
 } from './ui/form'
 import { Input } from './ui/input'
-// import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import {
+	getStorage,
+	ref,
+	getDownloadURL,
+	uploadBytesResumable,
+} from 'firebase/storage'
 
 const createTeamSchema = z.object({
 	logo: z.any(),
@@ -26,75 +31,51 @@ const createTeamSchema = z.object({
 type CreateTeamSchema = z.infer<typeof createTeamSchema>
 
 export const CreateTeam = () => {
-	// const storage = getStorage()
+	const storage = getStorage()
 	const { documentSnapshot } = useContext(AuthContext)
 	const form = useForm<CreateTeamSchema>({
 		resolver: zodResolver(createTeamSchema),
 	})
+	const [file, setFile] = useState(null)
+
+	const handleFileChange = (e) => {
+		const selectedFile = e.target.files[0]
+		setFile(selectedFile)
+	}
 
 	// this is where i neeed halpppp
-	const onSubmit = async (data: CreateTeamSchema) => {
+	const onSubmit = async (data) => {
 		console.log('data', data)
-		if (!documentSnapshot?.ref) {
+		if (!documentSnapshot?.ref || !file) {
 			return
 		}
 
-		try {
-			// const storageRef = ref(storage, 'team-logos/' + data.name)
-			// const uploadTask = uploadBytes(storageRef, data.logo)
-			// const unsubscribe = on(
-			// 	uploadTask,
-			// 	'state_changed',
-			// 	(snapshot) => {
-			// 		// Handle progress updates here if needed.
-			// 		const progress =
-			// 			(snapshot.bytesTransferred / snapshot.totalBytes) * 100
-			// 		console.log(`Upload is ${progress}% done`)
-			// 	},
-			// 	(error) => {
-			// 		// Handle upload errors.
-			// 		console.error('Error uploading image:', error)
-			// 		// Handle the error here, for example, by displaying an error message to the user.
-			// 	},
-			// 	async () => {
-			// 		// Upload completed successfully, now get the download URL.
-			// 		try {
-			// 			const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
-			// 			console.log('Image URL:', downloadURL)
-			// 			// Continue with creating the team or other actions as needed.
-			// 			// For example, update your Firestore document with the downloadURL.
-			// 		} catch (urlError) {
-			// 			// Handle any errors that may occur when getting the download URL.
-			// 			console.error('Error getting download URL:', urlError)
-			// 			// Handle the error, such as displaying an error message to the user.
-			// 		}
-			// 		// Unsubscribe the event listener when done (optional).
-			// 		unsubscribe()
-			// 	}
-			// )
-			// const res = await createTeam(documentSnapshot.ref, data)
-			// console.log(res)
-			// if (res.id) {
-			// 	toast({
-			// 		title: `Successfully created team ${data.name}!`,
-			// 		variant: 'default',
-			// 		description: (
-			// 			<span>
-			// 				Build up your roster by{' '}
-			// 				<Link to="/invites">inviting other players to join!</Link>
-			// 			</span>
-			// 		),
-			// 	})
-			// } else {
-			// 	toast({
-			// 		title: `Unable to create team ${data.name}!`,
-			// 		variant: 'destructive',
-			// 		description: 'Something went wrong, please try again.',
-			// 	})
-			// }
-		} catch (error) {
-			console.log(error)
-		}
+		const storageRef = ref(storage, 'teamLogos/' + data.name)
+		const uploadTask = uploadBytesResumable(storageRef, file)
+
+		uploadTask.on(
+			'state_changed',
+			(snapshot) => {
+				const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+				console.log('Upload is ' + progress + '% done')
+				switch (snapshot.state) {
+					case 'paused':
+						console.log('Upload is paused')
+						break
+					case 'running':
+						console.log('Upload is running')
+						break
+				}
+			},
+			(error) => {
+				console.error('Error uploading image:', error)
+			},
+			() => {
+				getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+					console.log('File available at', downloadURL)
+				})
+			}
+		)
 	}
 
 	return (
@@ -146,6 +127,7 @@ export const CreateTeam = () => {
 											placeholder={'Upload Image'}
 											{...field}
 											value={field.value ?? ''}
+											onChange={handleFileChange}
 										/>
 									</FormControl>
 									<FormMessage />
