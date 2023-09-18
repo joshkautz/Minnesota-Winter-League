@@ -33,7 +33,7 @@ export const TopNav = ({ title }: { title: string }) => {
 	]
 	const unrosteredContent = [
 		{ label: 'Join a Team', path: '/invites', alt: 'invite management' },
-		{ label: 'Create a Team', path: '/', alt: 'team creation' },
+		{ label: 'Create a Team', path: '/create', alt: 'team creation' },
 	]
 
 	const userContent = [
@@ -84,7 +84,6 @@ export const TopNav = ({ title }: { title: string }) => {
 							<div>
 								<ThemeToggle />
 							</div>
-
 							<UserAvatar userContent={userContent} />
 						</div>
 					</nav>

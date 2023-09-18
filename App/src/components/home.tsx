@@ -214,7 +214,9 @@ export const Home = () => {
 			<div className={'container'}>
 				<section
 					id="how-to-register"
-					className={'my-32 flex justify-center items-stretch gap-8'}
+					className={
+						'my-32 flex justify-center md:items-stretch gap-8 flex-col md:flex-row items-center'
+					}
 				>
 					<div className="flex items-center justify-center flex-1 rounded-lg overflow-clip bg-secondary max-w-[500px]">
 						<img src="/Map.png" />
