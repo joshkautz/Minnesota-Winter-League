@@ -66,12 +66,13 @@ const rejectOffer = (
 
 const createTeam = (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamData: { logo: string; name: string }
+	name: string,
+	logo: string
 ): Promise<DocumentReference<TeamData, DocumentData>> => {
 	return addDoc(collection(firestore, 'teams'), {
 		captains: [playerRef],
-		logo: teamData.logo,
-		name: teamData.name,
+		logo: logo,
+		name: name,
 		registered: false,
 		roster: [playerRef],
 	}) as Promise<DocumentReference<TeamData, DocumentData>>

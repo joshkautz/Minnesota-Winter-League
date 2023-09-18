@@ -1,12 +1,13 @@
 import { AuthContext } from '@/firebase/auth-context'
-// import { createTeam } from '@/firebase/firestore'
+import { createTeam } from '@/firebase/firestore'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-// import { toast } from './ui/use-toast'
-// import { Link } from 'react-router-dom'
+import { toast } from './ui/use-toast'
+import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
+import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
 import {
 	Form,
 	FormField,
@@ -16,66 +17,91 @@ import {
 	FormMessage,
 } from './ui/form'
 import { Input } from './ui/input'
-import {
-	getStorage,
-	ref,
-	getDownloadURL,
-	uploadBytesResumable,
-} from 'firebase/storage'
+import { getStorage, ref } from 'firebase/storage'
+import { v4 as uuidv4 } from 'uuid'
+import { StorageReference, FirebaseStorage } from 'firebase/storage'
+import { ReloadIcon } from '@radix-ui/react-icons'
 
 const createTeamSchema = z.object({
-	logo: z.any(),
+	logo: z.string().optional(),
 	name: z.string().min(2),
 })
 
 type CreateTeamSchema = z.infer<typeof createTeamSchema>
 
 export const CreateTeam = () => {
-	const storage = getStorage()
 	const { documentSnapshot } = useContext(AuthContext)
+
 	const form = useForm<CreateTeamSchema>({
 		resolver: zodResolver(createTeamSchema),
 	})
-	const [file, setFile] = useState(null)
 
-	const handleFileChange = (e) => {
-		const selectedFile = e.target.files[0]
-		setFile(selectedFile)
-	}
+	const [blob, setBlob] = useState<Blob>()
+	const [uuid, setUuid] = useState<string>(uuidv4())
+	const [storage, setStorage] = useState<FirebaseStorage>(getStorage())
+	const [storageRef, setStorageRef] = useState<StorageReference>(
+		ref(storage, uuid)
+	)
 
-	// this is where i neeed halpppp
-	const onSubmit = async (data) => {
-		console.log('data', data)
-		if (!documentSnapshot?.ref || !file) {
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (!e.target.files?.[0]) {
 			return
 		}
+		// form.setValue('logo', e.target.files[0].name)
+		setBlob(e.target.files[0])
+	}
 
-		const storageRef = ref(storage, 'teamLogos/' + data.name)
-		const uploadTask = uploadBytesResumable(storageRef, file)
+	const [uploadFile, uploadFileLoading, uploadFileSnapshot, uploadFileError] =
+		useUploadFile()
+	const [downloadUrl, downloadUrlLoading, downloadUrlError] =
+		useDownloadURL(storageRef)
 
-		uploadTask.on(
-			'state_changed',
-			(snapshot) => {
-				const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-				console.log('Upload is ' + progress + '% done')
-				switch (snapshot.state) {
-					case 'paused':
-						console.log('Upload is paused')
-						break
-					case 'running':
-						console.log('Upload is running')
-						break
-				}
-			},
-			(error) => {
-				console.error('Error uploading image:', error)
-			},
-			() => {
-				getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-					console.log('File available at', downloadURL)
+	useEffect(() => {
+		if (!uploadFileLoading) {
+			console.log(uploadFileSnapshot)
+		}
+	}, [uploadFileLoading])
+
+	// this is where i neeed halpppp
+	const onSubmit = async (data: CreateTeamSchema) => {
+		if (documentSnapshot) {
+			try {
+				if (!blob) return
+
+				const result = await uploadFile(storageRef, blob, {
+					contentType: 'image/jpeg',
 				})
+
+				if (result?.ref) {
+					setStorageRef(result?.ref)
+				}
+
+				// Create Team
+				// await createTeam(documentSnapshot.ref, data.name, data.logo)
+
+				// console.log(res)
+				// if (res.id) {
+				// 	toast({
+				// 		title: `Successfully created team ${data.name}!`,
+				// 		variant: 'default',
+				// 		description: (
+				// 			<span>
+				// 				Build up your roster by{' '}
+				// 				<Link to="/invites">inviting other players to join!</Link>
+				// 			</span>
+				// 		),
+				// 	})
+				// } else {
+				// 	toast({
+				// 		title: `Unable to create team ${data.name}!`,
+				// 		variant: 'destructive',
+				// 		description: 'Something went wrong, please try again.',
+				// 	})
+				// }
+			} catch (error) {
+				console.log(error)
 			}
-		)
+		}
 	}
 
 	return (
@@ -120,21 +146,27 @@ export const CreateTeam = () => {
 								<FormItem>
 									<FormLabel>Logo</FormLabel>
 									<FormControl>
+										<span>Upload Image</span>
 										<Input
 											id="image-upload"
 											type={'file'}
 											accept="image/*"
 											placeholder={'Upload Image'}
 											{...field}
-											value={field.value ?? ''}
 											onChange={handleFileChange}
+                      ref={fileInputRef}
 										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-						<Button type={'submit'}>Create</Button>
+						<Button type={'submit'} disabled={uploadFileLoading}>
+							{uploadFileLoading && (
+								<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+							)}
+							Create
+						</Button>
 					</form>
 				</Form>
 			</div>
