@@ -26,13 +26,13 @@ export const TopNav = ({ title }: { title: string }) => {
 	]
 
 	const captainContent = [
-		{ label: 'Manage Team', path: '/invites', alt: 'team management' },
+		{ label: 'Manage Team', path: '/manage', alt: 'team management' },
 	]
 	const rosteredContent = [
 		{ label: 'Your Team', path: '/team', alt: 'team profile' },
 	]
 	const unrosteredContent = [
-		{ label: 'Join a Team', path: '/invites', alt: 'invite management' },
+		{ label: 'Join a Team', path: '/manage', alt: 'team management' },
 		{ label: 'Create a Team', path: '/create', alt: 'team creation' },
 	]
 

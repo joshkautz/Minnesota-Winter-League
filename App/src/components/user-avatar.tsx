@@ -81,7 +81,7 @@ export const UserAvatar = ({
 						{userContent.map(({ label, path, alt }) => {
 							return (
 								<Link key={path} to={path} aria-label={alt}>
-									{path === '/invites' ? (
+									{path === '/manage' ? (
 										<DropdownMenuItem className={'gap-1'}>
 											{label}{' '}
 											{!!hasPendingOffers && (

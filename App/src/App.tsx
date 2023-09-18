@@ -8,7 +8,7 @@ import { Teams } from '@/components/teams'
 import { ProtectedRoute } from '@/components/protected-route'
 import { Profile } from '@/components/profile'
 import { TeamProfile } from './components/team-profile'
-import { ManageOffers } from './components/manage-offers'
+import { ManageTeam } from './components/manage-team'
 import { useContext } from 'react'
 import { AuthContext } from './firebase/auth-context'
 import { CreateTeam } from './components/create-team'
@@ -43,10 +43,10 @@ function App() {
 					}
 				/>
 				<Route
-					path={'/invites'}
+					path={'/manage'}
 					element={
 						<ProtectedRoute>
-							<ManageOffers />
+							<ManageTeam />
 						</ProtectedRoute>
 					}
 				/>
