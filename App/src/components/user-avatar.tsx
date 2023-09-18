@@ -22,8 +22,13 @@ export const UserAvatar = ({
 }: {
 	userContent: { label: string; path: string; alt: string }[]
 }) => {
-	const { authStateUser, authStateLoading, signOut } = useContext(AuthContext)
+	const { authStateUser, authStateLoading, documentSnapshot, signOut } =
+		useContext(AuthContext)
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
+
+	const userInitials = `${
+		documentSnapshot?.data()?.firstname.slice(0, 1) ?? ''
+	}${documentSnapshot?.data()?.lastname.slice(0, 1) ?? ''}`
 
 	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
 		(entry) => entry.data().status === 'pending'
@@ -58,12 +63,13 @@ export const UserAvatar = ({
 								}
 							/>
 						)}
+						{/* I dont think we even have this anymore... */}
 						<AvatarImage
 							src={authStateUser.photoURL ?? undefined}
 							alt={'profile image'}
 						/>
 						<AvatarFallback>
-							{authStateUser.displayName?.slice(0, 2) ?? 'NA'}
+							{!userInitials ? 'NA' : userInitials}
 						</AvatarFallback>
 					</Avatar>
 				</DropdownMenuTrigger>

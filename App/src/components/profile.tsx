@@ -16,7 +16,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from './ui/use-toast'
 import {
-	createTeam,
 	deleteTeam,
 	stripeRegistration,
 	updatePlayer,
@@ -84,12 +83,6 @@ export const Profile = () => {
 		}
 	}
 
-	const createTeamButtonOnClickHandler = () => {
-		if (documentSnapshot) {
-			createTeam(documentSnapshot.ref)
-		}
-	}
-
 	const deleteTeamButtonOnClickHandler = () => {
 		if (documentSnapshot) {
 			const data = documentSnapshot.data()
@@ -106,8 +99,8 @@ export const Profile = () => {
 					'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
 				}
 			>
-				{authStateUser?.displayName
-					? `Hello ${authStateUser.displayName}`
+				{documentSnapshot?.data()?.firstname
+					? `Hello ${documentSnapshot?.data()?.firstname}`
 					: 'Your Profile'}
 			</div>
 			<Form {...form}>
@@ -172,9 +165,7 @@ export const Profile = () => {
 			<Button onClick={sendPasswordResetEmailButtonOnClickHandler}>
 				Send Password Reset Email
 			</Button>
-			<br />{' '}
-			<Button onClick={createTeamButtonOnClickHandler}>Create Team</Button>
-			<br />
+			<br /> <br />
 			<Button onClick={deleteTeamButtonOnClickHandler}>Delete Team</Button>
 			<br />
 		</div>

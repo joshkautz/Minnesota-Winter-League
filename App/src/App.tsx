@@ -11,6 +11,7 @@ import { TeamProfile } from './components/team-profile'
 import { ManageOffers } from './components/manage-offers'
 import { useContext } from 'react'
 import { AuthContext } from './firebase/auth-context'
+import { CreateTeam } from './components/create-team'
 
 function App() {
 	const { documentSnapshot } = useContext(AuthContext)
@@ -30,6 +31,14 @@ function App() {
 					element={
 						<ProtectedRoute>
 							<Profile />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path={'/create'}
+					element={
+						<ProtectedRoute>
+							<CreateTeam />
 						</ProtectedRoute>
 					}
 				/>
