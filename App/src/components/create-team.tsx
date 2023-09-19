@@ -54,9 +54,7 @@ export const CreateTeam = () => {
 		setBlob(e.target.files[0])
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [uploadFile, uploadFileLoading, uploadFileSnapshot, uploadFileError] =
-		useUploadFile()
+	const [uploadFile, uploadFileLoading, , uploadFileError] = useUploadFile()
 	const [downloadUrl] = useDownloadURL(storageRef)
 
 	const handleResult = ({
@@ -79,7 +77,6 @@ export const CreateTeam = () => {
 	}
 
 	useEffect(() => {
-		console.log(newTeamData)
 		if (newTeamData) {
 			if (newTeamData.ref) {
 				setStorageRef(newTeamData.ref)
@@ -107,9 +104,7 @@ export const CreateTeam = () => {
 	}, [newTeamData])
 
 	useEffect(() => {
-		console.log(downloadUrl)
 		if (downloadUrl) {
-			// Create Team
 			if (documentSnapshot) {
 				if (newTeamData) {
 					createTeam(documentSnapshot.ref, newTeamData.name, downloadUrl)
@@ -124,14 +119,12 @@ export const CreateTeam = () => {
 							handleResult({ success: false, message: `Error: ${err}` })
 						})
 				} else {
-					console.log('New team data not available.')
 					handleResult({
 						success: false,
 						message: 'Something went wrong, please try again.',
 					})
 				}
 			} else {
-				console.log('User not loaded.')
 				handleResult({
 					success: false,
 					message: 'Something went wrong, please try logging in again.',
@@ -147,17 +140,13 @@ export const CreateTeam = () => {
 					const result = await uploadFile(ref(getStorage(), uuidv4()), blob, {
 						contentType: 'image/jpeg',
 					})
-					console.log('res', result)
-
 					if (result) {
 						setNewTeamData({ name: data.name, ref: result.ref })
 					}
 				} else {
-					console.log('rejected')
 					setNewTeamData({ name: data.name, ref: undefined })
 				}
 			} catch (error) {
-				console.log(error)
 				handleResult({ success: false, message: `Error: ${error}` })
 			}
 		}
