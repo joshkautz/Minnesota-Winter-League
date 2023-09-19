@@ -4,6 +4,8 @@ import {
 	DocumentData,
 	DocumentReference,
 	acceptOffer,
+	deleteTeam,
+	leaveTeam,
 	rejectOffer,
 } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
@@ -14,6 +16,7 @@ import { TeamRequestCard, TeamRosterCard } from './team-request-card'
 import { UnrosteredPlayerList } from './unrostered-player-card'
 import { TeamsContext } from '@/firebase/teams-context'
 import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
+import { Button } from './ui/button'
 
 export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -126,6 +129,36 @@ export const ManageTeam = () => {
 					: documentSnapshot?.data()?.team === null
 					? `Join Team`
 					: `Manage Team`}
+			</div>
+			<div className={'max-w-max mx-auto my-4'}>
+				{!isUnrostered && (
+					<Button
+						onClick={() => {
+							if (documentSnapshot) {
+								const documentSnapshotData = documentSnapshot.data()
+								if (documentSnapshotData) {
+									leaveTeam(documentSnapshot.ref, documentSnapshotData.team)
+								}
+							}
+						}}
+					>
+						Leave Team
+					</Button>
+				)}
+				{isCaptain && (
+					<Button
+						onClick={() => {
+							if (documentSnapshot) {
+								const documentSnapshotData = documentSnapshot.data()
+								if (documentSnapshotData) {
+									deleteTeam(documentSnapshotData.team)
+								}
+							}
+						}}
+					>
+						Delete Team
+					</Button>
+				)}
 			</div>
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}
