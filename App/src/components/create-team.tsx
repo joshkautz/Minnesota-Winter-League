@@ -72,7 +72,7 @@ export const CreateTeam = () => {
 			variant: success ? 'default' : 'destructive',
 		})
 		if (navigation) {
-			navigate('/team')
+			navigate('/manage')
 		}
 	}
 
