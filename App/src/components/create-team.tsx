@@ -80,7 +80,7 @@ export const CreateTeam = () => {
 				setStorageRef(newTeamData.ref)
 			} else {
 				if (documentSnapshot) {
-					createTeam(documentSnapshot.ref, newTeamData.name, '')
+					createTeam(documentSnapshot.ref, newTeamData.name)
 						.then(() => {
 							handleResult({
 								success: true,
@@ -105,7 +105,12 @@ export const CreateTeam = () => {
 		if (downloadUrl) {
 			if (documentSnapshot) {
 				if (newTeamData) {
-					createTeam(documentSnapshot.ref, newTeamData.name, downloadUrl)
+					createTeam(
+						documentSnapshot.ref,
+						newTeamData.name,
+						downloadUrl,
+						newTeamData.ref?.fullPath
+					)
 						.then(() => {
 							handleResult({
 								success: true,

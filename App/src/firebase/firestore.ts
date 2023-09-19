@@ -37,6 +37,7 @@ import {
 	StandingsData,
 	TeamData,
 } from '@/lib/interfaces'
+import { deleteImage, ref, storage } from './storage'
 
 interface PlayerDocumentData {
 	captain: boolean
@@ -68,7 +69,8 @@ const rejectOffer = (
 const createTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	name: string,
-	logo: string
+	logo?: string,
+	storagePath?: string
 ) => {
 	const team = await addDoc(collection(firestore, 'teams'), {
 		captains: [playerRef],
@@ -76,6 +78,7 @@ const createTeam = async (
 		name: name,
 		registered: false,
 		roster: [playerRef],
+		storagePath: storagePath,
 	})
 
 	await updateDoc(playerRef, {
@@ -110,10 +113,39 @@ const createPlayer = (
 	})
 }
 
-const deleteTeam = (
+const deleteTeam = async (
 	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<void> => {
-	return deleteDoc(doc(firestore, 'teams', teamRef.id)) as Promise<void>
+) => {
+	const offersQuerySnapshot = await getDocs(
+		query(collection(firestore, 'offers'), where('team', '==', teamRef))
+	)
+
+	const offersPromises = offersQuerySnapshot.docs.map(
+		(offer: QueryDocumentSnapshot) => deleteDoc(offer.ref)
+	)
+
+	const playersQuerySnapshot = await getDocs(
+		query(collection(firestore, 'players'), where('team', '==', teamRef))
+	)
+
+	const playersPromises = playersQuerySnapshot.docs.map(
+		(player: QueryDocumentSnapshot) =>
+			updateDoc(player.ref, {
+				captain: false,
+				team: null,
+			})
+	)
+
+	const teamDocumentSnapshot = await getDoc(teamRef)
+
+	if (teamDocumentSnapshot) {
+		const teamDocumentSnapshotData = teamDocumentSnapshot.data()
+		if (teamDocumentSnapshotData) {
+			await deleteImage(ref(storage, teamDocumentSnapshotData.storagePath))
+		}
+	}
+
+	return Promise.all([offersPromises, playersPromises, deleteDoc(teamRef)])
 }
 
 const removePlayerFromTeam = (
