@@ -69,7 +69,7 @@ const createTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	name: string,
 	logo: string
-): Promise<void[]> => {
+) => {
 	const team = await addDoc(collection(firestore, 'teams'), {
 		captains: [playerRef],
 		logo: logo,
