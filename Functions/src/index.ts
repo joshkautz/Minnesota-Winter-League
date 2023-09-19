@@ -170,36 +170,37 @@ export const OnOfferRejected: CloudFunction<Change<QueryDocumentSnapshot>> =
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_new_document_is_created_2 Trigger a function when a document is created.}
  */
 
-export const OnTeamCreated: CloudFunction<QueryDocumentSnapshot> = region(
-	REGIONS.CENTRAL
-)
-	.firestore.document('teams/{teamId}')
-	.onCreate(async (queryDocumentSnapshot: QueryDocumentSnapshot) => {
-		try {
-			const teamRef = queryDocumentSnapshot.ref
-			const playerRef = queryDocumentSnapshot
-				.data()
-				.captains.pop() as DocumentReference
+// export const OnTeamCreated: CloudFunction<QueryDocumentSnapshot> = region(
+// 	REGIONS.CENTRAL
+// )
+// 	.firestore.document('teams/{teamId}')
+// 	.onCreate(async (queryDocumentSnapshot: QueryDocumentSnapshot) => {
+// 		try {
+// 			const firestore = getFirestore()
+// 			const teamRef = queryDocumentSnapshot.ref
+// 			const playerRef = queryDocumentSnapshot
+// 				.data()
+// 				.captains.pop() as DocumentReference
 
-			// Delete all the `Offers` Firestore Documents for the player.
-			const firestore = getFirestore()
-			const offers = await firestore
-				.collection('offers')
-				.where('player', '==', playerRef)
-				.get()
+// 			const updatePlayerPromise = playerRef.update({
+// 				captain: true,
+// 				team: teamRef,
+// 			})
 
-			return Promise.all([
-				playerRef.update({
-					captain: true,
-					team: teamRef,
-				}),
-				offers.docs.map((offer: QueryDocumentSnapshot) => offer.ref.delete()),
-			])
-		} catch (error) {
-			logger.error(error)
-			return error
-		}
-	})
+// 			const offersPromises = firestore
+// 				.collection('offers')
+// 				.where('player', '==', playerRef)
+// 				.get()
+// 				.then((offers) =>
+// 					offers.docs.map((offer: QueryDocumentSnapshot) => offer.ref.delete())
+// 				)
+
+// 			return Promise.all([updatePlayerPromise, offersPromises])
+// 		} catch (error) {
+// 			logger.error(error)
+// 			return error
+// 		}
+// 	})
 
 /**
  * Firebase Firestore - Update the `Players` Firestore Document for the player when a new `Customers` `Payments` Firestore Document is created.
