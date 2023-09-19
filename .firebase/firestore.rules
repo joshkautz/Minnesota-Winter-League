@@ -33,15 +33,24 @@ service cloud.firestore {
     // Authenticated.
     // Email is verified.
     // One of the following:
-    // 	- [A Player is updating their name]
+    // 	- [Player is updating their name]
     // 			- Authenticated user is updating their own document.
     // 			- Authenticated user is updating only Firstname or Lastname,
-    // 	- [A Captain is removing a player from their team]:
+    // 	- [Player is creating a team]
+    // 			- Authenticated user is updating their own document.
+    // 			- Authenticated user is listed as a captain for the new team.
+    // 			- Authenticated user is updating only Captain and Team,
+    // 	- [Player is deleting their team]:
+    // 			- Authenticated user is listed as a captain for the old team.
+    // 			- Authenticated user is updating only Captain and Team.
+    // 			- Captain is false.
+    // 			- Team is null.
+    // 	- [Player is removing a player from their team]:
     // 			- Authenticated user is listed as a captain for the updated player's previous team.
     // 			- Authenticated user is updating only Captain or Team.
     //			- The updated player's new team is null.
     //			- The udpated player's new captain status is false.
-    // 	- [A Captain is promoting a player to captain]:
+    // 	- [Player is promoting a player to captain]:
     // 			- Authenticated user is listed as a captain for the updated player's previous team.
     // 			- Authenticated user is updating only Captain.
     match /players/{uid} {
@@ -53,6 +62,17 @@ service cloud.firestore {
           request.auth.uid == uid &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['firstname', 'lastname'])
     		) ||
+        ( // Player is creating a team
+          request.auth.uid == uid &&
+    		  /databases/$(database)/documents/players/$(request.auth.uid) in get(request.resource.data.team).data.captains &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain', 'team'])
+        ) ||
+        ( // Player is deleting their team
+    		  /databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain', 'team']) &&
+          request.resource.data.captain == false &&
+          request.resource.data.team == null
+        ) ||
         (
         	/databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains &&
         	request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain', 'team']) &&
@@ -104,18 +124,12 @@ service cloud.firestore {
     // TEAMS [Delete]:
     // Authenticated.
     // Email is verified.
-    // Authenticated user's captain value is true.
-    // Authenticated user's team value is the team being deleted.
     // Authenticated user is listed as a captain for the team.
-    // Authenticated user is listed as a player for the team.
     match /teams/{document=**} {
       allow delete:
       if request.auth != null &&
       request.auth.token.email_verified == true &&
-      get(/databases/$(database)/documents/players/$(request.auth.uid)).data.captain == true &&
- 			get(/databases/$(database)/documents/players/$(request.auth.uid)).data.team == resource['__name__'] &&
-      /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.captains &&
-      /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.roster
+      /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.captains
  		}
 
     // OFFERS [Read]:
@@ -199,6 +213,18 @@ service cloud.firestore {
           )
         )
     }
+    
+    // OFFERS [Delete]:
+    // Authenticated.
+    // Email is verified.
+    // [A Captain is deleting their team]:
+    //  - Authenticated user is a captain of the team in the Offer.
+    match /teams/{document=**} {
+      allow delete:
+      if request.auth != null &&
+      request.auth.token.email_verified == true &&
+      /databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains
+ 		}
 
     // Invertase Stripe Firebase Extension
     match /customers/{uid} {
