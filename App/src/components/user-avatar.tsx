@@ -68,7 +68,11 @@ export const UserAvatar = ({
 							src={authStateUser.photoURL ?? undefined}
 							alt={'profile image'}
 						/>
-						<AvatarFallback className="bg-secondary hover:bg-accent">
+						<AvatarFallback
+							className={
+								'transition-colors bg-secondary hover:bg-accent dark:hover:text-background'
+							}
+						>
 							{!userInitials ? 'NA' : userInitials}
 						</AvatarFallback>
 					</Avatar>
