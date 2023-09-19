@@ -68,7 +68,7 @@ export const UserAvatar = ({
 							src={authStateUser.photoURL ?? undefined}
 							alt={'profile image'}
 						/>
-						<AvatarFallback className='bg-secondary hover:bg-accent'>
+						<AvatarFallback className="bg-secondary hover:bg-accent">
 							{!userInitials ? 'NA' : userInitials}
 						</AvatarFallback>
 					</Avatar>
