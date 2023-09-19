@@ -146,7 +146,6 @@ export const CreateTeam = () => {
 								<FormItem>
 									<FormLabel>Logo</FormLabel>
 									<FormControl>
-										<span>Upload Image</span>
 										<Input
 											id="image-upload"
 											type={'file'}
@@ -154,7 +153,7 @@ export const CreateTeam = () => {
 											placeholder={'Upload Image'}
 											{...field}
 											onChange={handleFileChange}
-                      ref={fileInputRef}
+											// className="ring"
 										/>
 									</FormControl>
 									<FormMessage />
