@@ -1,11 +1,11 @@
 import { AuthContext } from '@/firebase/auth-context'
-import { createTeam } from '@/firebase/firestore'
+// import { createTeam } from '@/firebase/firestore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { toast } from './ui/use-toast'
-import { Link } from 'react-router-dom'
+// import { toast } from './ui/use-toast'
+// import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
 import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
 import {
@@ -19,8 +19,9 @@ import {
 import { Input } from './ui/input'
 import { getStorage, ref } from 'firebase/storage'
 import { v4 as uuidv4 } from 'uuid'
-import { StorageReference, FirebaseStorage } from 'firebase/storage'
+import { StorageReference } from 'firebase/storage'
 import { ReloadIcon } from '@radix-ui/react-icons'
+import { createTeam } from '@/firebase/firestore'
 
 const createTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -36,68 +37,68 @@ export const CreateTeam = () => {
 		resolver: zodResolver(createTeamSchema),
 	})
 
+	const [newTeamData, setNewTeamData] = useState<{
+		name: string
+		ref: StorageReference | undefined
+	}>()
 	const [blob, setBlob] = useState<Blob>()
-	const [uuid, setUuid] = useState<string>(uuidv4())
-	const [storage, setStorage] = useState<FirebaseStorage>(getStorage())
-	const [storageRef, setStorageRef] = useState<StorageReference>(
-		ref(storage, uuid)
-	)
+	const [storageRef, setStorageRef] = useState<StorageReference>()
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files?.[0]) {
 			return
 		}
-		// form.setValue('logo', e.target.files[0].name)
 		setBlob(e.target.files[0])
 	}
 
-	const [uploadFile, uploadFileLoading, uploadFileSnapshot, uploadFileError] =
-		useUploadFile()
-	const [downloadUrl, downloadUrlLoading, downloadUrlError] =
-		useDownloadURL(storageRef)
+	const [uploadFile, uploadFileLoading] = useUploadFile()
+	const [downloadUrl] = useDownloadURL(storageRef)
 
 	useEffect(() => {
-		if (!uploadFileLoading) {
-			console.log(uploadFileSnapshot)
+		console.log(newTeamData)
+		if (newTeamData) {
+			if (newTeamData.ref) {
+				setStorageRef(newTeamData.ref)
+			} else {
+				if (documentSnapshot) {
+					createTeam(documentSnapshot.ref, newTeamData.name, '')
+				} else {
+					console.log('User not loaded.')
+				}
+			}
 		}
-	}, [uploadFileLoading])
+	}, [newTeamData])
 
-	// this is where i neeed halpppp
+	useEffect(() => {
+		console.log(downloadUrl)
+		if (downloadUrl) {
+			// Create Team
+			if (documentSnapshot) {
+				if (newTeamData) {
+					createTeam(documentSnapshot.ref, newTeamData.name, downloadUrl)
+				} else {
+					console.log('New team data not available.')
+				}
+			} else {
+				console.log('User not loaded.')
+			}
+		}
+	}, [downloadUrl])
+
 	const onSubmit = async (data: CreateTeamSchema) => {
 		if (documentSnapshot) {
 			try {
-				if (!blob) return
+				if (blob) {
+					const result = await uploadFile(ref(getStorage(), uuidv4()), blob, {
+						contentType: 'image/jpeg',
+					})
 
-				const result = await uploadFile(storageRef, blob, {
-					contentType: 'image/jpeg',
-				})
-
-				if (result?.ref) {
-					setStorageRef(result?.ref)
+					if (result) {
+						setNewTeamData({ name: data.name, ref: result.ref })
+					}
+				} else {
+					setNewTeamData({ name: data.name, ref: undefined })
 				}
-
-				// Create Team
-				// await createTeam(documentSnapshot.ref, data.name, data.logo)
-
-				// console.log(res)
-				// if (res.id) {
-				// 	toast({
-				// 		title: `Successfully created team ${data.name}!`,
-				// 		variant: 'default',
-				// 		description: (
-				// 			<span>
-				// 				Build up your roster by{' '}
-				// 				<Link to="/invites">inviting other players to join!</Link>
-				// 			</span>
-				// 		),
-				// 	})
-				// } else {
-				// 	toast({
-				// 		title: `Unable to create team ${data.name}!`,
-				// 		variant: 'destructive',
-				// 		description: 'Something went wrong, please try again.',
-				// 	})
-				// }
 			} catch (error) {
 				console.log(error)
 			}
