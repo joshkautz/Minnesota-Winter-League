@@ -14,6 +14,7 @@ import {
 	orderBy,
 	updateDoc,
 	UpdateData,
+	getDocs,
 	collection,
 	onSnapshot,
 	Unsubscribe,
@@ -64,17 +65,33 @@ const rejectOffer = (
 	})
 }
 
-const createTeam = (
+const createTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamData: { logo: string; name: string }
-): Promise<DocumentReference<TeamData, DocumentData>> => {
-	return addDoc(collection(firestore, 'teams'), {
+	name: string,
+	logo: string
+) => {
+	const team = await addDoc(collection(firestore, 'teams'), {
 		captains: [playerRef],
-		logo: teamData.logo,
-		name: teamData.name,
+		logo: logo,
+		name: name,
 		registered: false,
 		roster: [playerRef],
-	}) as Promise<DocumentReference<TeamData, DocumentData>>
+	})
+
+	await updateDoc(playerRef, {
+		captain: true,
+		team: team,
+	})
+
+	const offersQuerySnapshot = await getDocs(
+		query(collection(firestore, 'offers'), where('player', '==', playerRef))
+	)
+
+	const offersPromises = offersQuerySnapshot.docs.map(
+		(offer: QueryDocumentSnapshot) => deleteDoc(offer.ref)
+	)
+
+	return Promise.all(offersPromises)
 }
 
 const createPlayer = (
@@ -133,6 +150,20 @@ const promoteToCaptain = (
 		updateDoc(playerRef, {
 			captain: true,
 			team: teamRef,
+		}),
+	])
+}
+
+const demoteFromCaptain = (
+	playerRef: DocumentReference<PlayerData, DocumentData>,
+	teamRef: DocumentReference<TeamData, DocumentData>
+): Promise<[void, void]> => {
+	return Promise.all([
+		updateDoc(teamRef, {
+			captains: arrayRemove(playerRef),
+		}),
+		updateDoc(playerRef, {
+			captain: false,
 		}),
 	])
 }
@@ -342,6 +373,7 @@ export {
 	deleteTeam,
 	stripeRegistration,
 	gamesByTeamQuery,
+	demoteFromCaptain,
 	unrosteredPlayersQuery,
 	promoteToCaptain,
 	removePlayerFromTeam,

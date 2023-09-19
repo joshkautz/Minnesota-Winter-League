@@ -4,6 +4,8 @@ import {
 	DocumentData,
 	DocumentReference,
 	acceptOffer,
+	deleteTeam,
+	leaveTeam,
 	rejectOffer,
 } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
@@ -14,12 +16,14 @@ import { TeamRequestCard, TeamRosterCard } from './team-request-card'
 import { UnrosteredPlayerList } from './unrostered-player-card'
 import { TeamsContext } from '@/firebase/teams-context'
 import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
+import { Button } from './ui/button'
 
-export const ManageOffers = () => {
+export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
 		useContext(OffersContext)
-	const { documentSnapshot } = useContext(AuthContext)
+	const { authStateLoading, documentSnapshot, documentSnapshotLoading } =
+		useContext(AuthContext)
 	const isCaptain = documentSnapshot?.data()?.captain
 	const isUnrostered = documentSnapshot?.data()?.team === null
 
@@ -118,7 +122,43 @@ export const ManageOffers = () => {
 					'max-w-max mx-auto my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
 				}
 			>
-				Manage Invites
+				{documentSnapshotLoading ||
+				authStateLoading ||
+				documentSnapshot?.data()?.team === undefined
+					? `Loading...`
+					: documentSnapshot?.data()?.team === null
+					? `Join Team`
+					: `Manage Team`}
+			</div>
+			<div className={'max-w-max mx-auto my-4'}>
+				{!isUnrostered && (
+					<Button
+						onClick={() => {
+							if (documentSnapshot) {
+								const documentSnapshotData = documentSnapshot.data()
+								if (documentSnapshotData) {
+									leaveTeam(documentSnapshot.ref, documentSnapshotData.team)
+								}
+							}
+						}}
+					>
+						Leave Team
+					</Button>
+				)}
+				{isCaptain && (
+					<Button
+						onClick={() => {
+							if (documentSnapshot) {
+								const documentSnapshotData = documentSnapshot.data()
+								if (documentSnapshotData) {
+									deleteTeam(documentSnapshotData.team)
+								}
+							}
+						}}
+					>
+						Delete Team
+					</Button>
+				)}
 			</div>
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}

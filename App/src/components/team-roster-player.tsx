@@ -1,7 +1,6 @@
 import {
 	DocumentReference,
 	DocumentData,
-	getPlayerSnapshot,
 	promoteToCaptain,
 	removePlayerFromTeam,
 } from '@/firebase/firestore'
@@ -15,11 +14,12 @@ import {
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
 import { DotsVerticalIcon, StarFilledIcon } from '@radix-ui/react-icons'
-import { useState, useEffect, useContext } from 'react'
+import { useContext } from 'react'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
 import { AuthContext } from '@/firebase/auth-context'
 import { PlayerData } from '@/lib/interfaces'
+import { useDocument } from 'react-firebase-hooks/firestore'
 
 export const TeamRosterPlayer = ({
 	playerRef,
@@ -30,20 +30,7 @@ export const TeamRosterPlayer = ({
 }) => {
 	const { documentSnapshot } = useContext(AuthContext)
 
-	const [playerData, setPlayerData] = useState<PlayerData | null | undefined>()
-
-	useEffect(() => {
-		async function fetchPlayerData() {
-			try {
-				const data = await getPlayerSnapshot(playerRef)
-				setPlayerData(data.data())
-			} catch (error) {
-				console.error('Error fetching player data:', error)
-			}
-		}
-
-		fetchPlayerData()
-	}, [playerRef])
+	const [playerSnapshot] = useDocument(playerRef)
 
 	const promoteToCaptainOnClickHandler = async () => {
 		if (documentSnapshot) {
@@ -65,13 +52,16 @@ export const TeamRosterPlayer = ({
 
 	return (
 		<div>
-			{playerData ? (
+			{playerSnapshot ? (
 				<div className="flex items-end gap-2 py-2">
 					<div className="flex flex-row items-center">
 						<p className="mr-2">
-							{playerData.firstname} {playerData.lastname}{' '}
+							{playerSnapshot.data()?.firstname}{' '}
+							{playerSnapshot.data()?.lastname}{' '}
 						</p>
-						{playerData.captain && <StarFilledIcon className="text-primary" />}
+						{playerSnapshot.data()?.captain && (
+							<StarFilledIcon className="text-primary" />
+						)}
 					</div>
 					{/* If not a captain, no need to show */}
 					{!isDisabled && (
@@ -87,13 +77,13 @@ export const TeamRosterPlayer = ({
 									<DropdownMenuSeparator />
 									<DropdownMenuGroup>
 										<DropdownMenuItem
-											disabled={isDisabled || playerData.captain}
+											disabled={isDisabled || playerSnapshot.data()?.captain}
 											onClick={promoteToCaptainOnClickHandler}
 										>
 											Promote to captain
 										</DropdownMenuItem>
 										<DropdownMenuItem
-											disabled={isDisabled || playerData.captain}
+											disabled={isDisabled || playerSnapshot.data()?.captain}
 											onClick={removeFromTeamOnClickHandler}
 										>
 											Remove from team

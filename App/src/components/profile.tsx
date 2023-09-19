@@ -32,7 +32,9 @@ type ProfileSchema = z.infer<typeof profileSchema>
 export const Profile = () => {
 	const {
 		authStateUser,
+		authStateLoading,
 		documentSnapshot,
+		documentSnapshotLoading,
 		sendEmailVerification,
 		sendPasswordResetEmail,
 	} = useContext(AuthContext)
@@ -42,6 +44,8 @@ export const Profile = () => {
 		lastname: documentSnapshot?.data()?.lastname ?? '',
 		email: documentSnapshot?.data()?.email ?? '',
 	}
+
+	console.log(defaultValues)
 
 	const form = useForm<ProfileSchema>({
 		resolver: zodResolver(profileSchema),
@@ -99,9 +103,13 @@ export const Profile = () => {
 					'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
 				}
 			>
-				{documentSnapshot?.data()?.firstname
+				{authStateLoading ||
+				documentSnapshotLoading ||
+				documentSnapshot?.data()?.firstname === undefined
+					? `Loading...`
+					: documentSnapshot?.data()?.firstname
 					? `Hello ${documentSnapshot?.data()?.firstname}`
-					: 'Your Profile'}
+					: `Edit Profile`}
 			</div>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
