@@ -20,6 +20,7 @@ export interface TeamData extends DocumentData {
 	name: string
 	registered: boolean
 	roster: DocumentReference<PlayerData, DocumentData>[]
+	storagePath: string
 }
 
 export interface OfferData extends DocumentData {

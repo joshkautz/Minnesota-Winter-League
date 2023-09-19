@@ -238,38 +238,38 @@ export const OnPaymentCreated: CloudFunction<QueryDocumentSnapshot> = region(
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
  */
 
-export const OnTeamDeleted: CloudFunction<QueryDocumentSnapshot> = region(
-	REGIONS.CENTRAL
-)
-	.firestore.document('teams/{teamId}')
-	.onDelete(async (queryDocumentSnapshot: QueryDocumentSnapshot) => {
-		try {
-			const promises = []
+// export const OnTeamDeleted: CloudFunction<QueryDocumentSnapshot> = region(
+// 	REGIONS.CENTRAL
+// )
+// 	.firestore.document('teams/{teamId}')
+// 	.onDelete(async (queryDocumentSnapshot: QueryDocumentSnapshot) => {
+// 		try {
+// 			const promises = []
 
-			// Update all `Players` left on the deleted team.
-			const team = queryDocumentSnapshot.data() as Team
+// 			// Update all `Players` left on the deleted team.
+// 			const team = queryDocumentSnapshot.data() as Team
 
-			promises.push(
-				team.roster.map((player) =>
-					player.update({
-						captain: false,
-						team: null,
-					})
-				)
-			)
+// 			promises.push(
+// 				team.roster.map((player) =>
+// 					player.update({
+// 						captain: false,
+// 						team: null,
+// 					})
+// 				)
+// 			)
 
-			// Delete all `Offers` left for the team.
-			const firestore = getFirestore()
-			const offers = await firestore
-				.collection('offers')
-				.where('team', '==', queryDocumentSnapshot.ref)
-				.get()
+// 			// Delete all `Offers` left for the team.
+// 			const firestore = getFirestore()
+// 			const offers = await firestore
+// 				.collection('offers')
+// 				.where('team', '==', queryDocumentSnapshot.ref)
+// 				.get()
 
-			promises.push(offers.docs.map((offer) => offer.ref.delete()))
+// 			promises.push(offers.docs.map((offer) => offer.ref.delete()))
 
-			return Promise.all(promises)
-		} catch (error) {
-			logger.error(error)
-			return error
-		}
-	})
+// 			return Promise.all(promises)
+// 		} catch (error) {
+// 			logger.error(error)
+// 			return error
+// 		}
+// 	})
