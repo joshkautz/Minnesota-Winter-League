@@ -251,21 +251,13 @@ export const OnTeamDeleted: CloudFunction<QueryDocumentSnapshot> = region(
 			promises.push(
 				team.roster.map((player) =>
 					player.update({
-						team: null,
-					})
-				)
-			)
-
-			promises.push(
-				team.captains.map((player) =>
-					player.update({
 						captain: false,
 						team: null,
 					})
 				)
 			)
 
-			// Delete all `Offers` left or the team.
+			// Delete all `Offers` left for the team.
 			const firestore = getFirestore()
 			const offers = await firestore
 				.collection('offers')

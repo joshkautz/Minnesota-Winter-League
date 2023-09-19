@@ -138,6 +138,20 @@ const promoteToCaptain = (
 	])
 }
 
+const demoteFromCaptain = (
+	playerRef: DocumentReference<PlayerData, DocumentData>,
+	teamRef: DocumentReference<TeamData, DocumentData>
+): Promise<[void, void]> => {
+	return Promise.all([
+		updateDoc(teamRef, {
+			captains: arrayRemove(playerRef),
+		}),
+		updateDoc(playerRef, {
+			captain: false,
+		}),
+	])
+}
+
 const leaveTeam = (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	teamRef: DocumentReference<TeamData, DocumentData>
@@ -343,6 +357,7 @@ export {
 	deleteTeam,
 	stripeRegistration,
 	gamesByTeamQuery,
+	demoteFromCaptain,
 	unrosteredPlayersQuery,
 	promoteToCaptain,
 	removePlayerFromTeam,
