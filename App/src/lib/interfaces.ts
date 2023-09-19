@@ -19,8 +19,8 @@ export interface TeamData extends DocumentData {
 	logo: string
 	name: string
 	registered: boolean
-  roster: DocumentReference<PlayerData, DocumentData>[]
-  storagePath: string
+	roster: DocumentReference<PlayerData, DocumentData>[]
+	storagePath: string
 }
 
 export interface OfferData extends DocumentData {
