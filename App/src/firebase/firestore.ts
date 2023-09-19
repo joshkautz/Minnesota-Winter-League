@@ -140,7 +140,7 @@ const deleteTeam = async (
 
 	if (teamDocumentSnapshot) {
 		const teamDocumentSnapshotData = teamDocumentSnapshot.data()
-		if (teamDocumentSnapshotData) {
+		if (teamDocumentSnapshotData?.storagePath) {
 			await deleteImage(ref(storage, teamDocumentSnapshotData.storagePath))
 		}
 	}

@@ -15,12 +15,11 @@ import {
 	FormMessage,
 } from './ui/form'
 import { Input } from './ui/input'
-import { getStorage, ref } from 'firebase/storage'
 import { v4 as uuidv4 } from 'uuid'
-import { StorageReference } from 'firebase/storage'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { createTeam } from '@/firebase/firestore'
 import { useNavigate } from 'react-router-dom'
+import { StorageReference, ref, storage } from '@/firebase/storage'
 
 const createTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -140,9 +139,13 @@ export const CreateTeam = () => {
 		if (documentSnapshot) {
 			try {
 				if (blob) {
-					const result = await uploadFile(ref(getStorage(), uuidv4()), blob, {
-						contentType: 'image/jpeg',
-					})
+					const result = await uploadFile(
+						ref(storage, `teams/${uuidv4()}`),
+						blob,
+						{
+							contentType: 'image/jpeg',
+						}
+					)
 					if (result) {
 						setNewTeamData({ name: data.name, ref: result.ref })
 					}
