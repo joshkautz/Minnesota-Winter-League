@@ -1,11 +1,9 @@
 import { AuthContext } from '@/firebase/auth-context'
-// import { createTeam } from '@/firebase/firestore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { toast } from './ui/use-toast'
-// import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
 import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
 import {
