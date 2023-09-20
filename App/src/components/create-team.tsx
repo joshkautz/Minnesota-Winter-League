@@ -168,7 +168,7 @@ export const CreateTeam = () => {
 	}, [uploadFileError])
 
 	return (
-		<div className="container flex flex-col items-center justify-center md:h-[calc(100vh-60px)] gap-10">
+		<div className="container flex flex-col items-center justify-center md:min-h-[calc(100vh-60px)] gap-10">
 			{isOnTeam || documentSnapshotLoading ? (
 				<div>You must first leave your team in order to create a new one.</div>
 			) : (
