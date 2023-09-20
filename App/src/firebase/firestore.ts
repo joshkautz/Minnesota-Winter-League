@@ -74,11 +74,11 @@ const createTeam = async (
 ) => {
 	const team = await addDoc(collection(firestore, 'teams'), {
 		captains: [playerRef],
-		logo: logo,
+		logo: logo ? logo : null,
 		name: name,
 		registered: false,
 		roster: [playerRef],
-		storagePath: storagePath,
+		storagePath: storagePath ? storagePath : null,
 	})
 
 	await updateDoc(playerRef, {
@@ -114,8 +114,11 @@ const createPlayer = (
 }
 
 const deleteTeam = async (
-	teamRef: DocumentReference<TeamData, DocumentData>
+	teamRef: DocumentReference<TeamData, DocumentData>,
+	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+	setLoadingState(true)
+
 	const offersQuerySnapshot = await getDocs(
 		query(collection(firestore, 'offers'), where('team', '==', teamRef))
 	)
@@ -145,7 +148,9 @@ const deleteTeam = async (
 		}
 	}
 
-	return Promise.all([offersPromises, playersPromises, deleteDoc(teamRef)])
+	await Promise.all([offersPromises, playersPromises, deleteDoc(teamRef)])
+
+	setLoadingState(false)
 }
 
 const removePlayerFromTeam = (
@@ -205,13 +210,13 @@ const leaveTeam = (
 	teamRef: DocumentReference<TeamData, DocumentData>
 ): Promise<[void, void]> => {
 	return Promise.all([
-		updateDoc(playerRef, {
-			captain: false,
-			team: null,
-		}),
 		updateDoc(teamRef, {
 			captains: arrayRemove(playerRef),
 			roster: arrayRemove(playerRef),
+		}),
+		updateDoc(playerRef, {
+			captain: false,
+			team: null,
 		}),
 	])
 }

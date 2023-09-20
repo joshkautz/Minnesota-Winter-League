@@ -40,6 +40,11 @@ service cloud.firestore {
     // 			- Authenticated user is updating their own document.
     // 			- Authenticated user is listed as a captain for the new team.
     // 			- Authenticated user is updating only Captain and Team,
+    // 	- [Player is leaving their team]:
+    // 			- Authenticated user is updating their own document.
+    // 			- Authenticated user is updating only Captain and Team.
+    // 			- Captain is false.
+    // 			- Team is null.
     // 	- [Player is deleting their team]:
     // 			- Authenticated user is listed as a captain for the old team.
     // 			- Authenticated user is updating only Captain and Team.
@@ -66,6 +71,12 @@ service cloud.firestore {
           request.auth.uid == uid &&
     		  /databases/$(database)/documents/players/$(request.auth.uid) in get(request.resource.data.team).data.captains &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain', 'team'])
+        ) ||
+        ( // Player is leaving their team
+        	request.auth.uid == uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain', 'team']) &&
+          request.resource.data.captain == false &&
+          request.resource.data.team == null
         ) ||
         ( // Player is deleting their team
     		  /databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains &&
@@ -112,14 +123,28 @@ service cloud.firestore {
 		// TEAMS [Update]:
     // Authenticated.
     // Email is verified.
-    // Authenticated user is listed as a captain for the team being updated.
-    // Authenticated user is updating only Captains, Roster, Logo, or Name.
+    // 	- [Player is leaving their team, is a Player]:
+    // 		-	Authenticated user was listed as a player for the team being updated.
+    // 		-	Authenticated user is updating only Roster.
+    // 	- [Player is leaving their team, is a Captain]:
+    // 		-	Authenticated user was listed as a captain for the team being updated.
+    // 		-	Authenticated user is updating only Captains and Roster.
     match /teams/{document=**} {
       allow update:
       if request.auth != null &&
-      /databases/$(database)/documents/players/$(request.auth.uid) in request.resource.data.captains &&
-      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captains', 'roster', 'logo', 'name'])
- 		}
+      request.auth.token.email_verified == true &&
+      (
+        ( // Player is leaving their team, is a Player
+          /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.roster &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['roster'])
+        )
+        ||
+        ( // Player is leaving their team, is a Captain
+          /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.captains &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['roster', 'captains'])
+        )
+      )
+		}
 
     // TEAMS [Delete]:
     // Authenticated.

@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { OffersContext } from '@/firebase/offers-context'
 import {
 	DocumentData,
@@ -17,6 +17,7 @@ import { UnrosteredPlayerList } from './unrostered-player-card'
 import { TeamsContext } from '@/firebase/teams-context'
 import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
 import { Button } from './ui/button'
+import { ReloadIcon } from '@radix-ui/react-icons'
 
 export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -26,6 +27,8 @@ export const ManageTeam = () => {
 		useContext(AuthContext)
 	const isCaptain = documentSnapshot?.data()?.captain
 	const isUnrostered = documentSnapshot?.data()?.team === null
+
+	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
 
 	const outgoingOffers = useOffer(
 		outgoingOffersQuerySnapshot,
@@ -152,11 +155,15 @@ export const ManageTeam = () => {
 								if (documentSnapshot) {
 									const documentSnapshotData = documentSnapshot.data()
 									if (documentSnapshotData) {
-										deleteTeam(documentSnapshotData.team)
+										deleteTeam(documentSnapshotData.team, setDeleteTeamLoading)
 									}
 								}
 							}}
+							disabled={deleteTeamLoading}
 						>
+							{deleteTeamLoading && (
+								<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+							)}
 							Delete Team
 						</Button>
 					)}
