@@ -29,6 +29,7 @@ export const ManageTeam = () => {
 	const isUnrostered = documentSnapshot?.data()?.team === null
 
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
+	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 
 	const outgoingOffers = useOffer(
 		outgoingOffersQuerySnapshot,
@@ -141,11 +142,19 @@ export const ManageTeam = () => {
 								if (documentSnapshot) {
 									const documentSnapshotData = documentSnapshot.data()
 									if (documentSnapshotData) {
-										leaveTeam(documentSnapshot.ref, documentSnapshotData.team)
+										leaveTeam(
+											documentSnapshot.ref,
+											documentSnapshotData.team,
+											setLeaveTeamLoading
+										)
 									}
 								}
 							}}
+							disabled={leaveTeamLoading}
 						>
+							{leaveTeamLoading && (
+								<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+							)}
 							Leave Team
 						</Button>
 					)}

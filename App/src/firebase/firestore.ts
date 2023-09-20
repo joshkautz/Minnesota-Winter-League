@@ -205,20 +205,24 @@ const demoteFromCaptain = (
 	])
 }
 
-const leaveTeam = (
+const leaveTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<[void, void]> => {
-	return Promise.all([
-		updateDoc(teamRef, {
-			captains: arrayRemove(playerRef),
-			roster: arrayRemove(playerRef),
-		}),
-		updateDoc(playerRef, {
-			captain: false,
-			team: null,
-		}),
-	])
+	teamRef: DocumentReference<TeamData, DocumentData>,
+	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+	setLoadingState(true)
+
+	await updateDoc(teamRef, {
+		captains: arrayRemove(playerRef),
+		roster: arrayRemove(playerRef),
+	})
+
+	await updateDoc(playerRef, {
+		captain: false,
+		team: null,
+	})
+
+	setLoadingState(false)
 }
 
 const invitePlayerToJoinTeam = (
