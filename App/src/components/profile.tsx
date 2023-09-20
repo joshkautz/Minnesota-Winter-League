@@ -30,11 +30,8 @@ type ProfileSchema = z.infer<typeof profileSchema>
 export const Profile = () => {
 	const {
 		authStateUser,
-		authStateLoading,
 		documentSnapshot,
-		documentSnapshotLoading,
 		sendEmailVerification,
-		sendPasswordResetEmail,
 	} = useContext(AuthContext)
 	const [sentEmail, setSentEmail] = useState(false)
 
