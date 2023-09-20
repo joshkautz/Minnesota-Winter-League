@@ -18,6 +18,7 @@ import { TeamsContext } from '@/firebase/teams-context'
 import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
 import { Button } from './ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
+import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 
 export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -135,10 +136,14 @@ export const ManageTeam = () => {
 					: `Manage Team`}
 			</div>
 			{!documentSnapshotLoading && !authStateLoading && (
-				<div className={'max-w-max mx-auto my-4'}>
+				<div className={'max-w-max mx-auto my-4 gap-8 flex'}>
 					{!isUnrostered && (
-						<Button
-							onClick={() => {
+						<DestructiveConfirmationDialog
+							title={'Are you sure you want to leave?'}
+							description={
+								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
+							}
+							onConfirm={() => {
 								if (documentSnapshot) {
 									const documentSnapshotData = documentSnapshot.data()
 									if (documentSnapshotData) {
@@ -150,17 +155,20 @@ export const ManageTeam = () => {
 									}
 								}
 							}}
-							disabled={leaveTeamLoading}
 						>
-							{leaveTeamLoading && (
-								<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-							)}
-							Leave Team
-						</Button>
+							<Button variant={'destructive'} disabled={leaveTeamLoading}>
+								{leaveTeamLoading && (
+									<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+								)}
+								Leave Team
+							</Button>
+						</DestructiveConfirmationDialog>
 					)}
 					{isCaptain && (
-						<Button
-							onClick={() => {
+						<DestructiveConfirmationDialog
+							title={'Are you sure?'}
+							description={'This action is irreversible.'}
+							onConfirm={() => {
 								if (documentSnapshot) {
 									const documentSnapshotData = documentSnapshot.data()
 									if (documentSnapshotData) {
@@ -168,13 +176,14 @@ export const ManageTeam = () => {
 									}
 								}
 							}}
-							disabled={deleteTeamLoading}
 						>
-							{deleteTeamLoading && (
-								<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-							)}
-							Delete Team
-						</Button>
+							<Button variant={'destructive'} disabled={deleteTeamLoading}>
+								{deleteTeamLoading && (
+									<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+								)}
+								Delete Team
+							</Button>
+						</DestructiveConfirmationDialog>
 					)}
 				</div>
 			)}
