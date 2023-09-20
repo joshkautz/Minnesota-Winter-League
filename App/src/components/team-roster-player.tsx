@@ -2,7 +2,8 @@ import {
 	DocumentReference,
 	DocumentData,
 	promoteToCaptain,
-	removePlayerFromTeam,
+	leaveTeam,
+	demoteFromCaptain,
 } from '@/firebase/firestore'
 import {
 	DropdownMenu,
@@ -14,7 +15,7 @@ import {
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
 import { DotsVerticalIcon, StarFilledIcon } from '@radix-ui/react-icons'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
 import { AuthContext } from '@/firebase/auth-context'
@@ -30,7 +31,18 @@ export const TeamRosterPlayer = ({
 }) => {
 	const { documentSnapshot } = useContext(AuthContext)
 
-	const [playerSnapshot] = useDocument(playerRef)
+  const [playerSnapshot] = useDocument(playerRef)
+  
+  const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
+
+	const demoteFromCaptainOnClickHandler = async () => {
+		if (documentSnapshot) {
+			const data = documentSnapshot.data()
+			if (data) {
+				demoteFromCaptain(playerRef, data.team)
+			}
+		}
+	}
 
 	const promoteToCaptainOnClickHandler = async () => {
 		if (documentSnapshot) {
@@ -45,7 +57,7 @@ export const TeamRosterPlayer = ({
 		if (documentSnapshot) {
 			const data = documentSnapshot.data()
 			if (data) {
-				removePlayerFromTeam(playerRef, data.team)
+				leaveTeam(playerRef, data.team, setLeaveTeamLoading)
 			}
 		}
 	}
@@ -77,13 +89,19 @@ export const TeamRosterPlayer = ({
 									<DropdownMenuSeparator />
 									<DropdownMenuGroup>
 										<DropdownMenuItem
+											disabled={isDisabled || !playerSnapshot.data()?.captain}
+											onClick={demoteFromCaptainOnClickHandler}
+										>
+											Demote from captain
+										</DropdownMenuItem>
+										<DropdownMenuItem
 											disabled={isDisabled || playerSnapshot.data()?.captain}
 											onClick={promoteToCaptainOnClickHandler}
 										>
 											Promote to captain
 										</DropdownMenuItem>
 										<DropdownMenuItem
-											disabled={isDisabled || playerSnapshot.data()?.captain}
+											disabled={isDisabled || leaveTeamLoading}
 											onClick={removeFromTeamOnClickHandler}
 										>
 											Remove from team

@@ -153,25 +153,6 @@ const deleteTeam = async (
 	setLoadingState(false)
 }
 
-const removePlayerFromTeam = (
-	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<[void, void]> => {
-	return Promise.all([
-		// Update the player.
-		updateDoc(playerRef, {
-			captain: false,
-			team: null,
-		}),
-
-		// Update the team.
-		updateDoc(teamRef, {
-			captains: arrayRemove(playerRef),
-			roster: arrayRemove(playerRef),
-		}),
-	])
-}
-
 const promoteToCaptain = (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	teamRef: DocumentReference<TeamData, DocumentData>
@@ -191,18 +172,16 @@ const promoteToCaptain = (
 	])
 }
 
-const demoteFromCaptain = (
+const demoteFromCaptain = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<[void, void]> => {
-	return Promise.all([
-		updateDoc(teamRef, {
-			captains: arrayRemove(playerRef),
-		}),
-		updateDoc(playerRef, {
-			captain: false,
-		}),
-	])
+) => {
+	await updateDoc(teamRef, {
+		captains: arrayRemove(playerRef),
+	})
+	await updateDoc(playerRef, {
+		captain: false,
+	})
 }
 
 const leaveTeam = async (
@@ -418,7 +397,6 @@ export {
 	demoteFromCaptain,
 	unrosteredPlayersQuery,
 	promoteToCaptain,
-	removePlayerFromTeam,
 	getStandingsRef,
 	type DocumentData,
 	type FirestoreError,
