@@ -30,10 +30,8 @@ export const TeamRosterPlayer = ({
 	isDisabled: boolean
 }) => {
 	const { documentSnapshot } = useContext(AuthContext)
-
-  const [playerSnapshot] = useDocument(playerRef)
-  
-  const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
+	const [playerSnapshot] = useDocument(playerRef)
+	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 
 	const demoteFromCaptainOnClickHandler = async () => {
 		if (documentSnapshot) {
