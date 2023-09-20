@@ -130,36 +130,38 @@ export const ManageTeam = () => {
 					? `Join Team`
 					: `Manage Team`}
 			</div>
-			<div className={'max-w-max mx-auto my-4'}>
-				{!isUnrostered && (
-					<Button
-						onClick={() => {
-							if (documentSnapshot) {
-								const documentSnapshotData = documentSnapshot.data()
-								if (documentSnapshotData) {
-									leaveTeam(documentSnapshot.ref, documentSnapshotData.team)
+			{!documentSnapshotLoading && !authStateLoading && (
+				<div className={'max-w-max mx-auto my-4'}>
+					{!isUnrostered && (
+						<Button
+							onClick={() => {
+								if (documentSnapshot) {
+									const documentSnapshotData = documentSnapshot.data()
+									if (documentSnapshotData) {
+										leaveTeam(documentSnapshot.ref, documentSnapshotData.team)
+									}
 								}
-							}
-						}}
-					>
-						Leave Team
-					</Button>
-				)}
-				{isCaptain && (
-					<Button
-						onClick={() => {
-							if (documentSnapshot) {
-								const documentSnapshotData = documentSnapshot.data()
-								if (documentSnapshotData) {
-									deleteTeam(documentSnapshotData.team)
+							}}
+						>
+							Leave Team
+						</Button>
+					)}
+					{isCaptain && (
+						<Button
+							onClick={() => {
+								if (documentSnapshot) {
+									const documentSnapshotData = documentSnapshot.data()
+									if (documentSnapshotData) {
+										deleteTeam(documentSnapshotData.team)
+									}
 								}
-							}
-						}}
-					>
-						Delete Team
-					</Button>
-				)}
-			</div>
+							}}
+						>
+							Delete Team
+						</Button>
+					)}
+				</div>
+			)}
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">

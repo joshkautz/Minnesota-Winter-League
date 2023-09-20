@@ -81,12 +81,12 @@ export const Profile = () => {
 			<div>
 				<div
 					className={
-						'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
+						'max-w-max mx-auto my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
 					}
 				>
 					Profile Settings
 				</div>
-				<p>Configure your profile by interacting with the fields below.</p>
+				<p>Configure your profile with the options below.</p>
 			</div>
 
 			<div className="flex flex-row flex-wrap items-stretch justify-center w-full gap-8">
@@ -154,7 +154,7 @@ export const Profile = () => {
 				<div className="max-w-[400px] flex-1 basis-[300px] shrink-0">
 					<div className="flex flex-col gap-6">
 						<fieldset className="space-y-2">
-							<Label>Verification</Label>
+							<Label>Email Verification</Label>
 							<div>
 								{isVerified ? (
 									<div className="inline-flex items-center gap-2 text-green-600 dark:text-green-500">
@@ -170,7 +170,7 @@ export const Profile = () => {
 											{sentEmail ? 'Email Sent!' : 'Re-Send Email'}
 										</Button>
 										<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
-											Check your email for the verification link.
+											Check your email for a verification link.
 										</p>
 									</>
 								)}
@@ -192,7 +192,7 @@ export const Profile = () => {
 											Continue to Stripe
 										</Button>
 										<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
-											Complete the verification process by navigating to Stripe.
+											Complete registration by paying via Stripe.
 										</p>
 									</>
 								)}

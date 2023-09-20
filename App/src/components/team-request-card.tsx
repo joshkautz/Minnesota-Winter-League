@@ -113,7 +113,8 @@ const TeamDetail = ({
 
 export const TeamRosterCard = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
-	const { documentSnapshot } = useContext(AuthContext)
+	const { documentSnapshot, documentSnapshotLoading, authStateLoading } =
+		useContext(AuthContext)
 
 	const teamSnapshot = teamsQuerySnapshot?.docs.find(
 		(team) => team.id === documentSnapshot?.data()?.team?.id
@@ -122,8 +123,12 @@ export const TeamRosterCard = () => {
 
 	return (
 		<NotificationCard
-			title={teamSnapshot?.data().name}
-			description={'your team roster'}
+			title={
+				documentSnapshotLoading || authStateLoading
+					? 'Loading...'
+					: teamSnapshot?.data().name
+			}
+			description={'Your team roster'}
 		>
 			{teamSnapshot
 				?.data()
