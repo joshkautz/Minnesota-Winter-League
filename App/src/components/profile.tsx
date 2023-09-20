@@ -28,11 +28,8 @@ const profileSchema = z.object({
 type ProfileSchema = z.infer<typeof profileSchema>
 
 export const Profile = () => {
-	const {
-		authStateUser,
-		documentSnapshot,
-		sendEmailVerification,
-	} = useContext(AuthContext)
+	const { authStateUser, documentSnapshot, sendEmailVerification } =
+		useContext(AuthContext)
 	const [sentEmail, setSentEmail] = useState(false)
 
 	const defaultValues: ProfileSchema = {
