@@ -22,7 +22,7 @@ service cloud.firestore {
     
     // PLAYERS [Create]:
     // Authenticated.
-    // Authenticated user is creating their own document.
+    // Creating their own document.
     match /players/{uid} {
       allow create:
       if request.auth != null &&
@@ -56,7 +56,8 @@ service cloud.firestore {
     // 		- Authenticated user is listed as a captain for the team of the player being updated.
     // 		- Updating only Captain.
     // 	- [Player is demoted from captain]:
-    // 		- Authenticated user is listed as a captain for the team of the player being updated.
+    //      - Authenticated user is updating their own document.
+    // 		  - Authenticated user is listed as a captain for the team of the player being updated.
     // 		- Updating only Captain.
     match /players/{uid} {
       allow update:
@@ -70,7 +71,7 @@ service cloud.firestore {
         ||
         ( // Player is creating their team
           request.auth.uid == uid &&
-    		  path(/databases/$(database)/documents/players/$(request.auth.uid)) in get(request.resource.data.team).data.captains &&
+    		  /databases/$(database)/documents/players/$(request.auth.uid) in get(request.resource.data.team).data.captains &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain', 'team']) &&
           request.resource.data.team != null &&
           request.resource.data.captain != false
@@ -84,24 +85,25 @@ service cloud.firestore {
         )
         ||
         ( // Player is removed from team
-    		  path(/databases/$(database)/documents/players/$(request.auth.uid)) in get(resource.data.team).data.captains &&
+    		  /databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains &&
         	request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain', 'team']) &&
           request.resource.data.team == null &&
           request.resource.data.captain == false
     		)
         ||
         ( // Player is promoted to captain
-        	path(/databases/$(database)/documents/players/$(request.auth.uid)) in get(resource.data.team).data.captains &&
-          // get(path(/databases/$(database)/documents/players/$(request.auth.uid))).data.team == resource.data.team &&
+        	/databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain']) &&
-          request.resource.data.team == true
+          request.resource.data.captain == true
     		)
         ||
         ( // Player is demoted from captain
-        	path(/databases/$(database)/documents/players/$(request.auth.uid)) in get(resource.data.team).data.captains &&
-          // get(path(/databases/$(database)/documents/players/$(request.auth.uid))).data.team == resource.data.team &&
+          (
+            request.auth.uid == uid ||
+            /databases/$(database)/documents/players/$(request.auth.uid) in get(resource.data.team).data.captains
+          ) &&
         	request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captain']) &&
-          request.resource.data.team == false
+          request.resource.data.captain == false
     		)
       )
     }
