@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from './ui/use-toast'
 import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
 import { Label } from './ui/label'
-import { CheckCircledIcon } from '@radix-ui/react-icons'
+import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -31,14 +31,13 @@ export const Profile = () => {
 	const { authStateUser, documentSnapshot, sendEmailVerification } =
 		useContext(AuthContext)
 	const [sentEmail, setSentEmail] = useState(false)
+	const [stripeLoading, setStripeLoading] = useState(false)
 
 	const defaultValues: ProfileSchema = {
 		firstname: documentSnapshot?.data()?.firstname ?? '',
 		lastname: documentSnapshot?.data()?.lastname ?? '',
 		email: documentSnapshot?.data()?.email ?? '',
 	}
-
-	console.log(defaultValues)
 
 	const form = useForm<ProfileSchema>({
 		resolver: zodResolver(profileSchema),
@@ -65,7 +64,7 @@ export const Profile = () => {
 	}
 
 	const registrationButtonOnClickHandler = () => {
-		stripeRegistration(authStateUser)
+		stripeRegistration(authStateUser, setStripeLoading)
 	}
 
 	const sendEmailVerificationButtonOnClickHandler = () => {
@@ -188,7 +187,11 @@ export const Profile = () => {
 										<Button
 											variant={'default'}
 											onClick={registrationButtonOnClickHandler}
+											disabled={stripeLoading}
 										>
+											{stripeLoading && (
+												<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+											)}
 											Continue to Stripe
 										</Button>
 										<p className={'text-[0.8rem] text-muted-foreground mt-2'}>

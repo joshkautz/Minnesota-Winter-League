@@ -367,16 +367,19 @@ const incomingOffersQuery = (
 }
 
 const stripeRegistration = async (
-	authValue: User | null | undefined
+	authValue: User | null | undefined,
+	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<Unsubscribe> => {
+	setLoadingState(true)
+
 	// Create new Checkout Session for the player
 	const checkoutSessionRef = (await addDoc(
 		collection(firestore, `customers/${authValue?.uid}/checkout_sessions`),
 		{
 			mode: 'payment',
 			price: Products.MinnesotaWinterLeagueRegistration2023Test,
-			success_url: window.location.origin,
-			cancel_url: window.location.origin,
+			success_url: window.location.href,
+			cancel_url: window.location.href,
 		}
 	)) as DocumentReference<CheckoutSessionData, DocumentData>
 
@@ -385,12 +388,10 @@ const stripeRegistration = async (
 		const data = checkoutSessionSnap.data()
 		if (data) {
 			if (data.url) {
-				console.log('Checkout Session URL:', data.url)
-			} else {
-				console.log('Creating Checkout Session')
+				// We have a Stripe Checkout URL, let's redirect.
+				setLoadingState(false)
+				window.location.assign(data.url)
 			}
-		} else {
-			console.log('Creating Checkout Session')
 		}
 	})
 }
