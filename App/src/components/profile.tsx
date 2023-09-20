@@ -153,7 +153,15 @@ export const Profile = () => {
 				<div className="max-w-[400px] flex-1 basis-[300px] shrink-0">
 					<div className="flex flex-col gap-6">
 						<fieldset className="space-y-2">
-							<Label>Email Verification</Label>
+							<Label className="inline-flex">
+								Email Verification
+								{!isVerified && (
+									<span className="relative flex w-2 h-2 ml-1">
+										<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+										<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+									</span>
+								)}
+							</Label>
 							<div>
 								{isVerified ? (
 									<div className="inline-flex items-center gap-2 text-green-600 dark:text-green-500">
@@ -176,7 +184,15 @@ export const Profile = () => {
 							</div>
 						</fieldset>
 						<fieldset className="space-y-2">
-							<Label>Registration</Label>
+							<Label className="inline-flex">
+								Registration
+								{!isRegistered && (
+									<span className="relative flex w-2 h-2 ml-1">
+										<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+										<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+									</span>
+								)}
+							</Label>
 							<div>
 								{isRegistered ? (
 									<div className="inline-flex items-center gap-2 text-green-600 dark:text-green-500">
