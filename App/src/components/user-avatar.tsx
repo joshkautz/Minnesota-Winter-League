@@ -88,25 +88,21 @@ export const UserAvatar = ({
 						{userContent.map(({ label, path, alt }) => {
 							return (
 								<Link key={path} to={path} aria-label={alt}>
-									{path === '/manage' ? (
+									{path === '/manage' && !!hasPendingOffers ? (
 										<DropdownMenuItem className={'gap-1'}>
 											{label}{' '}
-											{!!hasPendingOffers && (
-												<span className="relative flex w-2 h-2 -translate-y-1">
-													<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
-													<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
-												</span>
-											)}
+											<span className="relative flex w-2 h-2 -translate-y-1">
+												<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+											</span>
 										</DropdownMenuItem>
-									) : path === '/profile' ? (
+									) : path === '/profile' && hasRequiredTasks ? (
 										<DropdownMenuItem className={'gap-1'}>
 											{label}{' '}
-											{hasRequiredTasks && (
-												<span className="relative flex w-2 h-2 -translate-y-1">
-													<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
-													<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
-												</span>
-											)}
+											<span className="relative flex w-2 h-2 -translate-y-1">
+												<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+											</span>
 										</DropdownMenuItem>
 									) : (
 										<DropdownMenuItem>{label}</DropdownMenuItem>

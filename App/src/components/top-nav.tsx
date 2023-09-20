@@ -9,14 +9,23 @@ import { UserAvatar } from '@/components/user-avatar'
 import { AuthButton } from '@/components/auth-button'
 import { Separator } from '@/components/ui/separator'
 import { ThemeToggle } from './ui/theme-toggle'
+import { OffersContext } from '@/firebase/offers-context'
 
 export const TopNav = ({ title }: { title: string }) => {
 	const { authStateUser, authStateLoading, documentSnapshot } =
 		useContext(AuthContext)
+	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
+
 	const [open, setOpen] = useState(false)
 
+	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
+		(entry) => entry.data().status === 'pending'
+	).length
 	const isRostered = documentSnapshot?.data()?.team
 	const isCaptain = documentSnapshot?.data()?.captain
+	const isVerified = authStateUser?.emailVerified
+	const isRegistered = documentSnapshot?.data()?.registered
+	const hasRequiredTasks = !isVerified || !isRegistered
 
 	const navContent = [
 		{ label: 'Home', path: '/#welcome', alt: 'home page' },
@@ -129,16 +138,37 @@ export const TopNav = ({ title }: { title: string }) => {
 									// Mostly placeholder links for now will refine later.
 									<>
 										<Separator />
-										{userContent.map(({ path, label, alt }) => (
-											<Link
-												key={path}
-												to={path}
-												aria-label={alt}
-												onClick={handleClick}
-											>
-												{label}
-											</Link>
-										))}
+										{userContent.map(({ path, label, alt }) => {
+											return (
+												<Link
+													key={path}
+													to={path}
+													aria-label={alt}
+													onClick={handleClick}
+													className="inline-flex"
+												>
+													{path === '/manage' && !!hasPendingOffers ? (
+														<>
+															{label}{' '}
+															<span className="relative flex w-2 h-2 ml-1">
+																<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+																<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+															</span>
+														</>
+													) : path === '/profile' && hasRequiredTasks ? (
+														<>
+															{label}{' '}
+															<span className="relative flex w-2 h-2 ml-1">
+																<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+																<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+															</span>
+														</>
+													) : (
+														label
+													)}
+												</Link>
+											)
+										})}
 										<Separator />
 									</>
 								)}
