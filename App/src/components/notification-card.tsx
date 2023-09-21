@@ -10,6 +10,7 @@ import { DocumentData, DocumentReference } from '@/firebase/firestore'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
+import { ReactNode } from 'react'
 
 interface NotificationCardItemProps {
 	data: ExtendedOfferData | DocumentData
@@ -72,18 +73,21 @@ export const NotificationCard = ({
 	children,
 	scrollArea,
 	className,
+	moreActions,
 }: {
 	title?: string
 	description?: string
 	scrollArea?: boolean
-	children: React.ReactNode
+	children: ReactNode
 	className?: string
+	moreActions?: ReactNode
 }) => {
 	return (
 		<Card className={className}>
-			<CardHeader>
+			<CardHeader className="relative">
 				<CardTitle>{title}</CardTitle>
 				{description && <CardDescription>{description}</CardDescription>}
+				{moreActions && moreActions}
 			</CardHeader>
 			{scrollArea ? (
 				<ScrollArea className="h-[600px]">

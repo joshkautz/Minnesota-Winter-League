@@ -8,7 +8,7 @@ import {
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
-import { useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
 import { TeamRosterPlayer } from './team-roster-player'
@@ -111,7 +111,11 @@ const TeamDetail = ({
 	)
 }
 
-export const TeamRosterCard = () => {
+export const TeamRosterCard = ({
+	captainActions,
+}: {
+	captainActions: ReactNode
+}) => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { documentSnapshot, documentSnapshotLoading, authStateLoading } =
 		useContext(AuthContext)
@@ -129,6 +133,7 @@ export const TeamRosterCard = () => {
 					: teamSnapshot?.data().name
 			}
 			description={'Your team roster'}
+			moreActions={isCaptain && captainActions}
 		>
 			{teamSnapshot
 				?.data()

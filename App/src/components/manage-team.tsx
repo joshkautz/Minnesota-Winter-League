@@ -17,8 +17,18 @@ import { UnrosteredPlayerList } from './unrostered-player-card'
 import { TeamsContext } from '@/firebase/teams-context'
 import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
 import { Button } from './ui/button'
-import { ReloadIcon } from '@radix-ui/react-icons'
+import { DotsVerticalIcon } from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
+import { useNavigate } from 'react-router-dom'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from './ui/dropdown-menu'
 
 export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -26,6 +36,7 @@ export const ManageTeam = () => {
 		useContext(OffersContext)
 	const { authStateLoading, documentSnapshot, documentSnapshotLoading } =
 		useContext(AuthContext)
+	const navigate = useNavigate()
 	const isCaptain = documentSnapshot?.data()?.captain
 	const isUnrostered = documentSnapshot?.data()?.team === null
 
@@ -120,24 +131,18 @@ export const ManageTeam = () => {
 		{ title: 'Reject', action: handleReject },
 	]
 
-	return (
-		<div className={'container'}>
-			<div
-				className={
-					'max-w-max mx-auto my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
-				}
-			>
-				{documentSnapshotLoading ||
-				authStateLoading ||
-				documentSnapshot?.data()?.team === undefined
-					? `Loading...`
-					: documentSnapshot?.data()?.team === null
-					? `Join Team`
-					: `Manage Team`}
-			</div>
-			{!documentSnapshotLoading && !authStateLoading && (
-				<div className={'max-w-max mx-auto my-4 gap-8 flex'}>
-					{!isUnrostered && (
+	const captainActions = (
+		<div className="absolute right-6 top-6">
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button size={'sm'} variant={'ghost'}>
+						<DotsVerticalIcon />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className={'w-56'}>
+					<DropdownMenuLabel>More actions</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuGroup>
 						<DestructiveConfirmationDialog
 							title={'Are you sure you want to leave?'}
 							description={
@@ -156,41 +161,77 @@ export const ManageTeam = () => {
 								}
 							}}
 						>
-							<Button variant={'destructive'} disabled={leaveTeamLoading}>
-								{leaveTeamLoading && (
-									<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-								)}
+							<DropdownMenuItem
+								className="focus:bg-destructive focus:text-destructive-foreground"
+								disabled={leaveTeamLoading}
+								onClick={(event) => event.preventDefault()}
+							>
 								Leave Team
-							</Button>
+							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
-					)}
-					{isCaptain && (
+
 						<DestructiveConfirmationDialog
 							title={'Are you sure?'}
-							description={'This action is irreversible.'}
+							description={
+								'The entire team will be deleted. This action is irreversible.'
+							}
 							onConfirm={() => {
 								if (documentSnapshot) {
 									const documentSnapshotData = documentSnapshot.data()
 									if (documentSnapshotData) {
 										deleteTeam(documentSnapshotData.team, setDeleteTeamLoading)
+											.then(() => {
+												navigate('/')
+											})
+											.catch(() => {
+												toast({
+													title: 'Unable to delete team',
+													description:
+														'Something went wrong. Please try again later.',
+													variant: 'destructive',
+												})
+											})
 									}
 								}
 							}}
 						>
-							<Button variant={'destructive'} disabled={deleteTeamLoading}>
-								{deleteTeamLoading && (
-									<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-								)}
+							<DropdownMenuItem
+								className="focus:bg-destructive focus:text-destructive-foreground"
+								disabled={deleteTeamLoading}
+								onClick={(event) => event.preventDefault()}
+							>
 								Delete Team
-							</Button>
+							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
-					)}
-				</div>
-			)}
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
+	)
+
+	return (
+		<div className={'container'}>
+			<div
+				className={
+					'max-w-max mx-auto my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
+				}
+			>
+				{documentSnapshotLoading ||
+				authStateLoading ||
+				documentSnapshot?.data()?.team === undefined
+					? `Loading...`
+					: documentSnapshot?.data()?.team === null
+					? `Join Team`
+					: `Manage Team`}
+			</div>
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
-					{isUnrostered ? <TeamRequestCard /> : <TeamRosterCard />}
+					{isUnrostered ? (
+						<TeamRequestCard />
+					) : (
+						<TeamRosterCard captainActions={captainActions} />
+					)}
 					{isCaptain && <UnrosteredPlayerList />}
 				</div>
 				{/* RIGHT SIDE PANEL */}
