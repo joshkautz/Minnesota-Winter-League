@@ -27,6 +27,7 @@ import {
 	DocumentReference,
 	FieldValue,
 	getFirestore,
+	Timestamp,
 } from 'firebase-admin/firestore'
 import { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore'
 import { UserRecord } from 'firebase-functions/v1/auth'
@@ -55,6 +56,7 @@ interface Team extends DocumentData {
 	logo: string
 	name: string
 	registered: boolean
+	registeredTimestamp: Timestamp
 	roster: DocumentReference<Player>[]
 }
 
@@ -273,3 +275,54 @@ export const OnPaymentCreated: CloudFunction<QueryDocumentSnapshot> = region(
 // 			return error
 // 		}
 // 	})
+
+/**
+ * Firebase Firestore - Evaluate the registered status of a `Teams` Firestore Document and set its registeredTimestamp.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
+ */
+
+export const OnTeamUpdated: CloudFunction<Change<QueryDocumentSnapshot>> =
+	region(REGIONS.CENTRAL)
+		.firestore.document('teams/{teamId}')
+		.onUpdate(async (change: Change<QueryDocumentSnapshot>) => {
+			try {
+				const newValue = change.after.data() as Team
+				const previousValue = change.before.data() as Team
+				const teamRef = change.after.ref
+
+				if (newValue.registered != previousValue.registered) {
+					return teamRef.update({
+						registeredTimestamp: FieldValue.serverTimestamp(),
+					})
+				}
+
+				if (newValue.roster.length != previousValue.roster.length) {
+					const firestore = getFirestore()
+
+					const registeredPlayers = (
+						await firestore
+							.collection('players')
+							.where('team', '==', teamRef)
+							.where('registered', '==', true)
+							.count()
+							.get()
+					).data().count
+
+					if (registeredPlayers >= 10) {
+						return teamRef.update({
+							registered: true,
+						})
+					} else {
+						return teamRef.update({
+							registered: false,
+						})
+					}
+				}
+
+				return
+			} catch (error) {
+				logger.error(error)
+				return error
+			}
+		})
