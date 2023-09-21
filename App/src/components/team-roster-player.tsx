@@ -47,10 +47,11 @@ export const TeamRosterPlayer = ({
 							description: `They are still on your roster. You may be promote them back at any time.`,
 						})
 					})
-					.catch(() => {
+					.catch((error) => {
+						console.log(error.message)
 						toast({
-							title: 'Unable to demote',
-							description: 'Something went wrong. Please try again later.',
+							title: 'Unable to Demote',
+							description: error.message,
 							variant: 'destructive',
 						})
 					})
@@ -73,7 +74,7 @@ export const TeamRosterPlayer = ({
 					})
 					.catch(() => {
 						toast({
-							title: 'Unable to promote',
+							title: 'Unable to Promote',
 							description: 'Something went wrong. Please try again later.',
 							variant: 'destructive',
 						})
@@ -95,10 +96,10 @@ export const TeamRosterPlayer = ({
 							description: 'Send player invites to build up your roster.',
 						})
 					})
-					.catch(() => {
+					.catch((error) => {
 						toast({
-							title: 'Unable to remove',
-							description: 'Something went wrong. Please try again later.',
+							title: 'Unable to Remove',
+							description: error.message,
 							variant: 'destructive',
 						})
 					})

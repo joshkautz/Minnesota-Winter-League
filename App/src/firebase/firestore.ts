@@ -176,6 +176,9 @@ const demoteFromCaptain = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	teamRef: DocumentReference<TeamData, DocumentData>
 ) => {
+	if ((await getDoc(teamRef)).data()?.captains.length === 1)
+		throw new Error('Cannot demote last captain.')
+
 	await updateDoc(teamRef, {
 		captains: arrayRemove(playerRef),
 	})
@@ -190,6 +193,12 @@ const leaveTeam = async (
 	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
 	setLoadingState(true)
+	if ((await getDoc(playerRef)).data()?.captain) {
+    if ((await getDoc(teamRef)).data()?.captains.length === 1) {
+      setLoadingState(false)
+			throw new Error('Cannot remove last captain.')
+		}
+	}
 
 	await updateDoc(teamRef, {
 		captains: arrayRemove(playerRef),
