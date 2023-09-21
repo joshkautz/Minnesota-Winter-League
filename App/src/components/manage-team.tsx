@@ -203,9 +203,9 @@ export const ManageTeam = () => {
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>
-  )
-  
-  const playerActions = (
+	)
+
+	const playerActions = (
 		<div className="absolute right-6 top-6">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
@@ -268,7 +268,9 @@ export const ManageTeam = () => {
 					{isUnrostered ? (
 						<TeamRequestCard />
 					) : (
-						<TeamRosterCard actions={isCaptain ? captainActions : playerActions} />
+						<TeamRosterCard
+							actions={isCaptain ? captainActions : playerActions}
+						/>
 					)}
 					{isCaptain && <UnrosteredPlayerList />}
 				</div>

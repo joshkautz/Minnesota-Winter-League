@@ -194,8 +194,8 @@ const leaveTeam = async (
 ) => {
 	setLoadingState(true)
 	if ((await getDoc(playerRef)).data()?.captain) {
-    if ((await getDoc(teamRef)).data()?.captains.length === 1) {
-      setLoadingState(false)
+		if ((await getDoc(teamRef)).data()?.captains.length === 1) {
+			setLoadingState(false)
 			throw new Error('Cannot remove last captain.')
 		}
 	}

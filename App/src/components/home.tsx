@@ -145,10 +145,25 @@ export const Home = () => {
 								<p className={'text-2xl font-bold'}>Teams</p>
 								<p>
 									Minneapolis Winter League has room for <b>12 teams.</b> Be
-									sure to register your team before space fills up. There is a
-									10-player minimum for teams, with no roster limit. The cost to
-									register a team is $100. Be sure to check the Teams page to
-									see how many teams are currently registered.
+									sure to register your team before space fills up. There is a{' '}
+									<b>10-player minimum</b> requirement for teams, with no roster
+									maximum. The first 12 teams to meet this requirement will be
+									successfully locked in. All other players have the option to:
+									<br />
+									<br />
+									<ul>
+										<li>1. Request a roster spot on an existing team.</li>
+										<li>
+											2. Do nothing, and be fully refunded when the league
+											starts.
+										</li>
+									</ul>
+									<br />
+									Check the{' '}
+									<Link to={'/teams'}>
+										<u>Teams</u>
+									</Link>{' '}
+									page to see how many teams are currently locked in.
 								</p>
 							</div>
 						</div>

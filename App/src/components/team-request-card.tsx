@@ -111,11 +111,7 @@ const TeamDetail = ({
 	)
 }
 
-export const TeamRosterCard = ({
-	actions,
-}: {
-	actions: ReactNode
-}) => {
+export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { documentSnapshot, documentSnapshotLoading, authStateLoading } =
 		useContext(AuthContext)
