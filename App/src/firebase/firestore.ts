@@ -24,6 +24,7 @@ import {
 	DocumentReference,
 	QuerySnapshot,
 	Query,
+	getCountFromServer,
 } from 'firebase/firestore'
 
 import { app } from './app'
@@ -64,6 +65,19 @@ const rejectOffer = (
 	return updateDoc(offerRef, {
 		status: 'rejected',
 	})
+}
+
+const getRegisteredPlayers = async (
+	teamRef: DocumentReference<TeamData, DocumentData>
+) => {
+	const aggregateQuerySnapshot = await getCountFromServer(
+		query(
+			collection(firestore, 'players'),
+			where('team', '==', teamRef),
+			where('registered', '==', true)
+		)
+	)
+	return aggregateQuerySnapshot.data().count
 }
 
 const createTeam = async (
@@ -398,6 +412,7 @@ export {
 	incomingOffersQuery,
 	getPlayerRef,
 	updatePlayer,
+	getRegisteredPlayers,
 	leaveTeam,
 	createTeam,
 	deleteTeam,

@@ -23,6 +23,12 @@ export interface TeamData extends DocumentData {
 	storagePath: string
 }
 
+export interface ExtendedTeamData extends TeamData {
+  registeredCount: number
+  id: string
+  ref: DocumentReference
+}
+
 export interface OfferData extends DocumentData {
 	creator: string
 	player: DocumentReference<PlayerData, DocumentData>
