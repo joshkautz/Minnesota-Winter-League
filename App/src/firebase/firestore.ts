@@ -23,6 +23,7 @@ import {
 	QueryDocumentSnapshot,
 	DocumentReference,
 	QuerySnapshot,
+	Timestamp,
 	Query,
 } from 'firebase/firestore'
 
@@ -77,6 +78,7 @@ const createTeam = async (
 		logo: logo,
 		name: name,
 		registered: false,
+		registeredTimestamp: Timestamp.now(),
 		roster: [playerRef],
 		storagePath: storagePath,
 	})
