@@ -27,7 +27,11 @@ const signupSchema = z.object({
 
 type SignupSchema = z.infer<typeof signupSchema>
 
-export const UserSignup = () => {
+export const UserSignup = ({
+	closeMobileSheet,
+}: {
+	closeMobileSheet?: () => void
+}) => {
 	const {
 		authStateLoading,
 		createUserWithEmailAndPassword,
@@ -61,6 +65,10 @@ export const UserSignup = () => {
 				</pre>
 			),
 		})
+
+		if (closeMobileSheet) {
+			closeMobileSheet()
+		}
 	}
 
 	return (

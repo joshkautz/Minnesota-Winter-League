@@ -9,7 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { UserSignup } from './user-signup'
 import { UserLogin } from './user-login'
 
-export const UserForm = () => {
+export const UserForm = ({
+	closeMobileSheet,
+}: {
+	closeMobileSheet?: () => void
+}) => {
 	return (
 		<Tabs defaultValue={'login'} className={'min-w-[340px]'}>
 			<TabsList className={'grid w-full grid-cols-2'}>
@@ -23,7 +27,7 @@ export const UserForm = () => {
 						<CardDescription>Welcome back</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<UserLogin />
+						<UserLogin closeMobileSheet={closeMobileSheet} />
 					</CardContent>
 				</Card>
 			</TabsContent>
@@ -34,7 +38,7 @@ export const UserForm = () => {
 						<CardDescription>Create a new account</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<UserSignup />
+						<UserSignup closeMobileSheet={closeMobileSheet} />
 					</CardContent>
 				</Card>
 			</TabsContent>
