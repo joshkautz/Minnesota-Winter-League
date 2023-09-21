@@ -1,4 +1,4 @@
-import { HamburgerMenuIcon } from '@radix-ui/react-icons'
+import { HamburgerMenuIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -6,17 +6,24 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { AuthContext } from '@/firebase/auth-context'
 import { UserAvatar } from '@/components/user-avatar'
-import { AuthButton } from '@/components/auth-button'
 import { Separator } from '@/components/ui/separator'
 import { ThemeToggle } from './ui/theme-toggle'
 import { OffersContext } from '@/firebase/offers-context'
+import { UserForm } from './user-form'
+import { toast } from './ui/use-toast'
 
 export const TopNav = ({ title }: { title: string }) => {
-	const { authStateUser, authStateLoading, documentSnapshot } =
-		useContext(AuthContext)
+	const {
+		authStateUser,
+		authStateLoading,
+		documentSnapshot,
+		signOut,
+		signOutLoading,
+	} = useContext(AuthContext)
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
 	const [open, setOpen] = useState(false)
+	const [isOpen, setIsOpen] = useState(false)
 
 	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
 		(entry) => entry.data().status === 'pending'
@@ -98,6 +105,12 @@ export const TopNav = ({ title }: { title: string }) => {
 					</nav>
 				</div>
 
+				<Sheet open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
+					<SheetContent className="w-full pt-10">
+						<UserForm closeMobileSheet={() => setIsOpen(false)} />
+					</SheetContent>
+				</Sheet>
+
 				{/* Mobile */}
 				<Sheet open={open} onOpenChange={setOpen}>
 					<SheetTrigger asChild>
@@ -172,7 +185,45 @@ export const TopNav = ({ title }: { title: string }) => {
 										<Separator />
 									</>
 								)}
-								<AuthButton loading={authStateLoading} user={authStateUser} />
+								{authStateUser ? (
+									<Button
+										disabled={signOutLoading || authStateLoading}
+										onClick={() => {
+											signOut()
+												.then(() => {
+													toast({
+														title: 'Logged Out',
+														description:
+															'You are no longer signed in to an account.',
+													})
+													handleClick()
+												})
+												.catch(() => {
+													toast({
+														title: 'Unable to Log Out',
+														description:
+															'Something went wrong. Please try again.',
+													})
+												})
+										}}
+									>
+										{(signOutLoading || authStateLoading) && (
+											<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+										)}{' '}
+										Log Out
+									</Button>
+								) : (
+									<Button
+										onClick={() => {
+											setIsOpen(true)
+											setOpen(false)
+										}}
+										disabled={authStateLoading}
+									>
+										Login
+									</Button>
+								)}
+								{/* <AuthButton loading={authStateLoading} user={authStateUser} /> */}
 							</div>
 						</ScrollArea>
 					</SheetContent>
