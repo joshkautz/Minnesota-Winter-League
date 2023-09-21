@@ -146,6 +146,9 @@ service cloud.firestore {
     // 	- [Player is demoted from captain]:
     // 		-	Authenticated user was listed as a captain for the team being updated.
     // 		-	Authenticated user is updating only Captains.
+    // 	- [Player is editing their team, is a Captain]:
+    // 		-	Authenticated user was listed as a captain for the team being updated.
+    // 		-	Authenticated user is updating only Logo, Name, StoragePath
     match /teams/{document=**} {
       allow update:
       if request.auth != null &&
@@ -169,6 +172,11 @@ service cloud.firestore {
         ( // Player is demoted from captain
           /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.captains &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['captains'])
+        )
+        ||
+        ( // Player is editing team
+          /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.captains &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['logo, name, storagePath'])
         )
       )
 		}
