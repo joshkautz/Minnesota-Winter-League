@@ -146,8 +146,17 @@ export const TeamRosterPlayer = ({
 											Promote to captain
 										</DropdownMenuItem>
 										<DestructiveConfirmationDialog
-											title={'Are you sure?'}
-											description={'This action cannot be undone.'}
+											title={
+												playerSnapshot.id == documentSnapshot?.id
+													? 'Are you sure you want to leave?'
+													: 'Are you sure?'
+											}
+											description={
+												playerSnapshot.id == documentSnapshot?.id
+													? 'You will not be able to rejoin until a captain accepts you back on to the roster.'
+													: `${playerSnapshot.data()
+															?.firstname} will not be able to rejoin until a captain accepts them back on to the roster.`
+											}
 											onConfirm={removeFromTeamOnClickHandler}
 										>
 											<DropdownMenuItem
