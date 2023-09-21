@@ -23,7 +23,11 @@ const loginSchema = z.object({
 
 type LoginSchema = z.infer<typeof loginSchema>
 
-export const UserLogin = () => {
+export const UserLogin = ({
+	closeMobileSheet,
+}: {
+	closeMobileSheet?: () => void
+}) => {
 	const { signInWithEmailAndPassword, signInWithEmailAndPasswordError } =
 		useContext(AuthContext)
 	const form = useForm<LoginSchema>({
@@ -40,6 +44,10 @@ export const UserLogin = () => {
 			variant: res?.user ? 'default' : 'destructive',
 			description: res?.user ? `Welcome back` : `Invalid email or password`,
 		})
+
+		if (res?.user && closeMobileSheet) {
+			closeMobileSheet()
+		}
 	}
 
 	return (
