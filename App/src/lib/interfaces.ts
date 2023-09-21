@@ -24,9 +24,9 @@ export interface TeamData extends DocumentData {
 }
 
 export interface ExtendedTeamData extends TeamData {
-  registeredCount: number
-  id: string
-  ref: DocumentReference
+	registeredCount: number
+	id: string
+	ref: DocumentReference
 }
 
 export interface OfferData extends DocumentData {

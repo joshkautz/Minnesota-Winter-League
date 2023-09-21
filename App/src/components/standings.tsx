@@ -40,10 +40,8 @@ export const Standings = () => {
 				Standings
 			</div>
 			{standingsSnapshotLoading ? (
-				<div className='absolute inset-0 flex items-center justify-center'>
-					<ReloadIcon
-						className={'mr-2 h-10 w-10 animate-spin'}
-					/>
+				<div className="absolute inset-0 flex items-center justify-center">
+					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
 			) : standingsSnapshotError ? (
 				'Error'
