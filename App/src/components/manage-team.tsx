@@ -25,7 +25,6 @@ import {
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
@@ -140,7 +139,6 @@ export const ManageTeam = () => {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuLabel>More actions</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						<DestructiveConfirmationDialog

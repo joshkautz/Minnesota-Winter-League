@@ -9,7 +9,6 @@ import {
 	DropdownMenu,
 	DropdownMenuTrigger,
 	DropdownMenuContent,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuGroup,
 	DropdownMenuItem,
@@ -130,7 +129,6 @@ export const TeamRosterPlayer = ({
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className={'w-56'}>
-									<DropdownMenuLabel>More actions</DropdownMenuLabel>
 									<DropdownMenuSeparator />
 									<DropdownMenuGroup>
 										<DropdownMenuItem

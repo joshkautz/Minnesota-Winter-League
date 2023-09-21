@@ -10,7 +10,6 @@ import {
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
@@ -82,7 +81,6 @@ export const UserAvatar = ({
 				</DropdownMenuTrigger>
 				{/* Mostly example and placeholder content for now */}
 				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						{userContent.map(({ label, path, alt }) => {
