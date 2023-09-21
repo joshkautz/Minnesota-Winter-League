@@ -68,20 +68,42 @@ interface Offer extends DocumentData {
 }
 
 /**
- * Firebase Authentication - Delete the `Players` Firestore Document for the player.
+ * Firebase Authentication - Delete the `Players` Firestore Document for the player. Update the `Teams` Firestore Document for the player. Delete the `Offers` Firestore Documents for the player.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
  */
 
 export const OnUserDeleted: CloudFunction<UserRecord> = region(REGIONS.CENTRAL)
 	.auth.user()
-	.onDelete((user: UserRecord) => {
+	.onDelete(async (user: UserRecord) => {
 		try {
 			const firestore = getFirestore()
-			const playerDocumentReference = firestore
+			const playerRef = firestore
 				.collection(COLLECTIONS.PLAYERS)
-				.doc(user.uid)
-			return Promise.all([firestore.recursiveDelete(playerDocumentReference)])
+				.doc(user.uid) as DocumentReference<Player>
+
+			// Delete all the `Offers` Firestore Documents for the player.
+			const offers = await firestore
+				.collection('offers')
+				.where('player', '==', playerRef)
+				.get()
+
+			const offersDeletionPromises = offers.docs.map(
+				(offer: QueryDocumentSnapshot) => offer.ref.delete()
+			)
+
+			// Update the `Teams` Firestore Documents for the player.
+			const player = await playerRef.get()
+			const teamUpdatePromise = player.data()?.team?.update({
+				captains: FieldValue.arrayRemove(playerRef),
+				roster: FieldValue.arrayRemove(playerRef),
+			})
+
+			return Promise.all([
+				offersDeletionPromises,
+				teamUpdatePromise,
+				playerRef.delete(),
+			])
 		} catch (error) {
 			logger.error(error)
 			return error
@@ -155,8 +177,7 @@ export const OnOfferRejected: CloudFunction<Change<QueryDocumentSnapshot>> =
 					newValue.status === 'rejected' &&
 					previousValue.status === 'pending'
 				) {
-					// Delete the rejected `Offers` Firestore Document for the player.
-					return Promise.all([change.after.ref.delete()])
+					return change.after.ref.delete()
 				}
 
 				return
@@ -165,44 +186,6 @@ export const OnOfferRejected: CloudFunction<Change<QueryDocumentSnapshot>> =
 				return error
 			}
 		})
-
-/**
- * Firebase Firestore - Update the `Players` Firestore Document for the player when they create a new `Team` Firestore Document. Delete `Offer` Firestore Documents for the player.
- *
- * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_new_document_is_created_2 Trigger a function when a document is created.}
- */
-
-// export const OnTeamCreated: CloudFunction<QueryDocumentSnapshot> = region(
-// 	REGIONS.CENTRAL
-// )
-// 	.firestore.document('teams/{teamId}')
-// 	.onCreate(async (queryDocumentSnapshot: QueryDocumentSnapshot) => {
-// 		try {
-// 			const firestore = getFirestore()
-// 			const teamRef = queryDocumentSnapshot.ref
-// 			const playerRef = queryDocumentSnapshot
-// 				.data()
-// 				.captains.pop() as DocumentReference
-
-// 			const updatePlayerPromise = playerRef.update({
-// 				captain: true,
-// 				team: teamRef,
-// 			})
-
-// 			const offersPromises = firestore
-// 				.collection('offers')
-// 				.where('player', '==', playerRef)
-// 				.get()
-// 				.then((offers) =>
-// 					offers.docs.map((offer: QueryDocumentSnapshot) => offer.ref.delete())
-// 				)
-
-// 			return Promise.all([updatePlayerPromise, offersPromises])
-// 		} catch (error) {
-// 			logger.error(error)
-// 			return error
-// 		}
-// 	})
 
 /**
  * Firebase Firestore - Update the `Players` Firestore Document for the player when a new `Customers` `Payments` Firestore Document is created.
@@ -235,94 +218,121 @@ export const OnPaymentCreated: CloudFunction<QueryDocumentSnapshot> = region(
 	)
 
 /**
- * Firebase Firestore - Delete the `Teams` Firestore Document for the player.
- *
- * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
- */
-
-// export const OnTeamDeleted: CloudFunction<QueryDocumentSnapshot> = region(
-// 	REGIONS.CENTRAL
-// )
-// 	.firestore.document('teams/{teamId}')
-// 	.onDelete(async (queryDocumentSnapshot: QueryDocumentSnapshot) => {
-// 		try {
-// 			const promises = []
-
-// 			// Update all `Players` left on the deleted team.
-// 			const team = queryDocumentSnapshot.data() as Team
-
-// 			promises.push(
-// 				team.roster.map((player) =>
-// 					player.update({
-// 						captain: false,
-// 						team: null,
-// 					})
-// 				)
-// 			)
-
-// 			// Delete all `Offers` left for the team.
-// 			const firestore = getFirestore()
-// 			const offers = await firestore
-// 				.collection('offers')
-// 				.where('team', '==', queryDocumentSnapshot.ref)
-// 				.get()
-
-// 			promises.push(offers.docs.map((offer) => offer.ref.delete()))
-
-// 			return Promise.all(promises)
-// 		} catch (error) {
-// 			logger.error(error)
-// 			return error
-// 		}
-// 	})
-
-/**
- * Firebase Firestore - Evaluate the registered status of a `Teams` Firestore Document and set its registeredTimestamp.
+ * Firebase Firestore - Evaluate and set the registered value of a `Teams` Firestore Document when a player's registered field changes.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
 
-export const OnTeamUpdated: CloudFunction<Change<QueryDocumentSnapshot>> =
-	region(REGIONS.CENTRAL)
-		.firestore.document('teams/{teamId}')
-		.onUpdate(async (change: Change<QueryDocumentSnapshot>) => {
-			try {
-				const newValue = change.after.data() as Team
-				const previousValue = change.before.data() as Team
-				const teamRef = change.after.ref
+export const SetTeamRegistered_OnPlayerRegisteredChange: CloudFunction<
+	Change<QueryDocumentSnapshot>
+> = region(REGIONS.CENTRAL)
+	.firestore.document('players/{playerId}')
+	.onUpdate(async (change: Change<QueryDocumentSnapshot>) => {
+		try {
+			const newValue = change.after.data() as Player
+			const previousValue = change.before.data() as Player
 
-				if (newValue.registered != previousValue.registered) {
-					return teamRef.update({
-						registeredTimestamp: FieldValue.serverTimestamp(),
+			if (newValue.registered != previousValue.registered) {
+				const firestore = getFirestore()
+
+				const registeredPlayers = (
+					await firestore
+						.collection('players')
+						.where('team', '==', newValue.team)
+						.where('registered', '==', true)
+						.count()
+						.get()
+				).data().count
+
+				if (registeredPlayers >= 10) {
+					return newValue.team?.update({
+						registered: true,
+					})
+				} else {
+					return newValue.team?.update({
+						registered: false,
 					})
 				}
-
-				if (newValue.roster.length != previousValue.roster.length) {
-					const firestore = getFirestore()
-
-					const registeredPlayers = (
-						await firestore
-							.collection('players')
-							.where('team', '==', teamRef)
-							.where('registered', '==', true)
-							.count()
-							.get()
-					).data().count
-
-					if (registeredPlayers >= 10) {
-						return teamRef.update({
-							registered: true,
-						})
-					} else {
-						return teamRef.update({
-							registered: false,
-						})
-					}
-				}
-
-				return
-			} catch (error) {
-				logger.error(error)
-				return error
 			}
-		})
+
+			return
+		} catch (error) {
+			logger.error(error)
+			return error
+		}
+	})
+
+/**
+ * Firebase Firestore - Evaluate and set the registered value of a `Teams` Firestore Document when the team's roster field changes.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
+ */
+
+export const SetTeamRegistered_OnTeamRosterChange: CloudFunction<
+	Change<QueryDocumentSnapshot>
+> = region(REGIONS.CENTRAL)
+	.firestore.document('teams/{teamId}')
+	.onUpdate(async (change: Change<QueryDocumentSnapshot>) => {
+		try {
+			const newValue = change.after.data() as Team
+			const previousValue = change.before.data() as Team
+			const teamRef = change.after.ref
+
+			if (newValue.roster.length != previousValue.roster.length) {
+				const firestore = getFirestore()
+
+				const registeredPlayers = (
+					await firestore
+						.collection('players')
+						.where('team', '==', teamRef)
+						.where('registered', '==', true)
+						.count()
+						.get()
+				).data().count
+
+				if (registeredPlayers >= 10) {
+					return teamRef.update({
+						registered: true,
+					})
+				} else {
+					return teamRef.update({
+						registered: false,
+					})
+				}
+			}
+
+			return
+		} catch (error) {
+			logger.error(error)
+			return error
+		}
+	})
+
+/**
+ * Firebase Firestore - Set the registeredDate value of a `Teams` Firestore Document when the team's registered field changes.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
+ */
+
+export const SetTeamRegisteredDate_OnTeamRegisteredChange: CloudFunction<
+	Change<QueryDocumentSnapshot>
+> = region(REGIONS.CENTRAL)
+	.firestore.document('teams/{teamId}')
+	.onUpdate(async (change: Change<QueryDocumentSnapshot>) => {
+		try {
+			const newValue = change.after.data() as Team
+			const previousValue = change.before.data() as Team
+			const teamRef = change.after.ref
+
+			if (newValue.registered != previousValue.registered) {
+				return teamRef.update({
+					registeredTimestamp: FieldValue.serverTimestamp(),
+				})
+			}
+
+			return
+		} catch (error) {
+			logger.error(error)
+			return error
+		}
+	})
