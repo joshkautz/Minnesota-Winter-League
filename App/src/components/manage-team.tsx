@@ -25,7 +25,6 @@ import {
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 
@@ -139,7 +138,6 @@ export const ManageTeam = () => {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						<DestructiveConfirmationDialog
 							title={'Are you sure you want to leave?'}
@@ -205,6 +203,48 @@ export const ManageTeam = () => {
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>
+  )
+  
+  const playerActions = (
+		<div className="absolute right-6 top-6">
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button size={'sm'} variant={'ghost'}>
+						<DotsVerticalIcon />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className={'w-56'}>
+					<DropdownMenuGroup>
+						<DestructiveConfirmationDialog
+							title={'Are you sure you want to leave?'}
+							description={
+								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
+							}
+							onConfirm={() => {
+								if (documentSnapshot) {
+									const documentSnapshotData = documentSnapshot.data()
+									if (documentSnapshotData) {
+										leaveTeam(
+											documentSnapshot.ref,
+											documentSnapshotData.team,
+											setLeaveTeamLoading
+										)
+									}
+								}
+							}}
+						>
+							<DropdownMenuItem
+								className="focus:bg-destructive focus:text-destructive-foreground"
+								disabled={leaveTeamLoading}
+								onClick={(event) => event.preventDefault()}
+							>
+								Leave Team
+							</DropdownMenuItem>
+						</DestructiveConfirmationDialog>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	)
 
 	return (
@@ -228,7 +268,7 @@ export const ManageTeam = () => {
 					{isUnrostered ? (
 						<TeamRequestCard />
 					) : (
-						<TeamRosterCard captainActions={captainActions} />
+						<TeamRosterCard actions={isCaptain ? captainActions : playerActions} />
 					)}
 					{isCaptain && <UnrosteredPlayerList />}
 				</div>

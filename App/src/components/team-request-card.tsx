@@ -112,9 +112,9 @@ const TeamDetail = ({
 }
 
 export const TeamRosterCard = ({
-	captainActions,
+	actions,
 }: {
-	captainActions: ReactNode
+	actions: ReactNode
 }) => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { documentSnapshot, documentSnapshotLoading, authStateLoading } =
@@ -133,7 +133,7 @@ export const TeamRosterCard = ({
 					: teamSnapshot?.data().name
 			}
 			description={'Your team roster'}
-			moreActions={isCaptain && captainActions}
+			moreActions={actions}
 		>
 			{teamSnapshot
 				?.data()
