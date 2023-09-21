@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -28,19 +28,42 @@ export const DestructiveConfirmationDialog = ({
 	continueText?: string
 	onConfirm: () => void
 }) => {
+	const [open, setOpen] = useState(false)
 	return (
-		<AlertDialog>
-			<AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+		<AlertDialog open={open}>
+			<AlertDialogTrigger
+				onClick={() => {
+					if (!open) {
+						setOpen(true)
+					}
+				}}
+				asChild
+			>
+				{children}
+			</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>{title}</AlertDialogTitle>
 					<AlertDialogDescription>{description}</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel>{cancelText ?? 'Cancel'}</AlertDialogCancel>
+					<AlertDialogCancel
+						onClick={() => {
+							if (open) {
+								setOpen(false)
+							}
+						}}
+					>
+						{cancelText ?? 'Cancel'}
+					</AlertDialogCancel>
 					<AlertDialogAction
 						className={cn(buttonVariants({ variant: 'destructive' }))}
-						onClick={onConfirm}
+						onClick={() => {
+							onConfirm()
+							if (open) {
+								setOpen(false)
+							}
+						}}
 					>
 						{continueText ?? 'Continue'}
 					</AlertDialogAction>
