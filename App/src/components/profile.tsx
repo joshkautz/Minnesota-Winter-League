@@ -76,7 +76,7 @@ export const Profile = () => {
 	const isRegistered = documentSnapshot?.data()?.registered
 
 	return (
-		<div className="container flex flex-col items-center justify-center md:min-h-[calc(100vh-60px)] gap-10">
+		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
 			<div>
 				<div
 					className={
