@@ -23,6 +23,7 @@ import {
 	QueryDocumentSnapshot,
 	DocumentReference,
 	QuerySnapshot,
+	Timestamp,
 	Query,
 	getCountFromServer,
 } from 'firebase/firestore'
@@ -91,6 +92,7 @@ const createTeam = async (
 		logo: logo ? logo : null,
 		name: name,
 		registered: false,
+		registeredTimestamp: Timestamp.now(),
 		roster: [playerRef],
 		storagePath: storagePath ? storagePath : null,
 	})
