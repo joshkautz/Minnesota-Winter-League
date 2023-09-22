@@ -35,6 +35,7 @@ export const Profile = () => {
 
 	const form = useForm<ProfileSchema>({
 		resolver: zodResolver(profileSchema),
+		defaultValues: { firstname: '', lastname: '', email: '' },
 	})
 
 	useEffect(() => {
