@@ -74,6 +74,7 @@ export const NotificationCard = ({
 	scrollArea,
 	className,
 	moreActions,
+	searchBar,
 }: {
 	title?: string
 	description?: string
@@ -81,6 +82,7 @@ export const NotificationCard = ({
 	children: ReactNode
 	className?: string
 	moreActions?: ReactNode
+	searchBar?: ReactNode
 }) => {
 	return (
 		<Card className={className}>
@@ -88,6 +90,7 @@ export const NotificationCard = ({
 				<CardTitle>{title}</CardTitle>
 				{description && <CardDescription>{description}</CardDescription>}
 				{moreActions && moreActions}
+				{searchBar && searchBar}
 			</CardHeader>
 			{scrollArea ? (
 				<ScrollArea className="h-[600px]">

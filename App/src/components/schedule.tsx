@@ -63,7 +63,7 @@ const ScheduleCard = ({
 								<p className={'flex-1  text-center'}>
 									{game.date.toDate() > new Date()
 										? 'vs'
-										: !game.homeScore || !game.awayScore
+										: game.homeScore === null || game.awayScore === null
 										? 'vs'
 										: `${game.homeScore} - ${game.awayScore}`}
 								</p>

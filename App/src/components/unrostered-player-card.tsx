@@ -8,12 +8,14 @@ import {
 } from '@/firebase/firestore'
 import { useUnrosteredPlayers } from '@/lib/use-unrostered-players'
 import { cn } from '@/lib/utils'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
 import { ExtendedPlayerData, PlayerData, TeamData } from '@/lib/interfaces'
+import { Input } from './ui/input'
+import { Skeleton } from './ui/skeleton'
 
 const UnrosteredPlayerDetail = ({
 	teamRef,
@@ -66,12 +68,33 @@ const UnrosteredPlayerDetail = ({
 	)
 }
 
+const SearchBar = ({
+	value,
+	onChange,
+}: {
+	value: string
+	onChange: React.Dispatch<React.SetStateAction<string>>
+}) => {
+	return (
+		<div className={'pt-2'}>
+			<Input
+				placeholder={'Start typing to search...'}
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+			/>
+		</div>
+	)
+}
+
 export const UnrosteredPlayerList = () => {
 	const { documentSnapshot } = useContext(AuthContext)
 	const [unrosteredPlayersQuerySnapshot] = useCollection(
 		unrosteredPlayersQuery()
 	)
-	const unrosteredPlayers = useUnrosteredPlayers(unrosteredPlayersQuerySnapshot)
+	const { unrosteredPlayers, unrosteredPlayersLoading } = useUnrosteredPlayers(
+		unrosteredPlayersQuerySnapshot
+	)
+	const [search, setSearch] = useState('')
 
 	const handleInvite = (
 		playerRef: DocumentReference<PlayerData, DocumentData>
@@ -96,20 +119,46 @@ export const UnrosteredPlayerList = () => {
 			})
 	}
 
+	const filteredPlayers = unrosteredPlayers?.filter((player) => {
+		// this could probably be better but does the job for now
+		const fullName = `${player.firstname} ${player.lastname}`
+		return fullName.toLowerCase().includes(search.toLowerCase())
+	})
+
 	return (
 		<NotificationCard
 			description={'players elligible for team roster invitations.'}
 			scrollArea
 			title={'Unrostered players'}
+			searchBar={<SearchBar value={search} onChange={setSearch} />}
 		>
-			{unrosteredPlayers?.map((unrosteredPlayer: ExtendedPlayerData, index) => (
-				<UnrosteredPlayerDetail
-					key={`unrostered-player-${index}`}
-					handleInvite={handleInvite}
-					teamRef={documentSnapshot!.data()!.team}
-					unrosteredPlayer={unrosteredPlayer}
-				/>
-			))}
+			{unrosteredPlayersLoading ? (
+				Array.from({ length: 10 }).map((_, index) => (
+					<Skeleton key={index} className="mb-2">
+						<div className="flex items-end gap-2 py-2">
+							<div className="ml-2">
+								<Skeleton className="w-20 h-5" />
+
+								<Skeleton className="h-5 mt-1 w-36" />
+							</div>
+							<Skeleton className="flex justify-end w-20 gap-2 ml-auto mr-2">
+								<Button size={'sm'} variant={'ghost'} />
+							</Skeleton>
+						</div>
+					</Skeleton>
+				))
+			) : filteredPlayers?.length ? (
+				filteredPlayers?.map((unrosteredPlayer: ExtendedPlayerData, index) => (
+					<UnrosteredPlayerDetail
+						key={`unrostered-player-${index}`}
+						handleInvite={handleInvite}
+						teamRef={documentSnapshot!.data()!.team}
+						unrosteredPlayer={unrosteredPlayer}
+					/>
+				))
+			) : (
+				<span>No players found</span>
+			)}
 		</NotificationCard>
 	)
 }
