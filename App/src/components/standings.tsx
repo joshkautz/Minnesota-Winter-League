@@ -10,15 +10,15 @@ import {
 } from './ui/table'
 import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
-import { getStandingsRef } from '@/firebase/firestore'
-import { useDocument } from 'react-firebase-hooks/firestore'
+import { standingsQuery } from '@/firebase/firestore'
+import { useCollection } from 'react-firebase-hooks/firestore'
 import { ReloadIcon } from '@radix-ui/react-icons'
 
 export const Standings = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
 	const [standingsSnapshot, standingsSnapshotLoading, standingsSnapshotError] =
-		useDocument(getStandingsRef())
+		useCollection(standingsQuery())
 
 	const getColor = (value: number) => {
 		if (value > 9) {
@@ -58,17 +58,13 @@ export const Standings = () => {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{!standingsSnapshot?.data()?.standings ? (
-							<TableRow>
-								<TableCell>No data</TableCell>
-							</TableRow>
-						) : (
-							standingsSnapshot?.data()?.standings.map((data, index) => {
+						{standingsSnapshot?.size ? (
+							standingsSnapshot?.docs.map((standing, index) => {
 								const team = teamsQuerySnapshot?.docs.find(
-									(team) => team.id === data.team.id
+									(team) => team.id === standing.id
 								)
 								const teamData = teamsQuerySnapshot?.docs
-									.find((team) => team.id === data.team.id)
+									.find((team) => team.id === standing.id)
 									?.data()
 								return (
 									<TableRow key={index}>
@@ -86,14 +82,24 @@ export const Standings = () => {
 												</div>
 											</Link>
 										</TableCell>
-										<TableCell>{data.wins}</TableCell>
-										<TableCell>{data.losses}</TableCell>
-										<TableCell className={getColor(data.differential)}>
-											{data.differential}
+										<TableCell>{standing.data()?.wins}</TableCell>
+										<TableCell>{standing.data()?.losses}</TableCell>
+										<TableCell
+											className={getColor(
+												standing.data()?.pointsFor -
+													standing.data()?.pointsAgainst
+											)}
+										>
+											{standing.data()?.pointsFor -
+												standing.data()?.pointsAgainst}
 										</TableCell>
 									</TableRow>
 								)
 							})
+						) : (
+							<TableRow>
+								<TableCell>No data</TableCell>
+							</TableRow>
 						)}
 					</TableBody>
 				</Table>

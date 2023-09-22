@@ -37,13 +37,13 @@ for (let i = 0; i < numWeeks; i++) {
 	let thirdRoundTeams = []
 	let fourthRoundTeams = []
 
-	for (let j = 0; j < teams.length / 2; j++) {
+	for (let j = 0; j < 6; j++) {
 		firstRoundTeams.push(getTeam())
 	}
 
 	secondRoundTeams = [...firstRoundTeams]
 
-	for (let j = 0; j < teams.length / 2; j++) {
+	for (let j = 0; j < 6; j++) {
 		thirdRoundTeams.push(getTeam())
 	}
 
@@ -110,7 +110,7 @@ for (let i = 0; i < numWeeks; i++) {
 			let homeScore = null
 			let awayScore = null
 
-			if (Date.now() < date) {
+			if (Date.now() > date) {
 				if (Math.floor(Math.random() * 2) == 0) {
 					homeScore = 15
 					awayScore = Math.floor(Math.random() * 15)
@@ -126,7 +126,7 @@ for (let i = 0; i < numWeeks; i++) {
 				homeScore: homeScore,
 				awayScore: awayScore,
 				date: Timestamp.fromDate(date),
-				field: k.toString(),
+				field: (k + 1).toString(),
 			})
 
 			await new Promise((r) => setTimeout(r, 250))
