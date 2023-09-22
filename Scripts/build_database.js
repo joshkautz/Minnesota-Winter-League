@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase-admin/app'
-import { getFirestore } from 'firebase-admin/firestore'
+import { Timestamp, getFirestore } from 'firebase-admin/firestore'
 import { getStorage, getDownloadURL } from 'firebase-admin/storage'
 import random_name from 'node-random-name'
 
@@ -22,7 +22,7 @@ const bucket = storage.bucket()
 
 /////////////////////////////// Create Players ///////////////////////////////
 
-for (let players = 0; players < 100; players++) {
+for (let players = 0; players < 200; players++) {
 	const firstname = random_name({
 		seed: process.hrtime().join('').toString(),
 		first: true,
@@ -42,6 +42,7 @@ for (let players = 0; players < 100; players++) {
 	})
 
 	await new Promise((r) => setTimeout(r, 250))
+}
 
 /////////////////////////////// Create Teams ///////////////////////////////
 
@@ -52,12 +53,13 @@ playersSnapshot.forEach((doc) => {
 })
 
 const getPlayer = () => {
-	const i = Math.floor(Math.random() * players.length)
+  const i = Math.floor(Math.random() * players.length)
+  const result = players[i];
 	players.splice(i, 1)
-	return players[i]
+  return result;
 }
 
-for (let teams = 1; teams <= 4; teams++) {
+for (let teams = 1; teams <= 12; teams++) {
 	const playerRefs = []
 	const captainRefs = []
 
@@ -92,6 +94,8 @@ for (let teams = 1; teams <= 4; teams++) {
 			style: 'capital',
 		}),
 		registered: false,
+		registeredDate: Timestamp.now(),
+		storagePath: null,
 	})
 
 	await new Promise((r) => setTimeout(r, 250))
