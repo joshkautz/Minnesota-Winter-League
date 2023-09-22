@@ -104,9 +104,6 @@ export const Schedule = () => {
 		}
 	)
 
-	console.log(rounds)
-	console.log(rounds.length)
-
 	return (
 		<div className="container">
 			<div
