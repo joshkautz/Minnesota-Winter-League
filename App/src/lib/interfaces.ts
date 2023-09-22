@@ -55,12 +55,10 @@ export interface CheckoutSessionData extends DocumentData {
 }
 
 export interface StandingsData extends DocumentData {
-	standings: {
-		differential: number
-		losses: number
-		team: DocumentReference<TeamData, DocumentData>
-		wins: number
-	}[]
+	wins: number
+	losses: number
+	pointsFor: number
+	pointsAgainst: number
 }
 
 export interface GamesData extends DocumentData {

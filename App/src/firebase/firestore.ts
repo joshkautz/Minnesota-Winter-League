@@ -269,13 +269,11 @@ const getPlayerRef = (
 	>
 }
 
-const getStandingsRef = ():
-	| DocumentReference<StandingsData, DocumentData>
-	| undefined => {
-	return doc(firestore, 'standings', 'standings') as DocumentReference<
-		StandingsData,
-		DocumentData
-	>
+const standingsQuery = (): Query<StandingsData, DocumentData> => {
+	return query(
+		collection(firestore, 'standings'),
+		orderBy('wins', 'desc')
+	) as Query<StandingsData, DocumentData>
 }
 
 const gamesQuery = (): Query<GamesData, DocumentData> => {
@@ -423,7 +421,7 @@ export {
 	demoteFromCaptain,
 	unrosteredPlayersQuery,
 	promoteToCaptain,
-	getStandingsRef,
+	standingsQuery,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,
