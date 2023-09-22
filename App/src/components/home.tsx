@@ -149,16 +149,14 @@ export const Home = () => {
 									<b>10-player minimum</b> requirement for teams, with no roster
 									maximum. The first 12 teams to meet this requirement will be
 									successfully locked in. All other players have the option to:
-									<br />
-									<br />
-									<ul>
-										<li>1. Request a roster spot on an existing team.</li>
-										<li>
-											2. Do nothing, and be fully refunded when the league
-											starts.
-										</li>
-									</ul>
-									<br />
+								</p>
+								<ul>
+									<li>1. Request a roster spot on an existing team.</li>
+									<li>
+										2. Do nothing, and be fully refunded when the league starts.
+									</li>
+								</ul>
+								<p>
 									Check the{' '}
 									<Link to={'/teams'}>
 										<u>Teams</u>
