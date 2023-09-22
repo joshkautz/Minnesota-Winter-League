@@ -272,7 +272,8 @@ const getPlayerRef = (
 const standingsQuery = (): Query<StandingsData, DocumentData> => {
 	return query(
 		collection(firestore, 'standings'),
-		orderBy('wins', 'desc')
+		orderBy('wins', 'desc'),
+		orderBy('differential', 'desc')
 	) as Query<StandingsData, DocumentData>
 }
 

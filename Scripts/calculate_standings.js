@@ -30,6 +30,7 @@ for (let i = 0; i < teams.length; i++) {
 			pointsAgainst: 0,
 			wins: 0,
 			losses: 0,
+			differential: 0,
 		})
 		await new Promise((r) => setTimeout(r, 250))
 	}
@@ -59,71 +60,39 @@ gamesSnapshot.forEach((game) => {
 for (let i = 0; i < games.length; i++) {
 	const homeTeamId = games[i].data().home.id
 	const awayTeamId = games[i].data().away.id
-	const homeTeamDocSnapshot = await firestore
+	await firestore
 		.collection('standings')
 		.doc(homeTeamId)
-		.get()
+		.update({
+			pointsFor: FieldValue.increment(games[i].data().homeScore),
+			pointsAgainst: FieldValue.increment(games[i].data().awayScore),
+			wins: FieldValue.increment(
+				games[i].data().homeScore > games[i].data().awayScore ? 1 : 0
+			),
+			losses: FieldValue.increment(
+				games[i].data().homeScore > games[i].data().awayScore ? 0 : 1
+			),
+			differential: FieldValue.increment(
+				games[i].data().homeScore - games[i].data().awayScore
+			),
+		})
 
-	homeTeamDocSnapshot.exists
-		? await firestore
-				.collection('standings')
-				.doc(homeTeamId)
-				.update({
-					pointsFor: FieldValue.increment(games[i].data().homeScore),
-					pointsAgainst: FieldValue.increment(games[i].data().awayScore),
-					wins: FieldValue.increment(
-						games[i].data().homeScore > games[i].data().awayScore ? 1 : 0
-					),
-					losses: FieldValue.increment(
-						games[i].data().homeScore > games[i].data().awayScore ? 0 : 1
-					),
-				})
-		: await firestore
-				.collection('standings')
-				.doc(homeTeamId)
-				.create({
-					pointsFor: FieldValue.increment(games[i].data().homeScore),
-					pointsAgainst: FieldValue.increment(games[i].data().awayScore),
-					wins: FieldValue.increment(
-						games[i].data().homeScore > games[i].data().awayScore ? 1 : 0
-					),
-					losses: FieldValue.increment(
-						games[i].data().homeScore > games[i].data().awayScore ? 0 : 1
-					),
-				})
-
-	const awayTeamDocSnapshot = await firestore
+	await firestore
 		.collection('standings')
 		.doc(awayTeamId)
-		.get()
-
-	awayTeamDocSnapshot.exists
-		? await firestore
-				.collection('standings')
-				.doc(awayTeamId)
-				.update({
-					pointsFor: FieldValue.increment(games[i].data().awayScore),
-					pointsAgainst: FieldValue.increment(games[i].data().homeScore),
-					wins: FieldValue.increment(
-						games[i].data().awayScore > games[i].data().homeScore ? 1 : 0
-					),
-					losses: FieldValue.increment(
-						games[i].data().awayScore > games[i].data().homeScore ? 0 : 1
-					),
-				})
-		: await firestore
-				.collection('standings')
-				.doc(awayTeamId)
-				.create({
-					pointsFor: FieldValue.increment(games[i].data().awayScore),
-					pointsAgainst: FieldValue.increment(games[i].data().homeScore),
-					wins: FieldValue.increment(
-						games[i].data().awayScore > games[i].data().homeScore ? 1 : 0
-					),
-					losses: FieldValue.increment(
-						games[i].data().awayScore > games[i].data().homeScore ? 0 : 1
-					),
-				})
+		.update({
+			pointsFor: FieldValue.increment(games[i].data().awayScore),
+			pointsAgainst: FieldValue.increment(games[i].data().homeScore),
+			wins: FieldValue.increment(
+				games[i].data().awayScore > games[i].data().homeScore ? 1 : 0
+			),
+			losses: FieldValue.increment(
+				games[i].data().awayScore > games[i].data().homeScore ? 0 : 1
+			),
+			differential: FieldValue.increment(
+				games[i].data().awayScore - games[i].data().homeScore
+			),
+		})
 
 	await new Promise((r) => setTimeout(r, 250))
 }
