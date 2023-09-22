@@ -104,6 +104,9 @@ export const Schedule = () => {
 		}
 	)
 
+	console.log(rounds)
+	console.log(rounds.length)
+
 	return (
 		<div className="container">
 			<div
@@ -127,9 +130,9 @@ export const Schedule = () => {
 								<ScheduleCard
 									key={`schedule-card-${index}`}
 									games={games}
-									title={`Week ${Math.ceil(
-										(index + 1) / (rounds.length / 2)
-									)} | Round ${(index % 4) + 1}`}
+									title={`Week ${Math.ceil((index + 1) / 4)} | Round ${
+										(index % 4) + 1
+									}`}
 								/>
 						  ))}
 				</div>
