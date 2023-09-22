@@ -53,10 +53,10 @@ playersSnapshot.forEach((doc) => {
 })
 
 const getPlayer = () => {
-  const i = Math.floor(Math.random() * players.length)
-  const result = players[i];
+	const i = Math.floor(Math.random() * players.length)
+	const result = players[i]
 	players.splice(i, 1)
-  return result;
+	return result
 }
 
 for (let teams = 1; teams <= 12; teams++) {

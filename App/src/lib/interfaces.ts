@@ -19,6 +19,7 @@ export interface TeamData extends DocumentData {
 	logo: string
 	name: string
 	registered: boolean
+	registeredDate: Timestamp
 	roster: DocumentReference<PlayerData, DocumentData>[]
 	storagePath: string
 }

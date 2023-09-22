@@ -23,8 +23,8 @@ import {
 	QueryDocumentSnapshot,
 	DocumentReference,
 	QuerySnapshot,
-	Query,
 	Timestamp,
+	Query,
 	getCountFromServer,
 } from 'firebase/firestore'
 
