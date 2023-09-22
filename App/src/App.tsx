@@ -9,13 +9,36 @@ import { ProtectedRoute } from '@/components/protected-route'
 import { Profile } from '@/components/profile'
 import { TeamProfile } from './components/team-profile'
 import { ManageTeam } from './components/manage-team'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { AuthContext } from './firebase/auth-context'
 import { CreateTeam } from './components/create-team'
 
 function App() {
-	const { documentSnapshot } = useContext(AuthContext)
-	documentSnapshot?.data()?.team
+	const { authStateUser } = useContext(AuthContext)
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			if (!authStateUser?.emailVerified) {
+				authStateUser?.reload().then(() => {
+					if (authStateUser.emailVerified) {
+						authStateUser.getIdToken(true)
+						// We've forced a refresh, so now we can clear the interval.
+						clearInterval(interval)
+					}
+				})
+			}
+		}, 2000)
+
+		// If the user is already verified, clear the interval.
+		if (authStateUser?.emailVerified) {
+			clearInterval(interval)
+		}
+
+		// If the component unmounts or useEffect is called again, clear the interval.
+		return () => {
+			clearInterval(interval)
+		}
+	}, [authStateUser?.emailVerified])
 
 	return (
 		<Routes>
