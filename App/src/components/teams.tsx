@@ -2,7 +2,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { Alert, AlertTitle, AlertDescription } from './ui/alert'
-import { ExclamationTriangleIcon, ReloadIcon } from '@radix-ui/react-icons'
+import {
+	CheckCircledIcon,
+	ExclamationTriangleIcon,
+	ReloadIcon,
+} from '@radix-ui/react-icons'
 import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardHeader } from './ui/card'
@@ -90,15 +94,19 @@ export const Teams = () => {
 										</p>
 										<p
 											className={cn(
-												team.registeredCount < 1
+												team.registeredCount < 10
 													? 'text-destructive'
 													: 'text-green-600 dark:text-green-500'
 											)}
 										>
 											<i>
-												{team.registeredCount < 1
-													? `Roster Minimum Not Met`
-													: `Registered! (Team 1 of 12)`}
+												{team.registeredCount > 10 ? (
+													`Roster Minimum Not Met`
+												) : (
+													<div className="inline-flex items-center gap-2 text-green-600 dark:text-green-500">
+														Complete <CheckCircledIcon className="w-4 h-4" />
+													</div>
+												)}
 											</i>
 										</p>
 									</CardContent>
