@@ -27,7 +27,6 @@ export const NotificationCardItem = ({
 	message,
 	actionOptions,
 }: NotificationCardItemProps) => {
-	const isOfferType = 'creator' in data
 
 	return (
 		<div className="flex items-end gap-2 py-2">
@@ -41,12 +40,10 @@ export const NotificationCardItem = ({
 			)}
 			<div className="mr-2">
 				<p>
-					{isOfferType ? data.playerName : `${data.firstname} ${data.lastname}`}
+          {data.playerName}
 				</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-					{isOfferType
-						? `${message} ${data.teamName}`
-						: `is looking for a team.`}
+          {`${message} ${data.teamName}`}
 				</p>
 			</div>
 			<div className="flex justify-end flex-1 gap-2">
