@@ -59,11 +59,7 @@ export const UserSignup = ({
 				? 'Account creation succeeded!'
 				: `Account creation failed: ${createUserWithEmailAndPasswordError}`,
 			variant: res?.user ? 'default' : 'destructive',
-			description: (
-				<pre className={'mt-2 w-[340px] rounded-md bg-slate-950 p-4'}>
-					<code className={'text-white'}>{JSON.stringify(data, null, 2)}</code>
-				</pre>
-			),
+			description: 'Welcome to Minneapolis Winter League!',
 		})
 
 		if (closeMobileSheet) {
