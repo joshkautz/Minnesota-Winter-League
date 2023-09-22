@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase-admin/app'
-import { getFirestore, Timestamp } from 'firebase-admin/firestore'
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 
 const firebaseConfig = {
 	storageBucket: 'minnesota-winter-league.appspot.com',
@@ -8,6 +8,32 @@ const firebaseConfig = {
 initializeApp(firebaseConfig)
 
 const firestore = getFirestore()
+
+/////////////////////////////// Get Teams ///////////////////////////////
+
+const teams = []
+const teamsSnapshot = await firestore.collection('teams').get()
+teamsSnapshot.forEach((team) => {
+	teams.push(team)
+})
+
+/////////////////////////////// Create Standings ///////////////////////////////
+
+for (let i = 0; i < teams.length; i++) {
+	const snapshot = await firestore
+		.collection('standings')
+		.doc(teams[i].id)
+		.get()
+	if (!snapshot.exists) {
+		await firestore.collection('standings').doc(teams[i].id).create({
+			pointsFor: 0,
+			pointsAgainst: 0,
+			wins: 0,
+			losses: 0,
+		})
+		await new Promise((r) => setTimeout(r, 250))
+	}
+}
 
 /////////////////////////////// Get Standings ///////////////////////////////
 
@@ -22,7 +48,7 @@ standingsSnapshot.forEach((standing) => {
 const games = []
 const gamesSnapshot = await firestore
 	.collection('games')
-	.where('date', '<=', Date.now())
+	.where('date', '<=', new Date())
 	.get()
 gamesSnapshot.forEach((game) => {
 	games.push(game)
