@@ -89,11 +89,11 @@ export const Teams = () => {
 											></span>
 										</p>
 										<p
-											style={
+											className={cn(
 												team.registeredCount < 1
-													? { color: 'red' }
-													: { color: 'green' }
-											}
+													? 'text-destructive'
+													: 'text-green-600 dark:text-green-500'
+											)}
 										>
 											<i>
 												{team.registeredCount < 1
