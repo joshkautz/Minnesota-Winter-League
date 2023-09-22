@@ -6,33 +6,43 @@ export const useUnrosteredPlayers = (
 	unrosteredPlayersQuerySnapshot:
 		| QuerySnapshot<PlayerData, DocumentData>
 		| undefined
-): ExtendedPlayerData[] | undefined => {
+): {
+	unrosteredPlayers: ExtendedPlayerData[] | undefined
+	unrosteredPlayersLoading: boolean
+} => {
 	const [unrosteredPlayers, setUnrosteredPlayers] = useState<
 		ExtendedPlayerData[] | undefined
 	>()
 
+	const [unrosteredPlayersLoading, setUnrosteredPlayersLoading] = useState(true)
+
 	useEffect(() => {
 		const updateUnrosteredPlayers = async () => {
 			if (unrosteredPlayersQuerySnapshot) {
-				const updatedUnrosteredPlayers: ExtendedPlayerData[] =
-					await Promise.all(
-						unrosteredPlayersQuerySnapshot.docs.map(
-							async (unrosteredPlayer: DocumentData, index: number) => {
-								const result: ExtendedPlayerData = {
-									...unrosteredPlayer.data(),
-									ref: unrosteredPlayersQuerySnapshot.docs[index].ref,
+				try {
+					const updatedUnrosteredPlayers: ExtendedPlayerData[] =
+						await Promise.all(
+							unrosteredPlayersQuerySnapshot.docs.map(
+								async (unrosteredPlayer: DocumentData, index: number) => {
+									const result: ExtendedPlayerData = {
+										...unrosteredPlayer.data(),
+										ref: unrosteredPlayersQuerySnapshot.docs[index].ref,
+									}
+									return result
 								}
-								return result
-							}
+							)
 						)
-					)
-
-				setUnrosteredPlayers(updatedUnrosteredPlayers)
+					setUnrosteredPlayers(updatedUnrosteredPlayers)
+				} catch (error) {
+					console.log(error)
+				} finally {
+					setUnrosteredPlayersLoading(false)
+				}
 			}
 		}
 
 		updateUnrosteredPlayers()
 	}, [unrosteredPlayersQuerySnapshot])
 
-	return unrosteredPlayers
+	return { unrosteredPlayers, unrosteredPlayersLoading }
 }
