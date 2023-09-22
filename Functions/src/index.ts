@@ -56,7 +56,7 @@ interface Team extends DocumentData {
 	logo: string
 	name: string
 	registered: boolean
-	registeredTimestamp: Timestamp
+	registeredDate: Timestamp
 	roster: DocumentReference<Player>[]
 }
 
@@ -326,7 +326,7 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange: CloudFunction<
 
 			if (newValue.registered != previousValue.registered) {
 				return teamRef.update({
-					registeredTimestamp: FieldValue.serverTimestamp(),
+					registeredDate: FieldValue.serverTimestamp(),
 				})
 			}
 

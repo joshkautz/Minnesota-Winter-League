@@ -25,6 +25,7 @@ import {
 	QuerySnapshot,
 	Timestamp,
 	Query,
+	getCountFromServer,
 } from 'firebase/firestore'
 
 import { app } from './app'
@@ -67,6 +68,19 @@ const rejectOffer = (
 	})
 }
 
+const getRegisteredPlayers = async (
+	teamRef: DocumentReference<TeamData, DocumentData>
+) => {
+	const aggregateQuerySnapshot = await getCountFromServer(
+		query(
+			collection(firestore, 'players'),
+			where('team', '==', teamRef),
+			where('registered', '==', true)
+		)
+	)
+	return aggregateQuerySnapshot.data().count
+}
+
 const createTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	name: string,
@@ -75,12 +89,12 @@ const createTeam = async (
 ) => {
 	const team = await addDoc(collection(firestore, 'teams'), {
 		captains: [playerRef],
-		logo: logo,
+		logo: logo ? logo : null,
 		name: name,
 		registered: false,
-		registeredTimestamp: Timestamp.now(),
+		registeredDate: Timestamp.now(),
 		roster: [playerRef],
-		storagePath: storagePath,
+		storagePath: storagePath ? storagePath : null,
 	})
 
 	await updateDoc(playerRef, {
@@ -116,8 +130,11 @@ const createPlayer = (
 }
 
 const deleteTeam = async (
-	teamRef: DocumentReference<TeamData, DocumentData>
+	teamRef: DocumentReference<TeamData, DocumentData>,
+	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+	setLoadingState(true)
+
 	const offersQuerySnapshot = await getDocs(
 		query(collection(firestore, 'offers'), where('team', '==', teamRef))
 	)
@@ -147,26 +164,9 @@ const deleteTeam = async (
 		}
 	}
 
-	return Promise.all([offersPromises, playersPromises, deleteDoc(teamRef)])
-}
+	await Promise.all([offersPromises, playersPromises, deleteDoc(teamRef)])
 
-const removePlayerFromTeam = (
-	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<[void, void]> => {
-	return Promise.all([
-		// Update the player.
-		updateDoc(playerRef, {
-			captain: false,
-			team: null,
-		}),
-
-		// Update the team.
-		updateDoc(teamRef, {
-			captains: arrayRemove(playerRef),
-			roster: arrayRemove(playerRef),
-		}),
-	])
+	setLoadingState(false)
 }
 
 const promoteToCaptain = (
@@ -188,34 +188,45 @@ const promoteToCaptain = (
 	])
 }
 
-const demoteFromCaptain = (
+const demoteFromCaptain = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<[void, void]> => {
-	return Promise.all([
-		updateDoc(teamRef, {
-			captains: arrayRemove(playerRef),
-		}),
-		updateDoc(playerRef, {
-			captain: false,
-		}),
-	])
+) => {
+	if ((await getDoc(teamRef)).data()?.captains.length === 1)
+		throw new Error('Cannot demote last captain.')
+
+	await updateDoc(teamRef, {
+		captains: arrayRemove(playerRef),
+	})
+	await updateDoc(playerRef, {
+		captain: false,
+	})
 }
 
-const leaveTeam = (
+const leaveTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<[void, void]> => {
-	return Promise.all([
-		updateDoc(playerRef, {
-			captain: false,
-			team: null,
-		}),
-		updateDoc(teamRef, {
-			captains: arrayRemove(playerRef),
-			roster: arrayRemove(playerRef),
-		}),
-	])
+	teamRef: DocumentReference<TeamData, DocumentData>,
+	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+	setLoadingState(true)
+	if ((await getDoc(playerRef)).data()?.captain) {
+		if ((await getDoc(teamRef)).data()?.captains.length === 1) {
+			setLoadingState(false)
+			throw new Error('Cannot remove last captain.')
+		}
+	}
+
+	await updateDoc(teamRef, {
+		captains: arrayRemove(playerRef),
+		roster: arrayRemove(playerRef),
+	})
+
+	await updateDoc(playerRef, {
+		captain: false,
+		team: null,
+	})
+
+	setLoadingState(false)
 }
 
 const invitePlayerToJoinTeam = (
@@ -360,16 +371,19 @@ const incomingOffersQuery = (
 }
 
 const stripeRegistration = async (
-	authValue: User | null | undefined
+	authValue: User | null | undefined,
+	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<Unsubscribe> => {
+	setLoadingState(true)
+
 	// Create new Checkout Session for the player
 	const checkoutSessionRef = (await addDoc(
 		collection(firestore, `customers/${authValue?.uid}/checkout_sessions`),
 		{
 			mode: 'payment',
 			price: Products.MinnesotaWinterLeagueRegistration2023Test,
-			success_url: window.location.origin,
-			cancel_url: window.location.origin,
+			success_url: window.location.href,
+			cancel_url: window.location.href,
 		}
 	)) as DocumentReference<CheckoutSessionData, DocumentData>
 
@@ -378,12 +392,10 @@ const stripeRegistration = async (
 		const data = checkoutSessionSnap.data()
 		if (data) {
 			if (data.url) {
-				console.log('Checkout Session URL:', data.url)
-			} else {
-				console.log('Creating Checkout Session')
+				// We have a Stripe Checkout URL, let's redirect.
+				setLoadingState(false)
+				window.location.assign(data.url)
 			}
-		} else {
-			console.log('Creating Checkout Session')
 		}
 	})
 }
@@ -402,6 +414,7 @@ export {
 	incomingOffersQuery,
 	getPlayerRef,
 	updatePlayer,
+	getRegisteredPlayers,
 	leaveTeam,
 	createTeam,
 	deleteTeam,
@@ -410,7 +423,6 @@ export {
 	demoteFromCaptain,
 	unrosteredPlayersQuery,
 	promoteToCaptain,
-	removePlayerFromTeam,
 	getStandingsRef,
 	type DocumentData,
 	type FirestoreError,

@@ -14,6 +14,7 @@ import {
 	gamesQuery,
 } from '@/firebase/firestore'
 import { GamesData } from '@/lib/interfaces'
+import { ReloadIcon } from '@radix-ui/react-icons'
 
 const ScheduleCard = ({
 	games,
@@ -112,23 +113,27 @@ export const Schedule = () => {
 			>
 				Schedule
 			</div>
-			<div className={'flex flex-wrap gap-8'}>
-				{gamesSnapshotLoading
-					? 'Loading...'
-					: gamesSnapshotError
-					? 'Error'
-					: !gamesSnapshot
-					? 'No data'
-					: rounds.map((games, index) => (
-							<ScheduleCard
-								key={`schedule-card-${index}`}
-								games={games}
-								title={`Week ${Math.ceil(
-									(index + 1) / (rounds.length / 2)
-								)} | Round ${(index % 4) + 1}`}
-							/>
-					  ))}
-			</div>
+			{gamesSnapshotLoading ? (
+				<div className="absolute inset-0 flex items-center justify-center">
+					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+				</div>
+			) : (
+				<div className={'flex flex-wrap gap-8'}>
+					{gamesSnapshotError
+						? 'Error'
+						: !gamesSnapshot
+						? 'No data'
+						: rounds.map((games, index) => (
+								<ScheduleCard
+									key={`schedule-card-${index}`}
+									games={games}
+									title={`Week ${Math.ceil(
+										(index + 1) / (rounds.length / 2)
+									)} | Round ${(index % 4) + 1}`}
+								/>
+						  ))}
+				</div>
+			)}
 		</div>
 	)
 }

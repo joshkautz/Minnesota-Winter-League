@@ -2,35 +2,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { Alert, AlertTitle, AlertDescription } from './ui/alert'
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import { ExclamationTriangleIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardHeader } from './ui/card'
-
-const LoadingState = () => {
-	return (
-		<div className={'flex flex-row flex-wrap justify-evenly'}>
-			{[1, 2, 3, 4].map((placeholder) => (
-				<div
-					key={placeholder}
-					className={
-						'animate-pulse relative w-[180px] sm:w-[275px] h-[240px] flex items-center justify-center'
-					}
-				>
-					<div
-						className={
-							'bg-primary/10 rounded-md h-[200px] w-[100%] sm:w-[275px] max-w-[180px] sm:max-w-[275px]'
-						}
-					></div>
-				</div>
-			))}
-		</div>
-	)
-}
-
-const EmptyState = () => {
-	return <div>No Teams Data</div>
-}
+import { useCount } from '@/lib/use-count'
+import { ExtendedTeamData } from '@/lib/interfaces'
 
 export const Teams = () => {
 	const {
@@ -38,6 +15,9 @@ export const Teams = () => {
 		teamsQuerySnapshotLoading,
 		teamsQuerySnapshotError,
 	} = useContext(TeamsContext)
+
+	const [extendedTeamsData, extendedTeamsDataLoading] =
+		useCount(teamsQuerySnapshot)
 
 	const navigate = useNavigate()
 
@@ -50,8 +30,10 @@ export const Teams = () => {
 			>
 				Teams
 			</div>
-			{teamsQuerySnapshotLoading ? (
-				<LoadingState />
+			{teamsQuerySnapshotLoading || extendedTeamsDataLoading ? (
+				<div className="absolute inset-0 flex items-center justify-center">
+					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+				</div>
 			) : teamsQuerySnapshotError ? (
 				// offer refetch option here
 				<Alert className={cn('max-w-[600px] mx-auto')}>
@@ -75,11 +57,11 @@ export const Teams = () => {
 						</Button>
 					</div>
 				</Alert>
-			) : teamsQuerySnapshot && teamsQuerySnapshot.size > 0 ? (
+			) : extendedTeamsData && extendedTeamsData.length > 0 ? (
 				<div className={'flex flex-row flex-wrap justify-evenly gap-y-8'}>
-					{teamsQuerySnapshot.docs.map((doc) => {
+					{extendedTeamsData.map((team: ExtendedTeamData) => {
 						return (
-							<Link key={`link-${doc.id}`} to={`/teams/${doc.id}`}>
+							<Link key={`link-${team.id}`} to={`/teams/${team.id}`}>
 								<Card className={'group'}>
 									<CardHeader className={'p-0'}>
 										<div
@@ -88,21 +70,36 @@ export const Teams = () => {
 											}
 										>
 											<img
-												src={doc.data().logo}
+												src={team.logo}
 												className={
 													'h-auto w-auto object-contain transition duration-300 bg-muted group-hover:scale-105 aspect-square'
 												}
 											/>
 										</div>
 									</CardHeader>
-									<CardContent className={'flex items-end justify-center pt-6'}>
+									<CardContent
+										className={'flex flex-col items-center justify-center pt-6'}
+									>
 										<p className={'flex flex-col'}>
-											{doc.data().name}
+											{team.name}
 											<span
 												className={
 													'max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary'
 												}
 											></span>
+										</p>
+										<p
+											style={
+												team.registeredCount < 1
+													? { color: 'red' }
+													: { color: 'green' }
+											}
+										>
+											<i>
+												{team.registeredCount < 1
+													? `Roster Minimum Not Met`
+													: `Registered! (Team 1 of 12)`}
+											</i>
 										</p>
 									</CardContent>
 								</Card>
@@ -111,8 +108,7 @@ export const Teams = () => {
 					})}
 				</div>
 			) : (
-				// no loading, no error, but also no teams...
-				<EmptyState />
+				<div>No Teams Data</div>
 			)}
 		</div>
 	)

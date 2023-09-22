@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { OffersContext } from '@/firebase/offers-context'
 import {
 	DocumentData,
@@ -17,6 +17,16 @@ import { UnrosteredPlayerList } from './unrostered-player-card'
 import { TeamsContext } from '@/firebase/teams-context'
 import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
 import { Button } from './ui/button'
+import { DotsVerticalIcon } from '@radix-ui/react-icons'
+import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
+import { useNavigate } from 'react-router-dom'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from './ui/dropdown-menu'
 
 export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -24,8 +34,12 @@ export const ManageTeam = () => {
 		useContext(OffersContext)
 	const { authStateLoading, documentSnapshot, documentSnapshotLoading } =
 		useContext(AuthContext)
+	const navigate = useNavigate()
 	const isCaptain = documentSnapshot?.data()?.captain
 	const isUnrostered = documentSnapshot?.data()?.team === null
+
+	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
+	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 
 	const outgoingOffers = useOffer(
 		outgoingOffersQuerySnapshot,
@@ -115,6 +129,124 @@ export const ManageTeam = () => {
 		{ title: 'Reject', action: handleReject },
 	]
 
+	const captainActions = (
+		<div className="absolute right-6 top-6">
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button size={'sm'} variant={'ghost'}>
+						<DotsVerticalIcon />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className={'w-56'}>
+					<DropdownMenuGroup>
+						<DestructiveConfirmationDialog
+							title={'Are you sure you want to leave?'}
+							description={
+								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
+							}
+							onConfirm={() => {
+								if (documentSnapshot) {
+									const documentSnapshotData = documentSnapshot.data()
+									if (documentSnapshotData) {
+										leaveTeam(
+											documentSnapshot.ref,
+											documentSnapshotData.team,
+											setLeaveTeamLoading
+										)
+									}
+								}
+							}}
+						>
+							<DropdownMenuItem
+								className="focus:bg-destructive focus:text-destructive-foreground"
+								disabled={leaveTeamLoading}
+								onClick={(event) => event.preventDefault()}
+							>
+								Leave Team
+							</DropdownMenuItem>
+						</DestructiveConfirmationDialog>
+
+						<DestructiveConfirmationDialog
+							title={'Are you sure?'}
+							description={
+								'The entire team will be deleted. This action is irreversible.'
+							}
+							onConfirm={() => {
+								if (documentSnapshot) {
+									const documentSnapshotData = documentSnapshot.data()
+									if (documentSnapshotData) {
+										deleteTeam(documentSnapshotData.team, setDeleteTeamLoading)
+											.then(() => {
+												navigate('/')
+											})
+											.catch(() => {
+												toast({
+													title: 'Unable to delete team',
+													description:
+														'Something went wrong. Please try again later.',
+													variant: 'destructive',
+												})
+											})
+									}
+								}
+							}}
+						>
+							<DropdownMenuItem
+								className="focus:bg-destructive focus:text-destructive-foreground"
+								disabled={deleteTeamLoading}
+								onClick={(event) => event.preventDefault()}
+							>
+								Delete Team
+							</DropdownMenuItem>
+						</DestructiveConfirmationDialog>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
+	)
+
+	const playerActions = (
+		<div className="absolute right-6 top-6">
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button size={'sm'} variant={'ghost'}>
+						<DotsVerticalIcon />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className={'w-56'}>
+					<DropdownMenuGroup>
+						<DestructiveConfirmationDialog
+							title={'Are you sure you want to leave?'}
+							description={
+								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
+							}
+							onConfirm={() => {
+								if (documentSnapshot) {
+									const documentSnapshotData = documentSnapshot.data()
+									if (documentSnapshotData) {
+										leaveTeam(
+											documentSnapshot.ref,
+											documentSnapshotData.team,
+											setLeaveTeamLoading
+										)
+									}
+								}
+							}}
+						>
+							<DropdownMenuItem
+								className="focus:bg-destructive focus:text-destructive-foreground"
+								disabled={leaveTeamLoading}
+								onClick={(event) => event.preventDefault()}
+							>
+								Leave Team
+							</DropdownMenuItem>
+						</DestructiveConfirmationDialog>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
+	)
+
 	return (
 		<div className={'container'}>
 			<div
@@ -130,40 +262,16 @@ export const ManageTeam = () => {
 					? `Join Team`
 					: `Manage Team`}
 			</div>
-			<div className={'max-w-max mx-auto my-4'}>
-				{!isUnrostered && (
-					<Button
-						onClick={() => {
-							if (documentSnapshot) {
-								const documentSnapshotData = documentSnapshot.data()
-								if (documentSnapshotData) {
-									leaveTeam(documentSnapshot.ref, documentSnapshotData.team)
-								}
-							}
-						}}
-					>
-						Leave Team
-					</Button>
-				)}
-				{isCaptain && (
-					<Button
-						onClick={() => {
-							if (documentSnapshot) {
-								const documentSnapshotData = documentSnapshot.data()
-								if (documentSnapshotData) {
-									deleteTeam(documentSnapshotData.team)
-								}
-							}
-						}}
-					>
-						Delete Team
-					</Button>
-				)}
-			</div>
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
-					{isUnrostered ? <TeamRequestCard /> : <TeamRosterCard />}
+					{isUnrostered ? (
+						<TeamRequestCard />
+					) : (
+						<TeamRosterCard
+							actions={isCaptain ? captainActions : playerActions}
+						/>
+					)}
 					{isCaptain && <UnrosteredPlayerList />}
 				</div>
 				{/* RIGHT SIDE PANEL */}

@@ -10,7 +10,6 @@ import {
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
@@ -33,6 +32,9 @@ export const UserAvatar = ({
 	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
 		(entry) => entry.data().status === 'pending'
 	).length
+	const isVerified = authStateUser?.emailVerified
+	const isRegistered = documentSnapshot?.data()?.registered
+	const hasRequiredTasks = !isVerified || !isRegistered
 
 	if (authStateLoading) {
 		return <ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
@@ -56,10 +58,10 @@ export const UserAvatar = ({
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Avatar className={'overflow-visible cursor-default'}>
-						{!!hasPendingOffers && (
+						{(!!hasPendingOffers || hasRequiredTasks) && (
 							<span
 								className={
-									'z-10 absolute bottom-0 right-0 w-2 h-2 translate-y-1 rounded-full bg-primary'
+									'z-10 absolute bottom-0 right-0 w-2 h-2 rounded-full bg-primary'
 								}
 							/>
 						)}
@@ -68,29 +70,37 @@ export const UserAvatar = ({
 							src={authStateUser.photoURL ?? undefined}
 							alt={'profile image'}
 						/>
-						<AvatarFallback className="bg-secondary hover:bg-accent">
+						<AvatarFallback
+							className={
+								'transition-colors bg-secondary hover:bg-accent dark:hover:text-background uppercase'
+							}
+						>
 							{!userInitials ? 'NA' : userInitials}
 						</AvatarFallback>
 					</Avatar>
 				</DropdownMenuTrigger>
 				{/* Mostly example and placeholder content for now */}
 				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						{userContent.map(({ label, path, alt }) => {
 							return (
 								<Link key={path} to={path} aria-label={alt}>
-									{path === '/manage' ? (
+									{path === '/manage' && !!hasPendingOffers ? (
 										<DropdownMenuItem className={'gap-1'}>
 											{label}{' '}
-											{!!hasPendingOffers && (
-												<span
-													className={
-														'self-start w-2 h-2 translate-y-1 rounded-full bg-primary'
-													}
-												/>
-											)}
+											<span className="relative flex w-2 h-2 -translate-y-1">
+												<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+											</span>
+										</DropdownMenuItem>
+									) : path === '/profile' && hasRequiredTasks ? (
+										<DropdownMenuItem className={'gap-1'}>
+											{label}{' '}
+											<span className="relative flex w-2 h-2 -translate-y-1">
+												<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+											</span>
 										</DropdownMenuItem>
 									) : (
 										<DropdownMenuItem>{label}</DropdownMenuItem>

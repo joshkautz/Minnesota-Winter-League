@@ -168,20 +168,17 @@ export const CreateTeam = () => {
 	}, [uploadFileError])
 
 	return (
-		<div className="container flex flex-col items-center justify-center md:h-[calc(100vh-60px)] gap-10">
+		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
 			{isOnTeam || documentSnapshotLoading ? (
 				<div>You must first leave your team in order to create a new one.</div>
 			) : (
 				<>
-					<div>
-						<div
-							className={
-								'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
-							}
-						>
-							Create your own Team
-						</div>
-						<p>it all starts here!</p>
+					<div
+						className={
+							'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
+						}
+					>
+						Create a Team
 					</div>
 					<div className="max-w-[400px]">
 						<Form {...form}>
@@ -211,7 +208,7 @@ export const CreateTeam = () => {
 									name={'logo'}
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Logo</FormLabel>
+											<FormLabel>Team logo</FormLabel>
 											<FormControl>
 												<Input
 													id="image-upload"
