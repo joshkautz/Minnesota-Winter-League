@@ -46,7 +46,7 @@ const UnrosteredPlayerDetail = ({
 			<div className="mr-2">
 				<p>{`${unrosteredPlayer.firstname} ${unrosteredPlayer.lastname}`}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-					{`is looking for a team.`}
+					{`${unrosteredPlayer.email}`}
 				</p>
 			</div>
 			<div className="flex justify-end flex-1 gap-2">
@@ -120,9 +120,11 @@ export const UnrosteredPlayerList = () => {
 	}
 
 	const filteredPlayers = unrosteredPlayers?.filter((player) => {
-		// this could probably be better but does the job for now
 		const fullName = `${player.firstname} ${player.lastname}`
-		return fullName.toLowerCase().includes(search.toLowerCase())
+		return (
+			fullName.toLowerCase().includes(search.toLowerCase()) ||
+			player.email.toLowerCase().includes(search.toLowerCase())
+		)
 	})
 
 	return (

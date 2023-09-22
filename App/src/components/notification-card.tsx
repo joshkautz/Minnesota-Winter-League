@@ -27,7 +27,6 @@ export const NotificationCardItem = ({
 	message,
 	actionOptions,
 }: NotificationCardItemProps) => {
-
 	return (
 		<div className="flex items-end gap-2 py-2">
 			{statusColor && (
@@ -39,11 +38,9 @@ export const NotificationCardItem = ({
 				/>
 			)}
 			<div className="mr-2">
-				<p>
-          {data.playerName}
-				</p>
+				<p>{data.playerName}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-          {`${message} ${data.teamName}`}
+					{`${message} ${data.teamName}`}
 				</p>
 			</div>
 			<div className="flex justify-end flex-1 gap-2">
