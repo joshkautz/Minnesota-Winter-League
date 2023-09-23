@@ -9,7 +9,6 @@ import {
 	DropdownMenu,
 	DropdownMenuTrigger,
 	DropdownMenuContent,
-	DropdownMenuSeparator,
 	DropdownMenuGroup,
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
@@ -112,7 +111,7 @@ export const TeamRosterPlayer = ({
 			{playerSnapshot ? (
 				<div className="flex items-end gap-2 py-2">
 					<div className="flex flex-row items-center">
-						<p className="mr-2">
+						<p className="mr-2 select-none">
 							{playerSnapshot.data()?.firstname}{' '}
 							{playerSnapshot.data()?.lastname}{' '}
 						</p>
@@ -130,7 +129,6 @@ export const TeamRosterPlayer = ({
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className={'w-56'}>
-									<DropdownMenuSeparator />
 									<DropdownMenuGroup>
 										<DropdownMenuItem
 											disabled={isDisabled || !playerSnapshot.data()?.captain}
