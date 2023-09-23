@@ -90,7 +90,7 @@ export const UserAvatar = ({
 										<DropdownMenuItem className={'gap-1'}>
 											{label}{' '}
 											<span className="relative flex w-2 h-2 -translate-y-1">
-												<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
 											</span>
 										</DropdownMenuItem>
@@ -98,7 +98,7 @@ export const UserAvatar = ({
 										<DropdownMenuItem className={'gap-1'}>
 											{label}{' '}
 											<span className="relative flex w-2 h-2 -translate-y-1">
-												<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
 											</span>
 										</DropdownMenuItem>
