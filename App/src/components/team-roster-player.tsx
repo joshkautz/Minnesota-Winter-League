@@ -21,6 +21,7 @@ import { PlayerData } from '@/lib/interfaces'
 import { useDocument } from 'react-firebase-hooks/firestore'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { toast } from './ui/use-toast'
+import { Badge } from './ui/badge'
 
 export const TeamRosterPlayer = ({
 	playerRef,
@@ -122,6 +123,18 @@ export const TeamRosterPlayer = ({
 					{/* If not a captain, no need to show */}
 					{!isDisabled && (
 						<div className="flex justify-end flex-1 gap-2">
+							<div className="flex items-center">
+								<Badge
+									className={'select-none hover:bg-initial'}
+									variant={
+										playerSnapshot.data()?.registered ? 'secondary' : 'inverse'
+									}
+								>
+									{playerSnapshot.data()?.registered
+										? 'registered'
+										: 'unregistered'}
+								</Badge>
+							</div>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button size={'sm'} variant={'ghost'}>
