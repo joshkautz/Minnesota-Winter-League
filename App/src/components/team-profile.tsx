@@ -80,10 +80,10 @@ export const TeamProfile = () => {
 									key={`row-${index}`}
 									className="flex items-center justify-between w-full h-8"
 								>
-									<p className="flex-1">
+									<p className="flex-1 select-none">
 										{game.data().date.toDate().toLocaleDateString()}
 									</p>
-									<p className="flex-1 text-center">
+									<p className="flex-1 text-center select-none">
 										{game.data().date.toDate() > new Date()
 											? 'vs'
 											: !game.data().homeScore || !game.data().awayScore

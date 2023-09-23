@@ -81,8 +81,12 @@ export const NotificationCard = ({
 	return (
 		<Card className={className}>
 			<CardHeader className="relative">
-				<CardTitle>{title}</CardTitle>
-				{description && <CardDescription>{description}</CardDescription>}
+				<CardTitle className="select-none">{title}</CardTitle>
+				{description && (
+					<CardDescription className="select-none">
+						{description}
+					</CardDescription>
+				)}
 				{moreActions && moreActions}
 				{searchBar && searchBar}
 			</CardHeader>
