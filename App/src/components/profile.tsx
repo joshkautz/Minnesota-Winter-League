@@ -18,6 +18,7 @@ import { toast } from './ui/use-toast'
 import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
 import { Label } from './ui/label'
 import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
+import { GradientHeader } from './gradient-header'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -80,21 +81,25 @@ export const Profile = () => {
 	const isRegistered = documentSnapshot?.data()?.registered
 
 	return (
-		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
-			<div>
-				<div
-					className={
-						'max-w-max mx-auto my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
-					}
-				>
-					Profile Settings
-				</div>
-				<p>Configure your profile with the options below.</p>
-			</div>
+		<div
+			className={
+				'container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10'
+			}
+		>
+			<GradientHeader>
+				<p>Profile Settings</p>
+				<p className={'text-sm font-normal text-foreground'}>
+					Configure your profile with the options below.
+				</p>
+			</GradientHeader>
 
 			{form ? (
-				<div className="flex flex-row flex-wrap items-stretch justify-center w-full gap-8">
-					<div className="max-w-[400px] flex-1 basis-[300px] shrink-0">
+				<div
+					className={
+						'flex flex-row flex-wrap items-stretch justify-center w-full gap-8'
+					}
+				>
+					<div className={'max-w-[400px] flex-1 basis-[300px] shrink-0'}>
 						<Form {...form}>
 							<form
 								onSubmit={form.handleSubmit(onSubmit)}
@@ -155,22 +160,30 @@ export const Profile = () => {
 						</Form>
 					</div>
 
-					<div className="max-w-[400px] flex-1 basis-[300px] shrink-0">
-						<div className="flex flex-col gap-6">
-							<fieldset className="space-y-2">
-								<Label className="inline-flex">
+					<div className={'max-w-[400px] flex-1 basis-[300px] shrink-0'}>
+						<div className={'flex flex-col gap-6'}>
+							<fieldset className={'space-y-2'}>
+								<Label className={'inline-flex'}>
 									Email Verification
 									{!isVerified && (
-										<span className="relative flex w-2 h-2 ml-1">
+										<span className={'relative flex w-2 h-2 ml-1'}>
 											{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
-											<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+											<span
+												className={
+													'relative inline-flex w-2 h-2 rounded-full bg-primary'
+												}
+											></span>
 										</span>
 									)}
 								</Label>
 								<div>
 									{isVerified ? (
-										<div className="inline-flex items-center gap-2 text-green-600 dark:text-green-500">
-											Complete <CheckCircledIcon className="w-4 h-4" />
+										<div
+											className={
+												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
+											}
+										>
+											Complete <CheckCircledIcon className={'w-4 h-4'} />
 										</div>
 									) : (
 										<>
@@ -188,20 +201,28 @@ export const Profile = () => {
 									)}
 								</div>
 							</fieldset>
-							<fieldset className="space-y-2">
-								<Label className="inline-flex">
+							<fieldset className={'space-y-2'}>
+								<Label className={'inline-flex'}>
 									Registration
 									{!isRegistered && (
-										<span className="relative flex w-2 h-2 ml-1">
-											{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
-											<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+										<span className={'relative flex w-2 h-2 ml-1'}>
+											{/* <span className={'absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary'}></span> */}
+											<span
+												className={
+													'relative inline-flex w-2 h-2 rounded-full bg-primary'
+												}
+											></span>
 										</span>
 									)}
 								</Label>
 								<div>
 									{isRegistered ? (
-										<div className="inline-flex items-center gap-2 text-green-600 dark:text-green-500">
-											Complete <CheckCircledIcon className="w-4 h-4" />
+										<div
+											className={
+												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
+											}
+										>
+											Complete <CheckCircledIcon className={'w-4 h-4'} />
 										</div>
 									) : (
 										<>
@@ -226,7 +247,7 @@ export const Profile = () => {
 					</div>
 				</div>
 			) : (
-				<div className="absolute inset-0 flex items-center justify-center">
+				<div className={'absolute inset-0 flex items-center justify-center'}>
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
 			)}

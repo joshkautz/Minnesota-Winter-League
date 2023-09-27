@@ -20,6 +20,7 @@ import { ReloadIcon } from '@radix-ui/react-icons'
 import { createTeam } from '@/firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { StorageReference, ref, storage } from '@/firebase/storage'
+import { GradientHeader } from './gradient-header'
 
 const createTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -173,13 +174,7 @@ export const CreateTeam = () => {
 				<div>You must first leave your team in order to create a new one.</div>
 			) : (
 				<>
-					<div
-						className={
-							'max-w-max my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
-						}
-					>
-						Create a Team
-					</div>
+					<GradientHeader>Create a Team</GradientHeader>
 					<div className="max-w-[400px]">
 						<Form {...form}>
 							<form
