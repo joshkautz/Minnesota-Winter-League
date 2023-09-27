@@ -163,7 +163,7 @@ export const ManageTeam = () => {
 								disabled={leaveTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
-								Leave Team
+								Leave team
 							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
 
@@ -197,7 +197,7 @@ export const ManageTeam = () => {
 								disabled={deleteTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
-								Delete Team
+								Delete team
 							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
 					</DropdownMenuGroup>
@@ -239,7 +239,7 @@ export const ManageTeam = () => {
 								disabled={leaveTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
-								Leave Team
+								Leave team
 							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
 					</DropdownMenuGroup>

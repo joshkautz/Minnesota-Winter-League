@@ -1,21 +1,35 @@
 import { TeamsContext } from '@/firebase/teams-context'
-import { useContext } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useContext, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { NotificationCard } from './notification-card'
 import {
 	DocumentReference,
 	DocumentData,
 	gamesByTeamQuery,
+	leaveTeam,
+	deleteTeam,
 } from '@/firebase/firestore'
 import { PlayerData } from '@/lib/interfaces'
 import { TeamRosterPlayer } from './team-roster-player'
 import { AuthContext } from '@/firebase/auth-context'
 import { useCollection } from 'react-firebase-hooks/firestore'
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+} from './ui/dropdown-menu'
+import { DotsVerticalIcon } from '@radix-ui/react-icons'
+import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
+import { Button } from './ui/button'
+import { toast } from './ui/use-toast'
 
 export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { documentSnapshot } = useContext(AuthContext)
+	const navigate = useNavigate()
 
 	const isCaptain = documentSnapshot?.data()?.captain
 
@@ -30,6 +44,89 @@ export const TeamProfile = () => {
 		.roster.some((player) => player.id === documentSnapshot?.id)
 
 	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
+	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
+	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
+
+	// from manageOffers.tsx
+	const playerActions = (
+		<div className="absolute right-6 top-6">
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button size={'sm'} variant={'ghost'}>
+						<DotsVerticalIcon />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className={'w-56'}>
+					<DropdownMenuGroup>
+						<DestructiveConfirmationDialog
+							title={'Are you sure you want to leave?'}
+							description={
+								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
+							}
+							onConfirm={() => {
+								if (documentSnapshot) {
+									const documentSnapshotData = documentSnapshot.data()
+									if (documentSnapshotData) {
+										leaveTeam(
+											documentSnapshot.ref,
+											documentSnapshotData.team,
+											setLeaveTeamLoading
+										)
+									}
+								}
+							}}
+						>
+							<DropdownMenuItem
+								className="focus:bg-destructive focus:text-destructive-foreground"
+								disabled={leaveTeamLoading}
+								onClick={(event) => event.preventDefault()}
+							>
+								Leave team
+							</DropdownMenuItem>
+						</DestructiveConfirmationDialog>
+						{isCaptain && (
+							<DestructiveConfirmationDialog
+								title={'Are you sure?'}
+								description={
+									'The entire team will be deleted. This action is irreversible.'
+								}
+								onConfirm={() => {
+									if (documentSnapshot) {
+										const documentSnapshotData = documentSnapshot.data()
+										if (documentSnapshotData) {
+											deleteTeam(
+												documentSnapshotData.team,
+												setDeleteTeamLoading
+											)
+												.then(() => {
+													navigate('/')
+												})
+												.catch(() => {
+													toast({
+														title: 'Unable to delete team',
+														description:
+															'Something went wrong. Please try again later.',
+														variant: 'destructive',
+													})
+												})
+										}
+									}
+								}}
+							>
+								<DropdownMenuItem
+									className="focus:bg-destructive focus:text-destructive-foreground"
+									disabled={deleteTeamLoading}
+									onClick={(event) => event.preventDefault()}
+								>
+									Delete team
+								</DropdownMenuItem>
+							</DestructiveConfirmationDialog>
+						)}
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
+	)
 
 	return (
 		<div className={'container'}>
@@ -51,6 +148,7 @@ export const TeamProfile = () => {
 					title={'Roster'}
 					description={`${team?.data().name} team players and captains`}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
+					moreActions={isOnTeam && playerActions}
 				>
 					{team
 						?.data()

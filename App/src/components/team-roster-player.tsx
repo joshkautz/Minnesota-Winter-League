@@ -174,7 +174,9 @@ export const TeamRosterPlayer = ({
 												disabled={isDisabled || leaveTeamLoading}
 												onClick={(event) => event.preventDefault()}
 											>
-												Remove from team
+												{playerSnapshot.id === documentSnapshot?.id
+													? 'Leave team'
+													: 'Remove from team'}
 											</DropdownMenuItem>
 										</DestructiveConfirmationDialog>
 									</DropdownMenuGroup>

@@ -81,7 +81,6 @@ export const UserAvatar = ({
 				</DropdownMenuTrigger>
 				{/* Mostly example and placeholder content for now */}
 				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						{userContent.map(({ label, path, alt }) => {
 							return (
