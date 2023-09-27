@@ -15,6 +15,7 @@ import {
 } from '@/firebase/firestore'
 import { GamesData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
+import { GradientHeader } from './gradient-header'
 
 const ScheduleCard = ({
 	games,
@@ -105,16 +106,11 @@ export const Schedule = () => {
 	)
 
 	return (
-		<div className="container">
-			<div
-				className={
-					'my-4 mx-auto max-w-max text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
-				}
-			>
-				Schedule
-			</div>
+		<div className={'container'}>
+			<GradientHeader>Schedule</GradientHeader>
+
 			{gamesSnapshotLoading ? (
-				<div className="absolute inset-0 flex items-center justify-center">
+				<div className={'absolute inset-0 flex items-center justify-center'}>
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
 			) : (

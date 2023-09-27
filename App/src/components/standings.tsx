@@ -13,6 +13,7 @@ import { TeamsContext } from '@/firebase/teams-context'
 import { standingsQuery } from '@/firebase/firestore'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { ReloadIcon } from '@radix-ui/react-icons'
+import { GradientHeader } from './gradient-header'
 
 export const Standings = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -32,13 +33,7 @@ export const Standings = () => {
 
 	return (
 		<div className="container">
-			<div
-				className={
-					'max-w-min mx-auto my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
-				}
-			>
-				Standings
-			</div>
+			<GradientHeader>Standings</GradientHeader>
 			{standingsSnapshotLoading ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
@@ -72,7 +67,7 @@ export const Standings = () => {
 										<TableCell>
 											<Link to={`/teams/${team?.id}`}>
 												<div className="flex items-center justify-start gap-2 ">
-													<div className="w-16 flex justify-start">
+													<div className="flex justify-start w-16">
 														<img
 															className="w-auto h-8 max-w-16"
 															src={teamData?.logo}
