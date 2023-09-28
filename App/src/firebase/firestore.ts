@@ -113,6 +113,23 @@ const createTeam = async (
 	return Promise.all(offersPromises)
 }
 
+const updateTeam = async (
+	teamRef: DocumentReference<TeamData, DocumentData>,
+	name?: string,
+	logo?: string,
+	storagePath?: string
+) => {
+	const teamDocumentSnapshot = await getDoc(teamRef)
+
+	return updateDoc(teamRef, {
+		name: name ? name : teamDocumentSnapshot.data()?.name,
+		logo: logo ? logo : teamDocumentSnapshot.data()?.logo,
+		storagePath: storagePath
+			? storagePath
+			: teamDocumentSnapshot.data()?.storagePath,
+	})
+}
+
 const createPlayer = (
 	uid: string,
 	firstname: string,
@@ -380,7 +397,7 @@ const stripeRegistration = async (
 		collection(firestore, `customers/${authValue?.uid}/checkout_sessions`),
 		{
 			mode: 'payment',
-			price: Products.MinnesotaWinterLeagueRegistration2023Test,
+			price: Products.MinnesotaWinterLeagueRegistration2023,
 			success_url: window.location.href,
 			cancel_url: window.location.href,
 		}
@@ -417,6 +434,7 @@ export {
 	leaveTeam,
 	createTeam,
 	deleteTeam,
+	updateTeam,
 	stripeRegistration,
 	gamesByTeamQuery,
 	demoteFromCaptain,

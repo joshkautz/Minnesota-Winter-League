@@ -10,8 +10,6 @@ import {
 import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
-import { useTeamsCount } from '@/lib/use-count'
-import { ExtendedTeamData } from '@/lib/interfaces'
 import { GradientHeader } from './gradient-header'
 
 export const Teams = () => {
@@ -21,15 +19,12 @@ export const Teams = () => {
 		teamsQuerySnapshotError,
 	} = useContext(TeamsContext)
 
-	const [extendedTeamsData, extendedTeamsDataLoading] =
-		useTeamsCount(teamsQuerySnapshot)
-
 	const navigate = useNavigate()
 
 	return (
 		<div className={'container'}>
 			<GradientHeader>Teams</GradientHeader>
-			{teamsQuerySnapshotLoading || extendedTeamsDataLoading ? (
+			{teamsQuerySnapshotLoading ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
@@ -56,11 +51,11 @@ export const Teams = () => {
 						</Button>
 					</div>
 				</Alert>
-			) : extendedTeamsData && extendedTeamsData.length > 0 ? (
+			) : teamsQuerySnapshot && teamsQuerySnapshot.size > 0 ? (
 				<div
 					className={'flex flex-row flex-wrap justify-center gap-y-8 gap-x-8'}
 				>
-					{extendedTeamsData.map((team: ExtendedTeamData) => {
+					{teamsQuerySnapshot.docs.map((team) => {
 						return (
 							<Link key={`link-${team.id}`} to={`/teams/${team.id}`}>
 								<Card className={'group'}>
@@ -71,7 +66,7 @@ export const Teams = () => {
 											}
 										>
 											<img
-												src={team.logo}
+												src={team.data().logo}
 												className={
 													'h-auto w-auto max-w-[250px] max-h-[250px] transition duration-300 bg-muted group-hover:scale-105 aspect-square'
 												}
@@ -85,7 +80,7 @@ export const Teams = () => {
 									>
 										<p className={'flex flex-col flex-nowrap text-ellipsis'}>
 											<span className="text-ellipsis whitespace-nowrap">
-												{team.name}
+												{team.data().name}
 											</span>
 											<span
 												className={
@@ -100,7 +95,7 @@ export const Teams = () => {
 												'text-muted-foreground italic text-sm items-center mx-auto text-center'
 											)}
 										>
-											{team.registeredCount < 10 ? (
+											{!team.data().registered ? (
 												<p>Registration in progress</p>
 											) : (
 												<div className="inline-flex items-center gap-2">
