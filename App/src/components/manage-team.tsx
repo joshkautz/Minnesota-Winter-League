@@ -27,6 +27,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
+import { GradientHeader } from './gradient-header'
 
 export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -162,7 +163,7 @@ export const ManageTeam = () => {
 								disabled={leaveTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
-								Leave Team
+								Leave team
 							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
 
@@ -196,7 +197,7 @@ export const ManageTeam = () => {
 								disabled={deleteTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
-								Delete Team
+								Delete team
 							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
 					</DropdownMenuGroup>
@@ -238,7 +239,7 @@ export const ManageTeam = () => {
 								disabled={leaveTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
-								Leave Team
+								Leave team
 							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
 					</DropdownMenuGroup>
@@ -249,11 +250,7 @@ export const ManageTeam = () => {
 
 	return (
 		<div className={'container'}>
-			<div
-				className={
-					'max-w-max mx-auto my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
-				}
-			>
+			<GradientHeader>
 				{documentSnapshotLoading ||
 				authStateLoading ||
 				documentSnapshot?.data()?.team === undefined
@@ -261,7 +258,7 @@ export const ManageTeam = () => {
 					: documentSnapshot?.data()?.team === null
 					? `Join Team`
 					: `Manage Team`}
-			</div>
+			</GradientHeader>
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">

@@ -364,13 +364,15 @@ export const Home = () => {
 						</a>
 					</div>
 				</div>
-				<p>
-					Got questions or need assistance? Contact us at{' '}
-					<a href="mailto:leadership@mplsmallard.com">
-						<u>leadership@mplsmallard.com</u>
-					</a>
-					.
-				</p>
+				<div className={'container text-center'}>
+					<p>
+						Got questions or need assistance? Contact us at{' '}
+						<a href="mailto:leadership@mplsmallard.com">
+							<u>leadership@mplsmallard.com</u>
+						</a>
+						.
+					</p>
+				</div>
 			</footer>
 		</div>
 	)

@@ -9,7 +9,6 @@ import {
 	DropdownMenu,
 	DropdownMenuTrigger,
 	DropdownMenuContent,
-	DropdownMenuSeparator,
 	DropdownMenuGroup,
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
@@ -22,6 +21,7 @@ import { PlayerData } from '@/lib/interfaces'
 import { useDocument } from 'react-firebase-hooks/firestore'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { toast } from './ui/use-toast'
+import { Badge } from './ui/badge'
 
 export const TeamRosterPlayer = ({
 	playerRef,
@@ -112,7 +112,7 @@ export const TeamRosterPlayer = ({
 			{playerSnapshot ? (
 				<div className="flex items-end gap-2 py-2">
 					<div className="flex flex-row items-center">
-						<p className="mr-2">
+						<p className="mr-2 select-none">
 							{playerSnapshot.data()?.firstname}{' '}
 							{playerSnapshot.data()?.lastname}{' '}
 						</p>
@@ -123,6 +123,18 @@ export const TeamRosterPlayer = ({
 					{/* If not a captain, no need to show */}
 					{!isDisabled && (
 						<div className="flex justify-end flex-1 gap-2">
+							<div className="flex items-center">
+								<Badge
+									className={'select-none hover:bg-initial'}
+									variant={
+										playerSnapshot.data()?.registered ? 'secondary' : 'inverse'
+									}
+								>
+									{playerSnapshot.data()?.registered
+										? 'registered'
+										: 'unregistered'}
+								</Badge>
+							</div>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button size={'sm'} variant={'ghost'}>
@@ -130,7 +142,6 @@ export const TeamRosterPlayer = ({
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className={'w-56'}>
-									<DropdownMenuSeparator />
 									<DropdownMenuGroup>
 										<DropdownMenuItem
 											disabled={isDisabled || !playerSnapshot.data()?.captain}
@@ -163,7 +174,9 @@ export const TeamRosterPlayer = ({
 												disabled={isDisabled || leaveTeamLoading}
 												onClick={(event) => event.preventDefault()}
 											>
-												Remove from team
+												{playerSnapshot.id === documentSnapshot?.id
+													? 'Leave team'
+													: 'Remove from team'}
 											</DropdownMenuItem>
 										</DestructiveConfirmationDialog>
 									</DropdownMenuGroup>

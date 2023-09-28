@@ -9,9 +9,10 @@ import {
 } from '@radix-ui/react-icons'
 import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
-import { Card, CardContent, CardHeader } from './ui/card'
-import { useCount } from '@/lib/use-count'
+import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
+import { useTeamsCount } from '@/lib/use-count'
 import { ExtendedTeamData } from '@/lib/interfaces'
+import { GradientHeader } from './gradient-header'
 
 export const Teams = () => {
 	const {
@@ -21,19 +22,13 @@ export const Teams = () => {
 	} = useContext(TeamsContext)
 
 	const [extendedTeamsData, extendedTeamsDataLoading] =
-		useCount(teamsQuerySnapshot)
+		useTeamsCount(teamsQuerySnapshot)
 
 	const navigate = useNavigate()
 
 	return (
 		<div className={'container'}>
-			<div
-				className={
-					'max-w-min mx-auto my-4 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-300'
-				}
-			>
-				Teams
-			</div>
+			<GradientHeader>Teams</GradientHeader>
 			{teamsQuerySnapshotLoading || extendedTeamsDataLoading ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
@@ -62,7 +57,9 @@ export const Teams = () => {
 					</div>
 				</Alert>
 			) : extendedTeamsData && extendedTeamsData.length > 0 ? (
-				<div className={'flex flex-row flex-wrap justify-evenly gap-y-8'}>
+				<div
+					className={'flex flex-row flex-wrap justify-center gap-y-8 gap-x-8'}
+				>
 					{extendedTeamsData.map((team: ExtendedTeamData) => {
 						return (
 							<Link key={`link-${team.id}`} to={`/teams/${team.id}`}>
@@ -76,40 +73,43 @@ export const Teams = () => {
 											<img
 												src={team.logo}
 												className={
-													'h-auto w-auto object-contain transition duration-300 bg-muted group-hover:scale-105 aspect-square'
+													'h-auto w-auto max-w-[250px] max-h-[250px] transition duration-300 bg-muted group-hover:scale-105 aspect-square'
 												}
 											/>
 										</div>
 									</CardHeader>
 									<CardContent
-										className={'flex flex-col items-center justify-center pt-6'}
+										className={
+											'flex flex-col items-center justify-center pt-6 max-w-[250px] text-ellipsis flex-nowrap'
+										}
 									>
-										<p className={'flex flex-col'}>
-											{team.name}
+										<p className={'flex flex-col flex-nowrap text-ellipsis'}>
+											<span className="text-ellipsis whitespace-nowrap">
+												{team.name}
+											</span>
 											<span
 												className={
 													'max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary'
 												}
 											></span>
 										</p>
-										<p
+									</CardContent>
+									<CardFooter>
+										<div
 											className={cn(
-												team.registeredCount < 10
-													? 'text-destructive'
-													: 'text-green-600 dark:text-green-500'
+												'text-muted-foreground italic text-sm items-center mx-auto text-center'
 											)}
 										>
-											<i>
-												{team.registeredCount > 10 ? (
-													`Roster Minimum Not Met`
-												) : (
-													<div className="inline-flex items-center gap-2 text-green-600 dark:text-green-500">
-														Complete <CheckCircledIcon className="w-4 h-4" />
-													</div>
-												)}
-											</i>
-										</p>
-									</CardContent>
+											{team.registeredCount < 10 ? (
+												<p>Registration in progress</p>
+											) : (
+												<div className="inline-flex items-center gap-2">
+													Registered
+													<CheckCircledIcon className="w-4 h-4" />
+												</div>
+											)}
+										</div>
+									</CardFooter>
 								</Card>
 							</Link>
 						)

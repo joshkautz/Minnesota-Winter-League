@@ -81,29 +81,30 @@ export const UserAvatar = ({
 				</DropdownMenuTrigger>
 				{/* Mostly example and placeholder content for now */}
 				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						{userContent.map(({ label, path, alt }) => {
 							return (
 								<Link key={path} to={path} aria-label={alt}>
 									{path === '/manage' && !!hasPendingOffers ? (
-										<DropdownMenuItem className={'gap-1'}>
+										<DropdownMenuItem className={'gap-1 cursor-pointer'}>
 											{label}{' '}
 											<span className="relative flex w-2 h-2 -translate-y-1">
-												<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
 											</span>
 										</DropdownMenuItem>
 									) : path === '/profile' && hasRequiredTasks ? (
-										<DropdownMenuItem className={'gap-1'}>
+										<DropdownMenuItem className={'gap-1 cursor-pointer'}>
 											{label}{' '}
 											<span className="relative flex w-2 h-2 -translate-y-1">
-												<span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span>
+												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
 											</span>
 										</DropdownMenuItem>
 									) : (
-										<DropdownMenuItem>{label}</DropdownMenuItem>
+										<DropdownMenuItem className="cursor-pointer">
+											{label}
+										</DropdownMenuItem>
 									)}
 								</Link>
 							)

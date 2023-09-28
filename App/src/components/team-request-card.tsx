@@ -5,7 +5,7 @@ import {
 	offersForUnrosteredPlayersQuery,
 	requestToJoinTeam,
 } from '@/firebase/firestore'
-import { useCollection } from 'react-firebase-hooks/firestore'
+import { useCollection, useDocument } from 'react-firebase-hooks/firestore'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 import { ReactNode, useContext } from 'react'
@@ -15,6 +15,9 @@ import { TeamRosterPlayer } from './team-roster-player'
 import { AuthContext } from '@/firebase/auth-context'
 import { toast } from './ui/use-toast'
 import { PlayerData, TeamData } from '@/lib/interfaces'
+import { Link } from 'react-router-dom'
+import { useTeamCount } from '@/lib/use-count'
+import { CheckCircledIcon } from '@radix-ui/react-icons'
 
 export const TeamRequestCard = () => {
 	const { documentSnapshot } = useContext(AuthContext)
@@ -76,27 +79,41 @@ const TeamDetail = ({
 		offersForUnrosteredPlayersQuery(playerRef, teamSnapshot.ref)
 	)
 
+	// const creatorDoc = getPlayerSnapshot(teamSnapshot.data().captains[0])
+	const [creatorSnapshot, creatorSnapshotLoading] = useDocument(
+		teamSnapshot.data().captains[0]
+	)
 	const isDisabled =
 		offersForUnrosteredPlayersQuerySnapshot &&
 		offersForUnrosteredPlayersQuerySnapshot.size > 0
 
+	const captainZero = `${creatorSnapshot?.data()?.firstname ?? ''} ${
+		creatorSnapshot?.data()?.lastname ?? ''
+	}`
+
 	return (
 		<div className="flex items-end gap-2 py-2">
-			<Avatar>
-				<AvatarImage
-					src={teamSnapshot.data().logo ?? undefined}
-					alt={'team logo'}
-				/>
-				<AvatarFallback>
-					{teamSnapshot.data().name?.slice(0, 2) ?? 'NA'}
-				</AvatarFallback>
-			</Avatar>
-			<div className="mr-2">
-				<p>{teamSnapshot.data().name}</p>
-				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-					team details here
-				</p>
-			</div>
+			<Link to={`/teams/${teamSnapshot.id}`}>
+				<Avatar>
+					<AvatarImage
+						src={teamSnapshot.data().logo ?? undefined}
+						alt={'team logo'}
+					/>
+					<AvatarFallback>
+						{teamSnapshot.data().name?.slice(0, 2) ?? 'NA'}
+					</AvatarFallback>
+				</Avatar>
+			</Link>
+			<Link to={`/teams/${teamSnapshot.id}`}>
+				<div className="mr-2">
+					<p>{teamSnapshot.data().name}</p>
+					<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
+						{creatorSnapshotLoading
+							? 'created by...'
+							: `created by ${captainZero ?? 'unknown...'}`}
+					</p>
+				</div>
+			</Link>
 			<div className="flex justify-end flex-1 gap-2">
 				<Button
 					size={'sm'}
@@ -119,7 +136,29 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 	const teamSnapshot = teamsQuerySnapshot?.docs.find(
 		(team) => team.id === documentSnapshot?.data()?.team?.id
 	)
+
 	const isCaptain = documentSnapshot?.data()?.captain
+
+	const [extendedTeamData, extendedTeamDataLoading] = useTeamCount(teamSnapshot)
+
+	const count = extendedTeamData?.registeredCount
+	const registrationStatus =
+		!count || extendedTeamDataLoading ? (
+			<p className="text-sm text-muted-foreground">Loading...</p>
+		) : count < 10 ? (
+			<p className={'text-sm text-muted-foreground'}>
+				You need 10 registered players in order to meet the minimum requirement.
+			</p>
+		) : (
+			<p
+				className={
+					'text-sm text-muted-foreground inline-flex gap-2 items-center'
+				}
+			>
+				{extendedTeamData.name} is fully registered
+				<CheckCircledIcon className="w-4 h-4" />
+			</p>
+		)
 
 	return (
 		<NotificationCard
@@ -130,6 +169,7 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 			}
 			description={'Your team roster'}
 			moreActions={actions}
+			footerContent={isCaptain ? registrationStatus : undefined}
 		>
 			{teamSnapshot
 				?.data()
