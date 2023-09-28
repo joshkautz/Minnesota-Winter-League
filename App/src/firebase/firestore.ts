@@ -380,7 +380,7 @@ const stripeRegistration = async (
 		collection(firestore, `customers/${authValue?.uid}/checkout_sessions`),
 		{
 			mode: 'payment',
-			price: Products.MinnesotaWinterLeagueRegistration2023Test,
+			price: Products.MinnesotaWinterLeagueRegistration2023,
 			success_url: window.location.href,
 			cancel_url: window.location.href,
 		}
