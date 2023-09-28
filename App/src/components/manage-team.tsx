@@ -257,7 +257,9 @@ export const ManageTeam = () => {
 					? `Loading...`
 					: documentSnapshot?.data()?.team === null
 					? `Join Team`
-					: `Manage Team`}
+					: documentSnapshot?.data()?.captain
+					? `Manage Team`
+					: `Manage Player`}
 			</GradientHeader>
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}
