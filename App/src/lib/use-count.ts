@@ -13,8 +13,6 @@ export const useTeamsCount = (
 	const [loading, setLoading] = useState<boolean>(false)
 
 	useEffect(() => {
-		console.log('firing 1')
-
 		const updateTeams = async () => {
 			if (teamsSnapshot) {
 				setLoading(true)
@@ -49,7 +47,6 @@ export const useTeamCount = (
 	const [loading, setLoading] = useState<boolean>(false)
 
 	useEffect(() => {
-		console.log('firing 2')
 		const updateTeam = async () => {
 			if (teamSnapshot) {
 				setLoading(true)

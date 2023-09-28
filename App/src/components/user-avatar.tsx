@@ -86,7 +86,7 @@ export const UserAvatar = ({
 							return (
 								<Link key={path} to={path} aria-label={alt}>
 									{path === '/manage' && !!hasPendingOffers ? (
-										<DropdownMenuItem className={'gap-1'}>
+										<DropdownMenuItem className={'gap-1 cursor-pointer'}>
 											{label}{' '}
 											<span className="relative flex w-2 h-2 -translate-y-1">
 												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
@@ -94,7 +94,7 @@ export const UserAvatar = ({
 											</span>
 										</DropdownMenuItem>
 									) : path === '/profile' && hasRequiredTasks ? (
-										<DropdownMenuItem className={'gap-1'}>
+										<DropdownMenuItem className={'gap-1 cursor-pointer'}>
 											{label}{' '}
 											<span className="relative flex w-2 h-2 -translate-y-1">
 												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
@@ -102,7 +102,9 @@ export const UserAvatar = ({
 											</span>
 										</DropdownMenuItem>
 									) : (
-										<DropdownMenuItem>{label}</DropdownMenuItem>
+										<DropdownMenuItem className="cursor-pointer">
+											{label}
+										</DropdownMenuItem>
 									)}
 								</Link>
 							)
