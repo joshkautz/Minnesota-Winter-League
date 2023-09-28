@@ -24,11 +24,11 @@ import { CheckCircledIcon, DotsVerticalIcon } from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
-import { useTeamCount } from '@/lib/use-count'
 
 export const TeamProfile = () => {
 	const { id } = useParams()
-	const { teamsQuerySnapshot } = useContext(TeamsContext)
+	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
+		useContext(TeamsContext)
 	const { documentSnapshot } = useContext(AuthContext)
 	const navigate = useNavigate()
 
@@ -48,26 +48,20 @@ export const TeamProfile = () => {
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
 
-	const [extendedTeamData, extendedTeamDataLoading] = useTeamCount(team)
-
-	const count = extendedTeamData?.registeredCount
-	const registrationStatus =
-		!count || extendedTeamDataLoading ? (
-			<p className="text-sm text-muted-foreground">Loading...</p>
-		) : count < 10 ? (
-			<p className={'text-sm text-muted-foreground'}>
-				You need 10 registered players in order to meet the minimum requirement.
-			</p>
-		) : (
-			<p
-				className={
-					'text-sm text-muted-foreground inline-flex gap-2 items-center'
-				}
-			>
-				{extendedTeamData.name} is fully registered
-				<CheckCircledIcon className="w-4 h-4" />
-			</p>
-		)
+	const registrationStatus = teamsQuerySnapshotLoading ? (
+		<p className="text-sm text-muted-foreground">Loading...</p>
+	) : !team?.data().registered ? (
+		<p className={'text-sm text-muted-foreground'}>
+			You need 10 registered players in order to meet the minimum requirement.
+		</p>
+	) : (
+		<p
+			className={'text-sm text-muted-foreground inline-flex gap-2 items-center'}
+		>
+			{team?.data().name} is fully registered
+			<CheckCircledIcon className="w-4 h-4" />
+		</p>
+	)
 
 	// from manageOffers.tsx
 	const playerActions = (
