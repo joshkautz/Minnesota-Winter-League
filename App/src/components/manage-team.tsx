@@ -28,6 +28,7 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { GradientHeader } from './gradient-header'
+import { EditTeamDialog } from './edit-team-dialog'
 
 export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -140,6 +141,11 @@ export const ManageTeam = () => {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
+						<EditTeamDialog>
+							<DropdownMenuItem onClick={(event) => event.preventDefault()}>
+								Edit team
+							</DropdownMenuItem>
+						</EditTeamDialog>
 						<DestructiveConfirmationDialog
 							title={'Are you sure you want to leave?'}
 							description={
