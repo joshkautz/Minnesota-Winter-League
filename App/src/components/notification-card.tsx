@@ -5,6 +5,7 @@ import {
 	CardTitle,
 	CardDescription,
 	CardContent,
+	CardFooter,
 } from './ui/card'
 import { DocumentData, DocumentReference } from '@/firebase/firestore'
 import { cn } from '@/lib/utils'
@@ -69,6 +70,7 @@ export const NotificationCard = ({
 	className,
 	moreActions,
 	searchBar,
+	footerContent,
 }: {
 	title?: string
 	description?: string
@@ -77,6 +79,7 @@ export const NotificationCard = ({
 	className?: string
 	moreActions?: ReactNode
 	searchBar?: ReactNode
+	footerContent?: ReactNode
 }) => {
 	return (
 		<Card className={className}>
@@ -97,6 +100,7 @@ export const NotificationCard = ({
 			) : (
 				<CardContent>{children}</CardContent>
 			)}
+			{footerContent && <CardFooter>{footerContent}</CardFooter>}
 		</Card>
 	)
 }

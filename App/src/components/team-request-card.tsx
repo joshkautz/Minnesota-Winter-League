@@ -16,6 +16,8 @@ import { AuthContext } from '@/firebase/auth-context'
 import { toast } from './ui/use-toast'
 import { PlayerData, TeamData } from '@/lib/interfaces'
 import { Link } from 'react-router-dom'
+import { useTeamCount } from '@/lib/use-count'
+import { CheckCircledIcon } from '@radix-ui/react-icons'
 
 export const TeamRequestCard = () => {
 	const { documentSnapshot } = useContext(AuthContext)
@@ -134,7 +136,29 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 	const teamSnapshot = teamsQuerySnapshot?.docs.find(
 		(team) => team.id === documentSnapshot?.data()?.team?.id
 	)
+
 	const isCaptain = documentSnapshot?.data()?.captain
+
+	const [extendedTeamData, extendedTeamDataLoading] = useTeamCount(teamSnapshot)
+
+	const count = extendedTeamData?.registeredCount
+	const registrationStatus =
+		!count || extendedTeamDataLoading ? (
+			<p className="text-sm text-muted-foreground">Loading...</p>
+		) : count < 10 ? (
+			<p className={'text-sm text-muted-foreground'}>
+				You need 10 registered players in order to meet the minimum requirement.
+			</p>
+		) : (
+			<p
+				className={
+					'text-sm text-muted-foreground inline-flex gap-2 items-center'
+				}
+			>
+				{extendedTeamData.name} is fully registered
+				<CheckCircledIcon className="w-4 h-4" />
+			</p>
+		)
 
 	return (
 		<NotificationCard
@@ -145,6 +169,7 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 			}
 			description={'Your team roster'}
 			moreActions={actions}
+			footerContent={isCaptain ? registrationStatus : undefined}
 		>
 			{teamSnapshot
 				?.data()

@@ -9,8 +9,8 @@ import {
 } from '@radix-ui/react-icons'
 import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
-import { Card, CardContent, CardHeader } from './ui/card'
-import { useCount } from '@/lib/use-count'
+import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
+import { useTeamsCount } from '@/lib/use-count'
 import { ExtendedTeamData } from '@/lib/interfaces'
 import { GradientHeader } from './gradient-header'
 
@@ -22,7 +22,7 @@ export const Teams = () => {
 	} = useContext(TeamsContext)
 
 	const [extendedTeamsData, extendedTeamsDataLoading] =
-		useCount(teamsQuerySnapshot)
+		useTeamsCount(teamsQuerySnapshot)
 
 	const navigate = useNavigate()
 
@@ -93,24 +93,23 @@ export const Teams = () => {
 												}
 											></span>
 										</p>
-										<p
+									</CardContent>
+									<CardFooter>
+										<div
 											className={cn(
-												team.registeredCount < 10
-													? 'text-destructive'
-													: 'text-green-600 dark:text-green-500'
+												'text-muted-foreground italic text-sm items-center mx-auto text-center'
 											)}
 										>
-											<i>
-												{team.registeredCount > 10 ? (
-													`Roster Minimum Not Met`
-												) : (
-													<div className="inline-flex items-center gap-2 text-green-600 dark:text-green-500">
-														Complete <CheckCircledIcon className="w-4 h-4" />
-													</div>
-												)}
-											</i>
-										</p>
-									</CardContent>
+											{team.registeredCount < 10 ? (
+												<p>Registration in progress</p>
+											) : (
+												<div className="inline-flex items-center gap-2">
+													Registered
+													<CheckCircledIcon className="w-4 h-4" />
+												</div>
+											)}
+										</div>
+									</CardFooter>
 								</Card>
 							</Link>
 						)

@@ -20,10 +20,11 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
-import { DotsVerticalIcon } from '@radix-ui/react-icons'
+import { CheckCircledIcon, DotsVerticalIcon } from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
+import { useTeamCount } from '@/lib/use-count'
 
 export const TeamProfile = () => {
 	const { id } = useParams()
@@ -46,6 +47,27 @@ export const TeamProfile = () => {
 	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
+
+	const [extendedTeamData, extendedTeamDataLoading] = useTeamCount(team)
+
+	const count = extendedTeamData?.registeredCount
+	const registrationStatus =
+		!count || extendedTeamDataLoading ? (
+			<p className="text-sm text-muted-foreground">Loading...</p>
+		) : count < 10 ? (
+			<p className={'text-sm text-muted-foreground'}>
+				You need 10 registered players in order to meet the minimum requirement.
+			</p>
+		) : (
+			<p
+				className={
+					'text-sm text-muted-foreground inline-flex gap-2 items-center'
+				}
+			>
+				{extendedTeamData.name} is fully registered
+				<CheckCircledIcon className="w-4 h-4" />
+			</p>
+		)
 
 	// from manageOffers.tsx
 	const playerActions = (
@@ -149,6 +171,7 @@ export const TeamProfile = () => {
 					description={`${team?.data().name} team players and captains`}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
 					moreActions={isOnTeam && playerActions}
+					footerContent={isOnTeam && isCaptain ? registrationStatus : undefined}
 				>
 					{team
 						?.data()
