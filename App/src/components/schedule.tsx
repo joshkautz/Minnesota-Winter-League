@@ -16,6 +16,7 @@ import {
 import { GamesData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
+import { Link } from 'react-router-dom'
 
 const ScheduleCard = ({
 	games,
@@ -41,25 +42,32 @@ const ScheduleCard = ({
 					})}
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="flex flex-col gap-1">
 				{games.map((game, index) => {
-					const homeTeam = teamsQuerySnapshot?.docs
-						.find((team) => team.id === game.home.id)
-						?.data()
-					const awayTeam = teamsQuerySnapshot?.docs
-						.find((team) => team.id === game.away.id)
-						?.data()
+					const homeTeam = teamsQuerySnapshot?.docs.find(
+						(team) => team.id === game.home.id
+					)
+
+					const awayTeam = teamsQuerySnapshot?.docs.find(
+						(team) => team.id === game.away.id
+					)
+
 					return (
 						<div
 							key={`schedule-row-${index}`}
 							className={'flex items-center justify-start max-h-10'}
 						>
-							<div className={'flex-[1]'}>Field {index + 1}</div>
+							<div className={'flex-1'}>Field {index + 1}</div>
 							<div
 								className={'flex-[4] flex justify-center gap-4 items-center'}
 							>
 								<div className={'flex-1'}>
-									<img className={'mx-auto max-h-10'} src={homeTeam?.logo} />
+									<Link to={`/teams/${homeTeam?.id}`}>
+										<img
+											className={'mx-auto max-h-10'}
+											src={homeTeam?.data().logo}
+										/>
+									</Link>
 								</div>
 								<p className={'flex-1  text-center'}>
 									{game.date.toDate() > new Date()
@@ -69,7 +77,12 @@ const ScheduleCard = ({
 										: `${game.homeScore} - ${game.awayScore}`}
 								</p>
 								<div className={'items-center flex-1'}>
-									<img className={'mx-auto max-h-10'} src={awayTeam?.logo} />
+									<Link to={`/teams/${awayTeam?.id}`}>
+										<img
+											className={'mx-auto max-h-10'}
+											src={awayTeam?.data().logo}
+										/>
+									</Link>
 								</div>
 							</div>
 						</div>
