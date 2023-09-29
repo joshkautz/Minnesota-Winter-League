@@ -178,7 +178,7 @@ service cloud.firestore {
         ||
         ( // Player is editing team
           /databases/$(database)/documents/players/$(request.auth.uid) in resource.data.captains &&
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['logo, name, storagePath'])
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['logo', 'name', 'storagePath'])
         )
       )
 		}
