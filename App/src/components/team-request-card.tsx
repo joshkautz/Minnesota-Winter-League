@@ -37,8 +37,7 @@ export const TeamRequestCard = () => {
 					variant: 'default',
 				})
 			})
-			.catch((error) => {
-				console.log(error)
+			.catch(() => {
 				toast({
 					title: 'Unable to send request',
 					description:
@@ -78,7 +77,6 @@ const TeamDetail = ({
 		offersForUnrosteredPlayersQuery(playerRef, teamSnapshot.ref)
 	)
 
-	// const creatorDoc = getPlayerSnapshot(teamSnapshot.data().captains[0])
 	const [creatorSnapshot, creatorSnapshotLoading] = useDocument(
 		teamSnapshot.data().captains[0]
 	)

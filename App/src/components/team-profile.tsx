@@ -63,7 +63,6 @@ export const TeamProfile = () => {
 		</p>
 	)
 
-	// from manageOffers.tsx
 	const playerActions = (
 		<div className="absolute right-6 top-6">
 			<DropdownMenu>

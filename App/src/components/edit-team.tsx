@@ -53,8 +53,6 @@ export const EditTeam = () => {
 	const [blob, setBlob] = useState<Blob>()
 	const [storageRef, setStorageRef] = useState<StorageReference>()
 
-	console.log(storageRef)
-
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files?.[0]) {
 			return
@@ -116,7 +114,6 @@ export const EditTeam = () => {
 	}, [updatedTeamData])
 
 	useEffect(() => {
-		console.log(downloadUrl)
 		if (downloadUrl) {
 			if (team) {
 				if (updatedTeamData) {
@@ -146,16 +143,13 @@ export const EditTeam = () => {
 	const onSubmit = async (data: EditTeamSchema) => {
 		if (documentSnapshot) {
 			try {
-        if (blob) {
-          // If storageRef already exists, update the storage blob
+				if (blob) {
 					if (storageRef) {
 						await uploadFile(storageRef, blob, {
 							contentType: 'image/jpeg',
 						})
 						setUpdatedTeamData({ name: data.name, storageRef: storageRef })
-          }
-          // If storageRef doesn't exists, upload a storage blob
-          else {
+					} else {
 						const result = await uploadFile(
 							ref(storage, `teams/${uuidv4()}`),
 							blob,
@@ -167,7 +161,7 @@ export const EditTeam = () => {
 							setUpdatedTeamData({ name: data.name, storageRef: result.ref })
 						}
 					}
-				} else {  
+				} else {
 					setUpdatedTeamData({ name: data.name, storageRef: undefined })
 				}
 			} catch (error) {
@@ -225,7 +219,6 @@ export const EditTeam = () => {
 											placeholder={'Upload Image'}
 											{...field}
 											onChange={handleFileChange}
-											// className="ring"
 										/>
 									</FormControl>
 									<FormMessage />

@@ -212,7 +212,6 @@ export const CreateTeam = () => {
 													placeholder={'Upload Image'}
 													{...field}
 													onChange={handleFileChange}
-													// className="ring"
 												/>
 											</FormControl>
 											<FormMessage />

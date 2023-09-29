@@ -48,7 +48,6 @@ export const TeamRosterPlayer = ({
 						})
 					})
 					.catch((error) => {
-						console.log(error.message)
 						toast({
 							title: 'Unable to Demote',
 							description: error.message,

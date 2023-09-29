@@ -16,14 +16,12 @@ const standingsSnapshot = await firestore
 	.orderBy('wins', 'desc')
 	.orderBy('differential', 'desc')
 	.get()
-console.log(
-	await Promise.all(
-		standingsSnapshot.docs.map((standing, index) =>
-			firestore
-				.collection('teams')
-				.doc(standing.id)
-				.get()
-				.then((team) => team.data().name)
-		)
+await Promise.all(
+	standingsSnapshot.docs.map((standing, index) =>
+		firestore
+			.collection('teams')
+			.doc(standing.id)
+			.get()
+			.then((team) => team.data().name)
 	)
 )
