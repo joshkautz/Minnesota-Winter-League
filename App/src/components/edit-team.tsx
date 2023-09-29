@@ -181,7 +181,7 @@ export const EditTeam = () => {
 
 	return (
 		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
-			<GradientHeader>Create a Team</GradientHeader>
+			<GradientHeader>Edit Team</GradientHeader>
 			<div className="max-w-[400px]">
 				<Form {...form}>
 					<form
