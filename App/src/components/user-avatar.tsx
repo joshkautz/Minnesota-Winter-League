@@ -21,8 +21,13 @@ export const UserAvatar = ({
 }: {
 	userContent: { label: string; path: string; alt: string }[]
 }) => {
-	const { authStateUser, authStateLoading, documentSnapshot, documentSnapshotLoading, signOut } =
-		useContext(AuthContext)
+	const {
+		authStateUser,
+		authStateLoading,
+		documentSnapshot,
+		documentSnapshotLoading,
+		signOut,
+	} = useContext(AuthContext)
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
 	const userInitials = `${
