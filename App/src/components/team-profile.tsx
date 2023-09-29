@@ -1,5 +1,5 @@
 import { TeamsContext } from '@/firebase/teams-context'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { NotificationCard } from './notification-card'
 import {
@@ -41,11 +41,13 @@ export const TeamProfile = () => {
 
 	const [loaded, setLoaded] = useState(false)
 
-	const team = id
-		? teamsQuerySnapshot?.docs.find((team) => team.id === id)
-		: teamsQuerySnapshot?.docs.find(
-				(team) => team.id === documentSnapshot?.data()?.team?.id
-		  )
+	const team = useMemo(() => {
+		return id
+			? teamsQuerySnapshot?.docs.find((team) => team.id === id)
+			: teamsQuerySnapshot?.docs.find(
+					(team) => team.id === documentSnapshot?.data()?.team?.id
+			  )
+	}, [documentSnapshot, teamsQuerySnapshot])
 
 	const isOnTeam = team
 		?.data()
@@ -54,6 +56,11 @@ export const TeamProfile = () => {
 	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
+	const [imgSrc, setImgSrc] = useState<string | undefined>()
+
+	useEffect(() => {
+		setImgSrc(team?.data().logo + `&date=${Date.now()}`)
+	}, [team])
 
 	const registrationStatus = teamsQuerySnapshotLoading ? (
 		<p className="text-sm text-muted-foreground">Loading...</p>
@@ -81,7 +88,11 @@ export const TeamProfile = () => {
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
 						{isCaptain && (
-							<EditTeamDialog>
+							<EditTeamDialog
+								closeDialog={() => {
+									setImgSrc(team?.data().logo + `&date=${Date.now()}`)
+								}}
+							>
 								<DropdownMenuItem onClick={(event) => event.preventDefault()}>
 									Edit team
 								</DropdownMenuItem>
@@ -174,7 +185,7 @@ export const TeamProfile = () => {
 
 				<img
 					style={loaded ? {} : { display: 'none' }}
-					src={team?.data().logo}
+					src={imgSrc}
 					onLoad={() => setLoaded(true)}
 					alt={'team logo'}
 					className={'object-cover rounded-md'}
