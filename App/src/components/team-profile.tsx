@@ -20,11 +20,16 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
-import { CheckCircledIcon, DotsVerticalIcon } from '@radix-ui/react-icons'
+import {
+	CheckCircledIcon,
+	DotsVerticalIcon,
+	ReloadIcon,
+} from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
 import { EditTeamDialog } from './edit-team-dialog'
+import { Skeleton } from './ui/skeleton'
 
 export const TeamProfile = () => {
 	const { id } = useParams()
@@ -33,6 +38,8 @@ export const TeamProfile = () => {
 	const { documentSnapshot } = useContext(AuthContext)
 
 	const isCaptain = documentSnapshot?.data()?.captain
+
+	const [loaded, setLoaded] = useState(false)
 
 	const team = id
 		? teamsQuerySnapshot?.docs.find((team) => team.id === id)
@@ -150,20 +157,35 @@ export const TeamProfile = () => {
 		</div>
 	)
 
-	return (
+	return teamsQuerySnapshotLoading ? (
+		<div className={'absolute inset-0 flex items-center justify-center'}>
+			<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+		</div>
+	) : (
 		<div className={'container'}>
 			<div className={'max-h-[250px] w-[250px] my-8 mx-auto overflow-hidden'}>
-				{team?.data().logo ? (
-					<img
-						src={team?.data().logo}
-						alt={'team logo'}
-						className={'object-cover rounded-md'}
-					/>
-				) : (
-					<div className={'text-center text-2xl font-bold'}>
-						{'Team Profile'}
+				{loaded ? null : (
+					<div className="flex items-end gap-2 py-2">
+						<div className="mr-2">
+							<Skeleton className="h-[250px] w-[250px]" />
+						</div>
 					</div>
 				)}
+
+				<img
+					style={loaded ? {} : { display: 'none' }}
+					src={team?.data().logo}
+					onLoad={() => setLoaded(true)}
+					alt={'team logo'}
+					className={'object-cover rounded-md'}
+				/>
+
+				{/* //   :
+          //   (
+					// <div className={'text-center text-2xl font-bold'}>
+					// 	{'Team Profile'}
+					// </div>
+          //   ) */}
 			</div>
 			<div className="flex justify-center items-start gap-8 flex-wrap max-w-[1040px] mx-auto">
 				<NotificationCard
