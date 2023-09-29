@@ -19,13 +19,15 @@ import { v4 as uuidv4 } from 'uuid'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import {
 	DocumentData,
+	DocumentReference,
 	DocumentSnapshot,
 	createTeam,
+	updateTeam,
 } from '@/firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { StorageReference, ref, storage } from '@/firebase/storage'
 import { GradientHeader } from './gradient-header'
-import { PlayerData } from '@/lib/interfaces'
+import { PlayerData, TeamData } from '@/lib/interfaces'
 
 export const createEditTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -35,11 +37,13 @@ export const createEditTeamSchema = z.object({
 export type CreateEditTeamSchema = z.infer<typeof createEditTeamSchema>
 
 export const CreateEditTeamForm = ({
+	teamRef,
 	teamLogo,
 	teamName,
 	documentSnapshot,
 	create,
 }: {
+	teamRef?: DocumentReference<TeamData, DocumentData>
 	teamLogo?: string
 	teamName?: string
 	documentSnapshot: DocumentSnapshot<PlayerData, DocumentData> | undefined
@@ -118,17 +122,31 @@ export const CreateEditTeamForm = ({
 				setStorageRef(newTeamData.ref)
 			} else {
 				if (documentSnapshot) {
-					createTeam(documentSnapshot.ref, newTeamData.name)
-						.then(() => {
-							handleResult({
-								success: true,
-								message: `Created team: ${newTeamData.name}`,
-								navigation: true,
+					if (create) {
+						createTeam(documentSnapshot.ref, newTeamData.name)
+							.then(() => {
+								handleResult({
+									success: true,
+									message: `Created team: ${newTeamData.name}`,
+									navigation: true,
+								})
 							})
-						})
-						.catch((err) => {
-							handleResult({ success: false, message: `Error: ${err}` })
-						})
+							.catch((err) => {
+								handleResult({ success: false, message: `Error: ${err}` })
+							})
+					} else if (teamRef) {
+						updateTeam(teamRef, newTeamData.name, newTeamData.ref)
+							.then(() => {
+								handleResult({
+									success: true,
+									message: `Changes saved successfully`,
+									navigation: true,
+								})
+							})
+							.catch((err) => {
+								handleResult({ success: false, message: `Error: ${err}` })
+							})
+					}
 				} else {
 					handleResult({
 						success: false,

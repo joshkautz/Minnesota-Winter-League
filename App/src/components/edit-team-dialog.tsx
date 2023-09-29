@@ -40,6 +40,7 @@ export const EditTeamDialog = ({ children }: { children: ReactNode }) => {
 				<div className="max-w-[400px]">
 					<CreateEditTeamForm
 						documentSnapshot={documentSnapshot}
+						teamRef={teamSnapshot?.ref}
 						teamName={teamSnapshot?.data().name}
 						teamLogo={teamSnapshot?.data().logo}
 					/>
