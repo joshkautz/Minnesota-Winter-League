@@ -135,16 +135,21 @@ export const CreateEditTeamForm = ({
 								handleResult({ success: false, message: `Error: ${err}` })
 							})
 					} else if (teamRef) {
-						updateTeam(teamRef, newTeamData.name, newTeamData.ref)
+						updateTeam(teamRef, newTeamData.name, newTeamData.ref, storageRef)
 							.then(() => {
-								handleResult({
-									success: true,
-									message: `Changes saved successfully`,
-									navigation: true,
+								toast({
+									title: 'Team updated!',
+									description: 'Changes saved successfully.',
+									variant: 'default',
 								})
+								navigate('/team')
 							})
-							.catch((err) => {
-								handleResult({ success: false, message: `Error: ${err}` })
+							.catch(() => {
+								toast({
+									title: 'Unable to edit team',
+									description: 'Something went wrong. Please try again.',
+									variant: 'destructive',
+								})
 							})
 					}
 				} else {

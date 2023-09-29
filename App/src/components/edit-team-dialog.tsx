@@ -39,6 +39,7 @@ export const EditTeamDialog = ({ children }: { children: ReactNode }) => {
 				</DialogHeader>
 				<div className="max-w-[400px]">
 					<CreateEditTeamForm
+						create={false}
 						documentSnapshot={documentSnapshot}
 						teamRef={teamSnapshot?.ref}
 						teamName={teamSnapshot?.data().name}
