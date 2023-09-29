@@ -68,7 +68,7 @@ export const Teams = () => {
 											<img
 												src={team.data().logo}
 												className={
-													'h-auto w-auto max-w-[250px] max-h-[250px] transition duration-300 bg-muted group-hover:scale-105 aspect-square'
+													'w-full h-full max-w-[250px] max-h-[250px] transition duration-300 bg-muted group-hover:scale-105 mx-auto object-contain'
 												}
 											/>
 										</div>

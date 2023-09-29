@@ -9,7 +9,13 @@ import {
 } from './ui/dialog'
 import { EditTeam } from './edit-team'
 
-export const EditTeamDialog = ({ children }: { children: ReactNode }) => {
+export const EditTeamDialog = ({
+	closeDialog,
+	children,
+}: {
+	closeDialog?: () => void
+	children: ReactNode
+}) => {
 	const [open, setOpen] = useState(false)
 
 	return (
@@ -30,7 +36,12 @@ export const EditTeamDialog = ({ children }: { children: ReactNode }) => {
 					<DialogDescription>Update your team's name or logo</DialogDescription>
 				</DialogHeader>
 				<div className="max-w-[400px]">
-					<EditTeam />
+					<EditTeam
+						closeDialog={() => {
+							setOpen(false)
+							closeDialog && closeDialog()
+						}}
+					/>
 				</div>
 			</DialogContent>
 		</Dialog>

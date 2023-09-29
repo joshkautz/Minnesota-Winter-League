@@ -1,6 +1,6 @@
 import { TeamsContext } from '@/firebase/teams-context'
 import { useContext, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { NotificationCard } from './notification-card'
 import {
 	DocumentReference,
@@ -24,13 +24,13 @@ import { CheckCircledIcon, DotsVerticalIcon } from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
+import { EditTeamDialog } from './edit-team-dialog'
 
 export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
 		useContext(TeamsContext)
 	const { documentSnapshot } = useContext(AuthContext)
-	const navigate = useNavigate()
 
 	const isCaptain = documentSnapshot?.data()?.captain
 
@@ -73,6 +73,13 @@ export const TeamProfile = () => {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
+						{isCaptain && (
+							<EditTeamDialog>
+								<DropdownMenuItem onClick={(event) => event.preventDefault()}>
+									Edit team
+								</DropdownMenuItem>
+							</EditTeamDialog>
+						)}
 						<DestructiveConfirmationDialog
 							title={'Are you sure you want to leave?'}
 							description={
@@ -114,7 +121,7 @@ export const TeamProfile = () => {
 												setDeleteTeamLoading
 											)
 												.then(() => {
-													navigate('/')
+													// navigate('/')
 												})
 												.catch(() => {
 													toast({
@@ -145,7 +152,7 @@ export const TeamProfile = () => {
 
 	return (
 		<div className={'container'}>
-			<div className={'max-h-[250px] w-[250px] my-8 mx-auto'}>
+			<div className={'max-h-[250px] w-[250px] my-8 mx-auto overflow-hidden'}>
 				{team?.data().logo ? (
 					<img
 						src={team?.data().logo}

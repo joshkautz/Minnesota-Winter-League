@@ -30,9 +30,11 @@ const createTeamSchema = z.object({
 type CreateTeamSchema = z.infer<typeof createTeamSchema>
 
 export const CreateTeam = () => {
-	const { documentSnapshot, documentSnapshotLoading } = useContext(AuthContext)
+	const { documentSnapshot } = useContext(AuthContext)
 	const isOnTeam = documentSnapshot?.data()?.team
 	const navigate = useNavigate()
+
+	const [loading, setLoading] = useState(false)
 
 	const form = useForm<CreateTeamSchema>({
 		resolver: zodResolver(createTeamSchema),
@@ -91,6 +93,9 @@ export const CreateTeam = () => {
 						.catch((err) => {
 							handleResult({ success: false, message: `Error: ${err}` })
 						})
+						.finally(() => {
+							setLoading(false)
+						})
 				} else {
 					handleResult({
 						success: false,
@@ -121,6 +126,9 @@ export const CreateTeam = () => {
 						.catch((err) => {
 							handleResult({ success: false, message: `Error: ${err}` })
 						})
+						.finally(() => {
+							setLoading(false)
+						})
 				} else {
 					handleResult({
 						success: false,
@@ -139,6 +147,7 @@ export const CreateTeam = () => {
 	const onSubmit = async (data: CreateTeamSchema) => {
 		if (documentSnapshot) {
 			try {
+				setLoading(true)
 				if (blob) {
 					const result = await uploadFile(
 						ref(storage, `teams/${uuidv4()}`),
@@ -170,9 +179,7 @@ export const CreateTeam = () => {
 
 	return (
 		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
-			{isOnTeam || documentSnapshotLoading ? (
-				<div>You must first leave your team in order to create a new one.</div>
-			) : (
+			{documentSnapshot?.data()?.team === null ? (
 				<>
 					<GradientHeader>Create a Team</GradientHeader>
 					<div className="max-w-[400px]">
@@ -228,6 +235,12 @@ export const CreateTeam = () => {
 						</Form>
 					</div>
 				</>
+			) : isOnTeam && !loading ? (
+				<div>You must first leave your team in order to create a new one.</div>
+			) : (
+				<div className={'absolute inset-0 flex items-center justify-center'}>
+					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+				</div>
 			)}
 		</div>
 	)

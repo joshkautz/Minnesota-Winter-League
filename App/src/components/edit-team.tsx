@@ -18,9 +18,7 @@ import { Input } from './ui/input'
 import { v4 as uuidv4 } from 'uuid'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { updateTeam } from '@/firebase/firestore'
-import { useNavigate } from 'react-router-dom'
 import { StorageReference, ref, storage } from '@/firebase/storage'
-import { GradientHeader } from './gradient-header'
 import { TeamsContext } from '@/firebase/teams-context'
 
 const editTeamSchema = z.object({
@@ -30,16 +28,17 @@ const editTeamSchema = z.object({
 
 type EditTeamSchema = z.infer<typeof editTeamSchema>
 
-export const EditTeam = () => {
+export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 	const { documentSnapshot } = useContext(AuthContext)
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
-	const navigate = useNavigate()
 
 	const team = useMemo(() => {
 		return teamsQuerySnapshot?.docs.find(
 			(team) => team.id === documentSnapshot?.data()?.team?.id
 		)
 	}, [documentSnapshot])
+
+	const [loading, setLoading] = useState(false)
 
 	const form = useForm<EditTeamSchema>({
 		resolver: zodResolver(editTeamSchema),
@@ -63,25 +62,6 @@ export const EditTeam = () => {
 	const [uploadFile, uploadFileLoading, , uploadFileError] = useUploadFile()
 	const [downloadUrl] = useDownloadURL(storageRef)
 
-	const handleResult = ({
-		success,
-		message,
-		navigation,
-	}: {
-		success: boolean
-		message: string
-		navigation?: boolean
-	}) => {
-		toast({
-			title: success ? 'Success!' : 'Unable to update team',
-			description: message,
-			variant: success ? 'default' : 'destructive',
-		})
-		if (navigation) {
-			navigate('/manage')
-		}
-	}
-
 	useEffect(() => {
 		if (team?.data().name) {
 			form.setValue('name', team?.data().name)
@@ -93,20 +73,32 @@ export const EditTeam = () => {
 
 	useEffect(() => {
 		if (updatedTeamData) {
+			// If team is updated to have an image for the first time.
 			if (updatedTeamData.storageRef) {
 				setStorageRef(updatedTeamData.storageRef)
-			} else {
+			}
+			// If team is not setting an image for the first time.
+			else {
 				if (team) {
 					updateTeam(team?.ref, updatedTeamData.name)
 						.then(() => {
-							handleResult({
-								success: true,
-								message: `Updated team: ${updatedTeamData.name}`,
-								navigation: true,
+							console.log('done')
+							toast({
+								variant: 'default',
+								title: `Updated ${updatedTeamData.name}`,
+								description: 'Changes saved successfully.',
+							})
+							closeDialog()
+						})
+						.catch((error) => {
+							toast({
+								variant: 'destructive',
+								title: 'Unable to upload file',
+								description: `Error: ${error}`,
 							})
 						})
-						.catch((err) => {
-							handleResult({ success: false, message: `Error: ${err}` })
+						.finally(() => {
+							setLoading(false)
 						})
 				}
 			}
@@ -118,6 +110,7 @@ export const EditTeam = () => {
 			if (team) {
 				if (updatedTeamData) {
 					if (updatedTeamData.storageRef) {
+						// If team is updated to have an image for the first time.
 						updateTeam(
 							team?.ref,
 							updatedTeamData.name,
@@ -125,14 +118,22 @@ export const EditTeam = () => {
 							updatedTeamData.storageRef?.fullPath
 						)
 							.then(() => {
-								handleResult({
-									success: true,
-									message: `Created team: ${updatedTeamData.name}`,
-									navigation: true,
+								toast({
+									variant: 'default',
+									title: `Updated ${updatedTeamData.name}`,
+									description: 'Changes saved successfully.',
+								})
+								closeDialog()
+							})
+							.catch((error) => {
+								toast({
+									variant: 'destructive',
+									title: 'Unable to save changes',
+									description: `Error: ${error}`,
 								})
 							})
-							.catch((err) => {
-								handleResult({ success: false, message: `Error: ${err}` })
+							.finally(() => {
+								setLoading(false)
 							})
 					}
 				}
@@ -143,13 +144,24 @@ export const EditTeam = () => {
 	const onSubmit = async (data: EditTeamSchema) => {
 		if (documentSnapshot) {
 			try {
+				setLoading(true)
+				// If team is updated to have an image.
 				if (blob) {
+					// If team is updated to have an image, but not for the first time.
 					if (storageRef) {
 						await uploadFile(storageRef, blob, {
 							contentType: 'image/jpeg',
 						})
 						setUpdatedTeamData({ name: data.name, storageRef: storageRef })
-					} else {
+						toast({
+							variant: 'default',
+							title: `Updated team ${data.name}`,
+							description: 'Changes saved successfully',
+						})
+						closeDialog()
+					}
+					// If team is updated to have an image for the first time.
+					else {
 						const result = await uploadFile(
 							ref(storage, `teams/${uuidv4()}`),
 							blob,
@@ -159,81 +171,107 @@ export const EditTeam = () => {
 						)
 						if (result) {
 							setUpdatedTeamData({ name: data.name, storageRef: result.ref })
+							toast({
+								variant: 'default',
+								title: `Updated team ${data.name}`,
+								description: 'Changes saved successfully',
+							})
+							closeDialog()
 						}
 					}
-				} else {
+				}
+				// If team is updated without a change to the image.
+				else {
 					setUpdatedTeamData({ name: data.name, storageRef: undefined })
+					toast({
+						variant: 'default',
+						title: `Updated team ${data.name}`,
+						description: 'Changes saved successfully',
+					})
+					closeDialog()
 				}
 			} catch (error) {
-				handleResult({ success: false, message: `Error: ${error}` })
+				toast({
+					variant: 'destructive',
+					title: 'Unable to save changes',
+					description: `Error: ${error}`,
+				})
 			}
 		}
 	}
 
 	useEffect(() => {
 		if (uploadFileError) {
-			handleResult({
-				success: false,
-				message: `Error: ${uploadFileError}`,
+			toast({
+				variant: 'destructive',
+				title: 'Unable to upload file',
+				description: `Error: ${uploadFileError}`,
 			})
 		}
 	}, [uploadFileError])
 
+	const teamLogo = team?.data().logo
+	const teamName = team?.data().name
+
+	const previewImage = blob ? URL.createObjectURL(blob) : undefined
+
 	return (
-		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
-			<GradientHeader>Create a Team</GradientHeader>
-			<div className="max-w-[400px]">
-				<Form {...form}>
-					<form
-						onSubmit={form.handleSubmit(onSubmit)}
-						className={'w-full space-y-6'}
-					>
-						<FormField
-							control={form.control}
-							name={'name'}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Team name</FormLabel>
-									<FormControl>
-										<Input
-											placeholder={'Team name'}
-											{...field}
-											value={field.value ?? ''}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name={'logo'}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Team logo</FormLabel>
-									<FormControl>
-										<Input
-											id="image-upload"
-											type={'file'}
-											accept="image/*"
-											placeholder={'Upload Image'}
-											{...field}
-											onChange={handleFileChange}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<Button type={'submit'} disabled={uploadFileLoading}>
-							{uploadFileLoading && (
-								<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-							)}
-							Update
-						</Button>
-					</form>
-				</Form>
-			</div>
+		<div className="max-w-[400px]">
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className={'w-full space-y-6'}
+				>
+					<FormField
+						control={form.control}
+						name={'name'}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Team name</FormLabel>
+								<FormControl>
+									<Input
+										placeholder={teamName ?? 'Team name'}
+										{...field}
+										value={field.value ?? ''}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name={'logo'}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Team logo</FormLabel>
+								<FormControl>
+									<Input
+										id="image-upload"
+										type={'file'}
+										accept="image/*"
+										placeholder={'Upload Image'}
+										{...field}
+										onChange={handleFileChange}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					{teamLogo && (
+						<div className="w-40 h-40 mx-auto">
+							<img src={previewImage ?? teamLogo} />
+						</div>
+					)}
+					<Button type={'submit'} disabled={uploadFileLoading || loading}>
+						{(uploadFileLoading || loading) && (
+							<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+						)}
+						Save changes
+					</Button>
+				</form>
+			</Form>
 		</div>
 	)
 }
