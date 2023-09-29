@@ -39,7 +39,7 @@ import {
 	StandingsData,
 	TeamData,
 } from '@/lib/interfaces'
-import { StorageReference, deleteImage, ref, storage } from './storage'
+import { deleteImage, ref, storage } from './storage'
 
 interface PlayerDocumentData {
 	captain: boolean
@@ -117,7 +117,7 @@ const updateTeam = async (
 	teamRef: DocumentReference<TeamData, DocumentData>,
 	name?: string,
 	logo?: string,
-	storagePath?: StorageReference
+	storagePath?: string
 ) => {
 	const teamDocumentSnapshot = await getDoc(teamRef)
 
