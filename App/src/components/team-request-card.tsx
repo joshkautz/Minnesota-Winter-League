@@ -37,8 +37,7 @@ export const TeamRequestCard = () => {
 					variant: 'default',
 				})
 			})
-			.catch((error) => {
-				console.log(error)
+			.catch(() => {
 				toast({
 					title: 'Unable to send request',
 					description:
@@ -78,7 +77,6 @@ const TeamDetail = ({
 		offersForUnrosteredPlayersQuery(playerRef, teamSnapshot.ref)
 	)
 
-	// const creatorDoc = getPlayerSnapshot(teamSnapshot.data().captains[0])
 	const [creatorSnapshot, creatorSnapshotLoading] = useDocument(
 		teamSnapshot.data().captains[0]
 	)
@@ -157,12 +155,19 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 			</p>
 		)
 
+	const titleData = (
+		<div className={'inline-flex items-center gap-2 h-4'}>
+			<p>{team?.data().name}</p>
+			<div className={'h-8 w-8 rounded-full overflow-hidden'}>
+				<img className={'object-cover'} src={team?.data().logo} />
+			</div>
+		</div>
+	)
+
 	return (
 		<NotificationCard
 			title={
-				documentSnapshotLoading || authStateLoading
-					? 'Loading...'
-					: team?.data().name
+				documentSnapshotLoading || authStateLoading ? 'Loading...' : titleData
 			}
 			description={'Your team roster'}
 			moreActions={actions}

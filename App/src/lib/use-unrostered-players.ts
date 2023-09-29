@@ -33,8 +33,6 @@ export const useUnrosteredPlayers = (
 							)
 						)
 					setUnrosteredPlayers(updatedUnrosteredPlayers)
-				} catch (error) {
-					console.log(error)
 				} finally {
 					setUnrosteredPlayersLoading(false)
 				}

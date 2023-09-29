@@ -107,9 +107,7 @@ export const UnrosteredPlayerList = () => {
 					variant: 'default',
 				})
 			})
-			.catch((error) => {
-				console.log(error)
-
+			.catch(() => {
 				toast({
 					title: 'Unable to send invite',
 					description:

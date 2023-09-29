@@ -19,7 +19,6 @@ import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
 import { Button } from './ui/button'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
-import { useNavigate } from 'react-router-dom'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -28,6 +27,7 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { GradientHeader } from './gradient-header'
+import { EditTeamDialog } from './edit-team-dialog'
 
 export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -35,7 +35,6 @@ export const ManageTeam = () => {
 		useContext(OffersContext)
 	const { authStateLoading, documentSnapshot, documentSnapshotLoading } =
 		useContext(AuthContext)
-	const navigate = useNavigate()
 	const isCaptain = documentSnapshot?.data()?.captain
 	const isUnrostered = documentSnapshot?.data()?.team === null
 
@@ -130,9 +129,11 @@ export const ManageTeam = () => {
 		{ title: 'Reject', action: handleReject },
 	]
 
+	const [open, setOpen] = useState(false)
+
 	const captainActions = (
 		<div className="absolute right-6 top-6">
-			<DropdownMenu>
+			<DropdownMenu open={open} onOpenChange={setOpen}>
 				<DropdownMenuTrigger asChild>
 					<Button size={'sm'} variant={'ghost'}>
 						<DotsVerticalIcon />
@@ -140,6 +141,11 @@ export const ManageTeam = () => {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
+						<EditTeamDialog closeDialog={() => setOpen(false)}>
+							<DropdownMenuItem onClick={(event) => event.preventDefault()}>
+								Edit team
+							</DropdownMenuItem>
+						</EditTeamDialog>
 						<DestructiveConfirmationDialog
 							title={'Are you sure you want to leave?'}
 							description={
@@ -178,7 +184,7 @@ export const ManageTeam = () => {
 									if (documentSnapshotData) {
 										deleteTeam(documentSnapshotData.team, setDeleteTeamLoading)
 											.then(() => {
-												navigate('/')
+												// navigate('/')
 											})
 											.catch(() => {
 												toast({

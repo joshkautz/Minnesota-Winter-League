@@ -72,7 +72,7 @@ export const NotificationCard = ({
 	searchBar,
 	footerContent,
 }: {
-	title?: string
+	title?: ReactNode
 	description?: string
 	scrollArea?: boolean
 	children: ReactNode
