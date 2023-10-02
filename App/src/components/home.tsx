@@ -97,8 +97,8 @@ export const Home = () => {
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>When:</p>
 									<span>
-										Saturdays from 6:00 PM to 9:00 PM during November and
-										December
+										Saturdays from 6:00 PM to 9:00 PM during November (4th,
+										11th, and 18th) and December (2nd, 9th, and 16th)
 									</span>
 								</div>
 								<div className={'flex'}>
