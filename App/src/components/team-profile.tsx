@@ -174,13 +174,9 @@ export const TeamProfile = () => {
 		</div>
 	) : (
 		<div className={'container'}>
-			<div className={'max-h-[250px] w-[250px] my-8 mx-auto overflow-hidden'}>
+			<div className={'w-1/2 md:w-1/4 my-8 mx-auto'}>
 				{loaded ? null : (
-					<div className="flex items-end gap-2 py-2">
-						<div className="mr-2">
-							<Skeleton className="h-[250px] w-[250px]" />
-						</div>
-					</div>
+					<Skeleton className="h-[100px] md:w-[1/2] md:h-[250px] md:w-[1/4]" />
 				)}
 
 				<img
@@ -188,7 +184,7 @@ export const TeamProfile = () => {
 					src={imgSrc}
 					onLoad={() => setLoaded(true)}
 					alt={'team logo'}
-					className={'object-cover rounded-md'}
+					className={'rounded-md'}
 				/>
 
 				{/* //   :
