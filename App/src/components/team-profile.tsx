@@ -1,5 +1,5 @@
 import { TeamsContext } from '@/firebase/teams-context'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { NotificationCard } from './notification-card'
 import {
@@ -20,11 +20,16 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
-import { CheckCircledIcon, DotsVerticalIcon } from '@radix-ui/react-icons'
+import {
+	CheckCircledIcon,
+	DotsVerticalIcon,
+	ReloadIcon,
+} from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
 import { EditTeamDialog } from './edit-team-dialog'
+import { Skeleton } from './ui/skeleton'
 
 export const TeamProfile = () => {
 	const { id } = useParams()
@@ -34,11 +39,15 @@ export const TeamProfile = () => {
 
 	const isCaptain = documentSnapshot?.data()?.captain
 
-	const team = id
-		? teamsQuerySnapshot?.docs.find((team) => team.id === id)
-		: teamsQuerySnapshot?.docs.find(
-				(team) => team.id === documentSnapshot?.data()?.team?.id
-		  )
+	const [loaded, setLoaded] = useState(false)
+
+	const team = useMemo(() => {
+		return id
+			? teamsQuerySnapshot?.docs.find((team) => team.id === id)
+			: teamsQuerySnapshot?.docs.find(
+					(team) => team.id === documentSnapshot?.data()?.team?.id
+			  )
+	}, [documentSnapshot, teamsQuerySnapshot])
 
 	const isOnTeam = team
 		?.data()
@@ -47,6 +56,11 @@ export const TeamProfile = () => {
 	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
+	const [imgSrc, setImgSrc] = useState<string | undefined>()
+
+	useEffect(() => {
+		setImgSrc(team?.data().logo + `&date=${Date.now()}`)
+	}, [team])
 
 	const registrationStatus = teamsQuerySnapshotLoading ? (
 		<p className="text-sm text-muted-foreground">Loading...</p>
@@ -74,7 +88,11 @@ export const TeamProfile = () => {
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
 						{isCaptain && (
-							<EditTeamDialog>
+							<EditTeamDialog
+								closeDialog={() => {
+									setImgSrc(team?.data().logo + `&date=${Date.now()}`)
+								}}
+							>
 								<DropdownMenuItem onClick={(event) => event.preventDefault()}>
 									Edit team
 								</DropdownMenuItem>
@@ -150,20 +168,35 @@ export const TeamProfile = () => {
 		</div>
 	)
 
-	return (
+	return teamsQuerySnapshotLoading ? (
+		<div className={'absolute inset-0 flex items-center justify-center'}>
+			<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+		</div>
+	) : (
 		<div className={'container'}>
 			<div className={'max-h-[250px] w-[250px] my-8 mx-auto overflow-hidden'}>
-				{team?.data().logo ? (
-					<img
-						src={team?.data().logo}
-						alt={'team logo'}
-						className={'object-cover rounded-md'}
-					/>
-				) : (
-					<div className={'text-center text-2xl font-bold'}>
-						{'Team Profile'}
+				{loaded ? null : (
+					<div className="flex items-end gap-2 py-2">
+						<div className="mr-2">
+							<Skeleton className="h-[250px] w-[250px]" />
+						</div>
 					</div>
 				)}
+
+				<img
+					style={loaded ? {} : { display: 'none' }}
+					src={imgSrc}
+					onLoad={() => setLoaded(true)}
+					alt={'team logo'}
+					className={'object-cover rounded-md'}
+				/>
+
+				{/* //   :
+          //   (
+					// <div className={'text-center text-2xl font-bold'}>
+					// 	{'Team Profile'}
+					// </div>
+          //   ) */}
 			</div>
 			<div className="flex justify-center items-start gap-8 flex-wrap max-w-[1040px] mx-auto">
 				<NotificationCard

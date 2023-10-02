@@ -36,7 +36,7 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 		return teamsQuerySnapshot?.docs.find(
 			(team) => team.id === documentSnapshot?.data()?.team?.id
 		)
-	}, [documentSnapshot])
+	}, [documentSnapshot, teamsQuerySnapshot])
 
 	const [loading, setLoading] = useState(false)
 
@@ -82,7 +82,6 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 				if (team) {
 					updateTeam(team?.ref, updatedTeamData.name)
 						.then(() => {
-							console.log('done')
 							toast({
 								variant: 'default',
 								title: `Updated ${updatedTeamData.name}`,

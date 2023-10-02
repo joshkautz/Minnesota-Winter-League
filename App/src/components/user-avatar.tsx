@@ -21,8 +21,13 @@ export const UserAvatar = ({
 }: {
 	userContent: { label: string; path: string; alt: string }[]
 }) => {
-	const { authStateUser, authStateLoading, documentSnapshot, signOut } =
-		useContext(AuthContext)
+	const {
+		authStateUser,
+		authStateLoading,
+		documentSnapshot,
+		documentSnapshotLoading,
+		signOut,
+	} = useContext(AuthContext)
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
 	const userInitials = `${
@@ -36,7 +41,7 @@ export const UserAvatar = ({
 	const isRegistered = documentSnapshot?.data()?.registered
 	const hasRequiredTasks = !isVerified || !isRegistered
 
-	if (authStateLoading) {
+	if (authStateLoading || documentSnapshotLoading) {
 		return <ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
 	}
 
