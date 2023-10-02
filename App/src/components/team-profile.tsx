@@ -47,7 +47,7 @@ export const TeamProfile = () => {
 			: teamsQuerySnapshot?.docs.find(
 					(team) => team.id === documentSnapshot?.data()?.team?.id
 			  )
-	}, [documentSnapshot, teamsQuerySnapshot])
+	}, [id, documentSnapshot, teamsQuerySnapshot])
 
 	const isOnTeam = team
 		?.data()

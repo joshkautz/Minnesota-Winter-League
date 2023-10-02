@@ -1,8 +1,12 @@
-import { SketchLogoIcon } from '@radix-ui/react-icons'
+import { PersonIcon, ReloadIcon, SketchLogoIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { DomeSvg } from './ui/dome-svg'
 import { useAnchorScroll } from '@/lib/use-anchor-scroll'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useOutletContext } from 'react-router-dom'
+import { Button } from './ui/button'
+import { useContext } from 'react'
+import { AuthContext } from '@/firebase/auth-context'
+import { OutletContext } from './layout'
 
 const SnowFlake = ({ className }: { className?: string }) => {
 	return (
@@ -24,7 +28,24 @@ const SnowFlake = ({ className }: { className?: string }) => {
 }
 
 export const Home = () => {
+	const { toggleIsOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()
+	const navigate = useNavigate()
+	const { documentSnapshot, documentSnapshotLoading } = useContext(AuthContext)
+	const isRostered = documentSnapshot?.data()?.team
+
+	const handleCallToAction = () => {
+		if (!documentSnapshot) {
+			toggleIsOpen()
+			return
+		}
+		if (isRostered) {
+			navigate('/team')
+		} else {
+			navigate('/manage')
+		}
+	}
+
 	return (
 		<div className={'w-full'}>
 			<section id="welcome" className={'h-[80vh] max-h-[620px] container'}>
@@ -51,6 +72,20 @@ export const Home = () => {
 								we can't wait to welcome you to the league.
 							</span>
 						</div>
+						<Button
+							disabled={documentSnapshotLoading}
+							className="mt-12"
+							onClick={handleCallToAction}
+						>
+							{documentSnapshotLoading && (
+								<ReloadIcon className={'h-4 w-4 animate-spin mr-2'} />
+							)}
+							{!documentSnapshot
+								? 'Join our League'
+								: isRostered
+								? 'Your Team'
+								: 'Join a Team'}
+						</Button>
 					</div>
 
 					<DomeSvg
@@ -180,7 +215,7 @@ export const Home = () => {
 						<div className={'text-4xl font-bold '}>Why Join?</div>
 						<div className={'flex flex-row gap-4'}>
 							<div className={''}>
-								<SketchLogoIcon className={'w-8 h-8'} />
+								<PersonIcon className={'w-8 h-8'} />
 							</div>
 							<div className={'flex flex-col gap-2'}>
 								<div className={'text-2xl font-bold'}>Friends</div>
@@ -218,8 +253,8 @@ export const Home = () => {
 							</span>
 						</div>
 					</div>
-					<div className="absolute right-0 invisible md:visible -bottom-52 xl:-bottom-52 xl:-right-32">
-						<SnowFlake className="fill-foreground max-w-[150px] xl:max-w-[300px]" />
+					<div className="absolute right-0 invisible md:visible -bottom-52 2xl:-bottom-52 2xl:-right-32">
+						<SnowFlake className="fill-foreground max-w-[150px] 2xl:max-w-[300px]" />
 					</div>
 				</section>
 			</div>
