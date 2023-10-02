@@ -259,7 +259,7 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 						)}
 					/>
 					{teamLogo && (
-						<div className="w-40 h-40 mx-auto">
+						<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
 							<img src={previewImage ?? teamLogo} />
 						</div>
 					)}
