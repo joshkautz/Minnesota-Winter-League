@@ -40,6 +40,8 @@ export const Standings = () => {
 				</div>
 			) : standingsSnapshotError ? (
 				'Error'
+			) : standingsSnapshot?.size === 0 ? (
+				'No Standings Data'
 			) : (
 				<Table>
 					<TableCaption></TableCaption>
@@ -53,49 +55,43 @@ export const Standings = () => {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{standingsSnapshot?.size ? (
-							standingsSnapshot?.docs.map((standing, index) => {
-								const team = teamsQuerySnapshot?.docs.find(
-									(team) => team.id === standing.id
-								)
-								const teamData = teamsQuerySnapshot?.docs
-									.find((team) => team.id === standing.id)
-									?.data()
-								return (
-									<TableRow key={index}>
-										<TableCell className="font-medium ">{index + 1}</TableCell>
-										<TableCell>
-											<Link to={`/teams/${team?.id}`}>
-												<div className="flex items-center justify-start gap-2 ">
-													<div className="flex justify-start w-16">
-														<img
-															className="w-auto h-8 max-w-16"
-															src={teamData?.logo}
-														/>
-													</div>
-													<span>{teamData?.name}</span>
+						{standingsSnapshot?.docs.map((standing, index) => {
+							const team = teamsQuerySnapshot?.docs.find(
+								(team) => team.id === standing.id
+							)
+							const teamData = teamsQuerySnapshot?.docs
+								.find((team) => team.id === standing.id)
+								?.data()
+							return (
+								<TableRow key={index}>
+									<TableCell className="font-medium ">{index + 1}</TableCell>
+									<TableCell>
+										<Link to={`/teams/${team?.id}`}>
+											<div className="flex items-center justify-start gap-2 ">
+												<div className="flex justify-start w-16">
+													<img
+														className="w-auto h-8 max-w-16"
+														src={teamData?.logo}
+													/>
 												</div>
-											</Link>
-										</TableCell>
-										<TableCell>{standing.data()?.wins}</TableCell>
-										<TableCell>{standing.data()?.losses}</TableCell>
-										<TableCell
-											className={getColor(
-												standing.data()?.pointsFor -
-													standing.data()?.pointsAgainst
-											)}
-										>
-											{standing.data()?.pointsFor -
-												standing.data()?.pointsAgainst}
-										</TableCell>
-									</TableRow>
-								)
-							})
-						) : (
-							<TableRow>
-								<TableCell>No data</TableCell>
-							</TableRow>
-						)}
+												<span>{teamData?.name}</span>
+											</div>
+										</Link>
+									</TableCell>
+									<TableCell>{standing.data()?.wins}</TableCell>
+									<TableCell>{standing.data()?.losses}</TableCell>
+									<TableCell
+										className={getColor(
+											standing.data()?.pointsFor -
+												standing.data()?.pointsAgainst
+										)}
+									>
+										{standing.data()?.pointsFor -
+											standing.data()?.pointsAgainst}
+									</TableCell>
+								</TableRow>
+							)
+						})}
 					</TableBody>
 				</Table>
 			)}

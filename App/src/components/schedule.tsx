@@ -130,8 +130,8 @@ export const Schedule = () => {
 				<div className={'flex flex-wrap gap-8'}>
 					{gamesSnapshotError
 						? 'Error'
-						: !gamesSnapshot
-						? 'No data'
+						: !gamesSnapshot || rounds.length === 0
+						? 'No Schedule Data'
 						: rounds.map((games, index) => (
 								<ScheduleCard
 									key={`schedule-card-${index}`}
