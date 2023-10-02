@@ -218,8 +218,8 @@ export const Home = () => {
 							</span>
 						</div>
 					</div>
-					<div className="absolute right-0 invisible md:visible -bottom-52 xl:-bottom-52 xl:-right-32">
-						<SnowFlake className="fill-foreground max-w-[150px] xl:max-w-[300px]" />
+					<div className="absolute right-0 invisible md:visible -bottom-52 2xl:-bottom-52 2xl:-right-32">
+						<SnowFlake className="fill-foreground max-w-[150px] 2xl:max-w-[300px]" />
 					</div>
 				</section>
 			</div>
