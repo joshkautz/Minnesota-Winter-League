@@ -1,4 +1,4 @@
-import { ReloadIcon, SketchLogoIcon } from '@radix-ui/react-icons'
+import { PersonIcon, ReloadIcon, SketchLogoIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { DomeSvg } from './ui/dome-svg'
 import { useAnchorScroll } from '@/lib/use-anchor-scroll'
@@ -215,7 +215,7 @@ export const Home = () => {
 						<div className={'text-4xl font-bold '}>Why Join?</div>
 						<div className={'flex flex-row gap-4'}>
 							<div className={''}>
-								<SketchLogoIcon className={'w-8 h-8'} />
+								<PersonIcon className={'w-8 h-8'} />
 							</div>
 							<div className={'flex flex-col gap-2'}>
 								<div className={'text-2xl font-bold'}>Friends</div>
