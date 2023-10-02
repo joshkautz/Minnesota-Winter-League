@@ -35,7 +35,8 @@ export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
 		useContext(TeamsContext)
-	const { documentSnapshot } = useContext(AuthContext)
+  const { documentSnapshot } = useContext(AuthContext)
+  
 
 	const isCaptain = documentSnapshot?.data()?.captain
 
@@ -47,7 +48,7 @@ export const TeamProfile = () => {
 			: teamsQuerySnapshot?.docs.find(
 					(team) => team.id === documentSnapshot?.data()?.team?.id
 			  )
-	}, [documentSnapshot, teamsQuerySnapshot])
+	}, [id, documentSnapshot, teamsQuerySnapshot])
 
 	const isOnTeam = team
 		?.data()
