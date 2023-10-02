@@ -57,7 +57,7 @@ export const Profile = () => {
 		})
 			.then(() => {
 				toast({
-					title: `Updated profile with: ${data}`,
+					title: `Updated profile!`,
 				})
 			})
 			.catch((err) => {
