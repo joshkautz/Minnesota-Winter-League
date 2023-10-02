@@ -12,7 +12,15 @@ import { OffersContext } from '@/firebase/offers-context'
 import { UserForm } from './user-form'
 import { toast } from './ui/use-toast'
 
-export const TopNav = ({ title }: { title: string }) => {
+export const TopNav = ({
+	title,
+	isOpen,
+	setIsOpen,
+}: {
+	title: string
+	isOpen: boolean
+	setIsOpen: () => void
+}) => {
 	const {
 		authStateUser,
 		authStateLoading,
@@ -23,7 +31,6 @@ export const TopNav = ({ title }: { title: string }) => {
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
 	const [open, setOpen] = useState(false)
-	const [isOpen, setIsOpen] = useState(false)
 
 	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
 		(entry) => entry.data().status === 'pending'
@@ -107,9 +114,9 @@ export const TopNav = ({ title }: { title: string }) => {
 					</nav>
 				</div>
 
-				<Sheet open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
+				<Sheet open={isOpen} onOpenChange={setIsOpen}>
 					<SheetContent className="w-full pt-10">
-						<UserForm closeMobileSheet={() => setIsOpen(false)} />
+						<UserForm closeMobileSheet={setIsOpen} />
 					</SheetContent>
 				</Sheet>
 
@@ -164,7 +171,7 @@ export const TopNav = ({ title }: { title: string }) => {
 												>
 													{path === '/manage' && !!hasPendingOffers ? (
 														<>
-															{label}{' '}
+															{label}
 															<span className="relative flex w-2 h-2 ml-1">
 																{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 																<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
@@ -172,7 +179,7 @@ export const TopNav = ({ title }: { title: string }) => {
 														</>
 													) : path === '/profile' && hasRequiredTasks ? (
 														<>
-															{label}{' '}
+															{label}
 															<span className="relative flex w-2 h-2 ml-1">
 																{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 																<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
@@ -211,13 +218,13 @@ export const TopNav = ({ title }: { title: string }) => {
 									>
 										{(signOutLoading || authStateLoading) && (
 											<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-										)}{' '}
+										)}
 										Log Out
 									</Button>
 								) : (
 									<Button
 										onClick={() => {
-											setIsOpen(true)
+											setIsOpen()
 											setOpen(false)
 										}}
 										disabled={authStateLoading}
