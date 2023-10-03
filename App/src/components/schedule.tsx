@@ -17,6 +17,7 @@ import { GamesData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
 import { Link } from 'react-router-dom'
+import { ComingSoon } from './coming-soon'
 
 const ScheduleCard = ({
 	games,
@@ -128,19 +129,25 @@ export const Schedule = () => {
 				</div>
 			) : (
 				<div className={'flex flex-wrap gap-8'}>
-					{gamesSnapshotError
-						? 'Error'
-						: !gamesSnapshot || rounds.length === 0
-						? 'No Schedule Data'
-						: rounds.map((games, index) => (
-								<ScheduleCard
-									key={`schedule-card-${index}`}
-									games={games}
-									title={`Week ${Math.ceil((index + 1) / 4)} | Round ${
-										(index % 4) + 1
-									}`}
-								/>
-						  ))}
+					{gamesSnapshotError ? (
+						'Error'
+					) : !gamesSnapshot || rounds.length === 0 ? (
+						<ComingSoon
+							message={
+								'Full details will be posted once teams have registered. Minnesota Winter League 2023 games occur from November 4thth through December 16th.'
+							}
+						/>
+					) : (
+						rounds.map((games, index) => (
+							<ScheduleCard
+								key={`schedule-card-${index}`}
+								games={games}
+								title={`Week ${Math.ceil((index + 1) / 4)} | Round ${
+									(index % 4) + 1
+								}`}
+							/>
+						))
+					)}
 				</div>
 			)}
 		</div>

@@ -14,6 +14,7 @@ import { standingsQuery } from '@/firebase/firestore'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
+import { ComingSoon } from './coming-soon'
 
 export const Standings = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -41,7 +42,11 @@ export const Standings = () => {
 			) : standingsSnapshotError ? (
 				'Error'
 			) : standingsSnapshot?.size === 0 ? (
-				'No Standings Data'
+				<ComingSoon
+					message={
+						'Full team standings will become available as soon as the registration period ends.'
+					}
+				/>
 			) : (
 				<Table>
 					<TableCaption></TableCaption>
