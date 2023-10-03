@@ -145,7 +145,7 @@ export const TeamProfile = () => {
 													toast({
 														title: 'Unable to delete team',
 														description:
-															'Something went wrong. Please try again later.',
+															'Ensure your email is verified. Please try again later.',
 														variant: 'destructive',
 													})
 												})

@@ -99,7 +99,7 @@ export const CreateTeam = () => {
 				} else {
 					handleResult({
 						success: false,
-						message: 'Something went wrong, please try logging in again.',
+						message: 'Ensure your email is verified. Please try again later.',
 					})
 				}
 			}
@@ -132,13 +132,13 @@ export const CreateTeam = () => {
 				} else {
 					handleResult({
 						success: false,
-						message: 'Something went wrong, please try again.',
+						message: 'Ensure your email is verified. Please try again later.',
 					})
 				}
 			} else {
 				handleResult({
 					success: false,
-					message: 'Something went wrong, please try logging in again.',
+					message: 'Ensure your email is verified. Please try again later.',
 				})
 			}
 		}

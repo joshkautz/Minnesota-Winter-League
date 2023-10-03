@@ -74,7 +74,7 @@ export const TeamRosterPlayer = ({
 					.catch(() => {
 						toast({
 							title: 'Unable to Promote',
-							description: 'Something went wrong. Please try again later.',
+							description: 'Ensure your email is verified. Please try again later.',
 							variant: 'destructive',
 						})
 					})

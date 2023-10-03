@@ -211,7 +211,7 @@ export const TopNav = ({
 													toast({
 														title: 'Unable to Log Out',
 														description:
-															'Something went wrong. Please try again.',
+															'Ensure your email is verified. Please try again later.',
 													})
 												})
 										}}
