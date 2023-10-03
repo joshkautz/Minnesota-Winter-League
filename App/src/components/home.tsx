@@ -51,7 +51,9 @@ export const Home = () => {
 			<section id="welcome" className={'h-[80vh] max-h-[620px] container'}>
 				<div className="flex flex-col items-stretch h-full md:flex-row justify-stretch">
 					<div className="flex-1 mt-8">
-						<div className={'flex flex-col gap-4 pt-16 pb-2 max-w-[680px]'}>
+						<div
+							className={'flex flex-col gap-4 pt-2 sm:pt-16 pb-2 max-w-[680px]'}
+						>
 							<p className={'text-5xl font-bold'}>Minneapolis Winter League</p>
 							<p className={'text-2xl font-light '}>
 								Bundle up, lace up your cleats, and experience Minneapolis
@@ -64,7 +66,7 @@ export const Home = () => {
 							}
 						/>
 
-						<div className={'mt-12 max-w-[490px] flex-1'}>
+						<div className={'mt-4 sm:mt-12 max-w-[490px] flex-1'}>
 							Join us this season for unforgettable Saturday nights of organized
 							league play. Whether you're a seasoned club veteran, or a rookie
 							in college,{' '}
@@ -74,7 +76,7 @@ export const Home = () => {
 						</div>
 						<Button
 							disabled={documentSnapshotLoading}
-							className="mt-12"
+							className="mt-8 sm:mt-12"
 							onClick={handleCallToAction}
 						>
 							{documentSnapshotLoading && (
