@@ -134,7 +134,7 @@ export const Schedule = () => {
 					) : !gamesSnapshot || rounds.length === 0 ? (
 						<ComingSoon
 							message={
-								'Full details will be posted once teams have registered. Minnesota Winter League 2023 games occur from November 4thth through December 16th.'
+								'Full schedule details will be posted once the registration period ends. Minnesota Winter League 2023 games take place from November 4th through December 16th.'
 							}
 						/>
 					) : (
