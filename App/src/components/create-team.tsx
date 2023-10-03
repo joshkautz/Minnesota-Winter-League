@@ -90,8 +90,11 @@ export const CreateTeam = () => {
 								navigation: true,
 							})
 						})
-						.catch((err) => {
-							handleResult({ success: false, message: `Error: ${err}` })
+						.catch(() => {
+							handleResult({
+								success: false,
+								message: `Ensure your email is verified. Please try again later.`,
+							})
 						})
 						.finally(() => {
 							setLoading(false)
@@ -123,8 +126,11 @@ export const CreateTeam = () => {
 								navigation: true,
 							})
 						})
-						.catch((err) => {
-							handleResult({ success: false, message: `Error: ${err}` })
+						.catch(() => {
+							handleResult({
+								success: false,
+								message: `Ensure your email is verified. Please try again later.`,
+							})
 						})
 						.finally(() => {
 							setLoading(false)
@@ -163,7 +169,10 @@ export const CreateTeam = () => {
 					setNewTeamData({ name: data.name, storageRef: undefined })
 				}
 			} catch (error) {
-				handleResult({ success: false, message: `Error: ${error}` })
+				handleResult({
+					success: false,
+					message: `Ensure your email is verified. Please try again later.`,
+				})
 			}
 		}
 	}
@@ -172,7 +181,7 @@ export const CreateTeam = () => {
 		if (uploadFileError) {
 			handleResult({
 				success: false,
-				message: `Error: ${uploadFileError}`,
+				message: `Ensure your email is verified. Please try again later.`,
 			})
 		}
 	}, [uploadFileError])
