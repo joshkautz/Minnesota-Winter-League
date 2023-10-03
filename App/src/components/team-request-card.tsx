@@ -40,8 +40,7 @@ export const TeamRequestCard = () => {
 			.catch(() => {
 				toast({
 					title: 'Unable to send request',
-					description:
-						'Ensure your email is verified. Please try again later.',
+					description: 'Ensure your email is verified. Please try again later.',
 					variant: 'destructive',
 				})
 			})
