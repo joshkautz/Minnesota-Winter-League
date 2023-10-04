@@ -68,7 +68,7 @@ export const Teams = () => {
 												{!team.data().registered ? (
 													<p>Registration in progress</p>
 												) : (
-													<div className="inline-flex items-center gap-2">
+													<div className="inline-flex items-center gap-2 text-green-600">
 														Registered
 														<CheckCircledIcon className="w-4 h-4" />
 													</div>
