@@ -35,9 +35,11 @@ export const Teams = () => {
 											>
 												<img
 													src={team.data().logo}
-													className={
-														'w-full h-full max-w-[250px] max-h-[250px] transition duration-300 bg-muted group-hover:scale-105 mx-auto object-cover'
-													}
+													className={cn(
+														'w-full h-full max-w-[250px] max-h-[250px] transition duration-300 bg-muted group-hover:scale-105 mx-auto object-cover',
+														!team.data().logo &&
+															'bg-gradient-to-r from-primary to-sky-300 border-0 scale-[1.05]'
+													)}
 												/>
 											</div>
 										</CardHeader>
