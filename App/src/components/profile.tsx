@@ -211,7 +211,7 @@ export const Profile = () => {
 									{!documentSnapshot || documentSnapshotLoading ? (
 										<></>
 									) : (
-										isRegistered && (
+										!isRegistered && (
 											<span className={'relative flex w-2 h-2 ml-1'}>
 												{/* <span className={'absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary'}></span> */}
 												<span
