@@ -120,21 +120,20 @@ export const TeamRosterPlayer = ({
 							<StarFilledIcon className="text-primary" />
 						)}
 					</div>
-					{/* If not a captain, no need to show */}
-					{!isDisabled && (
-						<div className="flex justify-end flex-1 gap-2">
-							<div className="flex items-center">
-								<Badge
-									className={'select-none hover:bg-initial'}
-									variant={
-										playerSnapshot.data()?.registered ? 'secondary' : 'inverse'
-									}
-								>
-									{playerSnapshot.data()?.registered
-										? 'registered'
-										: 'unregistered'}
-								</Badge>
-							</div>
+					<div className="flex justify-end flex-1 gap-2">
+						<div className="flex items-center">
+							<Badge
+								className={'select-none hover:bg-initial'}
+								variant={
+									playerSnapshot.data()?.registered ? 'secondary' : 'inverse'
+								}
+							>
+								{playerSnapshot.data()?.registered
+									? 'registered'
+									: 'unregistered'}
+							</Badge>
+						</div>
+						{!isDisabled && (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button size={'sm'} variant={'ghost'}>
@@ -182,8 +181,8 @@ export const TeamRosterPlayer = ({
 									</DropdownMenuGroup>
 								</DropdownMenuContent>
 							</DropdownMenu>
-						</div>
-					)}
+						)}
+					</div>
 				</div>
 			) : (
 				<div className="flex items-end gap-2 py-2">
