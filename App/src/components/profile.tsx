@@ -29,8 +29,12 @@ const profileSchema = z.object({
 type ProfileSchema = z.infer<typeof profileSchema>
 
 export const Profile = () => {
-	const { authStateUser, documentSnapshot, sendEmailVerification } =
-		useContext(AuthContext)
+	const {
+		authStateUser,
+		documentSnapshot,
+		documentSnapshotLoading,
+		sendEmailVerification,
+	} = useContext(AuthContext)
 	const [sentEmail, setSentEmail] = useState(false)
 	const [stripeLoading, setStripeLoading] = useState(false)
 
@@ -204,19 +208,27 @@ export const Profile = () => {
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
 									Registration
-									{!isRegistered && (
-										<span className={'relative flex w-2 h-2 ml-1'}>
-											{/* <span className={'absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary'}></span> */}
-											<span
-												className={
-													'relative inline-flex w-2 h-2 rounded-full bg-primary'
-												}
-											></span>
-										</span>
+									{!documentSnapshot || documentSnapshotLoading ? (
+										<></>
+									) : (
+										isRegistered && (
+											<span className={'relative flex w-2 h-2 ml-1'}>
+												{/* <span className={'absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary'}></span> */}
+												<span
+													className={
+														'relative inline-flex w-2 h-2 rounded-full bg-primary'
+													}
+												></span>
+											</span>
+										)
 									)}
 								</Label>
 								<div>
-									{isRegistered ? (
+									{!documentSnapshot || documentSnapshotLoading ? (
+										<div className={'inline-flex items-center gap-2'}>
+											Loading...
+										</div>
+									) : isRegistered ? (
 										<div
 											className={
 												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
