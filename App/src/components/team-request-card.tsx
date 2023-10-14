@@ -141,7 +141,8 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 			<p className="text-sm text-muted-foreground">Loading...</p>
 		) : !team?.data().registered ? (
 			<p className={'text-sm text-muted-foreground'}>
-				You need 10 registered players in order to meet the minimum requirement. Registration ends Tuesday, October 31st, at 11:59pm.
+				You need 10 registered players in order to meet the minimum requirement.
+				Registration ends Tuesday, October 31st, at 11:59pm.
 			</p>
 		) : (
 			<p
