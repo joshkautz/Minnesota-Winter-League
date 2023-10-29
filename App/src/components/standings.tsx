@@ -15,6 +15,7 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
 import { ComingSoon } from './coming-soon'
+import { cn } from '@/lib/utils'
 
 export const Standings = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -75,7 +76,11 @@ export const Standings = () => {
 											<div className="flex items-center justify-start gap-2 ">
 												<div className="flex justify-start w-16">
 													<img
-														className="w-auto h-8 max-w-16"
+														className={cn(
+															'w-8 h-8 rounded-full object-cover bg-muted',
+															!teamData?.logo &&
+																'bg-gradient-to-r from-primary to-sky-300'
+														)}
 														src={teamData?.logo}
 													/>
 												</div>
