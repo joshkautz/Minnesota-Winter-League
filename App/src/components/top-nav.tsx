@@ -161,7 +161,11 @@ export const TopNav = ({
 									<>
 										<Separator />
 										{userContent.map(({ path, label, alt }) => {
-											return (
+											return path === '/create' ? (
+												<span key={path} className="inline-flex text-slate-500">
+													{label}
+												</span>
+											) : (
 												<Link
 													key={path}
 													to={path}
