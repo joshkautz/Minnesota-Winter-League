@@ -13,11 +13,37 @@ import {
 	QueryDocumentSnapshot,
 	gamesQuery,
 } from '@/firebase/firestore'
-import { GamesData } from '@/lib/interfaces'
+import { GamesData, TeamData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
 import { Link } from 'react-router-dom'
 import { ComingSoon } from './coming-soon'
+import { cn } from '@/lib/utils'
+
+const TeamIcon = ({
+	team,
+}: {
+	team: QueryDocumentSnapshot<TeamData, DocumentData> | undefined
+}) => {
+	if (!team) {
+		return (
+			<div
+				className={'w-10 h-10 bg-secondary animate-pulse mx-auto rounded-full'}
+			/>
+		)
+	}
+	return (
+		<Link to={`/teams/${team.id}`}>
+			<img
+				src={team.data().logo}
+				className={cn(
+					'mx-auto w-10 h-10 rounded-full object-cover bg-muted hover:scale-105 transition duration-300',
+					!team.data().logo && 'bg-gradient-to-r from-primary to-sky-300'
+				)}
+			/>
+		</Link>
+	)
+}
 
 const ScheduleCard = ({
 	games,
@@ -63,12 +89,7 @@ const ScheduleCard = ({
 								className={'flex-[4] flex justify-center gap-4 items-center'}
 							>
 								<div className={'flex-1'}>
-									<Link to={`/teams/${homeTeam?.id}`}>
-										<img
-											className={'mx-auto max-h-10'}
-											src={homeTeam?.data().logo}
-										/>
-									</Link>
+									<TeamIcon team={homeTeam} />
 								</div>
 								<p className={'flex-1  text-center'}>
 									{game.date.toDate() > new Date()
@@ -77,13 +98,8 @@ const ScheduleCard = ({
 										? 'vs'
 										: `${game.homeScore} - ${game.awayScore}`}
 								</p>
-								<div className={'items-center flex-1'}>
-									<Link to={`/teams/${awayTeam?.id}`}>
-										<img
-											className={'mx-auto max-h-10'}
-											src={awayTeam?.data().logo}
-										/>
-									</Link>
+								<div className={'flex-1'}>
+									<TeamIcon team={awayTeam} />
 								</div>
 							</div>
 						</div>
