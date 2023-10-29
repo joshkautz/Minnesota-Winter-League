@@ -89,7 +89,11 @@ export const UserAvatar = ({
 					<DropdownMenuGroup>
 						{userContent.map(({ label, path, alt }) => {
 							return path === '/create' ? (
-								<DropdownMenuItem className="cursor-pointer" disabled key={path}>
+								<DropdownMenuItem
+									className="cursor-pointer"
+									disabled
+									key={path}
+								>
 									{label}
 								</DropdownMenuItem>
 							) : (
