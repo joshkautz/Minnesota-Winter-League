@@ -37,7 +37,7 @@ const TeamIcon = ({
 			<img
 				src={team.data().logo}
 				className={cn(
-					'mx-auto w-10 h-10 rounded-full object-cover bg-muted hover:scale-105 transition duration-300',
+					'mx-auto w-8 h-8 rounded-full object-cover bg-muted hover:scale-105 transition duration-300',
 					!team.data().logo && 'bg-gradient-to-r from-primary to-sky-300'
 				)}
 			/>
@@ -69,7 +69,7 @@ const ScheduleCard = ({
 					})}
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="flex flex-col gap-1">
+			<CardContent className="flex flex-col gap-2">
 				{games.map((game, index) => {
 					const homeTeam = teamsQuerySnapshot?.docs.find(
 						(team) => team.id === game.home.id
