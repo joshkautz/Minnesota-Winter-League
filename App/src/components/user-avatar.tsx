@@ -88,7 +88,11 @@ export const UserAvatar = ({
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
 						{userContent.map(({ label, path, alt }) => {
-							return (
+							return path === '/create' ? (
+								<DropdownMenuItem className="cursor-pointer" disabled key={path}>
+									{label}
+								</DropdownMenuItem>
+							) : (
 								<Link key={path} to={path} aria-label={alt}>
 									{path === '/manage' && !!hasPendingOffers ? (
 										<DropdownMenuItem className={'gap-1 cursor-pointer'}>
