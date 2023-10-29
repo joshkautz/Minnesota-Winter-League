@@ -57,14 +57,14 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
-				<Route
+				{/* <Route
 					path={'/create'}
 					element={
 						<ProtectedRoute>
 							<CreateTeam />
 						</ProtectedRoute>
 					}
-				/>
+				/> */}
 				<Route
 					path={'/manage'}
 					element={
