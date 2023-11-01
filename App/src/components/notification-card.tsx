@@ -47,6 +47,7 @@ export const NotificationCardItem = ({
 			<div className="flex justify-end flex-1 gap-2">
 				{actionOptions.map(({ title, action }, index) => (
 					<Button
+						disabled={title === 'Accept' ? true : false}
 						key={`action-${index}-${title}`}
 						size={'sm'}
 						variant={'outline'}
