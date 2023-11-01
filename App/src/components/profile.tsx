@@ -241,7 +241,7 @@ export const Profile = () => {
 											<Button
 												variant={'default'}
 												onClick={registrationButtonOnClickHandler}
-												disabled={stripeLoading}
+												disabled={true}
 											>
 												{stripeLoading && (
 													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
