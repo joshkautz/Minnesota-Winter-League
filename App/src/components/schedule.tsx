@@ -136,7 +136,7 @@ export const Schedule = () => {
 	)
 
 	return (
-		<div className={'container'}>
+		<div className={'sm:container'}>
 			<GradientHeader>Schedule</GradientHeader>
 
 			{gamesSnapshotLoading ? (
