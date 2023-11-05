@@ -229,21 +229,30 @@ export const TeamProfile = () => {
 							return (
 								<div
 									key={`row-${index}`}
-									className="flex items-center justify-between w-full h-8"
+									className={'flex items-center justify-between w-full h-8'}
 								>
-									<p className="flex-1 select-none">
+									<p
+										className={
+											'flex grow-[1] select-none basis-[92px] shrink-0'
+										}
+									>
 										{game.data().date.toDate().toLocaleDateString()}
 									</p>
-									<p className="flex-1 text-center select-none">
+									<p
+										className={
+											'flex grow-[1] text-center basis-[74px] shrink-0 select-none'
+										}
+									>
 										{game.data().date.toDate() > new Date()
 											? 'vs'
-											: !game.data().homeScore || !game.data().awayScore
+											: !Number.isInteger(game.data().homeScore) ||
+											  !Number.isInteger(game.data().awayScore)
 											? 'vs'
 											: opponent == 'away'
 											? `${game.data().homeScore} - ${game.data().awayScore}`
 											: `${game.data().awayScore} - ${game.data().homeScore}`}
 									</p>
-									<div className="flex-[3]">
+									<div className="flex grow-[3] shrink-0 basis-[100px] overflow-hidden text-clip">
 										<Link
 											className="flex flex-col transition duration-300 group w-max"
 											to={
