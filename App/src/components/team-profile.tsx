@@ -177,9 +177,8 @@ export const TeamProfile = () => {
 		<div className={'container'}>
 			<div className={'w-1/2 md:w-1/4 my-8 mx-auto'}>
 				{loaded ? null : (
-					<Skeleton className="h-[100px] md:w-[1/2] md:h-[250px] md:w-[1/4]" />
+					<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
 				)}
-
 				<img
 					style={loaded ? {} : { display: 'none' }}
 					src={imgSrc}
@@ -187,13 +186,6 @@ export const TeamProfile = () => {
 					alt={'team logo'}
 					className={'rounded-md'}
 				/>
-
-				{/* //   :
-          //   (
-					// <div className={'text-center text-2xl font-bold'}>
-					// 	{'Team Profile'}
-					// </div>
-          //   ) */}
 			</div>
 			<div className="flex justify-center items-start gap-8 flex-wrap max-w-[1040px] mx-auto">
 				<NotificationCard
@@ -229,21 +221,31 @@ export const TeamProfile = () => {
 							return (
 								<div
 									key={`row-${index}`}
-									className="flex items-center justify-between w-full h-8"
+									className={'flex items-center justify-between w-full h-8'}
 								>
-									<p className="flex-1 select-none">
+									<p
+										className={
+											'flex grow-[1] select-none basis-[92px] shrink-0'
+										}
+									>
 										{game.data().date.toDate().toLocaleDateString()}
 									</p>
-									<p className="flex-1 text-center select-none">
+									<p
+										className={
+											'flex grow-[1] text-center basis-[74px] shrink-0 select-none'
+										}
+									>
 										{game.data().date.toDate() > new Date()
 											? 'vs'
-											: !game.data().homeScore || !game.data().awayScore
+											: // zero was being interpreted as false so added integer check.
+											!Number.isInteger(game.data().homeScore) ||
+											  !Number.isInteger(game.data().awayScore)
 											? 'vs'
 											: opponent == 'away'
 											? `${game.data().homeScore} - ${game.data().awayScore}`
 											: `${game.data().awayScore} - ${game.data().homeScore}`}
 									</p>
-									<div className="flex-[3]">
+									<div className="flex grow-[3] shrink-0 basis-[100px] overflow-hidden text-clip">
 										<Link
 											className="flex flex-col transition duration-300 group w-max"
 											to={
