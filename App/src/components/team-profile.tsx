@@ -177,7 +177,7 @@ export const TeamProfile = () => {
 		<div className={'container'}>
 			<div className={'w-1/2 md:w-1/4 my-8 mx-auto'}>
 				{loaded ? null : (
-					<Skeleton className="h-[100px] md:w-[1/2] md:h-[250px] md:w-[1/4]" />
+					<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
 				)}
 
 				<img
