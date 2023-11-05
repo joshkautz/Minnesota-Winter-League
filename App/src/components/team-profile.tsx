@@ -179,7 +179,6 @@ export const TeamProfile = () => {
 				{loaded ? null : (
 					<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
 				)}
-
 				<img
 					style={loaded ? {} : { display: 'none' }}
 					src={imgSrc}
@@ -187,13 +186,6 @@ export const TeamProfile = () => {
 					alt={'team logo'}
 					className={'rounded-md'}
 				/>
-
-				{/* //   :
-          //   (
-					// <div className={'text-center text-2xl font-bold'}>
-					// 	{'Team Profile'}
-					// </div>
-          //   ) */}
 			</div>
 			<div className="flex justify-center items-start gap-8 flex-wrap max-w-[1040px] mx-auto">
 				<NotificationCard
@@ -245,7 +237,8 @@ export const TeamProfile = () => {
 									>
 										{game.data().date.toDate() > new Date()
 											? 'vs'
-											: !Number.isInteger(game.data().homeScore) ||
+											: // zero was being interpreted as false so added integer check.
+											!Number.isInteger(game.data().homeScore) ||
 											  !Number.isInteger(game.data().awayScore)
 											? 'vs'
 											: opponent == 'away'

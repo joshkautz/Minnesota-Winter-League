@@ -19,6 +19,12 @@ import { GradientHeader } from './gradient-header'
 import { Link } from 'react-router-dom'
 import { ComingSoon } from './coming-soon'
 import { cn } from '@/lib/utils'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from './ui/tooltip'
 
 const TeamIcon = ({
 	team,
@@ -88,19 +94,37 @@ const ScheduleCard = ({
 							<div
 								className={'flex-[4] flex justify-center gap-4 items-center'}
 							>
-								<div className={'flex-1'}>
-									<TeamIcon team={homeTeam} />
-								</div>
-								<p className={'flex-1  text-center'}>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div className={'flex-1'}>
+												<TeamIcon team={homeTeam} />
+											</div>
+										</TooltipTrigger>
+										<TooltipContent>
+											<p>{homeTeam?.data().name}</p>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
+								<p className={'flex-1 select-none text-center'}>
 									{game.date.toDate() > new Date()
 										? 'vs'
 										: game.homeScore === null || game.awayScore === null
 										? 'vs'
 										: `${game.homeScore} - ${game.awayScore}`}
 								</p>
-								<div className={'flex-1'}>
-									<TeamIcon team={awayTeam} />
-								</div>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div className={'flex-1'}>
+												<TeamIcon team={awayTeam} />
+											</div>
+										</TooltipTrigger>
+										<TooltipContent>
+											<p>{awayTeam?.data().name}</p>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
 							</div>
 						</div>
 					)
