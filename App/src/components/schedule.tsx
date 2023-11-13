@@ -268,8 +268,11 @@ export const Schedule = () => {
 					)}
 
 					{!gamesSnapshotError &&
-						placeholderPlayoffData.map((match) => (
-							<Card className="flex-1 flex-shrink-0 basis-80">
+						placeholderPlayoffData.map((match, index) => (
+							<Card
+								key={`temp-card-${index}`}
+								className="flex-1 flex-shrink-0 basis-80"
+							>
 								<CardHeader>
 									<CardTitle>{match.title}</CardTitle>
 									<CardDescription>{match.date}</CardDescription>
@@ -277,7 +280,7 @@ export const Schedule = () => {
 								<CardContent className="flex flex-col gap-2">
 									{match.content.map((game, index) => (
 										<div
-											key={`temp-${index}`}
+											key={`temp-row-${index}`}
 											className={'flex items-center justify-start max-h-10'}
 										>
 											<div className={'flex-1'}>{game.field}</div>
