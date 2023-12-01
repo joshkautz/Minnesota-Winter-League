@@ -237,7 +237,7 @@ export const Home = () => {
 								<div className={'text-2xl font-bold'}>Competition</div>
 								<div>
 									The league is open to all skill levels, and is focused on
-									making sure everone has valuable opportunities during the
+									making sure everyone has valuable opportunities during the
 									winter months to continue playing, improving, and competing.
 									Weekly play will be organized, and results will be used to
 									ensure that teams are matched up against opponents of similar
