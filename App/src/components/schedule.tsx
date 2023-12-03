@@ -27,59 +27,59 @@ import {
 } from './ui/tooltip'
 
 const placeholderPlayoffData = [
-	{
-		title: 'Week 5 | Round 1',
-		date: 'Saturday, December 9 at 6:05 PM',
-		content: [
-			{ field: 'Field 1', home: 'Seed 1', away: 'Seed 8' },
-			{ field: 'Field 2', home: 'Seed 4', away: 'Seed 11' },
-			{ field: 'Field 3', home: 'Seed 7', away: 'Seed 10' },
-		],
-	},
-	{
-		title: 'Week 5 | Round 2',
-		date: 'Saturday, December 9 at 6:50 PM',
-		content: [
-			{ field: 'Field 1', home: 'Seed 1', away: 'Seed 9' },
-			{ field: 'Field 2', home: 'Seed 2', away: 'Seed 5' },
-			{ field: 'Field 3', home: 'Seed 6', away: 'Seed 11' },
-		],
-	},
-	{
-		title: 'Week 5 | Round 3',
-		date: 'Saturday, December 9 at 7:35 PM',
-		content: [
-			{ field: 'Field 1', home: 'Seed 8', away: 'Seed 9' },
-			{ field: 'Field 2', home: 'Seed 2', away: 'Seed 12' },
-			{ field: 'Field 3', home: 'Seed 3', away: 'Seed 7' },
-		],
-	},
-	{
-		title: 'Week 5 | Round 4',
-		date: 'Saturday, December 9 at 8:20 PM',
-		content: [
-			{ field: 'Field 1', home: 'Seed 4', away: 'Seed 6' },
-			{ field: 'Field 2', home: 'Seed 5', away: 'Seed 12' },
-			{ field: 'Field 3', home: 'Seed 3', away: 'Seed 10' },
-		],
-	},
+	// {
+	// 	title: 'Week 5 | Round 1',
+	// 	date: 'Saturday, December 9 at 6:05 PM',
+	// 	content: [
+	// 		{ field: 'Field 1', home: 'Seed 1', away: 'Seed 8' },
+	// 		{ field: 'Field 2', home: 'Seed 4', away: 'Seed 11' },
+	// 		{ field: 'Field 3', home: 'Seed 7', away: 'Seed 10' },
+	// 	],
+	// },
+	// {
+	// 	title: 'Week 5 | Round 2',
+	// 	date: 'Saturday, December 9 at 6:50 PM',
+	// 	content: [
+	// 		{ field: 'Field 1', home: 'Seed 1', away: 'Seed 9' },
+	// 		{ field: 'Field 2', home: 'Seed 2', away: 'Seed 5' },
+	// 		{ field: 'Field 3', home: 'Seed 6', away: 'Seed 11' },
+	// 	],
+	// },
+	// {
+	// 	title: 'Week 5 | Round 3',
+	// 	date: 'Saturday, December 9 at 7:35 PM',
+	// 	content: [
+	// 		{ field: 'Field 1', home: 'Seed 8', away: 'Seed 9' },
+	// 		{ field: 'Field 2', home: 'Seed 2', away: 'Seed 12' },
+	// 		{ field: 'Field 3', home: 'Seed 3', away: 'Seed 7' },
+	// 	],
+	// },
+	// {
+	// 	title: 'Week 5 | Round 4',
+	// 	date: 'Saturday, December 9 at 8:20 PM',
+	// 	content: [
+	// 		{ field: 'Field 1', home: 'Seed 4', away: 'Seed 6' },
+	// 		{ field: 'Field 2', home: 'Seed 5', away: 'Seed 12' },
+	// 		{ field: 'Field 3', home: 'Seed 3', away: 'Seed 10' },
+	// 	],
+	// },
 
 	{
 		title: 'Week 6 | Round 1 | Semifinals',
 		date: 'Saturday, December 16 at 6:05 PM',
 		content: [
-			{ field: 'Field 1', home: 'P1, 1st', away: 'P3, 1st' },
-			{ field: 'Field 2', home: 'P1, 2nd', away: 'P3, 2nd' },
-			{ field: 'Field 3', home: 'P1, 3rd', away: 'P3, 3rd' },
+			{ field: 'Field 1', home: 'P1, 1st', away: 'P4, 1st' },
+			{ field: 'Field 2', home: 'P1, 2nd', away: 'P4, 2nd' },
+			{ field: 'Field 3', home: 'P1, 3rd', away: 'P4, 3rd' },
 		],
 	},
 	{
 		title: 'Week 6 | Round 2 | Semifinals',
 		date: 'Saturday, December 16 at 6:50 PM',
 		content: [
-			{ field: 'Field 1', home: 'P2, 1st', away: 'P4, 1st' },
-			{ field: 'Field 2', home: 'P2, 2nd', away: 'P4, 2nd' },
-			{ field: 'Field 3', home: 'P2, 3rd', away: 'P4, 3rd' },
+			{ field: 'Field 1', home: 'P2, 1st', away: 'P3, 1st' },
+			{ field: 'Field 2', home: 'P2, 2nd', away: 'P3, 2nd' },
+			{ field: 'Field 3', home: 'P2, 3rd', away: 'P3, 3rd' },
 		],
 	},
 	{
