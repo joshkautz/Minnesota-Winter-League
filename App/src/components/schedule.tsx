@@ -152,59 +152,61 @@ const ScheduleCard = ({
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="flex flex-col gap-2">
-				{games.map((game, index) => {
-					const homeTeam = teamsQuerySnapshot?.docs.find(
-						(team) => team.id === game.home.id
-					)
+				{games
+					.sort((a, b) => a.field - b.field)
+					.map((game, index) => {
+						const homeTeam = teamsQuerySnapshot?.docs.find(
+							(team) => team.id === game.home.id
+						)
 
-					const awayTeam = teamsQuerySnapshot?.docs.find(
-						(team) => team.id === game.away.id
-					)
+						const awayTeam = teamsQuerySnapshot?.docs.find(
+							(team) => team.id === game.away.id
+						)
 
-					return (
-						<div
-							key={`schedule-row-${index}`}
-							className={'flex items-center justify-start max-h-10'}
-						>
-							<div className={'flex-1'}>Field {index + 1}</div>
+						return (
 							<div
-								className={'flex-[4] flex justify-center gap-4 items-center'}
+								key={`schedule-row-${index}`}
+								className={'flex items-center justify-start max-h-10'}
 							>
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<div className={'flex-1'}>
-												<TeamIcon team={homeTeam} />
-											</div>
-										</TooltipTrigger>
-										<TooltipContent>
-											<p>{homeTeam?.data().name}</p>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-								<p className={'flex-1 select-none text-center'}>
-									{game.date.toDate() > new Date()
-										? 'vs'
-										: game.homeScore === null || game.awayScore === null
-										? 'vs'
-										: `${game.homeScore} - ${game.awayScore}`}
-								</p>
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<div className={'flex-1'}>
-												<TeamIcon team={awayTeam} />
-											</div>
-										</TooltipTrigger>
-										<TooltipContent>
-											<p>{awayTeam?.data().name}</p>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
+								<div className={'flex-1'}>Field {index + 1}</div>
+								<div
+									className={'flex-[4] flex justify-center gap-4 items-center'}
+								>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<div className={'flex-1'}>
+													<TeamIcon team={homeTeam} />
+												</div>
+											</TooltipTrigger>
+											<TooltipContent>
+												<p>{homeTeam?.data().name}</p>
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+									<p className={'flex-1 select-none text-center'}>
+										{game.date.toDate() > new Date()
+											? 'vs'
+											: game.homeScore === null || game.awayScore === null
+											? 'vs'
+											: `${game.homeScore} - ${game.awayScore}`}
+									</p>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<div className={'flex-1'}>
+													<TeamIcon team={awayTeam} />
+												</div>
+											</TooltipTrigger>
+											<TooltipContent>
+												<p>{awayTeam?.data().name}</p>
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</div>
 							</div>
-						</div>
-					)
-				})}
+						)
+					})}
 			</CardContent>
 		</Card>
 	)
