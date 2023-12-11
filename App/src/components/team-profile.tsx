@@ -225,14 +225,30 @@ export const TeamProfile = () => {
 											game.data().homeScore.toString() == 'L') &&
 									  (game.data().awayScore.toString() == 'W' ||
 											game.data().awayScore.toString() == 'L') &&
-									  opponent == 'away'
-									? `${game.data().homeScore} - ${game.data().awayScore}`
+									  opponent == 'away' &&
+									  game.data().homeScore.toString() == 'L'
+									? 'Loss'
 									: (game.data().homeScore.toString() == 'W' ||
 											game.data().homeScore.toString() == 'L') &&
 									  (game.data().awayScore.toString() == 'W' ||
 											game.data().awayScore.toString() == 'L') &&
-									  opponent == 'home'
-									? `${game.data().awayScore} - ${game.data().homeScore}`
+									  opponent == 'home' &&
+									  game.data().awayScore.toString() == 'L'
+									? 'Loss'
+									: (game.data().homeScore.toString() == 'W' ||
+											game.data().homeScore.toString() == 'L') &&
+									  (game.data().awayScore.toString() == 'W' ||
+											game.data().awayScore.toString() == 'L') &&
+									  opponent == 'away' &&
+									  game.data().homeScore.toString() == 'W'
+									? 'Win'
+									: (game.data().homeScore.toString() == 'W' ||
+											game.data().homeScore.toString() == 'L') &&
+									  (game.data().awayScore.toString() == 'W' ||
+											game.data().awayScore.toString() == 'L') &&
+									  opponent == 'home' &&
+									  game.data().awayScore.toString() == 'W'
+									? 'Win'
 									: // zero was being interpreted as false so added integer check.
 									!Number.isInteger(game.data().homeScore) ||
 									  !Number.isInteger(game.data().awayScore)
