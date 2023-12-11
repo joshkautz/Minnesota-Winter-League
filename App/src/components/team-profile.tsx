@@ -218,6 +218,29 @@ export const TeamProfile = () => {
 					<div className="flex flex-col items-end gap-2 py-2">
 						{gamesSnapshot?.docs.map((game, index) => {
 							const opponent = team?.id == game.data().home.id ? 'away' : 'home'
+							const result =
+								game.data().date.toDate() > new Date()
+									? 'vs'
+									: (game.data().homeScore.toString() == 'W' ||
+											game.data().homeScore.toString() == 'L') &&
+									  (game.data().awayScore.toString() == 'W' ||
+											game.data().awayScore.toString() == 'L') &&
+									  opponent == 'away'
+									? `${game.data().homeScore} - ${game.data().awayScore}`
+									: (game.data().homeScore.toString() == 'W' ||
+											game.data().homeScore.toString() == 'L') &&
+									  (game.data().awayScore.toString() == 'W' ||
+											game.data().awayScore.toString() == 'L') &&
+									  opponent == 'home'
+									? `${game.data().awayScore} - ${game.data().homeScore}`
+									: // zero was being interpreted as false so added integer check.
+									!Number.isInteger(game.data().homeScore) ||
+									  !Number.isInteger(game.data().awayScore)
+									? 'vs'
+									: opponent == 'away'
+									? `${game.data().homeScore} - ${game.data().awayScore}`
+									: `${game.data().awayScore} - ${game.data().homeScore}`
+
 							return (
 								<div
 									key={`row-${index}`}
@@ -235,15 +258,7 @@ export const TeamProfile = () => {
 											'flex grow-[1] text-center basis-[74px] shrink-0 select-none'
 										}
 									>
-										{game.data().date.toDate() > new Date()
-											? 'vs'
-											: // zero was being interpreted as false so added integer check.
-											!Number.isInteger(game.data().homeScore) ||
-											  !Number.isInteger(game.data().awayScore)
-											? 'vs'
-											: opponent == 'away'
-											? `${game.data().homeScore} - ${game.data().awayScore}`
-											: `${game.data().awayScore} - ${game.data().homeScore}`}
+										{result}
 									</p>
 									<div className="flex grow-[3] shrink-0 basis-[100px] overflow-hidden text-clip">
 										<Link
