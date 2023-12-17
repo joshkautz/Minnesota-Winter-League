@@ -63,7 +63,6 @@ const placeholderPlayoffData = [
 	// 		{ field: 'Field 3', home: 'Seed 3', away: 'Seed 10' },
 	// 	],
 	// },
-
 	// {
 	// 	title: 'Week 6 | Round 1 | Semifinals',
 	// 	date: 'Saturday, December 16 at 6:05 PM',
