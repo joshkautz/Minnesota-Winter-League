@@ -82,24 +82,24 @@ const placeholderPlayoffData = [
 	// 		{ field: 'Field 3', home: 'P2, 3rd', away: 'P3, 3rd' },
 	// 	],
 	// },
-	{
-		title: 'Week 6 | Round 3 | 3rd, 7th, 11th Finals',
-		date: 'Saturday, December 16 at 7:35 PM',
-		content: [
-			{ field: 'Field 1', home: 'L, F1 R1', away: 'L, F1 R2' },
-			{ field: 'Field 2', home: 'L, F2 R1', away: 'L, F2 R2' },
-			{ field: 'Field 3', home: 'L, F3 R1', away: 'L, F3 R2' },
-		],
-	},
-	{
-		title: 'Week 6 | Round 4 | 1st, 5th, 9th Finals',
-		date: 'Saturday, December 16 at 8:20 PM',
-		content: [
-			{ field: 'Field 1', home: 'W, F1 R1', away: 'W, F1 R2' },
-			{ field: 'Field 2', home: 'W, F2 R1', away: 'W, F2 R2' },
-			{ field: 'Field 3', home: 'W, F3 R1', away: 'W, F3 R2' },
-		],
-	},
+	// {
+	// 	title: 'Week 6 | Round 3 | 3rd, 7th, 11th Finals',
+	// 	date: 'Saturday, December 16 at 7:35 PM',
+	// 	content: [
+	// 		{ field: 'Field 1', home: 'L, F1 R1', away: 'L, F1 R2' },
+	// 		{ field: 'Field 2', home: 'L, F2 R1', away: 'L, F2 R2' },
+	// 		{ field: 'Field 3', home: 'L, F3 R1', away: 'L, F3 R2' },
+	// 	],
+	// },
+	// {
+	// 	title: 'Week 6 | Round 4 | 1st, 5th, 9th Finals',
+	// 	date: 'Saturday, December 16 at 8:20 PM',
+	// 	content: [
+	// 		{ field: 'Field 1', home: 'W, F1 R1', away: 'W, F1 R2' },
+	// 		{ field: 'Field 2', home: 'W, F2 R1', away: 'W, F2 R2' },
+	// 		{ field: 'Field 3', home: 'W, F3 R1', away: 'W, F3 R2' },
+	// 	],
+	// },
 ]
 
 const TeamIcon = ({
