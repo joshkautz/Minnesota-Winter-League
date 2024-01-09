@@ -221,6 +221,8 @@ export const TeamProfile = () => {
 							const result =
 								game.data().date.toDate() > new Date()
 									? 'vs'
+									: (game.data().homeScore == null || game.data().awayScore == null)
+									? 'vs'
 									: (game.data().homeScore.toString() == 'W' ||
 											game.data().homeScore.toString() == 'L') &&
 									  (game.data().awayScore.toString() == 'W' ||

@@ -144,8 +144,6 @@ export const Schedule = () => {
 	let previous: number = 0
 	let index: number = 0
 
-	console.log(rounds.length)
-
 	gamesSnapshot?.docs.forEach(
 		(queryDocumentSnapshot: QueryDocumentSnapshot<GamesData, DocumentData>) => {
 			const time = queryDocumentSnapshot.data().date.toDate().getTime()
