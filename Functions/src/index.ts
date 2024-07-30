@@ -13,8 +13,10 @@ import {
 	Change,
 	CloudFunction,
 	EventContext,
+  HttpsFunction,
 	logger,
-	region,
+  region,
+  https,
 } from 'firebase-functions'
 
 /**
@@ -68,7 +70,7 @@ interface Offer extends DocumentData {
 }
 
 /**
- * Firebase Authentication - Delete the `Players` Firestore Document for the player. Update the `Teams` Firestore Document for the player. Delete the `Offers` Firestore Documents for the player.
+ * Cloud Firestore trigger - Delete the `Players` Firestore Document for the player. Update the `Teams` Firestore Document for the player. Delete the `Offers` Firestore Documents for the player.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
  */
@@ -111,7 +113,7 @@ export const OnUserDeleted: CloudFunction<UserRecord> = region(REGIONS.CENTRAL)
 	})
 
 /**
- * Firebase Firestore - Add the player to the team. Add the team to the player. Delete all the `Offers` Firestore Documents for the player.
+ * Cloud Firestore trigger - Add the player to the team. Add the team to the player. Delete all the `Offers` Firestore Documents for the player.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -160,7 +162,7 @@ export const OnOfferAccepted: CloudFunction<Change<QueryDocumentSnapshot>> =
 		})
 
 /**
- * Firebase Firestore - Delete the rejected `Offers` Firestore Document for the player.
+ * Cloud Firestore trigger - Delete the rejected `Offers` Firestore Document for the player.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -188,7 +190,7 @@ export const OnOfferRejected: CloudFunction<Change<QueryDocumentSnapshot>> =
 		})
 
 /**
- * Firebase Firestore - Update the `Players` Firestore Document for the player when a new `Customers` `Payments` Firestore Document is created.
+ * Cloud Firestore trigger - Update the `Players` Firestore Document for the player when a new `Customers` `Payments` Firestore Document is created.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_new_document_is_created_2 Trigger a function when a document is created.}
  */
@@ -218,7 +220,7 @@ export const OnPaymentCreated: CloudFunction<QueryDocumentSnapshot> = region(
 	)
 
 /**
- * Firebase Firestore - Evaluate and set the registered value of a `Teams` Firestore Document when a player's registered field changes.
+ * Cloud Firestore trigger - Evaluate and set the registered value of a `Teams` Firestore Document when a player's registered field changes.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -263,7 +265,7 @@ export const SetTeamRegistered_OnPlayerRegisteredChange: CloudFunction<
 	})
 
 /**
- * Firebase Firestore - Evaluate and set the registered value of a `Teams` Firestore Document when the team's roster field changes.
+ * Cloud Firestore trigger - Evaluate and set the registered value of a `Teams` Firestore Document when the team's roster field changes.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -309,7 +311,7 @@ export const SetTeamRegistered_OnTeamRosterChange: CloudFunction<
 	})
 
 /**
- * Firebase Firestore - Set the registeredDate value of a `Teams` Firestore Document when the team's registered field changes.
+ * Cloud Firestore trigger - Set the registeredDate value of a `Teams` Firestore Document when the team's registered field changes.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -336,3 +338,21 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange: CloudFunction<
 			return error
 		}
 	})
+
+/**
+ * HTTP request trigger - Set the registeredDate value of a `Teams` Firestore Document when the team's registered field changes.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/http-events?gen=1st#trigger_a_function_with_an_http_request_2 Trigger a function with an HTTP request.}
+ */
+
+export const dropboxSignHandleWebhookEvents: HttpsFunction = region(REGIONS.CENTRAL).https.onRequest((req: https.Request, resp) => {
+  const data = JSON.parse(req.body["json"]);
+  const eventType = data["event"]["event_type"];
+
+  logger.log(data);
+  logger.log(`Received ${eventType} event.`);
+
+  // Webhook must respond with a 200 status code
+  // and a body containing the string 'Hello API event received'
+  resp.status(200).send("Hello API event received");
+})
