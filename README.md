@@ -1,8 +1,21 @@
-<h1>🥏 Minneapolis Winter League</h1>
+<h1>Minneapolis Winter League</h1>
 
-![Production GitHub Workflow Status](https://github.com/joshkautz/Minnesota-Winter-League/actions/workflows/firebase-hosting-merge.yml/badge.svg "Production GitHub Workflow Status")
+| Environment | Status |
+| ----------- | ----------- |
+| Production | [![Production GitHub Workflow Status](https://github.com/joshkautz/Minneapolis-Winter-League/actions/workflows/firebase-hosting-merge.yml/badge.svg "Production GitHub Workflow Status")](https://github.com/joshkautz/Minneapolis-Winter-League/actions/workflows/firebase-hosting-merge.yml) |
+| Staging | [![Staging GitHub Workflow Status](https://github.com/joshkautz/Minneapolis-Winter-League/actions/workflows/firebase-hosting-merge.yml/badge.svg "Staging GitHub Workflow Status")](https://github.com/joshkautz/Minneapolis-Winter-League/actions/workflows/firebase-hosting-merge.yml) |
+
+# Requirements 📋
+
+- VS Code ([Windows](https://code.visualstudio.com/Download), [Mac](https://code.visualstudio.com/Download), [Linux](https://code.visualstudio.com/Download))
+- Docker ([Windows](https://docs.docker.com/desktop/install/windows-install/), [Mac](https://docs.docker.com/desktop/install/mac-install/), [Linux](https://docs.docker.com/desktop/install/linux-install/))
 
 # Development 💻
+
+We are using the Visual Studio Code Dev Containers extension to use a container as a full-featured development environment. Learn more about [developing inside a container](https://code.visualstudio.com/docs/devcontainers/containers).
+
+
+
 
 To begin development on the App, open `./App/` in your IDE and run `npm run start` to begin local development.
 
