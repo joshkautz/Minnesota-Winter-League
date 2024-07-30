@@ -348,11 +348,8 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange: CloudFunction<
 export const dropboxSignHandleWebhookEvents: HttpsFunction = region(
 	REGIONS.CENTRAL
 ).https.onRequest((req: https.Request, resp) => {
-	const data = JSON.parse(req.body['json'])
-	const eventType = data['event']['event_type']
-
+	const data = JSON.parse(req.body)
 	logger.log(data)
-	logger.log(`Received ${eventType} event.`)
 
 	// Webhook must respond with a 200 status code
 	// and a body containing the string 'Hello API event received'
