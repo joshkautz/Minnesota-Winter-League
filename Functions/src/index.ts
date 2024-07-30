@@ -13,10 +13,10 @@ import {
 	Change,
 	CloudFunction,
 	EventContext,
-  HttpsFunction,
+	HttpsFunction,
 	logger,
-  region,
-  https,
+	region,
+	https,
 } from 'firebase-functions'
 
 /**
@@ -345,14 +345,16 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange: CloudFunction<
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/http-events?gen=1st#trigger_a_function_with_an_http_request_2 Trigger a function with an HTTP request.}
  */
 
-export const dropboxSignHandleWebhookEvents: HttpsFunction = region(REGIONS.CENTRAL).https.onRequest((req: https.Request, resp) => {
-  const data = JSON.parse(req.body["json"]);
-  const eventType = data["event"]["event_type"];
+export const dropboxSignHandleWebhookEvents: HttpsFunction = region(
+	REGIONS.CENTRAL
+).https.onRequest((req: https.Request, resp) => {
+	const data = JSON.parse(req.body['json'])
+	const eventType = data['event']['event_type']
 
-  logger.log(data);
-  logger.log(`Received ${eventType} event.`);
+	logger.log(data)
+	logger.log(`Received ${eventType} event.`)
 
-  // Webhook must respond with a 200 status code
-  // and a body containing the string 'Hello API event received'
-  resp.status(200).send("Hello API event received");
+	// Webhook must respond with a 200 status code
+	// and a body containing the string 'Hello API event received'
+	resp.status(200).send('Hello API event received')
 })
