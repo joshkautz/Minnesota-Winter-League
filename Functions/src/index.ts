@@ -1,6 +1,5 @@
 import { initializeApp } from './initializeApp'
 import { Response } from 'express'
-import {} from '@dropbox/sign'
 import { SignatureRequestApi } from '@dropbox/sign/types/api/signatureRequestApi'
 import { SubSigningOptions } from '@dropbox/sign/types/model/subSigningOptions'
 import { EventCallbackRequest } from '@dropbox/sign/types/model/eventCallbackRequest'
