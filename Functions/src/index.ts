@@ -1,7 +1,10 @@
 import { initializeApp } from './initializeApp'
 import { Response } from 'express'
+import { } from '@dropbox/sign'
 import { SignatureRequestApi } from '@dropbox/sign/types/api/signatureRequestApi'
 import { SubSigningOptions } from '@dropbox/sign/types/model/subSigningOptions'
+import { EventCallbackRequest } from '@dropbox/sign/types/model/eventCallbackRequest'
+import { EventCallbackHelper } from '@dropbox/sign/types/model/eventCallbackHelper'
 import { Change } from 'firebase-functions/lib/common/change'
 import { CloudFunction } from 'firebase-functions/v1'
 import { EventContext } from 'firebase-functions/v1'
@@ -19,6 +22,8 @@ import {
 	getFirestore,
 	Timestamp,
 } from 'firebase-admin/firestore'
+
+const DROPBOX_SIGN_API_KEY = 'DROPBOX_SIGN_API_KEY'
 
 const REGIONS = {
 	CENTRAL: 'us-central1',
@@ -58,7 +63,9 @@ interface Offer extends DocumentData {
 
 const firestore = getFirestore()
 const dropbox = new SignatureRequestApi()
-dropbox.username = 'DROPBOX_SIGN_API_KEY'
+
+// Configure HTTP basic authorization: api_key
+dropbox.username = DROPBOX_SIGN_API_KEY
 
 /**
  * When a user is deleted via Firebase Authentication, delete the corresponding `Players` document, update the corresponding `Teams` document, and delete the corresponding `Offers` documents.
@@ -401,7 +408,7 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange: CloudFunction<
 	})
 
 /**
- * When Dropbox Sign sends a `signature_request_signed` event, update the corresponding `Player` document to reflect the signed status.
+ * When Dropbox Sign sends a `signature_request_signed` callback event, update the corresponding `Player` document to reflect the signed status.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/http-events?gen=1st#trigger_a_function_with_an_http_request_2 Trigger a function with an HTTP request.}
  */
@@ -410,8 +417,19 @@ export const dropboxSignHandleWebhookEvents: HttpsFunction = region(
 	REGIONS.CENTRAL
 ).https.onRequest(async (req: Request, resp: Response<string>) => {
 	logDebug(req.body)
+	const callback_data = JSON.parse(req.body.json)
+  const callback_event = EventCallbackRequest.init(callback_data)
+  
+	// Verify that a callback came from Dropbox Sign.
+	if (EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event)) {
+		// one of "account_callback" or "api_app_callback"
+    const callback_type = EventCallbackHelper.getCallbackType(callback_event)
+    logDebug(callback_data)
+    logDebug(callback_event)
+    logDebug(callback_type)
 
-	// Secure to only accept requests from Dropbox Sign.
+		// do your magic below!
+	}
 
 	// Parse the request body to get the event type and the event data, ensure it's a signature_request_signed event.
 
