@@ -1,6 +1,6 @@
 import { HamburgerMenuIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { useState, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -11,6 +11,7 @@ import { ThemeToggle } from './ui/theme-toggle'
 import { OffersContext } from '@/firebase/offers-context'
 import { UserForm } from './user-form'
 import { toast } from './ui/use-toast'
+import { cn } from '@/lib/utils'
 
 export const TopNav = ({
 	title,
@@ -86,7 +87,6 @@ export const TopNav = ({
 				{/* Nav */}
 				<div className={'hidden mr-4 md:flex md:flex-1'}>
 					<Link to={'/'} className={'flex items-center mr-6 space-x-2'}>
-						{/* <div className={'w-6 h-6 rounded-full bg-primary'} /> */}
 						<span className={'hidden font-bold sm:inline-block'}>{title}</span>
 					</Link>
 					<nav
@@ -95,15 +95,18 @@ export const TopNav = ({
 						}
 					>
 						{navContent.map((entry) => (
-							<Link
+							<NavLink
 								key={entry.path}
 								to={entry.path}
-								className={
-									'transition-colors hover:text-foreground/80 text-foreground/60'
+								className={({ isActive }) =>
+									cn(
+										'transition-colors hover:text-foreground/80 text-foreground/60',
+										isActive ? 'text-foreground' : ''
+									)
 								}
 							>
 								{entry.label}
-							</Link>
+							</NavLink>
 						))}
 						<div className="flex items-center justify-end flex-1 gap-4">
 							<div>

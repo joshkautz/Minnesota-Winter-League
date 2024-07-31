@@ -1,12 +1,14 @@
 import { PersonIcon, ReloadIcon, SketchLogoIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { DomeSvg } from './ui/dome-svg'
+// import { DomeSvg } from './ui/dome-svg'
 import { useAnchorScroll } from '@/lib/use-anchor-scroll'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import { Button } from './ui/button'
 import { useContext } from 'react'
 import { AuthContext } from '@/firebase/auth-context'
 import { OutletContext } from './layout'
+import { SparklesCore } from './ui/particles'
+import { CitySvg } from './ui/city-svg'
 
 const SnowFlake = ({ className }: { className?: string }) => {
 	return (
@@ -48,58 +50,92 @@ export const Home = () => {
 
 	return (
 		<div className={'w-full'}>
-			<section id="welcome" className={'h-[80vh] max-h-[620px] container'}>
-				<div className="flex flex-col items-stretch h-full md:flex-row justify-stretch">
-					<div className="flex-1 mt-8">
-						<div
-							className={'flex flex-col gap-4 pt-2 sm:pt-16 pb-2 max-w-[680px]'}
-						>
-							<p className={'text-5xl font-bold'}>Minneapolis Winter League</p>
-							<p className={'text-2xl font-light '}>
-								Bundle up, lace up your cleats, and experience Minneapolis
-								winter ultimate like never before.
-							</p>
-						</div>
-						<div
-							className={
-								'w-[220px] h-1 rounded bg-gradient-to-r from-primary to-sky-300'
-							}
-						/>
+			<section
+				id="welcome"
+				className={
+					'h-[80vh] max-h-[620px] relative bg-foreground text-background dark:text-foreground dark:bg-background z-10'
+				}
+			>
+				<div className="container">
+					<div className="flex flex-col items-stretch h-full md:flex-row justify-stretch">
+						<div className="flex-1 mt-8">
+							<div
+								className={
+									'flex flex-col gap-4 pt-2 sm:pt-16 pb-2 max-w-[680px]'
+								}
+							>
+								<p className={'text-5xl font-bold'}>
+									Minneapolis Winter League
+								</p>
+								<p className={'text-2xl font-light '}>
+									Bundle up, lace up your cleats, and experience Minneapolis
+									winter ultimate like never before.
+								</p>
+							</div>
+							<div
+								className={
+									'w-[220px] h-1 rounded bg-gradient-to-r from-primary to-sky-300'
+								}
+							/>
 
-						<div className={'mt-4 sm:mt-12 max-w-[490px] flex-1'}>
-							Join us this season for unforgettable Saturday nights of organized
-							league play. Whether you're a seasoned club veteran, or a rookie
-							in college,{' '}
-							<span className={'font-bold'}>
-								we can't wait to welcome you to the league.
-							</span>
+							<div className={'mt-4 sm:mt-12 max-w-[490px] flex-1'}>
+								Join us this season for unforgettable Saturday nights of
+								organized league play. Whether you're a seasoned club veteran,
+								or a rookie in college,{' '}
+								<span className={'font-bold'}>
+									we can't wait to welcome you to the league.
+								</span>
+							</div>
+							<Button
+								disabled={documentSnapshotLoading}
+								className="mt-8 sm:mt-12 bg-accent text-foreground dark:bg-primary dark:text-background"
+								onClick={handleCallToAction}
+							>
+								{documentSnapshotLoading && (
+									<ReloadIcon className={'h-4 w-4 animate-spin mr-2'} />
+								)}
+								{!documentSnapshot
+									? 'Join our League'
+									: isRostered
+									? 'Your Team'
+									: 'Join a Team'}
+							</Button>
 						</div>
-						<Button
-							disabled={documentSnapshotLoading}
-							className="mt-8 sm:mt-12"
-							onClick={handleCallToAction}
-						>
-							{documentSnapshotLoading && (
-								<ReloadIcon className={'h-4 w-4 animate-spin mr-2'} />
-							)}
-							{!documentSnapshot
-								? 'Join our League'
-								: isRostered
-								? 'Your Team'
-								: 'Join a Team'}
-						</Button>
 					</div>
-
-					<DomeSvg
-						className={'max-w-[620px] invisible relative sm:visible flex-1'}
+				</div>
+				<div className="absolute inset-y-0 right-0 w-1/2 h-screen">
+					<SparklesCore
+						background="transparent"
+						minSize={0.6}
+						maxSize={1.4}
+						particleDensity={100}
+						className="w-full h-full"
+						particleColor="#FFFFFF"
 					/>
 				</div>
+				<CitySvg className="absolute right-0 bottom-0 w-auto h-full max-h-[400px] -z-10" />
+				<img
+					src={'/snowman.png'}
+					alt={'A snowman shaped like a duck.'}
+					className={
+						'absolute z-40 w-[120px] md:w-[240px] lg:w-[300px] h-auto -bottom-16 lg:-bottom-10 right-8 lg:right-[15%]'
+					}
+				/>
+				<img
+					src={'/wave.png'}
+					alt={'A white wave of snow.'}
+					className={'w-full h-auto absolute bottom-[-10px] inset-x-0'}
+				/>
 			</section>
 
-			<div className={'w-full min-h-screen text-background bg-foreground'}>
+			<div
+				className={
+					'w-full min-h-screen bg-background text-foreground dark:text-background dark:bg-foreground'
+				}
+			>
 				<section id="league-details" className={'container pb-40'}>
 					<div className="flex flex-row">
-						<SnowFlake className="-mt-32 max-w-[400px] flex flex-1 basis-[80px] shrink-0 fill-accent" />
+						<SnowFlake className="-mt-32 max-w-[400px] flex-1 basis-[80px] shrink-0 fill-accent z-10 hidden lg:flex" />
 
 						<div className={'flex flex-col flex-2 items-end gap-2 pt-24'}>
 							<p className={'text-4xl font-bold max-w-[800px]'}>
@@ -276,7 +312,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								1
@@ -286,7 +322,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								2
@@ -298,7 +334,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								3
@@ -311,7 +347,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								4
@@ -324,7 +360,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								5
