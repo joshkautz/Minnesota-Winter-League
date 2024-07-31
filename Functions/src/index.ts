@@ -1,6 +1,6 @@
 import { initializeApp } from './initializeApp'
 import { Response } from 'express'
-import { } from '@dropbox/sign'
+import {} from '@dropbox/sign'
 import { SignatureRequestApi } from '@dropbox/sign/types/api/signatureRequestApi'
 import { SubSigningOptions } from '@dropbox/sign/types/model/subSigningOptions'
 import { EventCallbackRequest } from '@dropbox/sign/types/model/eventCallbackRequest'
@@ -418,15 +418,15 @@ export const dropboxSignHandleWebhookEvents: HttpsFunction = region(
 ).https.onRequest(async (req: Request, resp: Response<string>) => {
 	logDebug(req.body)
 	const callback_data = JSON.parse(req.body.json)
-  const callback_event = EventCallbackRequest.init(callback_data)
-  
+	const callback_event = EventCallbackRequest.init(callback_data)
+
 	// Verify that a callback came from Dropbox Sign.
 	if (EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event)) {
 		// one of "account_callback" or "api_app_callback"
-    const callback_type = EventCallbackHelper.getCallbackType(callback_event)
-    logDebug(callback_data)
-    logDebug(callback_event)
-    logDebug(callback_type)
+		const callback_type = EventCallbackHelper.getCallbackType(callback_event)
+		logDebug(callback_data)
+		logDebug(callback_event)
+		logDebug(callback_type)
 
 		// do your magic below!
 	}
