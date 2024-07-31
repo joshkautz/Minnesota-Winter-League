@@ -54,6 +54,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Inject Dropbox Sign API Key
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "dropbox.username = 'DROPBOX_SIGN_API_KEY'"
+          replace: "dropbox.username = '${{ secrets.DROPBOX_SIGN_API_KEY }}'"
+          include: 'Functions/src/pages/index.ts'
+          regex: false
+
+      # - name: Disable Dropbox Sign Test Mode
+      #   uses: jacobtomlinson/gha-find-replace@v3
+      #   with:
+      #     find: "testMode: true,"
+      #     replace: "testMode: false,"
+      #     include: 'Functions/src/pages/index.ts'
+      #     regex: false
+
       - name: Install Functions dependencies
         working-directory: ./Functions
         run: npm ci

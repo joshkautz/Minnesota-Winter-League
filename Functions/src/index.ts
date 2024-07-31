@@ -1,29 +1,17 @@
 import { initializeApp } from './initializeApp'
-
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
-import {
-	Change,
-	CloudFunction,
-	EventContext,
-	HttpsFunction,
-	logger,
-	region,
-	https,
-} from 'firebase-functions'
-
-/**
- * The Firebase Admin Node.js SDK enables access to Firebase services from
- * privileged environments (such as servers or cloud) in Node.js.
- */
-
+import { Response } from 'express'
+import { SignatureRequestApi } from '@dropbox/sign/types/api/signatureRequestApi'
+import { SubSigningOptions } from '@dropbox/sign/types/model/subSigningOptions'
+import { Change } from 'firebase-functions/lib/common/change'
+import { CloudFunction } from 'firebase-functions/v1'
+import { EventContext } from 'firebase-functions/v1'
+import { HttpsFunction } from 'firebase-functions/v1'
+import { region } from 'firebase-functions/v1'
+import { debug as logDebug } from 'firebase-functions/lib/logger'
+import { error as logError } from 'firebase-functions/lib/logger'
+import { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore'
+import { UserRecord } from 'firebase-functions/v1/auth'
+import { Request } from 'firebase-functions/v1/https'
 import {
 	DocumentData,
 	DocumentReference,
@@ -31,8 +19,6 @@ import {
 	getFirestore,
 	Timestamp,
 } from 'firebase-admin/firestore'
-import { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore'
-import { UserRecord } from 'firebase-functions/v1/auth'
 
 const REGIONS = {
 	CENTRAL: 'us-central1',
@@ -49,7 +35,8 @@ interface Player extends DocumentData {
 	email: string
 	firstname: string
 	lastname: string
-	registered: boolean
+	paid: boolean
+	signed: boolean
 	team: DocumentReference<Team> | null
 }
 
@@ -69,8 +56,12 @@ interface Offer extends DocumentData {
 	team: DocumentReference<Team>
 }
 
+const firestore = getFirestore()
+const dropbox = new SignatureRequestApi()
+dropbox.username = 'DROPBOX_SIGN_API_KEY'
+
 /**
- * Cloud Firestore trigger - Delete the `Players` Firestore Document for the player. Update the `Teams` Firestore Document for the player. Delete the `Offers` Firestore Documents for the player.
+ * When a user is deleted via Firebase Authentication, delete the corresponding `Players` document, update the corresponding `Teams` document, and delete the corresponding `Offers` documents.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
  */
@@ -79,7 +70,6 @@ export const OnUserDeleted: CloudFunction<UserRecord> = region(REGIONS.CENTRAL)
 	.auth.user()
 	.onDelete(async (user: UserRecord) => {
 		try {
-			const firestore = getFirestore()
 			const playerRef = firestore
 				.collection(COLLECTIONS.PLAYERS)
 				.doc(user.uid) as DocumentReference<Player>
@@ -107,13 +97,13 @@ export const OnUserDeleted: CloudFunction<UserRecord> = region(REGIONS.CENTRAL)
 				playerRef.delete(),
 			])
 		} catch (error) {
-			logger.error(error)
+			logError(error)
 			return error
 		}
 	})
 
 /**
- * Cloud Firestore trigger - Add the player to the team. Add the team to the player. Delete all the `Offers` Firestore Documents for the player.
+ * When an offer is accepted, update the corresponding `Player` document, update the corresponding `Team` document, and delete all the coresponding `Offer` documents.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -140,8 +130,7 @@ export const OnOfferAccepted: CloudFunction<Change<QueryDocumentSnapshot>> =
 						roster: FieldValue.arrayUnion(newValue.player),
 					})
 
-					// Delete all the `Offers` Firestore Documents for the player.
-					const firestore = getFirestore()
+					// Delete all the offers for the player.
 					const offers = await firestore
 						.collection('offers')
 						.where('player', '==', newValue.player)
@@ -156,13 +145,13 @@ export const OnOfferAccepted: CloudFunction<Change<QueryDocumentSnapshot>> =
 
 				return
 			} catch (error) {
-				logger.error(error)
+				logError(error)
 				return error
 			}
 		})
 
 /**
- * Cloud Firestore trigger - Delete the rejected `Offers` Firestore Document for the player.
+ * When an offer is rejected, delete the corresponding `Offer` document.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -184,13 +173,13 @@ export const OnOfferRejected: CloudFunction<Change<QueryDocumentSnapshot>> =
 
 				return
 			} catch (error) {
-				logger.error(error)
+				logError(error)
 				return error
 			}
 		})
 
 /**
- * Cloud Firestore trigger - Update the `Players` Firestore Document for the player when a new `Customers` `Payments` Firestore Document is created.
+ * When a payment is created, send a signature request, and update the corresponding `Player` document.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_new_document_is_created_2 Trigger a function when a document is created.}
  */
@@ -200,32 +189,60 @@ export const OnPaymentCreated: CloudFunction<QueryDocumentSnapshot> = region(
 )
 	.firestore.document('customers/{uid}/payments/{sid}')
 	.onCreate(
-		(
+		async (
 			queryDocumentSnapshot: QueryDocumentSnapshot,
 			eventContext: EventContext<{ uid: string; sid: string }>
 		) => {
 			try {
-				const firestore = getFirestore()
-				return firestore
-					.collection('players')
-					.doc(eventContext.params.uid)
-					.update({
-						registered: true,
-					})
+				const player = (
+					await firestore
+						.collection('players')
+						.doc(eventContext.params.uid)
+						.get()
+				).data() as Player
+
+				return Promise.all([
+					firestore.collection('players').doc(eventContext.params.uid).update({
+						paid: true,
+					}),
+					dropbox.signatureRequestSendWithTemplate({
+						templateIds: ['0fb30e5f0123f06cc20fe3155f51a539c65f9218'],
+						subject: 'Minneapolis Winter League - Release of Liability',
+						message:
+							"We're so excited you decided to join Minneapolis Winter League. " +
+							'Please make sure to sign this Release of Liability to finalize ' +
+							'your participation. Looking forward to seeing you!',
+						signers: [
+							{
+								role: 'Participant',
+								name: `${player.firstname} ${player.lastname}`,
+								emailAddress: player.email,
+							},
+						],
+						signingOptions: {
+							draw: true,
+							type: true,
+							upload: true,
+							phone: false,
+							defaultType: SubSigningOptions.DefaultTypeEnum.Type,
+						},
+						testMode: true,
+					}),
+				])
 			} catch (error) {
-				logger.error(error)
+				logError(error)
 				return error
 			}
 		}
 	)
 
 /**
- * Cloud Firestore trigger - Evaluate and set the registered value of a `Teams` Firestore Document when a player's registered field changes.
+ * When a waiver is signed, update the corresponding `Team` document.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
 
-export const SetTeamRegistered_OnPlayerRegisteredChange: CloudFunction<
+export const SetTeamRegistered_OnPlayerSignedChange: CloudFunction<
 	Change<QueryDocumentSnapshot>
 > = region(REGIONS.CENTRAL)
 	.firestore.document('players/{playerId}')
@@ -234,14 +251,13 @@ export const SetTeamRegistered_OnPlayerRegisteredChange: CloudFunction<
 			const newValue = change.after.data() as Player
 			const previousValue = change.before.data() as Player
 
-			if (newValue.registered != previousValue.registered) {
-				const firestore = getFirestore()
-
+			if (newValue.signed != previousValue.signed) {
 				const registeredPlayers = (
 					await firestore
 						.collection('players')
 						.where('team', '==', newValue.team)
-						.where('registered', '==', true)
+						.where('paid', '==', true)
+						.where('signed', '==', true)
 						.count()
 						.get()
 				).data().count
@@ -259,13 +275,59 @@ export const SetTeamRegistered_OnPlayerRegisteredChange: CloudFunction<
 
 			return
 		} catch (error) {
-			logger.error(error)
+			logError(error)
 			return error
 		}
 	})
 
 /**
- * Cloud Firestore trigger - Evaluate and set the registered value of a `Teams` Firestore Document when the team's roster field changes.
+ * @deprecated since version 2.0 - we can delete this, because waivers will never be signed before payments are made, I think...
+ *
+ * When a payment is made, update the corresponding `Team` document.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
+ */
+
+export const SetTeamRegistered_OnPlayerPaidChange: CloudFunction<
+	Change<QueryDocumentSnapshot>
+> = region(REGIONS.CENTRAL)
+	.firestore.document('players/{playerId}')
+	.onUpdate(async (change: Change<QueryDocumentSnapshot>) => {
+		try {
+			const newValue = change.after.data() as Player
+			const previousValue = change.before.data() as Player
+
+			if (newValue.paid != previousValue.paid) {
+				const registeredPlayers = (
+					await firestore
+						.collection('players')
+						.where('team', '==', newValue.team)
+						.where('paid', '==', true)
+						.where('signed', '==', true)
+						.count()
+						.get()
+				).data().count
+
+				if (registeredPlayers >= 10) {
+					return newValue.team?.update({
+						registered: true,
+					})
+				} else {
+					return newValue.team?.update({
+						registered: false,
+					})
+				}
+			}
+
+			return
+		} catch (error) {
+			logError(error)
+			return error
+		}
+	})
+
+/**
+ * When a team roster changes, update the corresponding `Team` document to reflect the registration status.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -281,13 +343,12 @@ export const SetTeamRegistered_OnTeamRosterChange: CloudFunction<
 			const teamRef = change.after.ref
 
 			if (newValue.roster.length != previousValue.roster.length) {
-				const firestore = getFirestore()
-
 				const registeredPlayers = (
 					await firestore
 						.collection('players')
 						.where('team', '==', teamRef)
-						.where('registered', '==', true)
+						.where('paid', '==', true)
+						.where('signed', '==', true)
 						.count()
 						.get()
 				).data().count
@@ -305,13 +366,13 @@ export const SetTeamRegistered_OnTeamRosterChange: CloudFunction<
 
 			return
 		} catch (error) {
-			logger.error(error)
+			logError(error)
 			return error
 		}
 	})
 
 /**
- * Cloud Firestore trigger - Set the registeredDate value of a `Teams` Firestore Document when the team's registered field changes.
+ * When a team roster changes, update the corresponding `Team` document to reflect the time of the registration status change.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
@@ -334,23 +395,29 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange: CloudFunction<
 
 			return
 		} catch (error) {
-			logger.error(error)
+			logError(error)
 			return error
 		}
 	})
 
 /**
- * HTTP request trigger - Set the registeredDate value of a `Teams` Firestore Document when the team's registered field changes.
+ * When Dropbox Sign sends a `signature_request_signed` event, update the corresponding `Player` document to reflect the signed status.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/http-events?gen=1st#trigger_a_function_with_an_http_request_2 Trigger a function with an HTTP request.}
  */
 
 export const dropboxSignHandleWebhookEvents: HttpsFunction = region(
 	REGIONS.CENTRAL
-).https.onRequest((req, resp) => {
-	logger.log(req.body)
+).https.onRequest(async (req: Request, resp: Response<string>) => {
+	logDebug(req.body)
 
-	// Webhook must respond with a 200 status code
-	// and a body containing the string 'Hello API event received'
+	// Secure to only accept requests from Dropbox Sign.
+
+	// Parse the request body to get the event type and the event data, ensure it's a signature_request_signed event.
+
+	// Get the player ID from the event data.
+
+	// Update the player document to reflect the signed status.
+
 	resp.status(200).send('Hello API event received')
 })
