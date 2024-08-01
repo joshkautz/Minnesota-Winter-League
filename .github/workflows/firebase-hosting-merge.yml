@@ -76,15 +76,15 @@ jobs:
 
       - name: Format Functions
         working-directory: ./Functions
-        run: npx prettier . --check
+        run: npm run format
 
       - name: Lint Functions
         working-directory: ./Functions
-        run: npx eslint .
+        run: npm run lint
 
       - name: Build Functions
         working-directory: ./Functions
-        run: npx tsc
+        run: npm run build
 
       - name: Deploy to Firebase Functions
         env:
