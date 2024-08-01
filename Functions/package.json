@@ -6,14 +6,9 @@
 		"node": "20"
 	},
 	"scripts": {
+		"format": "prettier --check .",
 		"lint": "eslint .",
-		"build": "npm run lint && tsc",
-		"build:watch": "tsc --watch",
-		"serve": "npm run build && firebase emulators:start --only functions",
-		"shell": "npm run build && firebase functions:shell",
-		"start": "npm run shell",
-		"deploy": "firebase deploy --only functions",
-		"logs": "firebase functions:log"
+		"build": "tsc"
 	},
 	"dependencies": {
 		"@dropbox/sign": "^1.4.2",
