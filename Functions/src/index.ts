@@ -2,6 +2,7 @@ import { initializeApp } from './initializeApp.js'
 
 // Dropbox Sign SDK
 import {
+	HttpError,
 	EventCallbackHelper,
 	EventCallbackRequest,
 	SignatureRequestApi,
@@ -236,7 +237,15 @@ export const OnPaymentCreated = onDocumentCreated(
 				}),
 			])
 		} catch (e) {
-			error(e)
+			if (e instanceof HttpError) {
+				error(e.response)
+				error(e.body)
+				error(e.message)
+				error(e.cause)
+				error(e.name)
+				error(e.statusCode)
+				error(e.stack)
+			}
 			return e
 		}
 	}
