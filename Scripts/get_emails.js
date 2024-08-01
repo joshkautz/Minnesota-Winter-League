@@ -13,7 +13,7 @@ const firestore = getFirestore()
 
 const playersSnapshot = await firestore
 	.collection('players')
-  .where('captain', '==', true)
+	.where('captain', '==', true)
 	.get()
 
 // playersSnapshot.docs.map((player) =>
