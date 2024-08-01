@@ -1,5 +1,7 @@
 import { initializeApp } from './initializeApp'
+
 import { Response } from 'express'
+
 import {
 	SignatureRequestApi,
 	SubSigningOptions,
@@ -7,16 +9,20 @@ import {
 	EventCallbackHelper,
 } from '@dropbox/sign'
 
-import { Change } from 'firebase-functions/lib/common/change'
-import { CloudFunction } from 'firebase-functions/v1'
-import { EventContext } from 'firebase-functions/v1'
-import { HttpsFunction } from 'firebase-functions/v1'
-import { region } from 'firebase-functions/v1'
-import { debug as logDebug } from 'firebase-functions/lib/logger'
-import { error as logError } from 'firebase-functions/lib/logger'
+import {
+	CloudFunction,
+	Change,
+	EventContext,
+	HttpsFunction,
+	region,
+} from 'firebase-functions'
+
+import { debug as logDebug, error as logError } from 'firebase-functions/logger'
+
 import { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore'
 import { UserRecord } from 'firebase-functions/v1/auth'
 import { Request } from 'firebase-functions/v1/https'
+
 import {
 	DocumentData,
 	DocumentReference,
