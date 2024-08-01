@@ -103,7 +103,7 @@ export const Home = () => {
 						</div>
 					</div>
 				</div>
-				<div className="absolute inset-y-0 right-0 w-1/2 h-screen">
+				<div className="absolute inset-y-0 right-0 w-full h-screen md:w-1/2">
 					<SparklesCore
 						background="transparent"
 						minSize={0.6}
