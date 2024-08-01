@@ -1,4 +1,4 @@
-import { initializeApp } from './initializeApp'
+import { initializeApp } from './initializeApp.js'
 
 import { Response } from 'express'
 
