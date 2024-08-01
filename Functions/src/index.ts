@@ -1,4 +1,4 @@
-import { initializeApp } from './initializeApp'
+import { initializeApp } from './initializeApp.js'
 
 import { Response } from 'express'
 
@@ -87,8 +87,8 @@ export const OnUserDeleted: CloudFunction<UserRecord> = region(REGIONS.CENTRAL)
 		try {
 			const playerRef = firestore
 				.collection(COLLECTIONS.PLAYERS)
-				.doc(user.uid) as DocumentReference<Player>
-
+        .doc(user.uid) as DocumentReference<Player>
+      
 			// Delete all the `Offers` Firestore Documents for the player.
 			const offers = await firestore
 				.collection('offers')
