@@ -1,9 +1,12 @@
 import { initializeApp } from './initializeApp'
 import { Response } from 'express'
-import { SignatureRequestApi } from '@dropbox/sign/types/api/signatureRequestApi'
-import { SubSigningOptions } from '@dropbox/sign/types/model/subSigningOptions'
-import { EventCallbackRequest } from '@dropbox/sign/types/model/eventCallbackRequest'
-import { EventCallbackHelper } from '@dropbox/sign/types/model/eventCallbackHelper'
+import {
+	SignatureRequestApi,
+	SubSigningOptions,
+	EventCallbackRequest,
+	EventCallbackHelper,
+} from '@dropbox/sign'
+
 import { Change } from 'firebase-functions/lib/common/change'
 import { CloudFunction } from 'firebase-functions/v1'
 import { EventContext } from 'firebase-functions/v1'
