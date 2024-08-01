@@ -3,13 +3,13 @@
 	"compilerOptions": {
 		"outDir": "dist", // https://www.typescriptlang.org/tsconfig/#outDir
 		"target": "ESNext", // https://www.typescriptlang.org/tsconfig/#target
-    "module":"NodeNext", // https://www.typescriptlang.org/tsconfig/#module
-    "moduleResolution":"NodeNext", // https://www.typescriptlang.org/tsconfig/#moduleResolution
-    "skipLibCheck": true, // https://www.typescriptlang.org/tsconfig/#skipLibCheck
+		"module": "NodeNext", // https://www.typescriptlang.org/tsconfig/#module
+		"moduleResolution": "NodeNext", // https://www.typescriptlang.org/tsconfig/#moduleResolution
+		"skipLibCheck": true, // https://www.typescriptlang.org/tsconfig/#skipLibCheck
 		"noImplicitReturns": true,
 		"noUnusedLocals": true,
 		"sourceMap": true,
 		"strict": true,
-		"esModuleInterop": true,
+		"esModuleInterop": true
 	}
 }
