@@ -238,13 +238,15 @@ export const OnPaymentCreated = onDocumentCreated(
 			])
 		} catch (e) {
 			if (e instanceof HttpError) {
-				error(e.response)
-				error(e.body)
-				error(e.message)
-				error(e.cause)
-				error(e.name)
-				error(e.statusCode)
-				error(e.stack)
+				debug('START')
+				debug(e.response)
+				debug(e.body)
+				debug(e.message)
+				debug(e.cause)
+				debug(e.name)
+				debug(e.statusCode)
+				debug(e.stack)
+				debug('STOP')
 			}
 			return e
 		}
