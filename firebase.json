@@ -1,18 +1,20 @@
 {
-	"functions": [
-		{
-			"source": "Functions",
-			"codebase": "default",
-			"ignore": [
-				"node_modules",
-				".git",
-				"firebase-debug.log",
-				"firebase-debug.*.log"
-			],
-			"predeploy": [],
-			"postdeploy": []
-		}
-	],
+	"$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json",
+	"functions": {
+		"source": "Functions",
+		"runtime": "nodejs20",
+		"predeploy": ["npm --prefix Functions run build"],
+		"postdeploy": [],
+		"ignore": [
+			"node_modules",
+			"src",
+			".gitignore",
+			"eslint.config.js",
+			"firebase-debug.log",
+			"firebase-debug.*.log",
+			"tsconfig.json"
+		]
+	},
 	"firestore": {
 		"rules": "firestore.rules",
 		"indexes": "firestore.indexes.json"
@@ -24,9 +26,9 @@
 			{
 				"source": "/dropboxSignHandleWebhookEvents",
 				"function": {
-          "functionId": "dropboxSignHandleWebhookEvents",
-          "region": "us-central1"
-        }
+					"functionId": "dropboxSignHandleWebhookEvents",
+					"region": "us-central1"
+				}
 			},
 			{
 				"source": "**",
