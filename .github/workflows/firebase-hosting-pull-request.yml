@@ -131,7 +131,7 @@ jobs:
         with:
           find: "const DROPBOX_SIGN_API_KEY = 'DROPBOX_SIGN_API_KEY'"
           replace: "const DROPBOX_SIGN_API_KEY = '${{ secrets.DROPBOX_SIGN_API_KEY }}'"
-          include: "Functions/src/pages/index.ts"
+          include: "Functions/src/index.ts"
           regex: false
 
       - name: Install Functions dependencies
