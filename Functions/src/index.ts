@@ -202,11 +202,18 @@ export const OnPaymentCreated = onDocumentCreated(
 				.collection(COLLECTIONS.PLAYERS)
 				.doc(event.params.uid)
 				.get()
+
 			const player = playerSnapshot.data() as Player
+
+			debug(DROPBOX_SIGN_API_KEY)
 
 			dropbox.username = DROPBOX_SIGN_API_KEY
 
-			const dropboxReturn = await dropbox.signatureRequestSendWithTemplate({
+			debug(dropbox.username)
+
+			debug('Execute')
+
+			await dropbox.signatureRequestSendWithTemplate({
 				templateIds: ['0fb30e5f0123f06cc20fe3155f51a539c65f9218'],
 				subject: 'Minneapolis Winter League - Release of Liability',
 				message:
@@ -229,11 +236,6 @@ export const OnPaymentCreated = onDocumentCreated(
 				},
 				testMode: true,
 			})
-
-			debug('START')
-			debug(dropboxReturn.body)
-			debug(dropboxReturn.response)
-			debug('STOP')
 
 			// return Promise.all([
 			// 	firestore.collection(COLLECTIONS.PLAYERS).doc(event.params.uid).update({
@@ -265,7 +267,6 @@ export const OnPaymentCreated = onDocumentCreated(
 			// ])
 		} catch (e) {
 			debug('Oops! Something went wrong.')
-			debug(DROPBOX_SIGN_API_KEY)
 			debug(dropbox.username)
 			debug(dropbox)
 			debug((e as HttpError).response)
