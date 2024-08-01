@@ -53,6 +53,9 @@ interface Offer extends DocumentData {
 	status: string
 	team: DocumentReference<Team>
 }
+
+const REGION = 'us-central1'
+
 const COLLECTIONS = {
 	OFFERS: 'offers',
 	PLAYERS: 'players',
@@ -81,37 +84,40 @@ dropbox.username = DROPBOX_SIGN_API_KEY
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
  */
 
-export const OnUserDeleted = functions.auth.user().onDelete(async (user) => {
-	try {
-		const playerRef = firestore.collection(COLLECTIONS.PLAYERS).doc(user.uid)
+export const OnUserDeleted = functions
+	.region(REGION)
+	.auth.user()
+	.onDelete(async (user) => {
+		try {
+			const playerRef = firestore.collection(COLLECTIONS.PLAYERS).doc(user.uid)
 
-		// Delete all the `Offers` Firestore Documents for the player.
-		const offers = await firestore
-			.collection(COLLECTIONS.OFFERS)
-			.where(FIELDS.PLAYER, '==', playerRef)
-			.get()
+			// Delete all the `Offers` Firestore Documents for the player.
+			const offers = await firestore
+				.collection(COLLECTIONS.OFFERS)
+				.where(FIELDS.PLAYER, '==', playerRef)
+				.get()
 
-		const offersDeletionPromises = offers.docs.map((offer) =>
-			offer.ref.delete()
-		)
+			const offersDeletionPromises = offers.docs.map((offer) =>
+				offer.ref.delete()
+			)
 
-		// Update the `Teams` Firestore Documents for the player.
-		const player = await playerRef.get()
-		const teamUpdatePromise = player.data()?.team?.update({
-			captains: FieldValue.arrayRemove(playerRef),
-			roster: FieldValue.arrayRemove(playerRef),
-		})
+			// Update the `Teams` Firestore Documents for the player.
+			const player = await playerRef.get()
+			const teamUpdatePromise = player.data()?.team?.update({
+				captains: FieldValue.arrayRemove(playerRef),
+				roster: FieldValue.arrayRemove(playerRef),
+			})
 
-		return Promise.all([
-			offersDeletionPromises,
-			teamUpdatePromise,
-			playerRef.delete(),
-		])
-	} catch (e) {
-		error(e)
-		return e
-	}
-})
+			return Promise.all([
+				offersDeletionPromises,
+				teamUpdatePromise,
+				playerRef.delete(),
+			])
+		} catch (e) {
+			error(e)
+			return e
+		}
+	})
 
 /**
  * When an offer is accepted, update the corresponding `Player` document, update the corresponding `Team` document, and delete all the coresponding `Offer` documents.
@@ -120,7 +126,7 @@ export const OnUserDeleted = functions.auth.user().onDelete(async (user) => {
  */
 
 export const OnOfferAccepted = onDocumentUpdated(
-	'offers/{offerId}',
+	{ document: 'offers/{offerId}', region: REGION },
 	async (event) => {
 		try {
 			const newValue = event.data?.after.data() as Offer
@@ -163,7 +169,7 @@ export const OnOfferAccepted = onDocumentUpdated(
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
 export const OnOfferRejected = onDocumentUpdated(
-	'offers/{offerId}',
+	{ document: 'offers/{offerId}', region: REGION },
 	async (event) => {
 		try {
 			const newValue = event.data?.after.data() as Offer
@@ -191,7 +197,7 @@ export const OnOfferRejected = onDocumentUpdated(
  */
 
 export const OnPaymentCreated = onDocumentCreated(
-	'customers/{uid}/payments/{sid}',
+	{ document: 'customers/{uid}/payments/{sid}', region: REGION },
 	async (event) => {
 		try {
 			const player = (
@@ -243,7 +249,7 @@ export const OnPaymentCreated = onDocumentCreated(
  */
 
 export const SetTeamRegistered_OnPlayerSignedChange = onDocumentUpdated(
-	'players/{playerId}',
+	{ document: 'players/{playerId}', region: REGION },
 
 	async (event) => {
 		try {
@@ -289,7 +295,7 @@ export const SetTeamRegistered_OnPlayerSignedChange = onDocumentUpdated(
  */
 
 export const SetTeamRegistered_OnPlayerPaidChange = onDocumentUpdated(
-	'players/{playerId}',
+	{ document: 'players/{playerId}', region: REGION },
 
 	async (event) => {
 		try {
@@ -333,7 +339,7 @@ export const SetTeamRegistered_OnPlayerPaidChange = onDocumentUpdated(
  */
 
 export const SetTeamRegistered_OnTeamRosterChange = onDocumentUpdated(
-	'teams/{teamId}',
+	{ document: 'teams/{teamId}', region: REGION },
 	async (event) => {
 		try {
 			const newValue = event.data?.after.data() as Team
@@ -377,7 +383,7 @@ export const SetTeamRegistered_OnTeamRosterChange = onDocumentUpdated(
  */
 
 export const SetTeamRegisteredDate_OnTeamRegisteredChange = onDocumentUpdated(
-	'teams/{teamId}',
+	{ document: 'teams/{teamId}', region: REGION },
 	async (event) => {
 		try {
 			const newValue = event.data?.after.data() as Team
@@ -404,27 +410,30 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange = onDocumentUpdated(
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/http-events?gen=1st#trigger_a_function_with_an_http_request_2 Trigger a function with an HTTP request.}
  */
 
-export const dropboxSignHandleWebhookEvents = onRequest(async (req, resp) => {
-	debug(req.body)
-	const callback_data = JSON.parse(req.body.json)
-	const callback_event = EventCallbackRequest.init(callback_data)
+export const dropboxSignHandleWebhookEvents = onRequest(
+	{ region: REGION },
+	async (req, resp) => {
+		debug(req.body)
+		const callback_data = JSON.parse(req.body.json)
+		const callback_event = EventCallbackRequest.init(callback_data)
 
-	// Verify that a callback came from Dropbox Sign.
-	if (EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event)) {
-		// one of "account_callback" or "api_app_callback"
-		const callback_type = EventCallbackHelper.getCallbackType(callback_event)
-		debug(callback_data)
-		debug(callback_event)
-		debug(callback_type)
+		// Verify that a callback came from Dropbox Sign.
+		if (EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event)) {
+			// one of "account_callback" or "api_app_callback"
+			const callback_type = EventCallbackHelper.getCallbackType(callback_event)
+			debug(callback_data)
+			debug(callback_event)
+			debug(callback_type)
 
-		// do your magic below!
+			// do your magic below!
+		}
+
+		// Parse the request body to get the event type and the event data, ensure it's a signature_request_signed event.
+
+		// Get the player ID from the event data.
+
+		// Update the player document to reflect the signed status.
+
+		resp.status(200).send('Hello API event received')
 	}
-
-	// Parse the request body to get the event type and the event data, ensure it's a signature_request_signed event.
-
-	// Get the player ID from the event data.
-
-	// Update the player document to reflect the signed status.
-
-	resp.status(200).send('Hello API event received')
-})
+)
