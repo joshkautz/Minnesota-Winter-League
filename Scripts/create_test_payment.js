@@ -12,6 +12,6 @@ const firestore = getFirestore()
 
 await firestore
 	.collection('customers')
-	.doc('yEDnOJREolY3OdQGZPxseMbvwqq1')
+	.doc('UID')
 	.collection('payments')
 	.add({})
