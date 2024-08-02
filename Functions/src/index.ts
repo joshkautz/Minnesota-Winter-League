@@ -4,7 +4,6 @@ import { initializeApp } from './initializeApp.js'
 import {
 	EventCallbackHelper,
 	EventCallbackRequest,
-	HttpError,
 	SignatureRequestApi,
 	SubSigningOptions,
 } from '@dropbox/sign'
