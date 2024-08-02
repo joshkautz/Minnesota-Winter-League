@@ -4,6 +4,8 @@ import { initializeApp } from './initializeApp.js'
 import {
 	EventCallbackHelper,
 	EventCallbackRequest,
+	EventCallbackRequestEvent,
+	HttpError,
 	SignatureRequestApi,
 	SubSigningOptions,
 } from '@dropbox/sign'
@@ -71,6 +73,7 @@ const FIELDS = {
 }
 
 const DROPBOX_SIGN_API_KEY = 'DROPBOX_SIGN_API_KEY'
+const DROPBOX_TEMPLATE_ID = '0fb30e5f0123f06cc20fe3155f51a539c65f9218'
 
 /**
  * When a user is deleted via Firebase Authentication, delete the corresponding `Players` document, update the corresponding `Teams` document, and delete the corresponding `Offers` documents.
@@ -209,12 +212,9 @@ export const OnPaymentCreated = onDocumentCreated(
 
 			const player = playerSnapshot.data() as Player
 
-			return Promise.all([
-				firestore.collection(COLLECTIONS.PLAYERS).doc(event.params.uid).update({
-					paid: true,
-				}),
-				dropbox.signatureRequestSendWithTemplate({
-					templateIds: ['0fb30e5f0123f06cc20fe3155f51a539c65f9218'],
+			const dropboxSignatureRequestResponse =
+				await dropbox.signatureRequestSendWithTemplate({
+					templateIds: [DROPBOX_TEMPLATE_ID],
 					subject: 'Minneapolis Winter League - Release of Liability',
 					message:
 						"We're so excited you decided to join Minneapolis Winter League. " +
@@ -235,10 +235,30 @@ export const OnPaymentCreated = onDocumentCreated(
 						defaultType: SubSigningOptions.DefaultTypeEnum.Type,
 					},
 					testMode: true,
+				})
+
+			debug('Benchmark 1')
+			debug(dropboxSignatureRequestResponse)
+			debug(dropboxSignatureRequestResponse.body)
+			debug(dropboxSignatureRequestResponse.body.signatureRequest)
+			debug('Benchmark 2')
+			debug(dropboxSignatureRequestResponse.response)
+			debug(dropboxSignatureRequestResponse.response.data)
+
+			return Promise.all([
+				firestore.collection(COLLECTIONS.PLAYERS).doc(event.params.uid).update({
+					paid: true,
 				}),
 			])
 		} catch (e) {
-			error(e)
+			debug(e)
+			if (e instanceof HttpError) {
+				debug(e.body)
+				debug(e.cause)
+				debug(e.message)
+				debug(e.name)
+				debug(e.statusCode)
+			}
 			return e
 		}
 	}
@@ -421,27 +441,38 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange = onDocumentUpdated(
 export const dropboxSignHandleWebhookEvents = onRequest(
 	{ region: REGION },
 	async (req, resp) => {
-		debug(req.body)
-		const callback_data = JSON.parse(req.body.json)
-		const callback_event = EventCallbackRequest.init(callback_data)
+		try {
+			const data = req.body.toString().match(/\{.*\}/s)[0]
 
-		// Verify that a callback came from Dropbox Sign.
-		if (EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event)) {
-			// one of "account_callback" or "api_app_callback"
-			const callback_type = EventCallbackHelper.getCallbackType(callback_event)
+			const callback_data = JSON.parse(data)
 			debug(callback_data)
+
+			const callback_event = EventCallbackRequest.init(callback_data)
 			debug(callback_event)
-			debug(callback_type)
 
-			// do your magic below!
+			debug(EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event))
+
+			// Verify that a callback came from Dropbox Sign.
+			if (EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event)) {
+				if (
+					callback_event.event.eventType ==
+					EventCallbackRequestEvent.EventTypeEnum.SignatureRequestSigned
+				) {
+					// Get the signatureRequestId.
+					const signatureRequestId =
+						callback_event.signatureRequest?.signatureRequestId
+
+					debug(signatureRequestId)
+				}
+
+				// TODO: Update the player document to reflect the signed status.
+			}
+
+			debug('DONE')
+		} catch (e) {
+			error(e)
+		} finally {
+			resp.status(200).send('Hello API event received')
 		}
-
-		// Parse the request body to get the event type and the event data, ensure it's a signature_request_signed event.
-
-		// Get the player ID from the event data.
-
-		// Update the player document to reflect the signed status.
-
-		resp.status(200).send('Hello API event received')
 	}
 )
