@@ -136,14 +136,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Inject Dropbox Sign API Key
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: 'const DROPBOX_SIGN_API_KEY.*'
-          replace: "const DROPBOX_SIGN_API_KEY = '${{ secrets.DROPBOX_SIGN_API_KEY }}'"
-          include: 'Functions/src/index.ts'
-          regex: true
-
       - name: Install Functions dependencies
         working-directory: ./Functions
         run: npm ci

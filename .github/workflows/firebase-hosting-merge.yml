@@ -72,25 +72,21 @@ jobs:
           include: 'Functions/src/index.ts'
           regex: true
 
-      # - name: Get output
-      #   id: vars
-      #   run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
-
       # - name: Disable Dropbox Sign Test Mode
       #   uses: jacobtomlinson/gha-find-replace@v3
       #   with:
-      #     find: "testMode: true,"
+      #     find: 'testMode: true,'
       #     replace: "testMode: false,"
       #     include: 'Functions/src/index.ts'
-      #     regex: false
+      #     regex: true
 
       - name: Install Functions dependencies
         working-directory: ./Functions
         run: npm ci
 
-      # - name: Format Functions
-      #   working-directory: ./Functions
-      #   run: npm run format
+      - name: Format Functions
+        working-directory: ./Functions
+        run: npm run format
 
       - name: Lint Functions
         working-directory: ./Functions
