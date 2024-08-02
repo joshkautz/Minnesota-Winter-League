@@ -56,6 +56,10 @@ interface Offer extends DocumentData {
 	team: DocumentReference<Team>
 }
 
+interface Waiver extends DocumentData {
+	player: DocumentReference<Player>
+}
+
 initializeApp()
 
 const REGION = 'us-central1'
@@ -71,6 +75,7 @@ const FIELDS = {
 	TEAM: 'team',
 	PAID: 'paid',
 	SIGNED: 'signed',
+	SIGNATUREREQUESTID: 'signatureRequestId',
 }
 
 const DROPBOX_SIGN_API_KEY = 'DROPBOX_SIGN_API_KEY'
@@ -245,25 +250,20 @@ export const OnPaymentCreated = onDocumentCreated(
 								})
 								.then((response) => {
 									const signatureRequestId =
-										response.body.signatureRequest?.signatureRequestId
-									return firestore.collection(COLLECTIONS.WAIVERS).add({
-										player: firestore
-											.collection(COLLECTIONS.PLAYERS)
-											.doc(event.params.uid),
-										signatureRequestId: signatureRequestId,
-									})
+										response.body.signatureRequest?.signatureRequestId!
+									return firestore
+										.collection(COLLECTIONS.WAIVERS)
+										.doc(signatureRequestId)
+										.set({
+											player: firestore
+												.collection(COLLECTIONS.PLAYERS)
+												.doc(event.params.uid),
+										})
 								})
 						})
 				})
 		} catch (e) {
-			debug(e)
-			if (e instanceof HttpError) {
-				debug(e.body)
-				debug(e.cause)
-				debug(e.message)
-				debug(e.name)
-				debug(e.statusCode)
-			}
+			error(e)
 			return e
 		}
 	}
@@ -447,15 +447,13 @@ export const dropboxSignHandleWebhookEvents = onRequest(
 	{ region: REGION },
 	async (req, resp) => {
 		try {
+			const firestore = getFirestore()
+
 			const data = req.body.toString().match(/\{.*\}/s)[0]
 
 			const callback_data = JSON.parse(data)
-			debug(callback_data)
 
 			const callback_event = EventCallbackRequest.init(callback_data)
-			debug(callback_event)
-
-			debug(EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event))
 
 			// Verify that a callback came from Dropbox Sign.
 			if (EventCallbackHelper.isValid(DROPBOX_SIGN_API_KEY, callback_event)) {
@@ -463,17 +461,21 @@ export const dropboxSignHandleWebhookEvents = onRequest(
 					callback_event.event.eventType ==
 					EventCallbackRequestEvent.EventTypeEnum.SignatureRequestSigned
 				) {
-					// Get the signatureRequestId.
 					const signatureRequestId =
-						callback_event.signatureRequest?.signatureRequestId
+						callback_event.signatureRequest?.signatureRequestId!
 
-					debug(signatureRequestId)
+					const waiverSnapshot = await firestore
+						.collection(COLLECTIONS.WAIVERS)
+						.doc(signatureRequestId)
+						.get()
+
+					const waiver = waiverSnapshot.data() as Waiver
+
+					await waiver.player.update({
+						signed: true,
+					})
 				}
-
-				// TODO: Update the player document to reflect the signed status.
 			}
-
-			debug('DONE')
 		} catch (e) {
 			error(e)
 		} finally {
