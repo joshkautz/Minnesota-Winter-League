@@ -210,61 +210,37 @@ export const OnPaymentCreated = onDocumentCreated(
 
 			const player = playerSnapshot.data() as Player
 
-			await dropbox.signatureRequestSendWithTemplate({
-				templateIds: ['0fb30e5f0123f06cc20fe3155f51a539c65f9218'],
-				subject: 'Minneapolis Winter League - Release of Liability',
-				message:
-					"We're so excited you decided to join Minneapolis Winter League. " +
-					'Please make sure to sign this Release of Liability to finalize ' +
-					'your participation. Looking forward to seeing you!',
-				signers: [
-					{
-						role: 'Participant',
-						name: `${player.firstname} ${player.lastname}`,
-						emailAddress: player.email,
+			return Promise.all([
+				firestore.collection(COLLECTIONS.PLAYERS).doc(event.params.uid).update({
+					paid: true,
+				}),
+				dropbox.signatureRequestSendWithTemplate({
+					templateIds: ['0fb30e5f0123f06cc20fe3155f51a539c65f9218'],
+					subject: 'Minneapolis Winter League - Release of Liability',
+					message:
+						"We're so excited you decided to join Minneapolis Winter League. " +
+						'Please make sure to sign this Release of Liability to finalize ' +
+						'your participation. Looking forward to seeing you!',
+					signers: [
+						{
+							role: 'Participant',
+							name: `${player.firstname} ${player.lastname}`,
+							emailAddress: player.email,
+						},
+					],
+					signingOptions: {
+						draw: true,
+						type: true,
+						upload: true,
+						phone: false,
+						defaultType: SubSigningOptions.DefaultTypeEnum.Type,
 					},
-				],
-				signingOptions: {
-					draw: true,
-					type: true,
-					upload: true,
-					phone: false,
-					defaultType: SubSigningOptions.DefaultTypeEnum.Type,
-				},
-				testMode: true,
-			})
-
-			// return Promise.all([
-			// 	firestore.collection(COLLECTIONS.PLAYERS).doc(event.params.uid).update({
-			// 		paid: true,
-			// 	}),
-			// 	dropbox.signatureRequestSendWithTemplate({
-			// 		templateIds: ['0fb30e5f0123f06cc20fe3155f51a539c65f9218'],
-			// 		subject: 'Minneapolis Winter League - Release of Liability',
-			// 		message:
-			// 			"We're so excited you decided to join Minneapolis Winter League. " +
-			// 			'Please make sure to sign this Release of Liability to finalize ' +
-			// 			'your participation. Looking forward to seeing you!',
-			// 		signers: [
-			// 			{
-			// 				role: 'Participant',
-			// 				name: `${player.firstname} ${player.lastname}`,
-			// 				emailAddress: player.email,
-			// 			},
-			// 		],
-			// 		signingOptions: {
-			// 			draw: true,
-			// 			type: true,
-			// 			upload: true,
-			// 			phone: false,
-			// 			defaultType: SubSigningOptions.DefaultTypeEnum.Type,
-			// 		},
-			// 		testMode: true,
-			// 	}),
-			// ])
+					testMode: true,
+				}),
+			])
 		} catch (e) {
-			debug('Oops! Something went wrong.')
-			debug((e as HttpError).response)
+			error(e)
+			return e
 		}
 	}
 )
