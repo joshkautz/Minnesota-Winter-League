@@ -103,7 +103,7 @@ export const Home = () => {
 						</div>
 					</div>
 				</div>
-				<div className="absolute inset-y-0 right-0 w-1/2 h-screen">
+				<div className="absolute inset-y-0 right-0 w-full h-screen md:w-1/2">
 					<SparklesCore
 						background="transparent"
 						minSize={0.6}
@@ -154,7 +154,7 @@ export const Home = () => {
 					<div className={'flex flex-wrap items-center gap-20 mt-32 w-full'}>
 						<Card
 							className={
-								'flex flex-col flex-1 basis-[320px] shrink-0 rounded-2xl bg-foreground text-background'
+								'flex flex-col flex-1 basis-[320px] shrink-0 rounded-2xl bg-foreground text-background dark:bg-background dark:text-foreground'
 							}
 						>
 							<CardHeader>
@@ -242,17 +242,17 @@ export const Home = () => {
 				</section>
 			</div>
 
-			<div>
+			<div className="border border-transparent bg-foreground dark:bg-background">
 				<section
 					id="why-join"
 					className={
-						'relative bg-accent text-accent-foreground min-h-[600px] rounded-2xl max-w-[1200px] mx-auto -mt-20 p-8 lg:py-24 lg:px-24'
+						'relative bg-accent text-accent-foreground min-h-[600px] rounded-2xl max-w-[968px] mx-auto -mt-20 p-8 lg:py-16 lg:px-0'
 					}
 				>
-					<div className={' flex flex-col gap-8 max-w-[800px] mx-auto'}>
+					<div className={'flex flex-col gap-8 max-w-[800px] mx-auto'}>
 						<div className={'text-4xl font-bold '}>Why Join?</div>
 						<div className={'flex flex-row gap-4'}>
-							<div className={''}>
+							<div>
 								<PersonIcon className={'w-8 h-8'} />
 							</div>
 							<div className={'flex flex-col gap-2'}>
@@ -292,12 +292,16 @@ export const Home = () => {
 						</div>
 					</div>
 					<div className="absolute right-0 invisible md:visible -bottom-52 2xl:-bottom-52 2xl:-right-32">
-						<SnowFlake className="fill-foreground max-w-[150px] 2xl:max-w-[300px]" />
+						<SnowFlake className="fill-background dark:fill-foreground max-w-[150px] 2xl:max-w-[300px]" />
 					</div>
 				</section>
 			</div>
 
-			<div className={'container'}>
+			<div
+				className={
+					'border border-transparent container dark:text-foreground dark:bg-background text-background bg-foreground'
+				}
+			>
 				<section
 					id="how-to-register"
 					className={
@@ -312,7 +316,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent text-foreground dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								1
@@ -322,7 +326,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent text-foreground dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								2
@@ -334,7 +338,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent text-foreground dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								3
@@ -347,7 +351,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent text-foreground dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								4
@@ -360,7 +364,7 @@ export const Home = () => {
 						<div className={'w-full flex'}>
 							<span
 								className={
-									'bg-accent dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+									'bg-accent text-foreground dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
 								5
@@ -372,66 +376,86 @@ export const Home = () => {
 
 				<div
 					className={
-						'flex flex-col gap-2 pb-24 items-center max-w-[1040px] mx-auto'
+						'flex flex-col gap-2 pb-8 items-center max-w-[1040px] mx-auto'
 					}
 				>
-					<p className={'text-2xl max-w-[1040px] mx-center'}>
+					<p className={'text-2xl max-w-[1040px] mx-auto'}>
 						Don't miss out on this opportunity to keep playing year-round.
 						Secure your spot today, and let's make this season of the
 						Minneapolis Winter League one to remember!
 					</p>
-
-					<div
-						className={
-							'self-start max-w-[640px] w-full h-1 rounded bg-gradient-to-r from-primary to-sky-300'
-						}
-					/>
 				</div>
 
-				<div className="flex items-center justify-center pb-24">
-					<p className="text-4xl font-bold ">See you on the field!</p>
+				<div className="max-w-[1040px] mx-auto flex items-center justify-start pb-24">
+					<p className="text-2xl font-bold">See you on the field!</p>
 				</div>
-				<p></p>
 			</div>
 
-			<footer className="bg-foreground text-background h-[400px] flex flex-col items-center justify-center gap-8">
-				<p>Thank you for helping to make this league possible</p>
-				<div className="container flex items-center justify-center gap-8">
-					<div>
-						<a
-							href="http://mplsmallard.com/"
-							target="_blank"
-							title="Minneapolis Mallard"
-            >
-							<img
-								src="/Mallard.png"
-								alt="Minneapolis Mallard"
-								width={100}
-							/>
-						</a>
+			<footer className="flex flex-col items-center justify-center h-full py-8 space-y-28 md:space-y-8 dark:bg-foreground dark:text-background bg-background text-foreground">
+				<div className="container flex flex-col items-center justify-between md:items-end md:flex-row">
+					<div className="pb-8 md:pb-0">
+						<img className="w-[324px]" src={'/footer-logo.png'} />
 					</div>
-					<div>
-						<a
-							href="https://watchufa.com/windchill"
-							target="_blank"
-							title="Minnesota Wind Chill"
-						>
-							<img
-								src="/Wind Chill.png"
-								alt="Minnesota Wind Chill"
-								width={100}
-							/>
-						</a>
+					<div className="space-y-2 max-w-[300px] flex flex-col w-full items-start">
+						<p className="text-2xl font-bold">Contact Us</p>
+						<div className="flex flex-col text-lg md:flex-row md:space-x-1">
+							<p className="font-bold">Email:</p>
+							<a href="mailto:leadership@mplsmallard.com">
+								<span>Leadership@mplsmallard.com</span>
+							</a>
+						</div>
 					</div>
 				</div>
-				<div className={'container text-center'}>
-					<p>
-						Got questions or need assistance? Contact us at{' '}
-						<a href="mailto:leadership@mplsmallard.com">
-							<u>leadership@mplsmallard.com</u>
+
+				<div className="container flex flex-col items-center justify-between md:items-end md:flex-row space-y-14 md:space-y-0">
+					<div className="flex flex-col items-center space-y-4 max-w-[300px]">
+						<p className="text-lg">
+							Thank you for helping to make this league possible!
+						</p>
+
+						<div className="flex flex-row justify-center space-x-8">
+							<div>
+								<a
+									href="http://mplsmallard.com/"
+									target="_blank"
+									title="Minneapolis Mallard"
+								>
+									<img
+										src={'/Mallard.png'}
+										alt="Minneapolis Mallard"
+										width={80}
+									/>
+								</a>
+							</div>
+							<div>
+								<a
+									href="https://watchufa.com/windchill"
+									target="_blank"
+									title="Minnesota Wind Chill"
+								>
+									<img
+										src={'/Wind Chill.png'}
+										alt="Minnesota Wind Chill"
+										width={80}
+									/>
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<a
+							href="https://lostyetidesign.com/"
+							target="_blank"
+							title="Lost Yeti Design Company"
+						>
+							<img
+								src="/lost-yeti.png"
+								alt="Lost Yeti Design Company"
+								width={296}
+							/>
 						</a>
-						.
-					</p>
+					</div>
 				</div>
 			</footer>
 		</div>
