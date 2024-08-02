@@ -397,7 +397,7 @@ const stripeRegistration = async (
 		collection(firestore, `customers/${authValue?.uid}/checkout_sessions`),
 		{
 			mode: 'payment',
-			price: Products.MinnesotaWinterLeagueRegistration2023,
+			price: Products.WinterLeagueRegistration2024, // TODO: Add to the season update guide. Add a new product for the new season on Stripe, then add its price code to the Products enum in stripe.ts., and then update this line to use the new product.
 			success_url: window.location.href,
 			cancel_url: window.location.href,
 		}
