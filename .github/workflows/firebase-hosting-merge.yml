@@ -74,9 +74,9 @@ jobs:
         working-directory: ./Functions
         run: npm ci
 
-      - name: Format Functions
-        working-directory: ./Functions
-        run: npm run format
+      # - name: Format Functions
+      #   working-directory: ./Functions
+      #   run: npm run format
 
       - name: Lint Functions
         working-directory: ./Functions
