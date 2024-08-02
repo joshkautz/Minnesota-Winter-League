@@ -241,7 +241,7 @@ export const Profile = () => {
 											<Button
 												variant={'default'}
 												onClick={registrationButtonOnClickHandler}
-												disabled={true}
+												disabled={false} // TODO: Check to see if current time is between the current season start and end registration dates.
 											>
 												{stripeLoading && (
 													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
