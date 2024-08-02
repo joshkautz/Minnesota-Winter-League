@@ -61,6 +61,7 @@ initializeApp()
 const REGION = 'us-central1'
 
 const COLLECTIONS = {
+	WAIVERS: 'waivers',
 	OFFERS: 'offers',
 	PLAYERS: 'players',
 }
@@ -205,51 +206,55 @@ export const OnPaymentCreated = onDocumentCreated(
 			const dropbox = new SignatureRequestApi()
 			dropbox.username = DROPBOX_SIGN_API_KEY
 
-			const playerSnapshot = await firestore
+			return firestore
 				.collection(COLLECTIONS.PLAYERS)
 				.doc(event.params.uid)
-				.get()
-
-			const player = playerSnapshot.data() as Player
-
-			const dropboxSignatureRequestResponse =
-				await dropbox.signatureRequestSendWithTemplate({
-					templateIds: [DROPBOX_TEMPLATE_ID],
-					subject: 'Minneapolis Winter League - Release of Liability',
-					message:
-						"We're so excited you decided to join Minneapolis Winter League. " +
-						'Please make sure to sign this Release of Liability to finalize ' +
-						'your participation. Looking forward to seeing you!',
-					signers: [
-						{
-							role: 'Participant',
-							name: `${player.firstname} ${player.lastname}`,
-							emailAddress: player.email,
-						},
-					],
-					signingOptions: {
-						draw: true,
-						type: true,
-						upload: true,
-						phone: false,
-						defaultType: SubSigningOptions.DefaultTypeEnum.Type,
-					},
-					testMode: true,
-				})
-
-			debug('Benchmark 1')
-			debug(dropboxSignatureRequestResponse)
-			debug(dropboxSignatureRequestResponse.body)
-			debug(dropboxSignatureRequestResponse.body.signatureRequest)
-			debug('Benchmark 2')
-			debug(dropboxSignatureRequestResponse.response)
-			debug(dropboxSignatureRequestResponse.response.data)
-
-			return Promise.all([
-				firestore.collection(COLLECTIONS.PLAYERS).doc(event.params.uid).update({
+				.update({
 					paid: true,
-				}),
-			])
+				})
+				.then(() => {
+					firestore
+						.collection(COLLECTIONS.PLAYERS)
+						.doc(event.params.uid)
+						.get()
+						.then((playerSnapshot) => {
+							const player = playerSnapshot.data() as Player
+							dropbox
+								.signatureRequestSendWithTemplate({
+									templateIds: [DROPBOX_TEMPLATE_ID],
+									subject: 'Minneapolis Winter League - Release of Liability',
+									message:
+										"We're so excited you decided to join Minneapolis Winter League. " +
+										'Please make sure to sign this Release of Liability to finalize ' +
+										'your participation. Looking forward to seeing you!',
+									signers: [
+										{
+											role: 'Participant',
+											name: `${player.firstname} ${player.lastname}`,
+											emailAddress: player.email,
+										},
+									],
+									signingOptions: {
+										draw: true,
+										type: true,
+										upload: true,
+										phone: false,
+										defaultType: SubSigningOptions.DefaultTypeEnum.Type,
+									},
+									testMode: true,
+								})
+								.then((response) => {
+									const signatureRequestId =
+										response.body.signatureRequest?.signatureRequestId
+									return firestore.collection(COLLECTIONS.WAIVERS).add({
+										player: firestore
+											.collection(COLLECTIONS.PLAYERS)
+											.doc(event.params.uid),
+										signatureRequestId: signatureRequestId,
+									})
+								})
+						})
+				})
 		} catch (e) {
 			debug(e)
 			if (e instanceof HttpError) {
