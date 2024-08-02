@@ -5,7 +5,6 @@ import {
 	EventCallbackHelper,
 	EventCallbackRequest,
 	EventCallbackRequestEvent,
-	HttpError,
 	SignatureRequestApi,
 	SubSigningOptions,
 } from '@dropbox/sign'
@@ -19,7 +18,7 @@ import {
 	onDocumentCreated,
 } from 'firebase-functions/v2/firestore'
 import { onRequest } from 'firebase-functions/v2/https'
-import { debug, error } from 'firebase-functions/logger'
+import { error } from 'firebase-functions/logger'
 
 // Firebase Firestore SDK
 import {
@@ -249,16 +248,22 @@ export const OnPaymentCreated = onDocumentCreated(
 									testMode: true,
 								})
 								.then((response) => {
-									const signatureRequestId =
-										response.body.signatureRequest?.signatureRequestId!
-									return firestore
-										.collection(COLLECTIONS.WAIVERS)
-										.doc(signatureRequestId)
-										.set({
-											player: firestore
-												.collection(COLLECTIONS.PLAYERS)
-												.doc(event.params.uid),
-										})
+									const signatureRequest = response.body.signatureRequest
+									if (signatureRequest) {
+										const signatureRequestId =
+											signatureRequest.signatureRequestId
+										if (signatureRequestId) {
+											return firestore
+												.collection(COLLECTIONS.WAIVERS)
+												.doc(signatureRequestId)
+												.set({
+													player: firestore
+														.collection(COLLECTIONS.PLAYERS)
+														.doc(event.params.uid),
+												})
+										}
+									}
+									return
 								})
 						})
 				})
@@ -461,19 +466,24 @@ export const dropboxSignHandleWebhookEvents = onRequest(
 					callback_event.event.eventType ==
 					EventCallbackRequestEvent.EventTypeEnum.SignatureRequestSigned
 				) {
-					const signatureRequestId =
-						callback_event.signatureRequest?.signatureRequestId!
+					const signatureRequest = callback_event.signatureRequest
 
-					const waiverSnapshot = await firestore
-						.collection(COLLECTIONS.WAIVERS)
-						.doc(signatureRequestId)
-						.get()
+					if (signatureRequest) {
+						const signatureRequestId = signatureRequest.signatureRequestId
 
-					const waiver = waiverSnapshot.data() as Waiver
+						if (signatureRequestId) {
+							const waiverSnapshot = await firestore
+								.collection(COLLECTIONS.WAIVERS)
+								.doc(signatureRequestId)
+								.get()
 
-					await waiver.player.update({
-						signed: true,
-					})
+							const waiver = waiverSnapshot.data() as Waiver
+
+							await waiver.player.update({
+								signed: true,
+							})
+						}
+					}
 				}
 			}
 		} catch (e) {
