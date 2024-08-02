@@ -421,7 +421,7 @@ export const Home = () => {
 									title="Minneapolis Mallard"
 								>
 									<img
-										src={'/mallard.png'}
+										src={'/Mallard.png'}
 										alt="Minneapolis Mallard"
 										width={80}
 									/>
@@ -429,12 +429,12 @@ export const Home = () => {
 							</div>
 							<div>
 								<a
-									href="https://theaudl.com/windchill"
+									href="https://watchufa.com/windchill"
 									target="_blank"
 									title="Minnesota Wind Chill"
 								>
 									<img
-										src="https://pbs.twimg.com/profile_images/1481722101824475143/c_dxHt-p_400x400.jpg"
+										src={'/Wind Chill.png'}
 										alt="Minnesota Wind Chill"
 										width={80}
 									/>
