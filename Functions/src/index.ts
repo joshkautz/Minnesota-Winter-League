@@ -73,9 +73,6 @@ const FIELDS = {
 
 const DROPBOX_SIGN_API_KEY = 'DROPBOX_SIGN_API_KEY'
 
-const firestore = getFirestore()
-const dropbox = new SignatureRequestApi()
-
 /**
  * When a user is deleted via Firebase Authentication, delete the corresponding `Players` document, update the corresponding `Teams` document, and delete the corresponding `Offers` documents.
  *
@@ -87,6 +84,8 @@ export const OnUserDeleted = functions
 	.auth.user()
 	.onDelete(async (user) => {
 		try {
+			const firestore = getFirestore()
+
 			const playerRef = firestore.collection(COLLECTIONS.PLAYERS).doc(user.uid)
 
 			// Delete all the `Offers` Firestore Documents for the player.
@@ -127,6 +126,8 @@ export const OnOfferAccepted = onDocumentUpdated(
 	{ document: 'offers/{offerId}', region: REGION },
 	async (event) => {
 		try {
+			const firestore = getFirestore()
+
 			const newValue = event.data?.after.data() as Offer
 			const previousValue = event.data?.after.data() as Offer
 
@@ -198,20 +199,16 @@ export const OnPaymentCreated = onDocumentCreated(
 	{ document: 'customers/{uid}/payments/{sid}', region: REGION },
 	async (event) => {
 		try {
+			const firestore = getFirestore()
+			const dropbox = new SignatureRequestApi()
+			dropbox.username = DROPBOX_SIGN_API_KEY
+
 			const playerSnapshot = await firestore
 				.collection(COLLECTIONS.PLAYERS)
 				.doc(event.params.uid)
 				.get()
 
 			const player = playerSnapshot.data() as Player
-
-			debug(DROPBOX_SIGN_API_KEY)
-
-			dropbox.username = DROPBOX_SIGN_API_KEY
-
-			debug(dropbox.username)
-
-			debug('Execute')
 
 			await dropbox.signatureRequestSendWithTemplate({
 				templateIds: ['0fb30e5f0123f06cc20fe3155f51a539c65f9218'],
@@ -267,8 +264,6 @@ export const OnPaymentCreated = onDocumentCreated(
 			// ])
 		} catch (e) {
 			debug('Oops! Something went wrong.')
-			debug(dropbox.username)
-			debug(dropbox)
 			debug((e as HttpError).response)
 		}
 	}
@@ -285,6 +280,8 @@ export const SetTeamRegistered_OnPlayerSignedChange = onDocumentUpdated(
 
 	async (event) => {
 		try {
+			const firestore = getFirestore()
+
 			const newValue = event.data?.after.data() as Player
 			const previousValue = event.data?.before.data() as Player
 
@@ -331,6 +328,8 @@ export const SetTeamRegistered_OnPlayerPaidChange = onDocumentUpdated(
 
 	async (event) => {
 		try {
+			const firestore = getFirestore()
+
 			const newValue = event.data?.after.data() as Player
 			const previousValue = event.data?.before.data() as Player
 
@@ -374,6 +373,8 @@ export const SetTeamRegistered_OnTeamRosterChange = onDocumentUpdated(
 	{ document: 'teams/{teamId}', region: REGION },
 	async (event) => {
 		try {
+			const firestore = getFirestore()
+
 			const newValue = event.data?.after.data() as Team
 			const previousValue = event.data?.before.data() as Team
 			const teamRef = event.data?.after.ref
