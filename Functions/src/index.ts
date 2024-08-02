@@ -210,7 +210,6 @@ export const OnPaymentCreated = onDocumentCreated(
 			const dropbox = new SignatureRequestApi()
 			dropbox.username = DROPBOX_SIGN_API_KEY
 
-
 			return firestore
 				.collection(COLLECTIONS.PLAYERS)
 				.doc(event.params.uid)
