@@ -402,12 +402,8 @@ export const Home = () => {
 							href="http://mplsmallard.com/"
 							target="_blank"
 							title="Minneapolis Mallard"
-            >
-							<img
-								src="/Mallard.png"
-								alt="Minneapolis Mallard"
-								width={100}
-							/>
+						>
+							<img src="/Mallard.png" alt="Minneapolis Mallard" width={100} />
 						</a>
 					</div>
 					<div>
