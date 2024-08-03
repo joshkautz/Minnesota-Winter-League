@@ -76,9 +76,6 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
-
 # Dependency directories
 node_modules/
 
@@ -103,7 +100,5 @@ node_modules/
 # private keys
 *.pem
 
-# Hikers Social: Build files
-build/
-
-service_account.json
+# Minneapolis Winter League: Build files
+dist
