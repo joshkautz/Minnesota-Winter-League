@@ -112,8 +112,8 @@ const ScheduleCard = ({
 										{game.date.toDate() > new Date()
 											? 'vs'
 											: game.homeScore === null || game.awayScore === null
-											? 'vs'
-											: `${game.homeScore} - ${game.awayScore}`}
+												? 'vs'
+												: `${game.homeScore} - ${game.awayScore}`}
 									</p>
 									<TooltipProvider>
 										<Tooltip>

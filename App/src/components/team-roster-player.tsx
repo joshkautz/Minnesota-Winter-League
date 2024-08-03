@@ -163,8 +163,9 @@ export const TeamRosterPlayer = ({
 											description={
 												playerSnapshot.id == documentSnapshot?.id
 													? 'You will not be able to rejoin until a captain accepts you back on to the roster.'
-													: `${playerSnapshot.data()
-															?.firstname} will not be able to rejoin until a captain accepts them back on to the roster.`
+													: `${
+															playerSnapshot.data()?.firstname
+														} will not be able to rejoin until a captain accepts them back on to the roster.`
 											}
 											onConfirm={removeFromTeamOnClickHandler}
 										>

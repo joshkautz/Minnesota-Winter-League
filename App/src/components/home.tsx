@@ -97,8 +97,8 @@ export const Home = () => {
 								{!documentSnapshot
 									? 'Join our League'
 									: isRostered
-									? 'Your Team'
-									: 'Join a Team'}
+										? 'Your Team'
+										: 'Join a Team'}
 							</Button>
 						</div>
 					</div>

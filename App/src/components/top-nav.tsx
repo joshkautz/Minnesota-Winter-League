@@ -68,8 +68,8 @@ export const TopNav = ({
 			? isCaptain
 				? captainContent
 				: isRostered
-				? rosteredContent
-				: unrosteredContent
+					? rosteredContent
+					: unrosteredContent
 			: []),
 	]
 
