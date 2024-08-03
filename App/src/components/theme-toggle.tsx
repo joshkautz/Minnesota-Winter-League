@@ -3,10 +3,10 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuContent,
 	DropdownMenuItem,
-} from './dropdown-menu'
+} from './ui/dropdown-menu'
 import { useContext } from 'react'
-import { ThemeContext } from '../theme-context'
-import { Button } from './button'
+import { ThemeContext } from './theme-context'
+import { Button } from './ui/button'
 import { LaptopIcon, MoonIcon, SunIcon } from '@radix-ui/react-icons'
 
 export const ThemeToggle = () => {
