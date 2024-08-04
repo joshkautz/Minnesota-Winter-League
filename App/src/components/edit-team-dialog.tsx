@@ -33,13 +33,15 @@ export const EditTeamDialog = ({
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Edit team</DialogTitle>
-					<DialogDescription>Update your team's name or logo</DialogDescription>
+					<DialogDescription>{`Update your team's name or logo`}</DialogDescription>
 				</DialogHeader>
 				<div className="max-w-[400px]">
 					<EditTeam
 						closeDialog={() => {
 							setOpen(false)
-							closeDialog && closeDialog()
+							if (closeDialog) {
+								closeDialog()
+							}
 						}}
 					/>
 				</div>

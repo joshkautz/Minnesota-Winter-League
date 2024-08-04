@@ -7,8 +7,8 @@ import { Button } from './ui/button'
 import { useContext } from 'react'
 import { AuthContext } from '@/firebase/auth-context'
 import { OutletContext } from './layout'
-import { SparklesCore } from './ui/particles'
-import { CitySvg } from './ui/city-svg'
+import { SparklesCore } from './particles'
+import { CitySvg } from './city-svg'
 
 const SnowFlake = ({ className }: { className?: string }) => {
 	return (
@@ -79,11 +79,11 @@ export const Home = () => {
 							/>
 
 							<div className={'mt-4 sm:mt-12 max-w-[490px] flex-1'}>
-								Join us this season for unforgettable Saturday nights of
+								{`Join us this season for unforgettable Saturday nights of
 								organized league play. Whether you're a seasoned club veteran,
-								or a rookie in college,{' '}
+								or a rookie in college, `}
 								<span className={'font-bold'}>
-									we can't wait to welcome you to the league.
+									{`we can't wait to welcome you to the league.`}
 								</span>
 							</div>
 							<Button
@@ -180,6 +180,7 @@ export const Home = () => {
 										<a
 											href="https://maps.app.goo.gl/avAamyReCbGmz8jWA"
 											target="_blank"
+											rel="noreferrer"
 										>
 											<u>University of Minnesota | URW Sports Field Complex</u>
 										</a>
@@ -207,8 +208,8 @@ export const Home = () => {
 							<div className={'flex flex-col gap-4'}>
 								<p className={'text-2xl font-bold'}>Individuals</p>
 								<p>
-									If you're a solo player looking for a team, don't worry! We'll
-									help you find a team up to play with for the season!{' '}
+									{`If you're a solo player looking for a team, don't worry! We'll
+									help you find a team up to play with for the season! `}
 									<Link to={'/#how-to-register'}>
 										<u>Learn more about registration below.</u>
 									</Link>
@@ -284,8 +285,8 @@ export const Home = () => {
 							</div>
 						</div>
 						<div className={'mt-8 text-2xl font-light '}>
-							Whether you're perfecting your throws, working on your defense, or
-							just out to have a great time,{' '}
+							{`Whether you're perfecting your throws, working on your defense, or
+							just out to have a great time, `}
 							<span className={'font-bold'}>
 								Minneapolis Winter League is the place to be.
 							</span>
@@ -321,7 +322,7 @@ export const Home = () => {
 							>
 								1
 							</span>
-							<p>Click on the "Login" button to register and log in.</p>
+							<p>{`Click on the "Login" button to register and log in.`}</p>
 						</div>
 						<div className={'w-full flex'}>
 							<span
@@ -344,8 +345,8 @@ export const Home = () => {
 								3
 							</span>
 							<p>
-								Click on the "Register" button on your Profile to submit
-								payment.
+								{`Click on the "Register" button on your Profile to submit
+								payment.`}
 							</p>
 						</div>
 						<div className={'w-full flex'}>
@@ -380,9 +381,9 @@ export const Home = () => {
 					}
 				>
 					<p className={'text-2xl max-w-[1040px] mx-auto'}>
-						Don't miss out on this opportunity to keep playing year-round.
+						{`Don't miss out on this opportunity to keep playing year-round.
 						Secure your spot today, and let's make this season of the
-						Minneapolis Winter League one to remember!
+						Minneapolis Winter League one to remember!`}
 					</p>
 				</div>
 
@@ -419,6 +420,7 @@ export const Home = () => {
 									href="http://mplsmallard.com/"
 									target="_blank"
 									title="Minneapolis Mallard"
+									rel="noreferrer"
 								>
 									<img
 										src={'/Mallard.png'}
@@ -432,6 +434,7 @@ export const Home = () => {
 									href="https://watchufa.com/windchill"
 									target="_blank"
 									title="Minnesota Wind Chill"
+									rel="noreferrer"
 								>
 									<img
 										src={'/Wind Chill.png'}
@@ -448,6 +451,7 @@ export const Home = () => {
 							href="https://lostyetidesign.com/"
 							target="_blank"
 							title="Lost Yeti Design Company"
+							rel="noreferrer"
 						>
 							<img
 								src="/lost-yeti.png"
