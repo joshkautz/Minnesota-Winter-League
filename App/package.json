@@ -1,12 +1,13 @@
 {
-	"name": "minnesota-winter-league",
+	"name": "app",
 	"version": "2.0.0",
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build",
+    "format": "prettier --check .",
 		"lint": "eslint .",
+		"build": "tsc && vite build",
+		"dev": "vite",
 		"test": "vitest",
 		"preview": "vite preview"
 	},
