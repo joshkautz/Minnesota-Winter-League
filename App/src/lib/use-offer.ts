@@ -17,8 +17,9 @@ export const useOffer = (
 						const playerSnapshot = await getPlayerSnapshot(offer.data().player)
 						const result: ExtendedOfferData = {
 							...offer.data(),
-							playerName: `${playerSnapshot.data()
-								?.firstname} ${playerSnapshot.data()?.lastname}`,
+							playerName: `${
+								playerSnapshot.data()?.firstname
+							} ${playerSnapshot.data()?.lastname}`,
 							teamName: teamSnapshot?.docs
 								.find((team) => team.id == offer.data().team.id)
 								?.data().name,

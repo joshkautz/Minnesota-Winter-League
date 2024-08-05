@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { AuthContext } from '@/firebase/auth-context'
 import { UserAvatar } from '@/components/user-avatar'
 import { Separator } from '@/components/ui/separator'
-import { ThemeToggle } from './ui/theme-toggle'
+import { ThemeToggle } from './theme-toggle'
 import { OffersContext } from '@/firebase/offers-context'
 import { UserForm } from './user-form'
 import { toast } from './ui/use-toast'
@@ -68,8 +68,8 @@ export const TopNav = ({
 			? isCaptain
 				? captainContent
 				: isRostered
-				? rosteredContent
-				: unrosteredContent
+					? rosteredContent
+					: unrosteredContent
 			: []),
 	]
 

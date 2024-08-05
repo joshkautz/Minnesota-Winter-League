@@ -168,7 +168,7 @@ export const CreateTeam = () => {
 				} else {
 					setNewTeamData({ name: data.name, storageRef: undefined })
 				}
-			} catch (error) {
+			} catch {
 				handleResult({
 					success: false,
 					message: `Ensure your email is verified. Please try again later.`,

@@ -1,62 +1,62 @@
 {
-	"$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json",
-	"functions": {
-		"source": "Functions",
-		"runtime": "nodejs20",
-		"ignore": [
-			"node_modules",
-			"src",
-			".gitignore",
-			"eslint.config.js",
-			"firebase-debug.log",
-			"firebase-debug.*.log",
-			"tsconfig.json"
-		]
-	},
-	"firestore": {
-		"rules": "firestore.rules",
-		"indexes": "firestore.indexes.json"
-	},
-	"hosting": {
-		"public": "App/build",
-		"ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-		"rewrites": [
-			{
-				"source": "/dropboxSignHandleWebhookEvents",
-				"function": {
-					"functionId": "dropboxSignHandleWebhookEvents",
-					"region": "us-central1"
-				}
-			},
-			{
-				"source": "**",
-				"destination": "/index.html"
-			}
-		],
-		"headers": [
-			{
-				"headers": [
-					{
-						"key": "Cache-Control",
-						"value": "max-age=604800"
-					}
-				],
-				"source": "**/*.@(jpg|jpeg|gif|png)"
-			},
-			{
-				"headers": [
-					{
-						"key": "Cache-Control",
-						"value": "max-age=86400"
-					}
-				],
-				"source": "**/*.@(js|css)"
-			}
-		],
-		"predeploy": [],
-		"postdeploy": []
-	},
-	"storage": {
-		"rules": "storage.rules"
-	}
+  "$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json",
+  "functions": {
+    "source": "Functions",
+    "runtime": "nodejs20",
+    "ignore": [
+      "node_modules",
+      "src",
+      ".gitignore",
+      "eslint.config.js",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "tsconfig.json"
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "App/dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/dropboxSignHandleWebhookEvents",
+        "function": {
+          "functionId": "dropboxSignHandleWebhookEvents",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=604800"
+          }
+        ],
+        "source": "**/*.@(jpg|jpeg|gif|png)"
+      },
+      {
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=86400"
+          }
+        ],
+        "source": "**/*.@(js|css)"
+      }
+    ],
+    "predeploy": [],
+    "postdeploy": []
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
 }

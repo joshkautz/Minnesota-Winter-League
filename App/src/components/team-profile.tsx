@@ -46,7 +46,7 @@ export const TeamProfile = () => {
 			? teamsQuerySnapshot?.docs.find((team) => team.id === id)
 			: teamsQuerySnapshot?.docs.find(
 					(team) => team.id === documentSnapshot?.data()?.team?.id
-			  )
+				)
 	}, [id, documentSnapshot, teamsQuerySnapshot])
 
 	const isOnTeam = team
@@ -222,43 +222,43 @@ export const TeamProfile = () => {
 								game.data().date.toDate() > new Date()
 									? 'vs'
 									: game.data().homeScore == null ||
-									  game.data().awayScore == null
-									? 'vs'
-									: (game.data().homeScore.toString() == 'W' ||
-											game.data().homeScore.toString() == 'L') &&
-									  (game.data().awayScore.toString() == 'W' ||
-											game.data().awayScore.toString() == 'L') &&
-									  opponent == 'away' &&
-									  game.data().homeScore.toString() == 'L'
-									? 'Loss'
-									: (game.data().homeScore.toString() == 'W' ||
-											game.data().homeScore.toString() == 'L') &&
-									  (game.data().awayScore.toString() == 'W' ||
-											game.data().awayScore.toString() == 'L') &&
-									  opponent == 'home' &&
-									  game.data().awayScore.toString() == 'L'
-									? 'Loss'
-									: (game.data().homeScore.toString() == 'W' ||
-											game.data().homeScore.toString() == 'L') &&
-									  (game.data().awayScore.toString() == 'W' ||
-											game.data().awayScore.toString() == 'L') &&
-									  opponent == 'away' &&
-									  game.data().homeScore.toString() == 'W'
-									? 'Win'
-									: (game.data().homeScore.toString() == 'W' ||
-											game.data().homeScore.toString() == 'L') &&
-									  (game.data().awayScore.toString() == 'W' ||
-											game.data().awayScore.toString() == 'L') &&
-									  opponent == 'home' &&
-									  game.data().awayScore.toString() == 'W'
-									? 'Win'
-									: // zero was being interpreted as false so added integer check.
-									!Number.isInteger(game.data().homeScore) ||
-									  !Number.isInteger(game.data().awayScore)
-									? 'vs'
-									: opponent == 'away'
-									? `${game.data().homeScore} - ${game.data().awayScore}`
-									: `${game.data().awayScore} - ${game.data().homeScore}`
+										  game.data().awayScore == null
+										? 'vs'
+										: (game.data().homeScore.toString() == 'W' ||
+													game.data().homeScore.toString() == 'L') &&
+											  (game.data().awayScore.toString() == 'W' ||
+													game.data().awayScore.toString() == 'L') &&
+											  opponent == 'away' &&
+											  game.data().homeScore.toString() == 'L'
+											? 'Loss'
+											: (game.data().homeScore.toString() == 'W' ||
+														game.data().homeScore.toString() == 'L') &&
+												  (game.data().awayScore.toString() == 'W' ||
+														game.data().awayScore.toString() == 'L') &&
+												  opponent == 'home' &&
+												  game.data().awayScore.toString() == 'L'
+												? 'Loss'
+												: (game.data().homeScore.toString() == 'W' ||
+															game.data().homeScore.toString() == 'L') &&
+													  (game.data().awayScore.toString() == 'W' ||
+															game.data().awayScore.toString() == 'L') &&
+													  opponent == 'away' &&
+													  game.data().homeScore.toString() == 'W'
+													? 'Win'
+													: (game.data().homeScore.toString() == 'W' ||
+																game.data().homeScore.toString() == 'L') &&
+														  (game.data().awayScore.toString() == 'W' ||
+																game.data().awayScore.toString() == 'L') &&
+														  opponent == 'home' &&
+														  game.data().awayScore.toString() == 'W'
+														? 'Win'
+														: // zero was being interpreted as false so added integer check.
+															!Number.isInteger(game.data().homeScore) ||
+															  !Number.isInteger(game.data().awayScore)
+															? 'vs'
+															: opponent == 'away'
+																? `${game.data().homeScore} - ${game.data().awayScore}`
+																: `${game.data().awayScore} - ${game.data().homeScore}`
 
 							return (
 								<div
