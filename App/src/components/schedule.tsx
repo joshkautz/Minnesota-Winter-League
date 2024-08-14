@@ -11,7 +11,7 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import {
 	DocumentData,
 	QueryDocumentSnapshot,
-	gamesQuery,
+	currentSeasonGamesQuery,
 } from '@/firebase/firestore'
 import { GamesData, TeamData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
@@ -25,6 +25,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './ui/tooltip'
+import { useSeasonContext } from '@/firebase/season-context'
 
 const TeamIcon = ({
 	team,
@@ -137,8 +138,15 @@ const ScheduleCard = ({
 }
 
 export const Schedule = () => {
+	const { selectedSeason } = useSeasonContext()
+
 	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
-		useCollection(gamesQuery())
+		useCollection(currentSeasonGamesQuery(selectedSeason))
+
+	console.log(
+		gamesSnapshot?.docs.map((doc) => doc.id),
+		selectedSeason?.id
+	)
 
 	const rounds: GamesData[][] = []
 	let previous: number = 0

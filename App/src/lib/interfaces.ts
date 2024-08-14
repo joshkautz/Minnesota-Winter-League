@@ -15,13 +15,15 @@ export interface ExtendedPlayerData extends PlayerData {
 }
 
 export interface TeamData extends DocumentData {
-	captains: DocumentReference<PlayerData, DocumentData>[]
 	logo: string
 	name: string
+	placement: number
 	registered: boolean
 	registeredDate: Timestamp
 	roster: DocumentReference<PlayerData, DocumentData>[]
+	season: DocumentReference<SeasonData, DocumentData>
 	storagePath: string
+	teamId: string
 }
 
 export interface SeasonData extends DocumentData {
@@ -62,6 +64,7 @@ export interface StandingsData extends DocumentData {
 	losses: number
 	pointsFor: number
 	pointsAgainst: number
+	differential: number
 }
 
 export interface GamesData extends DocumentData {
@@ -71,4 +74,5 @@ export interface GamesData extends DocumentData {
 	field: number
 	home: DocumentReference<TeamData, DocumentData>
 	homeScore: number
+	season: DocumentReference<SeasonData, DocumentData>
 }
