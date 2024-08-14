@@ -5,8 +5,6 @@ import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
 import { GradientHeader } from './gradient-header'
-import { SeasonsContext } from '@/firebase/season-context'
-import { useActiveTeams } from '@/lib/use-active-team'
 
 export const Teams = () => {
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =

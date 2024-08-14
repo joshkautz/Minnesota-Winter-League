@@ -35,7 +35,7 @@ const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		teamsQuerySnapshot,
 		teamsQuerySnapshotLoading,
 		teamsQuerySnapshotError,
-	] = useCollection(currentSeasonTeamsQuery(selectedSeason ?? undefined))
+	] = useCollection(currentSeasonTeamsQuery(selectedSeason))
 
 	return (
 		<TeamsContext.Provider
