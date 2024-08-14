@@ -67,7 +67,7 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		if (!seasonsQuerySnapshotLoading) {
 			setSelectedSeason(getMostRecentSeason())
 		}
-	}, [seasonsQuerySnapshotLoading])
+	}, [seasonsQuerySnapshot, seasonsQuerySnapshotLoading])
 
 	return (
 		<SeasonsContext.Provider
