@@ -12,6 +12,7 @@ import {
 	FC,
 	ReactNode,
 	SetStateAction,
+	useCallback,
 	useContext,
 	useEffect,
 	useState,
@@ -51,23 +52,15 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
 	>(undefined)
 
-	const getMostRecentSeason = () => {
-		const x = seasonsQuerySnapshot?.docs.sort(
+	const getMostRecentSeason = useCallback(() => {
+		return seasonsQuerySnapshot?.docs.sort(
 			(a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds
-		)
-
-		if (!x || !x.length) {
-			return undefined
-		}
-
-		return x[0]
-	}
+		)[0]
+	}, [seasonsQuerySnapshot])
 
 	useEffect(() => {
-		if (!seasonsQuerySnapshotLoading) {
-			setSelectedSeason(getMostRecentSeason())
-		}
-	}, [seasonsQuerySnapshotLoading])
+		setSelectedSeason(getMostRecentSeason())
+	}, [setSelectedSeason, getMostRecentSeason])
 
 	return (
 		<SeasonsContext.Provider
