@@ -15,7 +15,7 @@ import {
 import { AuthContext } from '@/firebase/auth-context'
 import { OfferData } from '@/lib/interfaces'
 
-interface AuthProps {
+interface OffersProps {
 	outgoingOffersQuerySnapshot:
 		| QuerySnapshot<OfferData, DocumentData>
 		| undefined
@@ -28,7 +28,14 @@ interface AuthProps {
 	incomingOffersQuerySnapshotError: FirestoreError | undefined
 }
 
-const OffersContext = createContext<AuthProps>({} as AuthProps)
+const OffersContext = createContext<OffersProps>({
+	outgoingOffersQuerySnapshot: undefined,
+	outgoingOffersQuerySnapshotLoading: false,
+	outgoingOffersQuerySnapshotError: undefined,
+	incomingOffersQuerySnapshot: undefined,
+	incomingOffersQuerySnapshotLoading: false,
+	incomingOffersQuerySnapshotError: undefined,
+})
 
 const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const { documentSnapshot } = useContext(AuthContext)

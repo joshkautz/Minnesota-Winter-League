@@ -5,25 +5,29 @@ import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
 import { GradientHeader } from './gradient-header'
+import { SeasonsContext } from '@/firebase/season-context'
+import { useActiveTeams } from '@/lib/use-active-team'
 
 export const Teams = () => {
-	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
-		useContext(TeamsContext)
+	const { selectedSeason, seasonsQuerySnapshotLoading } =
+		useContext(SeasonsContext)
+
+	const [teamsData] = useActiveTeams(selectedSeason?.data().teams)
 
 	return (
 		<div className={'container'}>
 			<GradientHeader>Teams</GradientHeader>
-			{teamsQuerySnapshotLoading ? (
+			{seasonsQuerySnapshotLoading ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
 			) : (
-				teamsQuerySnapshot &&
-				teamsQuerySnapshot.size > 0 && (
+				teamsData &&
+				teamsData.length > 0 && (
 					<div
 						className={'flex flex-row flex-wrap justify-center gap-y-8 gap-x-8'}
 					>
-						{teamsQuerySnapshot.docs.map((team) => {
+						{teamsData.map((team) => {
 							return (
 								<Link key={`link-${team.id}`} to={`/teams/${team.id}`}>
 									<Card className={'group'}>
@@ -82,7 +86,7 @@ export const Teams = () => {
 					</div>
 				)
 			)}
-			{teamsQuerySnapshot && teamsQuerySnapshot.size < 12 && (
+			{teamsData && teamsData.length < 12 && (
 				<div className="flex flex-col items-center justify-center my-16">
 					<div>
 						<p>Not finding the team you are looking for? </p>

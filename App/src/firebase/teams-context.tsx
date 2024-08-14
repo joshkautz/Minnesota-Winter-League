@@ -1,5 +1,5 @@
 // React
-import { PropsWithChildren, createContext } from 'react'
+import { PropsWithChildren, createContext, useContext } from 'react'
 
 // Firebase Hooks
 import { useCollection } from 'react-firebase-hooks/firestore'
@@ -13,13 +13,19 @@ import {
 } from '@/firebase/firestore'
 import { TeamData } from '@/lib/interfaces'
 
-interface AuthProps {
+interface TeamProps {
 	teamsQuerySnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
 	teamsQuerySnapshotLoading: boolean
 	teamsQuerySnapshotError: FirestoreError | undefined
 }
 
-const TeamsContext = createContext<AuthProps>({} as AuthProps)
+const TeamsContext = createContext<TeamProps>({
+	teamsQuerySnapshot: undefined,
+	teamsQuerySnapshotLoading: false,
+	teamsQuerySnapshotError: undefined,
+})
+
+export const useTeamsContext = () => useContext(TeamsContext)
 
 const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [
@@ -31,9 +37,9 @@ const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	return (
 		<TeamsContext.Provider
 			value={{
-				teamsQuerySnapshot: teamsQuerySnapshot,
-				teamsQuerySnapshotLoading: teamsQuerySnapshotLoading,
-				teamsQuerySnapshotError: teamsQuerySnapshotError,
+				teamsQuerySnapshot,
+				teamsQuerySnapshotLoading,
+				teamsQuerySnapshotError,
 			}}
 		>
 			{children}
