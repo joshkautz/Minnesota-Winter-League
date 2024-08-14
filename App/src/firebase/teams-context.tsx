@@ -6,12 +6,14 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 
 // Winter League
 import {
+	currentSeasonTeamsQuery,
 	DocumentData,
 	FirestoreError,
 	QuerySnapshot,
 	teamsQuery,
 } from '@/firebase/firestore'
 import { TeamData } from '@/lib/interfaces'
+import { useSeasonContext } from './season-context'
 
 interface TeamProps {
 	teamsQuerySnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
@@ -28,11 +30,13 @@ const TeamsContext = createContext<TeamProps>({
 export const useTeamsContext = () => useContext(TeamsContext)
 
 const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
+	const { selectedSeason } = useSeasonContext()
+
 	const [
 		teamsQuerySnapshot,
 		teamsQuerySnapshotLoading,
 		teamsQuerySnapshotError,
-	] = useCollection(teamsQuery())
+	] = useCollection(currentSeasonTeamsQuery(selectedSeason))
 
 	return (
 		<TeamsContext.Provider

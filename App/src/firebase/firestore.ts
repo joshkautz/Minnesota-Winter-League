@@ -326,7 +326,7 @@ const teamsQuery = (): Query<TeamData, DocumentData> => {
 }
 
 const currentSeasonTeamsQuery = (
-	seasonSnapshot: DocumentSnapshot<SeasonData, DocumentData> | undefined
+	seasonSnapshot: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
 ): Query<TeamData, DocumentData> | undefined => {
 	if (!seasonSnapshot) return undefined
 
