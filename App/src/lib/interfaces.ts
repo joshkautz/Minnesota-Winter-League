@@ -25,7 +25,10 @@ export interface TeamData extends DocumentData {
 	placement: number
 	registered: boolean
 	registeredDate: Timestamp
-	roster: DocumentReference<PlayerData, DocumentData>[]
+	roster: {
+		captain: boolean
+		player: DocumentReference<PlayerData, DocumentData>
+	}[]
 	season: DocumentReference<SeasonData, DocumentData>
 	storagePath: string
 	teamId: string

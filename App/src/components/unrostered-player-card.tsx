@@ -1,4 +1,4 @@
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import {
 	DocumentData,
 	DocumentReference,
@@ -8,7 +8,7 @@ import {
 } from '@/firebase/firestore'
 import { useUnrosteredPlayers } from '@/lib/use-unrostered-players'
 import { cn } from '@/lib/utils'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
@@ -87,7 +87,7 @@ const SearchBar = ({
 }
 
 export const UnrosteredPlayerList = () => {
-	const { documentSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useAuthContext()
 	const [unrosteredPlayersQuerySnapshot] = useCollection(
 		unrosteredPlayersQuery()
 	)

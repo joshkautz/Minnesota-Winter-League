@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { useContext } from 'react'
 import { Button } from '@/components/ui/button'
@@ -27,7 +27,7 @@ export const UserAvatar = ({
 		documentSnapshot,
 		documentSnapshotLoading,
 		signOut,
-	} = useContext(AuthContext)
+	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
 	const userInitials = `${

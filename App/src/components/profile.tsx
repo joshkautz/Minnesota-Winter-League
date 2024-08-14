@@ -1,6 +1,6 @@
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { Input } from '@/components/ui/input'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
 	Form,
@@ -34,7 +34,7 @@ export const Profile = () => {
 		documentSnapshot,
 		documentSnapshotLoading,
 		sendEmailVerification,
-	} = useContext(AuthContext)
+	} = useAuthContext()
 	const [sentEmail, setSentEmail] = useState(false)
 	const [stripeLoading, setStripeLoading] = useState(false)
 

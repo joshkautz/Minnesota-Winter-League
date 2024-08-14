@@ -12,14 +12,14 @@ import { ReactNode, useContext } from 'react'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
 import { TeamRosterPlayer } from './team-roster-player'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { toast } from './ui/use-toast'
 import { PlayerData, TeamData } from '@/lib/interfaces'
 import { Link } from 'react-router-dom'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 
 export const TeamRequestCard = () => {
-	const { documentSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useAuthContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
 	if (!documentSnapshot) {
@@ -128,7 +128,7 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
 		useContext(TeamsContext)
 	const { documentSnapshot, documentSnapshotLoading, authStateLoading } =
-		useContext(AuthContext)
+		useAuthContext()
 
 	const team = teamsQuerySnapshot?.docs.find(
 		(team) => team.id === documentSnapshot?.data()?.team?.id

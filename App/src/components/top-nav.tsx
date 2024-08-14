@@ -4,7 +4,7 @@ import { NavLink, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { UserAvatar } from '@/components/user-avatar'
 import { Separator } from '@/components/ui/separator'
 import { ThemeToggle } from './theme-toggle'
@@ -28,7 +28,7 @@ export const TopNav = ({
 		documentSnapshot,
 		signOut,
 		signOutLoading,
-	} = useContext(AuthContext)
+	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
 	const [open, setOpen] = useState(false)

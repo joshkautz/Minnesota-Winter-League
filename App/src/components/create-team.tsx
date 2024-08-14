@@ -1,6 +1,6 @@
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { toast } from './ui/use-toast'
@@ -30,7 +30,7 @@ const createTeamSchema = z.object({
 type CreateTeamSchema = z.infer<typeof createTeamSchema>
 
 export const CreateTeam = () => {
-	const { documentSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useAuthContext()
 	const isOnTeam = documentSnapshot?.data()?.team
 	const navigate = useNavigate()
 

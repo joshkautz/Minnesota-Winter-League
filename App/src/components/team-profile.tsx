@@ -1,5 +1,5 @@
 import { useTeamsContext } from '@/firebase/teams-context'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { NotificationCard } from './notification-card'
 import {
@@ -11,7 +11,7 @@ import {
 } from '@/firebase/firestore'
 import { PlayerData } from '@/lib/interfaces'
 import { TeamRosterPlayer } from './team-roster-player'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import {
 	DropdownMenu,
@@ -35,7 +35,7 @@ import { useSeasonContext } from '@/firebase/season-context'
 export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
-	const { documentSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useAuthContext()
 	const { selectedSeason } = useSeasonContext()
 
 	const seasonMatch = documentSnapshot
@@ -48,20 +48,19 @@ export const TeamProfile = () => {
 	const team = useMemo(() => {
 		return id
 			? teamsQuerySnapshot?.docs.find((team) => team.id === id)
-			: teamsQuerySnapshot?.docs.find(
-					(team) => team.id === seasonMatch?.team.id
-					// (team) => team.id === documentSnapshot?.data()?.team?.id
-				)
+			: undefined // TODO: Use the authenticated players team for the current season. If they don't have one, just say undefined, or....
 	}, [id, documentSnapshot, teamsQuerySnapshot])
 
 	const isOnTeam = team
 		?.data()
-		.roster.some((player) => player.id === documentSnapshot?.id)
+		.roster.some((item) => item.player.id === documentSnapshot?.id)
 
 	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
 	const [imgSrc, setImgSrc] = useState<string | undefined>()
+
+	console.log(gamesSnapshot, leaveTeamLoading, deleteTeamLoading, imgSrc)
 
 	useEffect(() => {
 		setImgSrc(team?.data().logo + `&date=${Date.now()}`)
@@ -200,20 +199,21 @@ export const TeamProfile = () => {
 					moreActions={isOnTeam && playerActions}
 					footerContent={isOnTeam && isCaptain ? registrationStatus : undefined}
 				>
-					{team
-						?.data()
-						.roster?.map(
-							(
-								playerRef: DocumentReference<PlayerData, DocumentData>,
-								index: number
-							) => (
-								<TeamRosterPlayer
-									key={`team-${index}`}
-									isDisabled={!isOnTeam || !isCaptain}
-									playerRef={playerRef}
-								/>
-							)
-						)}
+					{team?.data().roster?.map(
+						(
+							item: {
+								captain: boolean
+								player: DocumentReference<PlayerData, DocumentData>
+							},
+							index: number
+						) => (
+							<TeamRosterPlayer
+								key={`team-${index}`}
+								isDisabled={!isOnTeam || !isCaptain}
+								playerRef={item.player}
+							/>
+						)
+					)}
 				</NotificationCard>
 				<NotificationCard
 					title={'Record'}

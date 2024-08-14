@@ -1,5 +1,5 @@
 // React
-import { PropsWithChildren, createContext } from 'react'
+import { PropsWithChildren, createContext, useContext } from 'react'
 
 // Firebase Hooks
 import {
@@ -64,9 +64,13 @@ interface AuthProps {
 	sendPasswordResetEmailSending: boolean
 	sendPasswordResetEmailError: Error | AuthError | undefined
 }
-const AuthContext = createContext<AuthProps>({} as AuthProps)
+export const AuthContext = createContext<AuthProps>({} as AuthProps)
 
-const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
+export const useAuthContext = () => useContext(AuthContext)
+
+export const AuthContextProvider: React.FC<PropsWithChildren> = ({
+	children,
+}) => {
 	const [authStateUser, authStateLoading, authStateError] = useAuthState(auth)
 	const [documentSnapshot, documentSnapshotLoading, documentSnapshotError] =
 		useDocument(getPlayerRef(authStateUser))
@@ -130,5 +134,3 @@ const AuthContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		</AuthContext.Provider>
 	)
 }
-
-export { AuthContext, AuthContextProvider }

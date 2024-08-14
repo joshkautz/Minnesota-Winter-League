@@ -1,4 +1,4 @@
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -29,7 +29,7 @@ const editTeamSchema = z.object({
 type EditTeamSchema = z.infer<typeof editTeamSchema>
 
 export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
-	const { documentSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useAuthContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
 	const team = useMemo(() => {

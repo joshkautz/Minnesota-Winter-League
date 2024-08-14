@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { useAnchorScroll } from '@/lib/use-anchor-scroll'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import { Button } from './ui/button'
-import { useContext } from 'react'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { OutletContext } from './layout'
 import { SparklesCore } from './particles'
 import { CitySvg } from './city-svg'
@@ -33,7 +32,7 @@ export const Home = () => {
 	const { toggleIsOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()
 	const navigate = useNavigate()
-	const { documentSnapshot, documentSnapshotLoading } = useContext(AuthContext)
+	const { documentSnapshot, documentSnapshotLoading } = useAuthContext()
 	const isRostered = documentSnapshot?.data()?.team
 
 	const handleCallToAction = () => {

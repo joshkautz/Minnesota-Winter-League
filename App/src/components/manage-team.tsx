@@ -10,7 +10,7 @@ import {
 } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
 import { useOffer } from '@/lib/use-offer'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { NotificationCard, NotificationCardItem } from './notification-card'
 import { TeamRequestCard, TeamRosterCard } from './team-request-card'
 import { UnrosteredPlayerList } from './unrostered-player-card'
@@ -34,7 +34,7 @@ export const ManageTeam = () => {
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
 		useContext(OffersContext)
 	const { authStateLoading, documentSnapshot, documentSnapshotLoading } =
-		useContext(AuthContext)
+		useAuthContext()
 	const isCaptain = documentSnapshot?.data()?.captain
 	const isUnrostered = documentSnapshot?.data()?.team === null
 

@@ -13,10 +13,10 @@ import {
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
 import { DotsVerticalIcon, StarFilledIcon } from '@radix-ui/react-icons'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { PlayerData } from '@/lib/interfaces'
 import { useDocument } from 'react-firebase-hooks/firestore'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
@@ -30,7 +30,7 @@ export const TeamRosterPlayer = ({
 	playerRef: DocumentReference<PlayerData, DocumentData>
 	isDisabled: boolean
 }) => {
-	const { documentSnapshot } = useContext(AuthContext)
+	const { documentSnapshot } = useAuthContext()
 	const [playerSnapshot] = useDocument(playerRef)
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 
