@@ -33,11 +33,7 @@ export const SeasonSelect = () => {
 				</SelectTrigger>
 				<SelectContent>
 					{seasonsQuerySnapshot?.docs.map((season) => (
-						<SelectItem
-							key={season.id}
-							value={season.data().name}
-							onClick={() => console.log('clicked')}
-						>
+						<SelectItem key={season.id} value={season.data().name}>
 							{season.data().name}
 						</SelectItem>
 					))}

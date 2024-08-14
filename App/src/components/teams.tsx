@@ -1,28 +1,18 @@
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
 import { GradientHeader } from './gradient-header'
 
 export const Teams = () => {
-	const {
-		teamsQuerySnapshot,
-		teamsQuerySnapshotLoading,
-		teamsQuerySnapshotError,
-	} = useContext(TeamsContext)
-
-	console.log(teamsQuerySnapshot?.docs)
-
-	useEffect(() => {
-		console.log(teamsQuerySnapshotError)
-	}, [teamsQuerySnapshotError])
+	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
+		useContext(TeamsContext)
 
 	return (
 		<div className={'container'}>
 			<GradientHeader>Teams</GradientHeader>
-			{/* {JSON.stringify(teamsQuerySnapshot)} */}
 			{teamsQuerySnapshotLoading ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
