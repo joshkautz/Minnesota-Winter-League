@@ -17,6 +17,7 @@ const playerQuerySnapshot = await firestore.collection("players").get();
 playerQuerySnapshot.forEach(async (playerDoc) => {
   await firestore
     .collection("new")
+    .doc("new")
     .collection("players")
     .doc(playerDoc.id)
     .set(playerDoc.data());
