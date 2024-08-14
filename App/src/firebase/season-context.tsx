@@ -22,9 +22,9 @@ interface SeasonProps {
 	seasonsQuerySnapshot: QuerySnapshot<SeasonData, DocumentData> | undefined
 	seasonsQuerySnapshotLoading: boolean
 	seasonsQuerySnapshotError: FirestoreError | undefined
-	selectedSeason: QueryDocumentSnapshot<SeasonData, DocumentData> | null
+	selectedSeason: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
 	setSelectedSeason: Dispatch<
-		SetStateAction<QueryDocumentSnapshot<SeasonData, DocumentData> | null>
+		SetStateAction<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>
 	>
 }
 
@@ -32,7 +32,7 @@ export const SeasonsContext = createContext<SeasonProps>({
 	seasonsQuerySnapshot: undefined,
 	seasonsQuerySnapshotLoading: false,
 	seasonsQuerySnapshotError: undefined,
-	selectedSeason: null,
+	selectedSeason: undefined,
 	setSelectedSeason: () => {},
 })
 
@@ -47,10 +47,9 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		seasonsQuerySnapshotError,
 	] = useCollection(seasonsQuery())
 
-	const [selectedSeason, setSelectedSeason] = useState<QueryDocumentSnapshot<
-		SeasonData,
-		DocumentData
-	> | null>(null)
+	const [selectedSeason, setSelectedSeason] = useState<
+		QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
+	>(undefined)
 
 	const getMostRecentSeason = () => {
 		const x = seasonsQuerySnapshot?.docs.sort(
@@ -58,7 +57,7 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		)
 
 		if (!x || !x.length) {
-			return null
+			return undefined
 		}
 
 		return x[0]

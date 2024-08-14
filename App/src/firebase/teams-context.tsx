@@ -10,7 +10,6 @@ import {
 	DocumentData,
 	FirestoreError,
 	QuerySnapshot,
-	teamsQuery,
 } from '@/firebase/firestore'
 import { TeamData } from '@/lib/interfaces'
 import { useSeasonContext } from './season-context'
