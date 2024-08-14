@@ -143,31 +143,32 @@ export const Schedule = () => {
 	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
 		useCollection(currentSeasonGamesQuery(selectedSeason))
 
-	console.log(
-		gamesSnapshot?.docs.map((doc) => doc.id),
-		selectedSeason?.id
-	)
-
 	const rounds: GamesData[][] = []
 	let previous: number = 0
 	let index: number = 0
 
-	gamesSnapshot?.docs.forEach(
-		(queryDocumentSnapshot: QueryDocumentSnapshot<GamesData, DocumentData>) => {
-			const time = queryDocumentSnapshot.data().date.toDate().getTime()
-			if (previous == 0) {
-				previous = time
+	gamesSnapshot?.docs
+		.sort((a, b) => a.data().date.seconds - b.data().date.seconds)
+		.forEach(
+			(
+				queryDocumentSnapshot: QueryDocumentSnapshot<GamesData, DocumentData>
+			) => {
+				const time = queryDocumentSnapshot.data().date.seconds
+				if (previous == 0) {
+					previous = time
+				}
+				if (previous !== time) {
+					previous = time
+					index++
+				}
+				if (!rounds[index]) {
+					rounds[index] = []
+				}
+				rounds[index].push(queryDocumentSnapshot.data())
 			}
-			if (previous !== time) {
-				previous = time
-				index++
-			}
-			if (!rounds[index]) {
-				rounds[index] = []
-			}
-			rounds[index].push(queryDocumentSnapshot.data())
-		}
-	)
+		)
+
+	console.log(rounds)
 
 	return (
 		<div className={'sm:container'}>
