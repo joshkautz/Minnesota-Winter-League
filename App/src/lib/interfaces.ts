@@ -24,6 +24,15 @@ export interface TeamData extends DocumentData {
 	storagePath: string
 }
 
+export interface SeasonData extends DocumentData {
+	dateEnd: Timestamp
+	dateStart: Timestamp
+	name: string
+	registrationEnd: Timestamp
+	registrationStart: Timestamp
+	teams: DocumentReference<TeamData, DocumentData>[]
+}
+
 export interface OfferData extends DocumentData {
 	creator: string
 	player: DocumentReference<PlayerData, DocumentData>

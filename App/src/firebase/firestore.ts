@@ -38,6 +38,7 @@ import {
 	PlayerData,
 	StandingsData,
 	TeamData,
+	SeasonData,
 } from '@/lib/interfaces'
 import { deleteImage, ref, storage } from './storage'
 
@@ -324,6 +325,13 @@ const teamsQuery = (): Query<TeamData, DocumentData> => {
 	return query(collection(firestore, 'teams')) as Query<TeamData, DocumentData>
 }
 
+const seasonsQuery = (): Query<SeasonData, DocumentData> => {
+	return query(collection(firestore, 'seasons')) as Query<
+		SeasonData,
+		DocumentData
+	>
+}
+
 const offersForUnrosteredPlayersQuery = (
 	playerRef: DocumentReference<PlayerData, DocumentData>,
 	teamRef: DocumentReference<TeamData, DocumentData>
@@ -423,6 +431,7 @@ export {
 	requestToJoinTeam,
 	invitePlayerToJoinTeam,
 	teamsQuery,
+	seasonsQuery,
 	gamesQuery,
 	outgoingOffersQuery,
 	offersForUnrosteredPlayersQuery,
