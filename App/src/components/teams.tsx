@@ -9,25 +9,23 @@ import { SeasonsContext } from '@/firebase/season-context'
 import { useActiveTeams } from '@/lib/use-active-team'
 
 export const Teams = () => {
-	const { selectedSeason, seasonsQuerySnapshotLoading } =
-		useContext(SeasonsContext)
-
-	const [teamsData] = useActiveTeams(selectedSeason?.data().teams)
+	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
+		useContext(TeamsContext)
 
 	return (
 		<div className={'container'}>
 			<GradientHeader>Teams</GradientHeader>
-			{seasonsQuerySnapshotLoading ? (
+			{teamsQuerySnapshotLoading ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
 			) : (
-				teamsData &&
-				teamsData.length > 0 && (
+				teamsQuerySnapshot &&
+				teamsQuerySnapshot.size > 0 && (
 					<div
 						className={'flex flex-row flex-wrap justify-center gap-y-8 gap-x-8'}
 					>
-						{teamsData.map((team) => {
+						{teamsQuerySnapshot.docs.map((team) => {
 							return (
 								<Link key={`link-${team.id}`} to={`/teams/${team.id}`}>
 									<Card className={'group'}>
@@ -86,7 +84,7 @@ export const Teams = () => {
 					</div>
 				)
 			)}
-			{teamsData && teamsData.length < 12 && (
+			{teamsQuerySnapshot && teamsQuerySnapshot.docs.length < 12 && (
 				<div className="flex flex-col items-center justify-center my-16">
 					<div>
 						<p>Not finding the team you are looking for? </p>
