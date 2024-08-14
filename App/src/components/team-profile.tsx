@@ -1,4 +1,4 @@
-import { TeamsContext } from '@/firebase/teams-context'
+import { useTeamsContext } from '@/firebase/teams-context'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { NotificationCard } from './notification-card'
@@ -30,14 +30,18 @@ import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
 import { EditTeamDialog } from './edit-team-dialog'
 import { Skeleton } from './ui/skeleton'
+import { useSeasonContext } from '@/firebase/season-context'
 
 export const TeamProfile = () => {
 	const { id } = useParams()
-	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
-		useContext(TeamsContext)
+	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
 	const { documentSnapshot } = useContext(AuthContext)
+	const { selectedSeason } = useSeasonContext()
 
-	const isCaptain = documentSnapshot?.data()?.captain
+	const seasonMatch = documentSnapshot
+		?.data()
+		?.seasons.find((season) => season.season.id === selectedSeason?.id)
+	const isCaptain = seasonMatch?.captain
 
 	const [loaded, setLoaded] = useState(false)
 
@@ -45,7 +49,8 @@ export const TeamProfile = () => {
 		return id
 			? teamsQuerySnapshot?.docs.find((team) => team.id === id)
 			: teamsQuerySnapshot?.docs.find(
-					(team) => team.id === documentSnapshot?.data()?.team?.id
+					(team) => team.id === seasonMatch?.team.id
+					// (team) => team.id === documentSnapshot?.data()?.team?.id
 				)
 	}, [id, documentSnapshot, teamsQuerySnapshot])
 
