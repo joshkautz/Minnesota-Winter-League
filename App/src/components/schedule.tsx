@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import {
 	Card,
 	CardContent,
@@ -143,32 +143,32 @@ export const Schedule = () => {
 	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
 		useCollection(currentSeasonGamesQuery(selectedSeason))
 
-	const rounds: GamesData[][] = []
-	let previous: number = 0
-	let index: number = 0
-
-	gamesSnapshot?.docs
-		.sort((a, b) => a.data().date.seconds - b.data().date.seconds)
-		.forEach(
-			(
-				queryDocumentSnapshot: QueryDocumentSnapshot<GamesData, DocumentData>
-			) => {
-				const time = queryDocumentSnapshot.data().date.seconds
-				if (previous == 0) {
-					previous = time
+	const rounds: GamesData[][] = useMemo(() => {
+		const result: GamesData[][] = []
+		let index: number = 0
+		let previousTimestamp: number = 0
+		gamesSnapshot?.docs
+			.sort((a, b) => a.data().date.seconds - b.data().date.seconds)
+			.forEach(
+				(
+					queryDocumentSnapshot: QueryDocumentSnapshot<GamesData, DocumentData>
+				) => {
+					const currentTimestamp = queryDocumentSnapshot.data().date.seconds
+					if (previousTimestamp == 0) {
+						previousTimestamp = currentTimestamp
+					}
+					if (previousTimestamp !== currentTimestamp) {
+						previousTimestamp = currentTimestamp
+						index++
+					}
+					if (!result[index]) {
+						result[index] = []
+					}
+					result[index].push(queryDocumentSnapshot.data())
 				}
-				if (previous !== time) {
-					previous = time
-					index++
-				}
-				if (!rounds[index]) {
-					rounds[index] = []
-				}
-				rounds[index].push(queryDocumentSnapshot.data())
-			}
-		)
-
-	console.log(rounds)
+			)
+		return result
+	}, [gamesSnapshot])
 
 	return (
 		<div className={'sm:container'}>
