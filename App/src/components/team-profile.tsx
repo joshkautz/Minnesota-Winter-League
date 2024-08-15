@@ -35,32 +35,39 @@ import { useSeasonContext } from '@/firebase/season-context'
 export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
-	const { documentSnapshot } = useAuthContext()
+	const { documentSnapshot } = useAuthContext() //TODO: Rename to userSnapshot or authenticatedUserSnapshot.
 	const { selectedSeason } = useSeasonContext()
-
-	const seasonMatch = documentSnapshot
-		?.data()
-		?.seasons.find((season) => season.season.id === selectedSeason?.id)
-	const isCaptain = seasonMatch?.captain
 
 	const [loaded, setLoaded] = useState(false)
 
 	const team = useMemo(() => {
-		return id
+		const team = id
 			? teamsQuerySnapshot?.docs.find((team) => team.id === id)
-			: undefined // TODO: Use the authenticated players team for the current season. If they don't have one, just say undefined, or....
+			: teamsQuerySnapshot?.docs.find(
+					(team) =>
+						team.id ===
+						documentSnapshot
+							?.data()
+							?.seasons.find((item) => item.season.id === selectedSeason?.id)
+							?.team.id
+				)
+		return team
 	}, [id, documentSnapshot, teamsQuerySnapshot])
+
+	const isCaptain = team
+		?.data()
+		.roster.some(
+			(item) => item.player === documentSnapshot?.ref && item.captain
+		)
 
 	const isOnTeam = team
 		?.data()
-		.roster.some((item) => item.player.id === documentSnapshot?.id)
+		.roster.some((item) => item.player === documentSnapshot?.ref)
 
 	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
 	const [imgSrc, setImgSrc] = useState<string | undefined>()
-
-	console.log(gamesSnapshot, leaveTeamLoading, deleteTeamLoading, imgSrc)
 
 	useEffect(() => {
 		setImgSrc(team?.data().logo + `&date=${Date.now()}`)
