@@ -30,8 +30,8 @@ const createTeamSchema = z.object({
 type CreateTeamSchema = z.infer<typeof createTeamSchema>
 
 export const CreateTeam = () => {
-	const { documentSnapshot } = useAuthContext()
-	const isOnTeam = documentSnapshot?.data()?.team
+	const { authenticatedUserSnapshot } = useAuthContext()
+	const isOnTeam = authenticatedUserSnapshot?.data()?.team
 	const navigate = useNavigate()
 
 	const [loading, setLoading] = useState(false)
@@ -81,8 +81,8 @@ export const CreateTeam = () => {
 			if (newTeamData.storageRef) {
 				setStorageRef(newTeamData.storageRef)
 			} else {
-				if (documentSnapshot) {
-					createTeam(documentSnapshot.ref, newTeamData.name)
+				if (authenticatedUserSnapshot) {
+					createTeam(authenticatedUserSnapshot.ref, newTeamData.name)
 						.then(() => {
 							handleResult({
 								success: true,
@@ -111,10 +111,10 @@ export const CreateTeam = () => {
 
 	useEffect(() => {
 		if (downloadUrl) {
-			if (documentSnapshot) {
+			if (authenticatedUserSnapshot) {
 				if (newTeamData) {
 					createTeam(
-						documentSnapshot.ref,
+						authenticatedUserSnapshot.ref,
 						newTeamData.name,
 						downloadUrl,
 						newTeamData.storageRef?.fullPath
@@ -151,7 +151,7 @@ export const CreateTeam = () => {
 	}, [downloadUrl])
 
 	const onSubmit = async (data: CreateTeamSchema) => {
-		if (documentSnapshot) {
+		if (authenticatedUserSnapshot) {
 			try {
 				setLoading(true)
 				if (blob) {
@@ -188,7 +188,7 @@ export const CreateTeam = () => {
 
 	return (
 		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
-			{documentSnapshot?.data()?.team === null ? (
+			{authenticatedUserSnapshot?.data()?.team === null ? (
 				<>
 					<GradientHeader>Create a Team</GradientHeader>
 					<div className="max-w-[400px]">

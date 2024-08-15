@@ -33,10 +33,13 @@ export const ManageTeam = () => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
 		useContext(OffersContext)
-	const { authStateLoading, documentSnapshot, documentSnapshotLoading } =
-		useAuthContext()
-	const isCaptain = documentSnapshot?.data()?.captain
-	const isUnrostered = documentSnapshot?.data()?.team === null
+	const {
+		authStateLoading,
+		authenticatedUserSnapshot,
+		authenticatedUserSnapshotLoading,
+	} = useAuthContext()
+	const isCaptain = authenticatedUserSnapshot?.data()?.captain
+	const isUnrostered = authenticatedUserSnapshot?.data()?.team === null
 
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
@@ -152,12 +155,13 @@ export const ManageTeam = () => {
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
 							}
 							onConfirm={() => {
-								if (documentSnapshot) {
-									const documentSnapshotData = documentSnapshot.data()
-									if (documentSnapshotData) {
+								if (authenticatedUserSnapshot) {
+									const authenticatedUserSnapshotData =
+										authenticatedUserSnapshot.data()
+									if (authenticatedUserSnapshotData) {
 										leaveTeam(
-											documentSnapshot.ref,
-											documentSnapshotData.team,
+											authenticatedUserSnapshot.ref,
+											authenticatedUserSnapshotData.team,
 											setLeaveTeamLoading
 										)
 									}
@@ -179,10 +183,14 @@ export const ManageTeam = () => {
 								'The entire team will be deleted. This action is irreversible.'
 							}
 							onConfirm={() => {
-								if (documentSnapshot) {
-									const documentSnapshotData = documentSnapshot.data()
-									if (documentSnapshotData) {
-										deleteTeam(documentSnapshotData.team, setDeleteTeamLoading)
+								if (authenticatedUserSnapshot) {
+									const authenticatedUserSnapshotData =
+										authenticatedUserSnapshot.data()
+									if (authenticatedUserSnapshotData) {
+										deleteTeam(
+											authenticatedUserSnapshotData.team,
+											setDeleteTeamLoading
+										)
 											.then(() => {
 												// navigate('/')
 											})
@@ -228,12 +236,13 @@ export const ManageTeam = () => {
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
 							}
 							onConfirm={() => {
-								if (documentSnapshot) {
-									const documentSnapshotData = documentSnapshot.data()
-									if (documentSnapshotData) {
+								if (authenticatedUserSnapshot) {
+									const authenticatedUserSnapshotData =
+										authenticatedUserSnapshot.data()
+									if (authenticatedUserSnapshotData) {
 										leaveTeam(
-											documentSnapshot.ref,
-											documentSnapshotData.team,
+											authenticatedUserSnapshot.ref,
+											authenticatedUserSnapshotData.team,
 											setLeaveTeamLoading
 										)
 									}
@@ -257,13 +266,13 @@ export const ManageTeam = () => {
 	return (
 		<div className={'container'}>
 			<GradientHeader>
-				{documentSnapshotLoading ||
+				{authenticatedUserSnapshotLoading ||
 				authStateLoading ||
-				documentSnapshot?.data()?.team === undefined
+				authenticatedUserSnapshot?.data()?.team === undefined
 					? `Loading...`
-					: documentSnapshot?.data()?.team === null
+					: authenticatedUserSnapshot?.data()?.team === null
 						? `Join Team`
-						: documentSnapshot?.data()?.captain
+						: authenticatedUserSnapshot?.data()?.captain
 							? `Manage Team`
 							: `Manage Player`}
 			</GradientHeader>

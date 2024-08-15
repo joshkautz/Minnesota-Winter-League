@@ -6,178 +6,88 @@ import {
 	DocumentReference,
 	DocumentData,
 	gamesByTeamQuery,
-	leaveTeam,
-	deleteTeam,
 } from '@/firebase/firestore'
 import { PlayerData } from '@/lib/interfaces'
 import { TeamRosterPlayer } from './team-roster-player'
 import { useAuthContext } from '@/firebase/auth-context'
 import { useCollection } from 'react-firebase-hooks/firestore'
-import {
-	DropdownMenu,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-} from './ui/dropdown-menu'
-import {
-	CheckCircledIcon,
-	DotsVerticalIcon,
-	ReloadIcon,
-} from '@radix-ui/react-icons'
-import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
-import { Button } from './ui/button'
-import { toast } from './ui/use-toast'
-import { EditTeamDialog } from './edit-team-dialog'
+
+import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
+import { TeamProfilePlayerActions } from './team-profile-player-actions'
 import { Skeleton } from './ui/skeleton'
 import { useSeasonContext } from '@/firebase/season-context'
 
 export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
-	const { documentSnapshot } = useAuthContext() //TODO: Rename to userSnapshot or authenticatedUserSnapshot.
+	const { authenticatedUserSnapshot } = useAuthContext()
 	const { selectedSeason } = useSeasonContext()
 
-	const [loaded, setLoaded] = useState(false)
+	const [teamProfileImageLoaded, setTeamProfileImageLoaded] = useState(false)
 
-	const team = useMemo(() => {
-		const team = id
-			? teamsQuerySnapshot?.docs.find((team) => team.id === id)
-			: teamsQuerySnapshot?.docs.find(
-					(team) =>
-						team.id ===
-						documentSnapshot
-							?.data()
-							?.seasons.find((item) => item.season.id === selectedSeason?.id)
-							?.team.id
-				)
-		return team
-	}, [id, documentSnapshot, teamsQuerySnapshot])
+	const team = useMemo(
+		() =>
+			id
+				? teamsQuerySnapshot?.docs.find((team) => team.id === id)
+				: teamsQuerySnapshot?.docs.find(
+						(team) =>
+							team.id ===
+							authenticatedUserSnapshot
+								?.data()
+								?.seasons.find((item) => item.season.id === selectedSeason?.id)
+								?.team.id
+					),
+		[id, authenticatedUserSnapshot, teamsQuerySnapshot]
+	)
 
-	const isCaptain = team
-		?.data()
-		.roster.some(
-			(item) => item.player === documentSnapshot?.ref && item.captain
-		)
+	const isCaptain = useMemo(
+		() =>
+			team
+				?.data()
+				.roster.some(
+					(item) =>
+						item.player.id === authenticatedUserSnapshot?.id && item.captain
+				),
+		[team, authenticatedUserSnapshot]
+	)
 
-	const isOnTeam = team
-		?.data()
-		.roster.some((item) => item.player === documentSnapshot?.ref)
+	const isOnTeam = useMemo(
+		() =>
+			team
+				?.data()
+				.roster.some(
+					(item) => item.player.id === authenticatedUserSnapshot?.id
+				),
+		[team, authenticatedUserSnapshot]
+	)
 
 	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
-	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
-	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
 	const [imgSrc, setImgSrc] = useState<string | undefined>()
 
 	useEffect(() => {
 		setImgSrc(team?.data().logo + `&date=${Date.now()}`)
 	}, [team])
 
-	const registrationStatus = teamsQuerySnapshotLoading ? (
-		<p className="text-sm text-muted-foreground">Loading...</p>
-	) : !team?.data().registered ? (
-		<p className={'text-sm text-muted-foreground'}>
-			You need 10 registered players in order to meet the minimum requirement.
-			Registration ends Tuesday, October 31st, at 11:59pm.
-		</p>
-	) : (
-		<p
-			className={'text-sm text-muted-foreground inline-flex gap-2 items-center'}
-		>
-			{team?.data().name} is fully registered
-			<CheckCircledIcon className="w-4 h-4" />
-		</p>
-	)
-
-	const playerActions = (
-		<div className="absolute right-6 top-6">
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button size={'sm'} variant={'ghost'}>
-						<DotsVerticalIcon />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuGroup>
-						{isCaptain && (
-							<EditTeamDialog
-								closeDialog={() => {
-									setImgSrc(team?.data().logo + `&date=${Date.now()}`)
-								}}
-							>
-								<DropdownMenuItem onClick={(event) => event.preventDefault()}>
-									Edit team
-								</DropdownMenuItem>
-							</EditTeamDialog>
-						)}
-						<DestructiveConfirmationDialog
-							title={'Are you sure you want to leave?'}
-							description={
-								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
-							}
-							onConfirm={() => {
-								if (documentSnapshot) {
-									const documentSnapshotData = documentSnapshot.data()
-									if (documentSnapshotData) {
-										leaveTeam(
-											documentSnapshot.ref,
-											documentSnapshotData.team,
-											setLeaveTeamLoading
-										)
-									}
-								}
-							}}
-						>
-							<DropdownMenuItem
-								className="focus:bg-destructive focus:text-destructive-foreground"
-								disabled={leaveTeamLoading}
-								onClick={(event) => event.preventDefault()}
-							>
-								Leave team
-							</DropdownMenuItem>
-						</DestructiveConfirmationDialog>
-						{isCaptain && (
-							<DestructiveConfirmationDialog
-								title={'Are you sure?'}
-								description={
-									'The entire team will be deleted. This action is irreversible.'
-								}
-								onConfirm={() => {
-									if (documentSnapshot) {
-										const documentSnapshotData = documentSnapshot.data()
-										if (documentSnapshotData) {
-											deleteTeam(
-												documentSnapshotData.team,
-												setDeleteTeamLoading
-											)
-												.then(() => {
-													// navigate('/')
-												})
-												.catch(() => {
-													toast({
-														title: 'Unable to delete team',
-														description:
-															'Ensure your email is verified. Please try again later.',
-														variant: 'destructive',
-													})
-												})
-										}
-									}
-								}}
-							>
-								<DropdownMenuItem
-									className="focus:bg-destructive focus:text-destructive-foreground"
-									disabled={deleteTeamLoading}
-									onClick={(event) => event.preventDefault()}
-								>
-									Delete team
-								</DropdownMenuItem>
-							</DestructiveConfirmationDialog>
-						)}
-					</DropdownMenuGroup>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
+	const registrationStatus = useMemo(
+		() =>
+			teamsQuerySnapshotLoading ? (
+				<p className="text-sm text-muted-foreground">Loading...</p>
+			) : !team?.data().registered ? (
+				<p className={'text-sm text-muted-foreground'}>
+					You need 10 registered players in order to meet the minimum
+					requirement. Registration ends Tuesday, October 31st, at 11:59pm.
+				</p>
+			) : (
+				<p
+					className={
+						'text-sm text-muted-foreground inline-flex gap-2 items-center'
+					}
+				>
+					{team?.data().name} is fully registered
+					<CheckCircledIcon className="w-4 h-4" />
+				</p>
+			),
+		[teamsQuerySnapshotLoading]
 	)
 
 	return teamsQuerySnapshotLoading ? (
@@ -187,13 +97,13 @@ export const TeamProfile = () => {
 	) : (
 		<div className={'container'}>
 			<div className={'w-1/2 md:w-1/4 my-8 mx-auto'}>
-				{loaded ? null : (
+				{teamProfileImageLoaded ? null : (
 					<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
 				)}
 				<img
-					style={loaded ? {} : { display: 'none' }}
+					style={teamProfileImageLoaded ? {} : { display: 'none' }}
 					src={imgSrc}
-					onLoad={() => setLoaded(true)}
+					onLoad={() => setTeamProfileImageLoaded(true)}
 					alt={'team logo'}
 					className={'rounded-md'}
 				/>
@@ -203,7 +113,15 @@ export const TeamProfile = () => {
 					title={'Roster'}
 					description={`${team?.data().name} team players and captains`}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
-					moreActions={isOnTeam && playerActions}
+					moreActions={
+						isOnTeam && (
+							<TeamProfilePlayerActions
+								closeDialog={() => {
+									setImgSrc(team?.data().logo + `&date=${Date.now()}`)
+								}}
+							/>
+						)
+					}
 					footerContent={isOnTeam && isCaptain ? registrationStatus : undefined}
 				>
 					{team?.data().roster?.map(

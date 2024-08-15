@@ -30,13 +30,13 @@ export const TeamRosterPlayer = ({
 	playerRef: DocumentReference<PlayerData, DocumentData>
 	isDisabled: boolean
 }) => {
-	const { documentSnapshot } = useAuthContext()
+	const { authenticatedUserSnapshot } = useAuthContext()
 	const [playerSnapshot] = useDocument(playerRef)
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 
 	const demoteFromCaptainOnClickHandler = async () => {
-		if (documentSnapshot) {
-			const data = documentSnapshot.data()
+		if (authenticatedUserSnapshot) {
+			const data = authenticatedUserSnapshot.data()
 			if (data) {
 				demoteFromCaptain(playerRef, data.team)
 					.then(() => {
@@ -59,8 +59,8 @@ export const TeamRosterPlayer = ({
 	}
 
 	const promoteToCaptainOnClickHandler = async () => {
-		if (documentSnapshot) {
-			const data = documentSnapshot.data()
+		if (authenticatedUserSnapshot) {
+			const data = authenticatedUserSnapshot.data()
 			if (data) {
 				promoteToCaptain(playerRef, data.team)
 					.then(() => {
@@ -84,8 +84,8 @@ export const TeamRosterPlayer = ({
 	}
 
 	const removeFromTeamOnClickHandler = async () => {
-		if (documentSnapshot) {
-			const data = documentSnapshot.data()
+		if (authenticatedUserSnapshot) {
+			const data = authenticatedUserSnapshot.data()
 			if (data) {
 				leaveTeam(playerRef, data.team, setLeaveTeamLoading)
 					.then(() => {
@@ -156,12 +156,12 @@ export const TeamRosterPlayer = ({
 										</DropdownMenuItem>
 										<DestructiveConfirmationDialog
 											title={
-												playerSnapshot.id == documentSnapshot?.id
+												playerSnapshot.id == authenticatedUserSnapshot?.id
 													? 'Are you sure you want to leave?'
 													: 'Are you sure?'
 											}
 											description={
-												playerSnapshot.id == documentSnapshot?.id
+												playerSnapshot.id == authenticatedUserSnapshot?.id
 													? 'You will not be able to rejoin until a captain accepts you back on to the roster.'
 													: `${
 															playerSnapshot.data()?.firstname
@@ -174,7 +174,7 @@ export const TeamRosterPlayer = ({
 												disabled={isDisabled || leaveTeamLoading}
 												onClick={(event) => event.preventDefault()}
 											>
-												{playerSnapshot.id === documentSnapshot?.id
+												{playerSnapshot.id === authenticatedUserSnapshot?.id
 													? 'Leave team'
 													: 'Remove from team'}
 											</DropdownMenuItem>

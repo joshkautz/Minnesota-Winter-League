@@ -31,8 +31,8 @@ type ProfileSchema = z.infer<typeof profileSchema>
 export const Profile = () => {
 	const {
 		authStateUser,
-		documentSnapshot,
-		documentSnapshotLoading,
+		authenticatedUserSnapshot,
+		authenticatedUserSnapshotLoading,
 		sendEmailVerification,
 	} = useAuthContext()
 	const [sentEmail, setSentEmail] = useState(false)
@@ -44,15 +44,15 @@ export const Profile = () => {
 	})
 
 	useEffect(() => {
-		if (documentSnapshot) {
-			const data = documentSnapshot.data()
+		if (authenticatedUserSnapshot) {
+			const data = authenticatedUserSnapshot.data()
 			if (data) {
 				form.setValue('firstname', data.firstname)
 				form.setValue('lastname', data.lastname)
 				form.setValue('email', data.email)
 			}
 		}
-	}, [documentSnapshot])
+	}, [authenticatedUserSnapshot])
 
 	const onSubmit = (data: ProfileSchema) => {
 		updatePlayer(authStateUser, {
@@ -82,7 +82,7 @@ export const Profile = () => {
 	}
 
 	const isVerified = authStateUser?.emailVerified
-	const isRegistered = documentSnapshot?.data()?.registered
+	const isRegistered = authenticatedUserSnapshot?.data()?.registered
 
 	return (
 		<div
@@ -208,7 +208,8 @@ export const Profile = () => {
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
 									Registration
-									{!documentSnapshot || documentSnapshotLoading ? (
+									{!authenticatedUserSnapshot ||
+									authenticatedUserSnapshotLoading ? (
 										<></>
 									) : (
 										!isRegistered && (
@@ -224,7 +225,8 @@ export const Profile = () => {
 									)}
 								</Label>
 								<div>
-									{!documentSnapshot || documentSnapshotLoading ? (
+									{!authenticatedUserSnapshot ||
+									authenticatedUserSnapshotLoading ? (
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>

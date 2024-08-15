@@ -32,11 +32,12 @@ export const Home = () => {
 	const { toggleIsOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()
 	const navigate = useNavigate()
-	const { documentSnapshot, documentSnapshotLoading } = useAuthContext()
-	const isRostered = documentSnapshot?.data()?.team
+	const { authenticatedUserSnapshot, authenticatedUserSnapshotLoading } =
+		useAuthContext()
+	const isRostered = authenticatedUserSnapshot?.data()?.team
 
 	const handleCallToAction = () => {
-		if (!documentSnapshot) {
+		if (!authenticatedUserSnapshot) {
 			toggleIsOpen()
 			return
 		}
@@ -86,14 +87,14 @@ export const Home = () => {
 								</span>
 							</div>
 							<Button
-								disabled={documentSnapshotLoading}
+								disabled={authenticatedUserSnapshotLoading}
 								className="mt-8 sm:mt-12 bg-accent text-foreground dark:bg-primary dark:text-background"
 								onClick={handleCallToAction}
 							>
-								{documentSnapshotLoading && (
+								{authenticatedUserSnapshotLoading && (
 									<ReloadIcon className={'h-4 w-4 animate-spin mr-2'} />
 								)}
-								{!documentSnapshot
+								{!authenticatedUserSnapshot
 									? 'Join our League'
 									: isRostered
 										? 'Your Team'

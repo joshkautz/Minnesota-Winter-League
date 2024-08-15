@@ -19,17 +19,17 @@ import { Link } from 'react-router-dom'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 
 export const TeamRequestCard = () => {
-	const { documentSnapshot } = useAuthContext()
+	const { authenticatedUserSnapshot } = useAuthContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
-	if (!documentSnapshot) {
+	if (!authenticatedUserSnapshot) {
 		return
 	}
 
 	const handleRequest = (
 		teamRef: DocumentReference<TeamData, DocumentData>
 	) => {
-		requestToJoinTeam(documentSnapshot?.ref, teamRef)
+		requestToJoinTeam(authenticatedUserSnapshot?.ref, teamRef)
 			.then(() => {
 				toast({
 					title: 'Request sent',
@@ -56,7 +56,7 @@ export const TeamRequestCard = () => {
 					key={teamSnapshot.id}
 					handleRequest={handleRequest}
 					teamSnapshot={teamSnapshot}
-					playerRef={documentSnapshot?.ref}
+					playerRef={authenticatedUserSnapshot?.ref}
 				/>
 			))}
 		</NotificationCard>
@@ -127,17 +127,20 @@ const TeamDetail = ({
 export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
 		useContext(TeamsContext)
-	const { documentSnapshot, documentSnapshotLoading, authStateLoading } =
-		useAuthContext()
+	const {
+		authenticatedUserSnapshot,
+		authenticatedUserSnapshotLoading,
+		authStateLoading,
+	} = useAuthContext()
 
 	const team = teamsQuerySnapshot?.docs.find(
-		(team) => team.id === documentSnapshot?.data()?.team?.id
+		(team) => team.id === authenticatedUserSnapshot?.data()?.team?.id
 	)
 
-	const isCaptain = documentSnapshot?.data()?.captain
+	const isCaptain = authenticatedUserSnapshot?.data()?.captain
 
 	const registrationStatus =
-		documentSnapshotLoading || teamsQuerySnapshotLoading ? (
+		authenticatedUserSnapshotLoading || teamsQuerySnapshotLoading ? (
 			<p className="text-sm text-muted-foreground">Loading...</p>
 		) : !team?.data().registered ? (
 			<p className={'text-sm text-muted-foreground'}>
@@ -167,7 +170,9 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 	return (
 		<NotificationCard
 			title={
-				documentSnapshotLoading || authStateLoading ? 'Loading...' : titleData
+				authenticatedUserSnapshotLoading || authStateLoading
+					? 'Loading...'
+					: titleData
 			}
 			description={'Your team roster'}
 			moreActions={actions}

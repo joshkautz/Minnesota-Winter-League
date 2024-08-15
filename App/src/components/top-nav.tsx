@@ -25,7 +25,7 @@ export const TopNav = ({
 	const {
 		authStateUser,
 		authStateLoading,
-		documentSnapshot,
+		authenticatedUserSnapshot,
 		signOut,
 		signOutLoading,
 	} = useAuthContext()
@@ -36,10 +36,10 @@ export const TopNav = ({
 	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
 		(entry) => entry.data().status === 'pending'
 	).length
-	const isRostered = documentSnapshot?.data()?.team
-	const isCaptain = documentSnapshot?.data()?.captain
+	const isRostered = authenticatedUserSnapshot?.data()?.team
+	const isCaptain = authenticatedUserSnapshot?.data()?.captain
 	const isVerified = authStateUser?.emailVerified
-	const isRegistered = documentSnapshot?.data()?.registered
+	const isRegistered = authenticatedUserSnapshot?.data()?.registered
 	const hasRequiredTasks = !isVerified || !isRegistered
 
 	const navContent = [

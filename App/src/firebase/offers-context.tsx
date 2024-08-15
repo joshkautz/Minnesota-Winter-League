@@ -38,19 +38,19 @@ const OffersContext = createContext<OffersProps>({
 })
 
 const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const { documentSnapshot } = useAuthContext()
+	const { authenticatedUserSnapshot } = useAuthContext()
 
 	const [
 		outgoingOffersQuerySnapshot,
 		outgoingOffersQuerySnapshotLoading,
 		outgoingOffersQuerySnapshotError,
-	] = useCollection(outgoingOffersQuery(documentSnapshot))
+	] = useCollection(outgoingOffersQuery(authenticatedUserSnapshot))
 
 	const [
 		incomingOffersQuerySnapshot,
 		incomingOffersQuerySnapshotLoading,
 		incomingOffersQuerySnapshotError,
-	] = useCollection(incomingOffersQuery(documentSnapshot))
+	] = useCollection(incomingOffersQuery(authenticatedUserSnapshot))
 
 	return (
 		<OffersContext.Provider

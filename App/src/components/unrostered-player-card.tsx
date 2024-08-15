@@ -87,7 +87,7 @@ const SearchBar = ({
 }
 
 export const UnrosteredPlayerList = () => {
-	const { documentSnapshot } = useAuthContext()
+	const { authenticatedUserSnapshot } = useAuthContext()
 	const [unrosteredPlayersQuerySnapshot] = useCollection(
 		unrosteredPlayersQuery()
 	)
@@ -99,7 +99,7 @@ export const UnrosteredPlayerList = () => {
 	const handleInvite = (
 		playerRef: DocumentReference<PlayerData, DocumentData>
 	) => {
-		invitePlayerToJoinTeam(playerRef, documentSnapshot!.data()!.team)
+		invitePlayerToJoinTeam(playerRef, authenticatedUserSnapshot!.data()!.team)
 			.then(() => {
 				toast({
 					title: 'Invite sent!',
@@ -151,7 +151,7 @@ export const UnrosteredPlayerList = () => {
 					<UnrosteredPlayerDetail
 						key={`unrostered-player-${index}`}
 						handleInvite={handleInvite}
-						teamRef={documentSnapshot!.data()!.team}
+						teamRef={authenticatedUserSnapshot!.data()!.team}
 						unrosteredPlayer={unrosteredPlayer}
 					/>
 				))
