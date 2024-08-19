@@ -185,13 +185,7 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 						player: DocumentReference<PlayerData, DocumentData>
 					},
 					index: number
-				) => (
-					<TeamRosterPlayer
-						key={`team-${index}`}
-						isDisabled={!isCaptain}
-						playerRef={item.player}
-					/>
-				)
+				) => <TeamRosterPlayer key={`team-${index}`} playerRef={item.player} />
 			)}
 		</NotificationCard>
 	)

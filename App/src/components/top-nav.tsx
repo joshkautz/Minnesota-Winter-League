@@ -1,5 +1,5 @@
 import { HamburgerMenuIcon, ReloadIcon } from '@radix-ui/react-icons'
-import { useState, useContext } from 'react'
+import { useState, useContext, useMemo } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
@@ -12,6 +12,7 @@ import { OffersContext } from '@/firebase/offers-context'
 import { UserForm } from './user-form'
 import { toast } from './ui/use-toast'
 import { cn } from '@/lib/utils'
+import { useSeasonContext } from '@/firebase/season-context'
 
 export const TopNav = ({
 	isOpen,
@@ -28,16 +29,62 @@ export const TopNav = ({
 		signOutLoading,
 	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
+	const { selectedSeason } = useSeasonContext()
 
 	const [open, setOpen] = useState(false)
 
-	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
-		(entry) => entry.data().status === 'pending'
-	).length
-	const isRostered = authenticatedUserSnapshot?.data()?.team
-	const isCaptain = authenticatedUserSnapshot?.data()?.captain
+	enum OfferStatus {
+		PENDING = 'pending',
+	}
+
+	const isAuthenticatedUserCaptain = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) => item.season.id === selectedSeason?.id && item.captain
+				),
+		[authenticatedUserSnapshot, selectedSeason]
+	)
+
+	const isAuthenticatedUserRostered = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) => item.season.id === selectedSeason?.id && item.team
+				),
+		[authenticatedUserSnapshot, selectedSeason]
+	)
+
+	const hasPendingOffers = useMemo(
+		() =>
+			incomingOffersQuerySnapshot?.docs.filter(
+				(offer) => offer.data().status === OfferStatus.PENDING
+			).length,
+		[incomingOffersQuerySnapshot]
+	)
+
+	const isAuthenticatedUserPaid = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === selectedSeason?.id && item.paid
+				),
+		[authenticatedUserSnapshot, selectedSeason]
+	)
+
+	const isAuthenticatedUserSigned = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find((item) => item.season.id === selectedSeason?.id)?.signed,
+		[authenticatedUserSnapshot, selectedSeason]
+	)
+
 	const isVerified = authStateUser?.emailVerified
-	const isRegistered = authenticatedUserSnapshot?.data()?.registered
+	const isRegistered = isAuthenticatedUserPaid && isAuthenticatedUserSigned
 	const hasRequiredTasks = !isVerified || !isRegistered
 
 	const navContent = [
@@ -63,9 +110,9 @@ export const TopNav = ({
 	const userContent = [
 		{ label: 'Edit Profile', path: '/profile', alt: 'user profile' },
 		...(authStateUser
-			? isCaptain
+			? isAuthenticatedUserCaptain
 				? captainContent
-				: isRostered
+				: isAuthenticatedUserRostered
 					? rosteredContent
 					: unrosteredContent
 			: []),
