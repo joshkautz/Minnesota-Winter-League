@@ -13,7 +13,7 @@ import {
 	QueryDocumentSnapshot,
 	currentSeasonGamesQuery,
 } from '@/firebase/firestore'
-import { GamesData, TeamData } from '@/lib/interfaces'
+import { GameData, TeamData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
 import { Link } from 'react-router-dom'
@@ -56,7 +56,7 @@ const ScheduleCard = ({
 	games,
 	title,
 }: {
-	games: GamesData[]
+	games: GameData[]
 	title: string
 }) => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -143,15 +143,15 @@ export const Schedule = () => {
 	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
 		useCollection(currentSeasonGamesQuery(selectedSeason))
 
-	const rounds: GamesData[][] = useMemo(() => {
-		const result: GamesData[][] = []
+	const rounds: GameData[][] = useMemo(() => {
+		const result: GameData[][] = []
 		let index: number = 0
 		let previousTimestamp: number = 0
 		gamesSnapshot?.docs
 			.sort((a, b) => a.data().date.seconds - b.data().date.seconds)
 			.forEach(
 				(
-					queryDocumentSnapshot: QueryDocumentSnapshot<GamesData, DocumentData>
+					queryDocumentSnapshot: QueryDocumentSnapshot<GameData, DocumentData>
 				) => {
 					const currentTimestamp = queryDocumentSnapshot.data().date.seconds
 					if (previousTimestamp == 0) {

@@ -6,16 +6,47 @@ import {
 	DocumentReference,
 	DocumentData,
 	gamesByTeamQuery,
+	QueryDocumentSnapshot,
 } from '@/firebase/firestore'
-import { PlayerData } from '@/lib/interfaces'
+import { GameData, PlayerData, TeamData } from '@/lib/interfaces'
 import { TeamRosterPlayer } from './team-roster-player'
 import { useAuthContext } from '@/firebase/auth-context'
 import { useCollection } from 'react-firebase-hooks/firestore'
+import { Timestamp } from '@firebase/firestore'
 
-import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
+import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { TeamProfilePlayerActions } from './team-profile-player-actions'
 import { Skeleton } from './ui/skeleton'
 import { useSeasonContext } from '@/firebase/season-context'
+
+enum Opponent {
+	HOME = 'HOME',
+	AWAY = 'AWAY',
+}
+
+enum Result {
+	VS = 'vs',
+	UNREPORTED = 'Unreported',
+}
+
+const formatGameResult = (
+	team: QueryDocumentSnapshot<TeamData, DocumentData> | undefined,
+	gameData: GameData
+) => {
+	const homeScore = gameData.homeScore
+	const awayScore = gameData.awayScore
+	const opponent = team?.id == gameData.home.id ? Opponent.AWAY : Opponent.HOME
+	const isInFuture = gameData.date > Timestamp.now()
+	const isScoreReported =
+		Number.isInteger(homeScore) && Number.isInteger(awayScore)
+	return isInFuture
+		? Result.VS
+		: isScoreReported
+			? opponent == Opponent.AWAY
+				? `${homeScore} - ${awayScore}`
+				: `${awayScore} - ${homeScore}`
+			: Result.UNREPORTED
+}
 
 export const TeamProfile = () => {
 	const { id } = useParams()
@@ -40,7 +71,7 @@ export const TeamProfile = () => {
 		[id, authenticatedUserSnapshot, teamsQuerySnapshot]
 	)
 
-	const isCaptain = useMemo(
+	const isAuthenticatedUserCaptain = useMemo(
 		() =>
 			team
 				?.data()
@@ -51,7 +82,7 @@ export const TeamProfile = () => {
 		[team, authenticatedUserSnapshot]
 	)
 
-	const isOnTeam = useMemo(
+	const isAuthenticatedUserOnTeam = useMemo(
 		() =>
 			team
 				?.data()
@@ -90,11 +121,7 @@ export const TeamProfile = () => {
 		[teamsQuerySnapshotLoading]
 	)
 
-	return teamsQuerySnapshotLoading ? (
-		<div className={'absolute inset-0 flex items-center justify-center'}>
-			<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
-		</div>
-	) : (
+	return (
 		<div className={'container'}>
 			<div className={'w-1/2 md:w-1/4 my-8 mx-auto'}>
 				{teamProfileImageLoaded ? null : (
@@ -114,7 +141,7 @@ export const TeamProfile = () => {
 					description={`${team?.data().name} team players and captains`}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
 					moreActions={
-						isOnTeam && (
+						isAuthenticatedUserOnTeam && (
 							<TeamProfilePlayerActions
 								closeDialog={() => {
 									setImgSrc(team?.data().logo + `&date=${Date.now()}`)
@@ -122,7 +149,9 @@ export const TeamProfile = () => {
 							/>
 						)
 					}
-					footerContent={isOnTeam && isCaptain ? registrationStatus : undefined}
+					footerContent={
+						isAuthenticatedUserCaptain ? registrationStatus : undefined
+					}
 				>
 					{team?.data().roster?.map(
 						(
@@ -132,63 +161,21 @@ export const TeamProfile = () => {
 							},
 							index: number
 						) => (
-							<TeamRosterPlayer
-								key={`team-${index}`}
-								isDisabled={!isOnTeam || !isCaptain}
-								playerRef={item.player}
-							/>
+							<TeamRosterPlayer key={`team-${index}`} playerRef={item.player} />
 						)
 					)}
 				</NotificationCard>
 				<NotificationCard
 					title={'Record'}
-					description={'2023 Minneapolis Winter League'}
+					// description={'2023 Minneapolis Winter League'}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
 				>
 					<div className="flex flex-col items-end gap-2 py-2">
 						{gamesSnapshot?.docs.map((game, index) => {
-							const opponent = team?.id == game.data().home.id ? 'away' : 'home'
-							const result =
-								game.data().date.toDate() > new Date()
-									? 'vs'
-									: game.data().homeScore == null ||
-										  game.data().awayScore == null
-										? 'vs'
-										: (game.data().homeScore.toString() == 'W' ||
-													game.data().homeScore.toString() == 'L') &&
-											  (game.data().awayScore.toString() == 'W' ||
-													game.data().awayScore.toString() == 'L') &&
-											  opponent == 'away' &&
-											  game.data().homeScore.toString() == 'L'
-											? 'Loss'
-											: (game.data().homeScore.toString() == 'W' ||
-														game.data().homeScore.toString() == 'L') &&
-												  (game.data().awayScore.toString() == 'W' ||
-														game.data().awayScore.toString() == 'L') &&
-												  opponent == 'home' &&
-												  game.data().awayScore.toString() == 'L'
-												? 'Loss'
-												: (game.data().homeScore.toString() == 'W' ||
-															game.data().homeScore.toString() == 'L') &&
-													  (game.data().awayScore.toString() == 'W' ||
-															game.data().awayScore.toString() == 'L') &&
-													  opponent == 'away' &&
-													  game.data().homeScore.toString() == 'W'
-													? 'Win'
-													: (game.data().homeScore.toString() == 'W' ||
-																game.data().homeScore.toString() == 'L') &&
-														  (game.data().awayScore.toString() == 'W' ||
-																game.data().awayScore.toString() == 'L') &&
-														  opponent == 'home' &&
-														  game.data().awayScore.toString() == 'W'
-														? 'Win'
-														: // zero was being interpreted as false so added integer check.
-															!Number.isInteger(game.data().homeScore) ||
-															  !Number.isInteger(game.data().awayScore)
-															? 'vs'
-															: opponent == 'away'
-																? `${game.data().homeScore} - ${game.data().awayScore}`
-																: `${game.data().awayScore} - ${game.data().homeScore}`
+							const gameData = game.data()
+							const opponent =
+								team?.id == gameData.home.id ? Opponent.AWAY : Opponent.HOME
+							const result = formatGameResult(team, gameData)
 
 							return (
 								<div
@@ -200,7 +187,7 @@ export const TeamProfile = () => {
 											'flex grow-[1] select-none basis-[92px] shrink-0'
 										}
 									>
-										{game.data().date.toDate().toLocaleDateString()}
+										{gameData.date.toDate().toLocaleDateString()}
 									</p>
 									<p
 										className={
@@ -213,17 +200,17 @@ export const TeamProfile = () => {
 										<Link
 											className="flex flex-col transition duration-300 group w-max"
 											to={
-												opponent == 'away'
-													? `/teams/${game.data().away.id}`
-													: `/teams/${game.data().home.id}`
+												opponent == Opponent.AWAY
+													? `/teams/${gameData.away.id}`
+													: `/teams/${gameData.home.id}`
 											}
 										>
-											{opponent == 'away'
+											{opponent == Opponent.AWAY
 												? teamsQuerySnapshot?.docs
-														.find((team) => team.id === game.data().away.id)
+														.find((team) => team.id === gameData.away.id)
 														?.data().name
 												: teamsQuerySnapshot?.docs
-														.find((team) => team.id === game.data().home.id)
+														.find((team) => team.id === gameData.home.id)
 														?.data().name}
 											<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
 										</Link>

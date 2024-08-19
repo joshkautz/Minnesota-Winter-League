@@ -42,7 +42,7 @@ export const TeamProfilePlayerActions = ({
 		[id, authenticatedUserSnapshot, teamsQuerySnapshot]
 	)
 
-	const isCaptain = useMemo(
+	const isAuthenticatedUserCaptain = useMemo(
 		() =>
 			team
 				?.data()
@@ -66,14 +66,14 @@ export const TeamProfilePlayerActions = ({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
-						{isCaptain && (
+						{isAuthenticatedUserCaptain && ( // TODO: Check the logic of this section!!!!
 							<EditTeamDialog closeDialog={closeDialog}>
 								<DropdownMenuItem onClick={(event) => event.preventDefault()}>
 									Edit team
 								</DropdownMenuItem>
 							</EditTeamDialog>
 						)}
-						<DestructiveConfirmationDialog
+						<DestructiveConfirmationDialog // TODO: Check the logic of this section!!!!
 							title={'Are you sure you want to leave?'}
 							description={
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
@@ -100,7 +100,7 @@ export const TeamProfilePlayerActions = ({
 								Leave team
 							</DropdownMenuItem>
 						</DestructiveConfirmationDialog>
-						{isCaptain && (
+						{isAuthenticatedUserCaptain && ( // TODO: Check the logic of this section!!!!
 							<DestructiveConfirmationDialog
 								title={'Are you sure?'}
 								description={

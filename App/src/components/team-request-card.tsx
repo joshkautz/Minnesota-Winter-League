@@ -178,20 +178,21 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 			moreActions={actions}
 			footerContent={isCaptain ? registrationStatus : undefined}
 		>
-			{team
-				?.data()
-				.roster.map(
-					(
-						playerRef: DocumentReference<PlayerData, DocumentData>,
-						index: number
-					) => (
-						<TeamRosterPlayer
-							key={`team-${index}`}
-							isDisabled={!isCaptain}
-							playerRef={playerRef}
-						/>
-					)
-				)}
+			{team?.data().roster.map(
+				(
+					item: {
+						captain: boolean
+						player: DocumentReference<PlayerData, DocumentData>
+					},
+					index: number
+				) => (
+					<TeamRosterPlayer
+						key={`team-${index}`}
+						isDisabled={!isCaptain}
+						playerRef={item.player}
+					/>
+				)
+			)}
 		</NotificationCard>
 	)
 }

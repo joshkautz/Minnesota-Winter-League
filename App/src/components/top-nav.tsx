@@ -14,11 +14,9 @@ import { toast } from './ui/use-toast'
 import { cn } from '@/lib/utils'
 
 export const TopNav = ({
-	title,
 	isOpen,
 	setIsOpen,
 }: {
-	title: string
 	isOpen: boolean
 	setIsOpen: () => void
 }) => {
@@ -86,9 +84,6 @@ export const TopNav = ({
 			<div className={'container flex items-center h-14'}>
 				{/* Nav */}
 				<div className={'hidden mr-4 md:flex md:flex-1'}>
-					<Link to={'/'} className={'flex items-center mr-6 space-x-2'}>
-						<span className={'hidden font-bold sm:inline-block'}>{title}</span>
-					</Link>
 					<nav
 						className={
 							'flex items-center justify-start space-x-6 text-sm font-medium flex-1'

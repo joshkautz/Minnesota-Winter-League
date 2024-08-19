@@ -24,7 +24,7 @@ export const Layout = () => {
 				pathname !== '/' && 'pb-10'
 			)}
 		>
-			<TopNav title={'🥏'} isOpen={isOpen} setIsOpen={toggleIsOpen} />
+			<TopNav isOpen={isOpen} setIsOpen={toggleIsOpen} />
 			{/* pass toggleIsOpen using outlet context from react router dom */}
 			<SeasonSelect />
 			<Outlet context={{ toggleIsOpen } satisfies OutletContext} />

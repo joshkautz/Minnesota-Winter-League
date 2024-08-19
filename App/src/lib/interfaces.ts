@@ -75,7 +75,7 @@ export interface StandingsData extends DocumentData {
 	differential: number
 }
 
-export interface GamesData extends DocumentData {
+export interface GameData extends DocumentData {
 	away: DocumentReference<TeamData, DocumentData>
 	awayScore: number
 	date: Timestamp
