@@ -38,6 +38,7 @@ import {
 	StandingsData,
 	TeamData,
 	SeasonData,
+	ExtendedPlayerData,
 } from '@/lib/interfaces'
 import { deleteImage, ref, storage } from './storage'
 
@@ -303,14 +304,16 @@ const leaveTeam = async (
 
 const invitePlayerToJoinTeam = (
 	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
-	teamRef: DocumentReference<TeamData, DocumentData> | undefined
+	teamQueryDocumentSnapshot:
+		| QueryDocumentSnapshot<TeamData, DocumentData>
+		| undefined
 ) => {
 	if (!playerRef) return
-	if (!teamRef) return
+	if (!teamQueryDocumentSnapshot) return
 	return addDoc(collection(firestore, Collections.OFFERS), {
 		creator: 'captain',
 		player: playerRef,
-		team: teamRef,
+		team: teamQueryDocumentSnapshot.ref,
 		status: 'pending',
 	})
 }
@@ -416,10 +419,14 @@ const seasonsQuery = (): Query<SeasonData, DocumentData> => {
 const offersForUnrosteredPlayersQuery = (
 	playerDocumentSnapshot:
 		| DocumentSnapshot<PlayerData, DocumentData>
+		| ExtendedPlayerData
 		| undefined,
-	teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+	teamQueryDocumentSnapshot:
+		| QueryDocumentSnapshot<TeamData, DocumentData>
+		| undefined
 ) => {
 	if (!playerDocumentSnapshot) return
+	if (!teamQueryDocumentSnapshot) return
 	return query(
 		collection(firestore, Collections.OFFERS),
 		where('player', '==', playerDocumentSnapshot.ref),

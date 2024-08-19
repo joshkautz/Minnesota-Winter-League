@@ -2,13 +2,14 @@ import { useAuthContext } from '@/firebase/auth-context'
 import {
 	DocumentData,
 	DocumentReference,
+	QueryDocumentSnapshot,
 	invitePlayerToJoinTeam,
 	offersForUnrosteredPlayersQuery,
 	unrosteredPlayersQuery,
 } from '@/firebase/firestore'
 import { useUnrosteredPlayers } from '@/lib/use-unrostered-players'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
@@ -16,21 +17,25 @@ import { toast } from './ui/use-toast'
 import { ExtendedPlayerData, PlayerData, TeamData } from '@/lib/interfaces'
 import { Input } from './ui/input'
 import { Skeleton } from './ui/skeleton'
+import { useTeamsContext } from '@/firebase/teams-context'
+import { useSeasonContext } from '@/firebase/season-context'
 
 const UnrosteredPlayerDetail = ({
-	teamRef,
+	teamQueryDocumentSnapshot,
 	unrosteredPlayer,
 	statusColor,
 	handleInvite,
 }: {
-	teamRef: DocumentReference<TeamData, DocumentData>
+	teamQueryDocumentSnapshot:
+		| QueryDocumentSnapshot<TeamData, DocumentData>
+		| undefined
 	unrosteredPlayer: ExtendedPlayerData
 	statusColor?: string
 	message?: string
 	handleInvite: (arg: DocumentReference<PlayerData, DocumentData>) => void
 }) => {
 	const [offersForUnrosteredPlayersQuerySnapshot] = useCollection(
-		offersForUnrosteredPlayersQuery(unrosteredPlayer.ref, teamRef)
+		offersForUnrosteredPlayersQuery(unrosteredPlayer, teamQueryDocumentSnapshot)
 	)
 
 	return (
@@ -88,19 +93,36 @@ const SearchBar = ({
 
 export const UnrosteredPlayerList = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { teamsQuerySnapshot } = useTeamsContext()
 	const [unrosteredPlayersQuerySnapshot] = useCollection(
 		unrosteredPlayersQuery()
 	)
 	const { unrosteredPlayers, unrosteredPlayersLoading } = useUnrosteredPlayers(
 		unrosteredPlayersQuerySnapshot
 	)
+
 	const [search, setSearch] = useState('')
+
+	const team = useMemo(
+		() =>
+			teamsQuerySnapshot?.docs.find(
+				(team) =>
+					team.id ===
+					authenticatedUserSnapshot
+						?.data()
+						?.seasons.find(
+							(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+						)?.team.id
+			),
+		[authenticatedUserSnapshot, teamsQuerySnapshot, seasonQueryDocumentSnapshot]
+	)
 
 	const handleInvite = (
 		playerRef: DocumentReference<PlayerData, DocumentData>
 	) => {
-		invitePlayerToJoinTeam(playerRef, authenticatedUserSnapshot!.data()!.team)
-			.then(() => {
+		invitePlayerToJoinTeam(playerRef, team)
+			?.then(() => {
 				toast({
 					title: 'Invite sent!',
 					description: 'success',
@@ -151,7 +173,7 @@ export const UnrosteredPlayerList = () => {
 					<UnrosteredPlayerDetail
 						key={`unrostered-player-${index}`}
 						handleInvite={handleInvite}
-						teamRef={authenticatedUserSnapshot!.data()!.team}
+						teamQueryDocumentSnapshot={team}
 						unrosteredPlayer={unrosteredPlayer}
 					/>
 				))
