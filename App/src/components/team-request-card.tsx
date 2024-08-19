@@ -1,6 +1,7 @@
 import {
 	DocumentData,
 	DocumentReference,
+	DocumentSnapshot,
 	QueryDocumentSnapshot,
 	offersForUnrosteredPlayersQuery,
 	requestToJoinTeam,
@@ -8,7 +9,7 @@ import {
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
-import { ReactNode, useContext, useMemo } from 'react'
+import { ReactNode, useCallback, useContext, useMemo } from 'react'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
 import { TeamRosterPlayer } from './team-roster-player'
@@ -23,41 +24,40 @@ export const TeamRequestCard = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
-	if (!authenticatedUserSnapshot) {
-		return
-	}
-
-	const handleRequest = (
-		teamRef: DocumentReference<TeamData, DocumentData>
-	) => {
-		requestToJoinTeam(authenticatedUserSnapshot?.ref, teamRef)
-			.then(() => {
-				toast({
-					title: 'Request sent',
-					description: 'you requested to join',
-					variant: 'default',
+	const handleRequest = useCallback(
+		(
+			teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+		) =>
+			requestToJoinTeam(authenticatedUserSnapshot, teamQueryDocumentSnapshot)
+				?.then(() => {
+					toast({
+						title: 'Request sent',
+						description: 'you requested to join',
+						variant: 'default',
+					})
 				})
-			})
-			.catch(() => {
-				toast({
-					title: 'Unable to send request',
-					description: 'Ensure your email is verified. Please try again later.',
-					variant: 'destructive',
-				})
-			})
-	}
+				.catch(() => {
+					toast({
+						title: 'Unable to send request',
+						description:
+							'Ensure your email is verified. Please try again later.',
+						variant: 'destructive',
+					})
+				}),
+		[authenticatedUserSnapshot]
+	)
 
 	return (
 		<NotificationCard
 			title={'Team list'}
 			description={'request to join a team below'}
 		>
-			{teamsQuerySnapshot?.docs.map((teamSnapshot) => (
+			{teamsQuerySnapshot?.docs.map((teamQueryDocumentSnapshot) => (
 				<TeamDetail
-					key={teamSnapshot.id}
+					key={teamQueryDocumentSnapshot.id}
 					handleRequest={handleRequest}
-					teamSnapshot={teamSnapshot}
-					playerRef={authenticatedUserSnapshot?.ref}
+					teamQueryDocumentSnapshot={teamQueryDocumentSnapshot}
+					playerDocumentSnapshot={authenticatedUserSnapshot}
 				/>
 			))}
 		</NotificationCard>
@@ -66,19 +66,24 @@ export const TeamRequestCard = () => {
 
 const TeamDetail = ({
 	handleRequest,
-	teamSnapshot,
-	playerRef,
+	teamQueryDocumentSnapshot,
+	playerDocumentSnapshot,
 }: {
-	handleRequest: (teamRef: DocumentReference<TeamData, DocumentData>) => void
-	teamSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
-	playerRef: DocumentReference<PlayerData, DocumentData>
+	handleRequest: (
+		teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+	) => Promise<void> | undefined
+	teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+	playerDocumentSnapshot: DocumentSnapshot<PlayerData, DocumentData> | undefined
 }) => {
 	const [offersForUnrosteredPlayersQuerySnapshot] = useCollection(
-		offersForUnrosteredPlayersQuery(playerRef, teamSnapshot.ref)
+		offersForUnrosteredPlayersQuery(
+			playerDocumentSnapshot,
+			teamQueryDocumentSnapshot
+		)
 	)
 
 	const [creatorSnapshot, creatorSnapshotLoading] = useDocument(
-		teamSnapshot.data().captains[0]
+		teamQueryDocumentSnapshot.data().captains[0]
 	)
 	const isDisabled =
 		offersForUnrosteredPlayersQuerySnapshot &&
@@ -90,20 +95,20 @@ const TeamDetail = ({
 
 	return (
 		<div className="flex items-end gap-2 py-2">
-			<Link to={`/teams/${teamSnapshot.id}`}>
+			<Link to={`/teams/${teamQueryDocumentSnapshot.id}`}>
 				<Avatar>
 					<AvatarImage
-						src={teamSnapshot.data().logo ?? undefined}
+						src={teamQueryDocumentSnapshot.data().logo ?? undefined}
 						alt={'team logo'}
 					/>
 					<AvatarFallback>
-						{teamSnapshot.data().name?.slice(0, 2) ?? 'NA'}
+						{teamQueryDocumentSnapshot.data().name?.slice(0, 2) ?? 'NA'}
 					</AvatarFallback>
 				</Avatar>
 			</Link>
-			<Link to={`/teams/${teamSnapshot.id}`}>
+			<Link to={`/teams/${teamQueryDocumentSnapshot.id}`}>
 				<div className="mr-2">
-					<p>{teamSnapshot.data().name}</p>
+					<p>{teamQueryDocumentSnapshot.data().name}</p>
 					<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
 						{creatorSnapshotLoading
 							? 'created by...'
@@ -116,7 +121,7 @@ const TeamDetail = ({
 					size={'sm'}
 					variant={'default'}
 					disabled={isDisabled}
-					onClick={() => handleRequest(teamSnapshot.ref)}
+					onClick={() => handleRequest(teamQueryDocumentSnapshot)}
 				>
 					Request to join
 				</Button>

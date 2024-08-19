@@ -50,6 +50,10 @@ interface PlayerDocumentData {
 	team: DocumentReference<TeamData, DocumentData>
 }
 
+enum Collections {
+	OFFERS = 'offers',
+}
+
 const firestore = getFirestore(app)
 
 const acceptOffer = (
@@ -103,7 +107,10 @@ const createTeam = async (
 	})
 
 	const offersQuerySnapshot = await getDocs(
-		query(collection(firestore, 'offers'), where('player', '==', playerRef))
+		query(
+			collection(firestore, Collections.OFFERS),
+			where('player', '==', playerRef)
+		)
 	)
 
 	const offersPromises = offersQuerySnapshot.docs.map(
@@ -153,7 +160,10 @@ const deleteTeam = async (
 	setLoadingState(true)
 
 	const offersQuerySnapshot = await getDocs(
-		query(collection(firestore, 'offers'), where('team', '==', teamRef))
+		query(
+			collection(firestore, Collections.OFFERS),
+			where('team', '==', teamRef)
+		)
 	)
 
 	const offersPromises = offersQuerySnapshot.docs.map(
@@ -292,27 +302,32 @@ const leaveTeam = async (
 }
 
 const invitePlayerToJoinTeam = (
-	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<DocumentReference<OfferData, DocumentData>> => {
-	return addDoc(collection(firestore, 'offers'), {
+	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
+	teamRef: DocumentReference<TeamData, DocumentData> | undefined
+) => {
+	if (!playerRef) return
+	if (!teamRef) return
+	return addDoc(collection(firestore, Collections.OFFERS), {
 		creator: 'captain',
 		player: playerRef,
 		team: teamRef,
 		status: 'pending',
-	}) as Promise<DocumentReference<OfferData, DocumentData>>
+	})
 }
 
 const requestToJoinTeam = (
-	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamRef: DocumentReference<TeamData, DocumentData>
-): Promise<DocumentReference<OfferData, DocumentData>> => {
-	return addDoc(collection(firestore, 'offers'), {
+	playerDocumentSnapshot:
+		| DocumentSnapshot<PlayerData, DocumentData>
+		| undefined,
+	teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+) => {
+	if (!playerDocumentSnapshot) return
+	return addDoc(collection(firestore, Collections.OFFERS), {
 		creator: 'player',
-		player: playerRef,
-		team: teamRef,
+		player: playerDocumentSnapshot.ref,
+		team: teamQueryDocumentSnapshot.ref,
 		status: 'pending',
-	}) as Promise<DocumentReference<OfferData, DocumentData>>
+	})
 }
 
 const getPlayerSnapshot = (
@@ -399,13 +414,16 @@ const seasonsQuery = (): Query<SeasonData, DocumentData> => {
 }
 
 const offersForUnrosteredPlayersQuery = (
-	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamRef: DocumentReference<TeamData, DocumentData>
-): Query<OfferData, DocumentData> => {
+	playerDocumentSnapshot:
+		| DocumentSnapshot<PlayerData, DocumentData>
+		| undefined,
+	teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+) => {
+	if (!playerDocumentSnapshot) return
 	return query(
-		collection(firestore, 'offers'),
-		where('player', '==', playerRef),
-		where('team', '==', teamRef)
+		collection(firestore, Collections.OFFERS),
+		where('player', '==', playerDocumentSnapshot.ref),
+		where('team', '==', teamQueryDocumentSnapshot.ref)
 	) as Query<OfferData, DocumentData>
 }
 
@@ -424,7 +442,7 @@ const outgoingOffersQuery = (
 	// If the user is a captain, show all the invitations to join their team.
 	if (playerSnapshot.data()?.captain) {
 		return query(
-			collection(firestore, 'offers'),
+			collection(firestore, Collections.OFFERS),
 			where('team', '==', playerSnapshot.data()?.team),
 			where('creator', '==', 'captain')
 		) as Query<OfferData, DocumentData>
@@ -432,7 +450,7 @@ const outgoingOffersQuery = (
 
 	// If the user is a player, show all their requests to join teams.
 	return query(
-		collection(firestore, 'offers'),
+		collection(firestore, Collections.OFFERS),
 		where('player', '==', playerSnapshot?.ref),
 		where('creator', '==', 'player')
 	) as Query<OfferData, DocumentData>
@@ -446,7 +464,7 @@ const incomingOffersQuery = (
 	// If the user is a captain, show all the requests to join their team.
 	if (playerSnapshot.data()?.captain) {
 		return query(
-			collection(firestore, 'offers'),
+			collection(firestore, Collections.OFFERS),
 			where('team', '==', playerSnapshot.data()?.team),
 			where('creator', '==', 'player')
 		) as Query<OfferData, DocumentData>
@@ -454,7 +472,7 @@ const incomingOffersQuery = (
 
 	// If the user is a player, show all their invitations to join teams.
 	return query(
-		collection(firestore, 'offers'),
+		collection(firestore, Collections.OFFERS),
 		where('player', '==', playerSnapshot.ref),
 		where('creator', '==', 'captain')
 	) as Query<OfferData, DocumentData>

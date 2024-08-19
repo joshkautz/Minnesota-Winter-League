@@ -109,12 +109,7 @@ export const TeamProfile = () => {
 		() =>
 			teamsQuerySnapshotLoading ? (
 				<p className="text-sm text-muted-foreground">Loading...</p>
-			) : !team?.data().registered ? (
-				<p className={'text-sm text-muted-foreground'}>
-					You need 10 registered players in order to meet the minimum
-					requirement. Registration ends Tuesday, October 31st, at 11:59pm.
-				</p>
-			) : (
+			) : team?.data().registered ? (
 				<p
 					className={
 						'text-sm text-muted-foreground inline-flex gap-2 items-center'
@@ -123,8 +118,13 @@ export const TeamProfile = () => {
 					{team?.data().name} is fully registered
 					<CheckCircledIcon className="w-4 h-4" />
 				</p>
+			) : (
+				<p className={'text-sm text-muted-foreground'}>
+					You need 10 registered players in order to meet the minimum
+					requirement. Registration ends Tuesday, October 31st, at 11:59pm.
+				</p>
 			),
-		[teamsQuerySnapshotLoading]
+		[teamsQuerySnapshotLoading, team]
 	)
 
 	return (
@@ -134,9 +134,14 @@ export const TeamProfile = () => {
 					<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
 				)}
 				<img
+					onError={() => {
+						setTeamProfileImageLoaded(false)
+					}}
 					style={teamProfileImageLoaded ? {} : { display: 'none' }}
 					src={imgSrc}
-					onLoad={() => setTeamProfileImageLoaded(true)}
+					onLoad={() => {
+						setTeamProfileImageLoaded(true)
+					}}
 					alt={'team logo'}
 					className={'rounded-md'}
 				/>
@@ -144,7 +149,9 @@ export const TeamProfile = () => {
 			<div className="flex justify-center items-start gap-8 flex-wrap max-w-[1040px] mx-auto">
 				<NotificationCard
 					title={'Roster'}
-					description={`${team?.data().name} team players and captains`}
+					description={
+						team ? `${team?.data().name} team players and captains` : ``
+					}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
 					moreActions={
 						isAuthenticatedUserOnTeam && (
@@ -156,7 +163,7 @@ export const TeamProfile = () => {
 						)
 					}
 					footerContent={
-						isAuthenticatedUserCaptain ? registrationStatus : undefined
+						isAuthenticatedUserCaptain ? registrationStatus : <></>
 					}
 				>
 					{team?.data().roster?.map(
