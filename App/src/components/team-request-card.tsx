@@ -8,7 +8,7 @@ import {
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore'
 import { TeamsContext } from '@/firebase/teams-context'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
-import { ReactNode, useContext } from 'react'
+import { ReactNode, useContext, useMemo } from 'react'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
 import { TeamRosterPlayer } from './team-roster-player'
@@ -17,6 +17,7 @@ import { toast } from './ui/use-toast'
 import { PlayerData, TeamData } from '@/lib/interfaces'
 import { Link } from 'react-router-dom'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
+import { useSeasonContext } from '@/firebase/season-context'
 
 export const TeamRequestCard = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
@@ -125,6 +126,7 @@ const TeamDetail = ({
 }
 
 export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
 		useContext(TeamsContext)
 	const {
@@ -133,11 +135,30 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 		authStateLoading,
 	} = useAuthContext()
 
-	const team = teamsQuerySnapshot?.docs.find(
-		(team) => team.id === authenticatedUserSnapshot?.data()?.team?.id
+	const team = useMemo(
+		() =>
+			teamsQuerySnapshot?.docs.find(
+				(team) =>
+					team.id ===
+					authenticatedUserSnapshot
+						?.data()
+						?.seasons.find(
+							(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+						)?.team.id
+			),
+		[authenticatedUserSnapshot, teamsQuerySnapshot, seasonQueryDocumentSnapshot]
 	)
 
-	const isCaptain = authenticatedUserSnapshot?.data()?.captain
+	const isAuthenticatedUserCaptain = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.captain
+				),
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+	)
 
 	const registrationStatus =
 		authenticatedUserSnapshotLoading || teamsQuerySnapshotLoading ? (
@@ -176,7 +197,9 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 			}
 			description={'Your team roster'}
 			moreActions={actions}
-			footerContent={isCaptain ? registrationStatus : undefined}
+			footerContent={
+				isAuthenticatedUserCaptain ? registrationStatus : undefined
+			}
 		>
 			{team?.data().roster.map(
 				(

@@ -11,8 +11,8 @@ import { Skeleton } from './ui/skeleton'
 
 export const SeasonSelect = () => {
 	const {
-		selectedSeason,
-		setSelectedSeason,
+		seasonQueryDocumentSnapshot,
+		setSeasonQueryDocumentSnapshot,
 		seasonsQuerySnapshot,
 		seasonsQuerySnapshotLoading,
 	} = useSeasonContext()
@@ -26,16 +26,20 @@ export const SeasonSelect = () => {
 			(doc) => doc.data().name === season
 		)
 		if (seasonDoc) {
-			setSelectedSeason(seasonDoc)
+			setSeasonQueryDocumentSnapshot(seasonDoc)
 		}
 	}
 
 	useEffect(() => {
-		if (!seasonsQuerySnapshotLoading && selectedSeason && !isLoaded) {
-			setStringValue(selectedSeason.data().name)
+		if (
+			!seasonsQuerySnapshotLoading &&
+			seasonQueryDocumentSnapshot &&
+			!isLoaded
+		) {
+			setStringValue(seasonQueryDocumentSnapshot.data().name)
 			setIsLoaded(true)
 		}
-	}, [seasonsQuerySnapshotLoading, selectedSeason, isLoaded])
+	}, [seasonsQuerySnapshotLoading, seasonQueryDocumentSnapshot, isLoaded])
 
 	return (
 		<div className="inline-flex items-center justify-center py-16 space-x-2">

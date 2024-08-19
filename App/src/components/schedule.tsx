@@ -138,10 +138,10 @@ const ScheduleCard = ({
 }
 
 export const Schedule = () => {
-	const { selectedSeason } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 
 	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
-		useCollection(currentSeasonGamesQuery(selectedSeason))
+		useCollection(currentSeasonGamesQuery(seasonQueryDocumentSnapshot))
 
 	const rounds: GameData[][] = useMemo(() => {
 		const result: GameData[][] = []

@@ -52,7 +52,7 @@ export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { selectedSeason } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 
 	const [teamProfileImageLoaded, setTeamProfileImageLoaded] = useState(false)
 
@@ -65,10 +65,16 @@ export const TeamProfile = () => {
 							team.id ===
 							authenticatedUserSnapshot
 								?.data()
-								?.seasons.find((item) => item.season.id === selectedSeason?.id)
-								?.team.id
+								?.seasons.find(
+									(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+								)?.team.id
 					),
-		[id, authenticatedUserSnapshot, teamsQuerySnapshot]
+		[
+			id,
+			authenticatedUserSnapshot,
+			teamsQuerySnapshot,
+			seasonQueryDocumentSnapshot,
+		]
 	)
 
 	const isAuthenticatedUserCaptain = useMemo(

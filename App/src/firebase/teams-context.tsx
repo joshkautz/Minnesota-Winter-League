@@ -29,13 +29,13 @@ const TeamsContext = createContext<TeamProps>({
 export const useTeamsContext = () => useContext(TeamsContext)
 
 const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const { selectedSeason } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 
 	const [
 		teamsQuerySnapshot,
 		teamsQuerySnapshotLoading,
 		teamsQuerySnapshotError,
-	] = useCollection(currentSeasonTeamsQuery(selectedSeason))
+	] = useCollection(currentSeasonTeamsQuery(seasonQueryDocumentSnapshot))
 
 	return (
 		<TeamsContext.Provider

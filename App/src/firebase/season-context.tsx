@@ -23,8 +23,10 @@ interface SeasonProps {
 	seasonsQuerySnapshot: QuerySnapshot<SeasonData, DocumentData> | undefined
 	seasonsQuerySnapshotLoading: boolean
 	seasonsQuerySnapshotError: FirestoreError | undefined
-	selectedSeason: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
-	setSelectedSeason: Dispatch<
+	seasonQueryDocumentSnapshot:
+		| QueryDocumentSnapshot<SeasonData, DocumentData>
+		| undefined
+	setSeasonQueryDocumentSnapshot: Dispatch<
 		SetStateAction<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>
 	>
 }
@@ -33,8 +35,8 @@ export const SeasonsContext = createContext<SeasonProps>({
 	seasonsQuerySnapshot: undefined,
 	seasonsQuerySnapshotLoading: false,
 	seasonsQuerySnapshotError: undefined,
-	selectedSeason: undefined,
-	setSelectedSeason: () => {},
+	seasonQueryDocumentSnapshot: undefined,
+	setSeasonQueryDocumentSnapshot: () => {},
 })
 
 export const useSeasonContext = () => useContext(SeasonsContext)
@@ -48,9 +50,10 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		seasonsQuerySnapshotError,
 	] = useCollection(seasonsQuery())
 
-	const [selectedSeason, setSelectedSeason] = useState<
-		QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
-	>(undefined)
+	const [seasonQueryDocumentSnapshot, setSeasonQueryDocumentSnapshot] =
+		useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>(
+			undefined
+		)
 
 	const getMostRecentSeason = useCallback(() => {
 		return seasonsQuerySnapshot?.docs.sort(
@@ -59,8 +62,8 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 	}, [seasonsQuerySnapshot])
 
 	useEffect(() => {
-		setSelectedSeason(getMostRecentSeason())
-	}, [setSelectedSeason, getMostRecentSeason])
+		setSeasonQueryDocumentSnapshot(getMostRecentSeason())
+	}, [setSeasonQueryDocumentSnapshot, getMostRecentSeason])
 
 	return (
 		<SeasonsContext.Provider
@@ -68,8 +71,8 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 				seasonsQuerySnapshot,
 				seasonsQuerySnapshotLoading,
 				seasonsQuerySnapshotError,
-				selectedSeason,
-				setSelectedSeason,
+				seasonQueryDocumentSnapshot,
+				setSeasonQueryDocumentSnapshot,
 			}}
 		>
 			{children}

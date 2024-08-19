@@ -29,7 +29,7 @@ export const TopNav = ({
 		signOutLoading,
 	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
-	const { selectedSeason } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 
 	const [open, setOpen] = useState(false)
 
@@ -42,9 +42,10 @@ export const TopNav = ({
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.some(
-					(item) => item.season.id === selectedSeason?.id && item.captain
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.captain
 				),
-		[authenticatedUserSnapshot, selectedSeason]
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserRostered = useMemo(
@@ -52,9 +53,10 @@ export const TopNav = ({
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.some(
-					(item) => item.season.id === selectedSeason?.id && item.team
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.team
 				),
-		[authenticatedUserSnapshot, selectedSeason]
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const hasPendingOffers = useMemo(
@@ -70,17 +72,20 @@ export const TopNav = ({
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.find(
-					(item) => item.season.id === selectedSeason?.id && item.paid
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.paid
 				),
-		[authenticatedUserSnapshot, selectedSeason]
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserSigned = useMemo(
 		() =>
 			authenticatedUserSnapshot
 				?.data()
-				?.seasons.find((item) => item.season.id === selectedSeason?.id)?.signed,
-		[authenticatedUserSnapshot, selectedSeason]
+				?.seasons.find(
+					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+				)?.signed,
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const isVerified = authStateUser?.emailVerified
@@ -129,7 +134,7 @@ export const TopNav = ({
 			}
 		>
 			<div className={'container flex items-center h-14'}>
-				{/* Nav */}
+				{/* Desktop */}
 				<div className={'hidden mr-4 md:flex md:flex-1'}>
 					<nav
 						className={
@@ -179,16 +184,6 @@ export const TopNav = ({
 						</Button>
 					</SheetTrigger>
 					<SheetContent side={'top'} className={'pr-0'}>
-						<Link
-							to={'/'}
-							className={'flex items-center'}
-							onClick={handleClick}
-						>
-							{/* <div className={'w-6 h-6 rounded-full bg-primary'} /> */}
-							{/* <span className={'ml-1 hidden font-bold sm:inline-block'}>
-								Minneapolis Winter League
-							</span> */}
-						</Link>
 						<ScrollArea className={'my-4 h-[calc(100vh-8rem)] pb-10 px-6'}>
 							<div className={'flex flex-col space-y-3'}>
 								{navContent.map(({ path, label, alt }) => (

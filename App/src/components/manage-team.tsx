@@ -31,24 +31,52 @@ import { EditTeamDialog } from './edit-team-dialog'
 import { useSeasonContext } from '@/firebase/season-context'
 
 export const ManageTeam = () => {
-	const { selectedSeason } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
 		useContext(OffersContext)
 	const {
+		authStateUser,
 		authStateLoading,
 		authenticatedUserSnapshot,
 		authenticatedUserSnapshotLoading,
 	} = useAuthContext()
+
+	const isLoading = useMemo(
+		() =>
+			(!authStateUser &&
+				authStateLoading &&
+				!authenticatedUserSnapshot &&
+				authenticatedUserSnapshotLoading) ||
+			(!authStateUser &&
+				authStateLoading &&
+				!authenticatedUserSnapshot &&
+				!authenticatedUserSnapshotLoading) ||
+			(authStateUser &&
+				!authStateLoading &&
+				!authenticatedUserSnapshot &&
+				!authenticatedUserSnapshotLoading) ||
+			(authStateUser &&
+				!authStateLoading &&
+				!authenticatedUserSnapshot &&
+				authenticatedUserSnapshotLoading),
+		[
+			authStateUser,
+			authStateLoading,
+			authenticatedUserSnapshot,
+			authenticatedUserSnapshotLoading,
+		]
+	)
 
 	const isAuthenticatedUserCaptain = useMemo(
 		() =>
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.some(
-					(item) => item.season.id === selectedSeason?.id && item.captain
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.captain
 				),
-		[authenticatedUserSnapshot, selectedSeason]
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserRostered = useMemo(
@@ -56,9 +84,10 @@ export const ManageTeam = () => {
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.some(
-					(item) => item.season.id === selectedSeason?.id && item.team
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.team
 				),
-		[authenticatedUserSnapshot, selectedSeason]
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
@@ -286,13 +315,11 @@ export const ManageTeam = () => {
 	return (
 		<div className={'container'}>
 			<GradientHeader>
-				{authenticatedUserSnapshotLoading ||
-				authStateLoading ||
-				authenticatedUserSnapshot?.data()?.team === undefined
+				{isLoading
 					? `Loading...`
-					: authenticatedUserSnapshot?.data()?.team === null
+					: !isAuthenticatedUserRostered
 						? `Join Team`
-						: authenticatedUserSnapshot?.data()?.captain
+						: isAuthenticatedUserCaptain
 							? `Manage Team`
 							: `Manage Player`}
 			</GradientHeader>

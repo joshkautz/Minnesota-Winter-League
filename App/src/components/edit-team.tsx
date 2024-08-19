@@ -32,6 +32,7 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
+	// TODO: FIX THIS
 	const team = useMemo(() => {
 		return teamsQuerySnapshot?.docs.find(
 			(team) => team.id === authenticatedUserSnapshot?.data()?.team?.id

@@ -1,4 +1,4 @@
-import { PersonIcon, ReloadIcon, SketchLogoIcon } from '@radix-ui/react-icons'
+import { PersonIcon, SketchLogoIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 // import { DomeSvg } from './ui/dome-svg'
 import { useAnchorScroll } from '@/lib/use-anchor-scroll'
@@ -8,6 +8,9 @@ import { useAuthContext } from '@/firebase/auth-context'
 import { OutletContext } from './layout'
 import { SparklesCore } from './particles'
 import { CitySvg } from './city-svg'
+import { useMemo } from 'react'
+import { useSeasonContext } from '@/firebase/season-context'
+import { Skeleton } from './ui/skeleton'
 
 const SnowFlake = ({ className }: { className?: string }) => {
 	return (
@@ -29,19 +32,66 @@ const SnowFlake = ({ className }: { className?: string }) => {
 }
 
 export const Home = () => {
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+
 	const { toggleIsOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()
 	const navigate = useNavigate()
-	const { authenticatedUserSnapshot, authenticatedUserSnapshotLoading } =
-		useAuthContext()
-	const isRostered = authenticatedUserSnapshot?.data()?.team
+	const {
+		authStateUser,
+		authStateLoading,
+		authenticatedUserSnapshot,
+		authenticatedUserSnapshotLoading,
+	} = useAuthContext()
+
+	const isLoading = useMemo(
+		() =>
+			(!authStateUser &&
+				authStateLoading &&
+				!authenticatedUserSnapshot &&
+				authenticatedUserSnapshotLoading) ||
+			(!authStateUser &&
+				authStateLoading &&
+				!authenticatedUserSnapshot &&
+				!authenticatedUserSnapshotLoading) ||
+			(authStateUser &&
+				!authStateLoading &&
+				!authenticatedUserSnapshot &&
+				!authenticatedUserSnapshotLoading) ||
+			(authStateUser &&
+				!authStateLoading &&
+				!authenticatedUserSnapshot &&
+				authenticatedUserSnapshotLoading),
+		[
+			authStateUser,
+			authStateLoading,
+			authenticatedUserSnapshot,
+			authenticatedUserSnapshotLoading,
+		]
+	)
+
+	const isAuthenticated = useMemo(
+		() => authenticatedUserSnapshot,
+		[authenticatedUserSnapshot]
+	)
+
+	const isAuthenticatedUserRostered = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.team
+				),
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+	)
 
 	const handleCallToAction = () => {
 		if (!authenticatedUserSnapshot) {
 			toggleIsOpen()
 			return
 		}
-		if (isRostered) {
+		if (isAuthenticatedUserRostered) {
 			navigate('/team')
 		} else {
 			navigate('/manage')
@@ -77,7 +127,6 @@ export const Home = () => {
 									'w-[220px] h-1 rounded bg-gradient-to-r from-primary to-sky-300'
 								}
 							/>
-
 							<div className={'mt-4 sm:mt-12 max-w-[490px] flex-1'}>
 								{`Join us this season for unforgettable Saturday nights of
 								organized league play. Whether you're a seasoned club veteran,
@@ -86,20 +135,21 @@ export const Home = () => {
 									{`we can't wait to welcome you to the league.`}
 								</span>
 							</div>
-							<Button
-								disabled={authenticatedUserSnapshotLoading}
-								className="mt-8 sm:mt-12 bg-accent text-foreground dark:bg-primary dark:text-background"
-								onClick={handleCallToAction}
-							>
-								{authenticatedUserSnapshotLoading && (
-									<ReloadIcon className={'h-4 w-4 animate-spin mr-2'} />
-								)}
-								{!authenticatedUserSnapshot
-									? 'Join our League'
-									: isRostered
-										? 'Your Team'
-										: 'Join a Team'}
-							</Button>
+
+							{isLoading ? (
+								<Skeleton className="mt-8 sm:mt-12 bg-accent w-24 h-9 rounded" />
+							) : (
+								<Button
+									className="mt-8 sm:mt-12 bg-accent"
+									onClick={handleCallToAction}
+								>
+									{!isAuthenticated
+										? 'Join our League'
+										: isAuthenticatedUserRostered
+											? 'Your Team'
+											: 'Join a Team'}
+								</Button>
+							)}
 						</div>
 					</div>
 				</div>

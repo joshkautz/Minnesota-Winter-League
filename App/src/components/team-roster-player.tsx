@@ -34,7 +34,7 @@ export const TeamRosterPlayer = ({
 	const { id } = useParams()
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { teamsQuerySnapshot } = useTeamsContext()
-	const { selectedSeason } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 	const [playerSnapshot] = useDocument(playerRef)
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 
@@ -47,10 +47,16 @@ export const TeamRosterPlayer = ({
 							team.id ===
 							authenticatedUserSnapshot
 								?.data()
-								?.seasons.find((item) => item.season.id === selectedSeason?.id)
-								?.team.id
+								?.seasons.find(
+									(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+								)?.team.id
 					),
-		[id, authenticatedUserSnapshot, teamsQuerySnapshot]
+		[
+			id,
+			authenticatedUserSnapshot,
+			teamsQuerySnapshot,
+			seasonQueryDocumentSnapshot,
+		]
 	)
 
 	const isAuthenticatedUserCaptain = useMemo(
@@ -68,30 +74,35 @@ export const TeamRosterPlayer = ({
 		() =>
 			playerSnapshot
 				?.data()
-				?.seasons.find((item) => item.season.id === selectedSeason?.id)
-				?.captain,
-		[playerSnapshot, selectedSeason]
+				?.seasons.find(
+					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+				)?.captain,
+		[playerSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const isPlayerPaid = useMemo(
 		() =>
 			playerSnapshot
 				?.data()
-				?.seasons.find((item) => item.season.id === selectedSeason?.id)?.paid,
-		[playerSnapshot, selectedSeason]
+				?.seasons.find(
+					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+				)?.paid,
+		[playerSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const isPlayerSigned = useMemo(
 		() =>
 			playerSnapshot
 				?.data()
-				?.seasons.find((item) => item.season.id === selectedSeason?.id)?.signed,
-		[playerSnapshot, selectedSeason]
+				?.seasons.find(
+					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+				)?.signed,
+		[playerSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const demoteFromCaptainOnClickHandler = useCallback(
 		() =>
-			demoteFromCaptain(playerRef, team?.ref, selectedSeason?.ref)
+			demoteFromCaptain(playerRef, team?.ref, seasonQueryDocumentSnapshot?.ref)
 				.then(() => {
 					toast({
 						title: `${
@@ -107,12 +118,12 @@ export const TeamRosterPlayer = ({
 						variant: 'destructive',
 					})
 				}),
-		[team, playerSnapshot, selectedSeason]
+		[team, playerSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const promoteToCaptainOnClickHandler = useCallback(
 		() =>
-			promoteToCaptain(playerRef, team?.ref, selectedSeason?.ref)
+			promoteToCaptain(playerRef, team?.ref, seasonQueryDocumentSnapshot?.ref)
 				.then(() => {
 					toast({
 						title: 'Congratulations',
@@ -129,7 +140,7 @@ export const TeamRosterPlayer = ({
 						variant: 'destructive',
 					})
 				}),
-		[team, playerSnapshot, selectedSeason]
+		[team, playerSnapshot, seasonQueryDocumentSnapshot]
 	)
 
 	const removeFromTeamOnClickHandler = async () => {
