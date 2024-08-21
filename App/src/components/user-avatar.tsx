@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuthContext } from '@/firebase/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { useContext } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { UserForm } from '@/components/user-form'
@@ -14,7 +13,7 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Link } from 'react-router-dom'
-import { OffersContext } from '@/firebase/offers-context'
+import { useOffersContext } from '@/firebase/offers-context'
 
 export const UserAvatar = ({
 	userContent,
@@ -28,7 +27,7 @@ export const UserAvatar = ({
 		authenticatedUserSnapshotLoading,
 		signOut,
 	} = useAuthContext()
-	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
+	const { incomingOffersQuerySnapshot } = useOffersContext()
 
 	const userInitials = `${
 		authenticatedUserSnapshot?.data()?.firstname.slice(0, 1) ?? ''

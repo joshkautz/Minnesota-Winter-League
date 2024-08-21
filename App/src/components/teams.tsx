@@ -1,14 +1,12 @@
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
-import { useContext } from 'react'
-import { TeamsContext } from '@/firebase/teams-context'
+import { useTeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
 import { GradientHeader } from './gradient-header'
 
 export const Teams = () => {
-	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
-		useContext(TeamsContext)
+	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
 
 	return (
 		<div className={'container'}>

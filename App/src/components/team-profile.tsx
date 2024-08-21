@@ -17,7 +17,7 @@ import { Timestamp } from '@firebase/firestore'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { TeamProfilePlayerActions } from './team-profile-player-actions'
 import { Skeleton } from './ui/skeleton'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 
 enum Opponent {
 	HOME = 'HOME',
@@ -52,7 +52,7 @@ export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [teamProfileImageLoaded, setTeamProfileImageLoaded] = useState(false)
 

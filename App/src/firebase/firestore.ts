@@ -53,6 +53,9 @@ interface PlayerDocumentData {
 
 enum Collections {
 	OFFERS = 'offers',
+	GAMES = 'games',
+	TEAMS = 'teams',
+	SEASONS = 'seasons',
 }
 
 const firestore = getFirestore(app)
@@ -92,7 +95,7 @@ const createTeam = async (
 	logo?: string,
 	storagePath?: string
 ) => {
-	const team = await addDoc(collection(firestore, 'teams'), {
+	const team = await addDoc(collection(firestore, Collections.TEAMS), {
 		captains: [playerRef],
 		logo: logo ? logo : null,
 		name: name,
@@ -358,10 +361,10 @@ const standingsQuery = (): Query<StandingsData, DocumentData> => {
 }
 
 const gamesQuery = (): Query<GameData, DocumentData> => {
-	return query(collection(firestore, 'games'), orderBy('date')) as Query<
-		GameData,
-		DocumentData
-	>
+	return query(
+		collection(firestore, Collections.GAMES),
+		orderBy('date')
+	) as Query<GameData, DocumentData>
 }
 
 const currentSeasonGamesQuery = (
@@ -370,7 +373,7 @@ const currentSeasonGamesQuery = (
 	if (!seasonSnapshot) return undefined
 
 	return query(
-		collection(firestore, 'games'),
+		collection(firestore, Collections.GAMES),
 		where('season', '==', seasonSnapshot.ref)
 	) as Query<GameData, DocumentData>
 }
@@ -380,7 +383,7 @@ const gamesByTeamQuery = (
 ): Query<GameData, DocumentData> | undefined => {
 	if (teamRef)
 		return query(
-			collection(firestore, 'games'),
+			collection(firestore, Collections.GAMES),
 			or(where('home', '==', teamRef), where('away', '==', teamRef)),
 			orderBy('date', 'asc')
 		) as Query<GameData, DocumentData>
@@ -395,7 +398,10 @@ const updatePlayer = (
 }
 
 const teamsQuery = (): Query<TeamData, DocumentData> => {
-	return query(collection(firestore, 'teams')) as Query<TeamData, DocumentData>
+	return query(collection(firestore, Collections.TEAMS)) as Query<
+		TeamData,
+		DocumentData
+	>
 }
 
 const currentSeasonTeamsQuery = (
@@ -404,13 +410,13 @@ const currentSeasonTeamsQuery = (
 	if (!seasonSnapshot) return undefined
 
 	return query(
-		collection(firestore, 'teams'),
+		collection(firestore, Collections.TEAMS),
 		where('season', '==', seasonSnapshot.ref)
 	) as Query<TeamData, DocumentData>
 }
 
 const seasonsQuery = (): Query<SeasonData, DocumentData> => {
-	return query(collection(firestore, 'seasons')) as Query<
+	return query(collection(firestore, Collections.SEASONS)) as Query<
 		SeasonData,
 		DocumentData
 	>

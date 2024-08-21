@@ -25,7 +25,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './ui/tooltip'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 
 const TeamIcon = ({
 	team,
@@ -138,7 +138,7 @@ const ScheduleCard = ({
 }
 
 export const Schedule = () => {
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
 		useCollection(currentSeasonGamesQuery(seasonQueryDocumentSnapshot))

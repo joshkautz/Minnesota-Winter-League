@@ -18,7 +18,7 @@ import { ExtendedPlayerData, PlayerData, TeamData } from '@/lib/interfaces'
 import { Input } from './ui/input'
 import { Skeleton } from './ui/skeleton'
 import { useTeamsContext } from '@/firebase/teams-context'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 
 const UnrosteredPlayerDetail = ({
 	teamQueryDocumentSnapshot,
@@ -93,7 +93,7 @@ const SearchBar = ({
 
 export const UnrosteredPlayerList = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 	const { teamsQuerySnapshot } = useTeamsContext()
 	const [unrosteredPlayersQuerySnapshot] = useCollection(
 		unrosteredPlayersQuery()

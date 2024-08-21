@@ -1,5 +1,5 @@
 import { HamburgerMenuIcon, ReloadIcon } from '@radix-ui/react-icons'
-import { useState, useContext, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
@@ -8,11 +8,12 @@ import { useAuthContext } from '@/firebase/auth-context'
 import { UserAvatar } from '@/components/user-avatar'
 import { Separator } from '@/components/ui/separator'
 import { ThemeToggle } from './theme-toggle'
-import { OffersContext } from '@/firebase/offers-context'
+import { useOffersContext } from '@/firebase/offers-context'
 import { UserForm } from './user-form'
 import { toast } from './ui/use-toast'
 import { cn } from '@/lib/utils'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
+import { SeasonSelect } from './season-select'
 
 export const TopNav = ({
 	isOpen,
@@ -28,8 +29,8 @@ export const TopNav = ({
 		signOut,
 		signOutLoading,
 	} = useAuthContext()
-	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { incomingOffersQuerySnapshot } = useOffersContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [open, setOpen] = useState(false)
 
@@ -155,10 +156,10 @@ export const TopNav = ({
 								{entry.label}
 							</NavLink>
 						))}
+
 						<div className="flex items-center justify-end flex-1 gap-4">
-							<div>
-								<ThemeToggle />
-							</div>
+							<SeasonSelect />
+							<ThemeToggle />
 							<UserAvatar userContent={userContent} />
 						</div>
 					</nav>

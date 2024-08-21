@@ -1,5 +1,5 @@
 import { useContext, useMemo, useState } from 'react'
-import { OffersContext } from '@/firebase/offers-context'
+import { useOffersContext } from '@/firebase/offers-context'
 import {
 	DocumentData,
 	DocumentReference,
@@ -28,13 +28,13 @@ import {
 } from './ui/dropdown-menu'
 import { GradientHeader } from './gradient-header'
 import { EditTeamDialog } from './edit-team-dialog'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 
 export const ManageTeam = () => {
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
-		useContext(OffersContext)
+		useOffersContext()
 	const {
 		authStateUser,
 		authStateLoading,

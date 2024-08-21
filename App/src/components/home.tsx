@@ -9,7 +9,7 @@ import { OutletContext } from './layout'
 import { SparklesCore } from './particles'
 import { CitySvg } from './city-svg'
 import { useMemo } from 'react'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Skeleton } from './ui/skeleton'
 
 const SnowFlake = ({ className }: { className?: string }) => {
@@ -32,7 +32,7 @@ const SnowFlake = ({ className }: { className?: string }) => {
 }
 
 export const Home = () => {
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const { toggleIsOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()

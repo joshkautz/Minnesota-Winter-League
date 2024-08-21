@@ -12,7 +12,7 @@ import {
 	QuerySnapshot,
 } from '@/firebase/firestore'
 import { TeamData } from '@/lib/interfaces'
-import { useSeasonContext } from './season-context'
+import { useSeasonsContext } from './seasons-context'
 
 interface TeamProps {
 	teamsQuerySnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
@@ -29,7 +29,7 @@ const TeamsContext = createContext<TeamProps>({
 export const useTeamsContext = () => useContext(TeamsContext)
 
 const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [
 		teamsQuerySnapshot,

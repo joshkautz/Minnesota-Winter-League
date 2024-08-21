@@ -15,7 +15,7 @@ import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
 import { EditTeamDialog } from './edit-team-dialog'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 
 export const TeamProfilePlayerActions = ({
 	closeDialog,
@@ -25,7 +25,7 @@ export const TeamProfilePlayerActions = ({
 	const { id } = useParams()
 	const { teamsQuerySnapshot } = useTeamsContext()
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const team = useMemo(
 		() =>

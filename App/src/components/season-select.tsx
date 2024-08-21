@@ -5,7 +5,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 import { useEffect, useState } from 'react'
 import { Skeleton } from './ui/skeleton'
 
@@ -15,7 +15,7 @@ export const SeasonSelect = () => {
 		setSeasonQueryDocumentSnapshot,
 		seasonsQuerySnapshot,
 		seasonsQuerySnapshotLoading,
-	} = useSeasonContext()
+	} = useSeasonsContext()
 
 	const [stringValue, setStringValue] = useState<string | undefined>(undefined)
 	const [isLoaded, setIsLoaded] = useState(false)
@@ -43,7 +43,6 @@ export const SeasonSelect = () => {
 
 	return (
 		<div className="inline-flex items-center justify-center py-16 space-x-2">
-			<p>Season</p>
 			{seasonsQuerySnapshotLoading ? (
 				<Skeleton className="w-24 h-8" />
 			) : (

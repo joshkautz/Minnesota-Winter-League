@@ -39,7 +39,7 @@ export const SeasonsContext = createContext<SeasonProps>({
 	setSeasonQueryDocumentSnapshot: () => {},
 })
 
-export const useSeasonContext = () => useContext(SeasonsContext)
+export const useSeasonsContext = () => useContext(SeasonsContext)
 
 export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 	children,

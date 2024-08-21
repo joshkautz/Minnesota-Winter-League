@@ -22,7 +22,7 @@ import { useDocument } from 'react-firebase-hooks/firestore'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { toast } from './ui/use-toast'
 import { Badge } from './ui/badge'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 import { useParams } from 'react-router-dom'
 import { useTeamsContext } from '@/firebase/teams-context'
 
@@ -34,7 +34,7 @@ export const TeamRosterPlayer = ({
 	const { id } = useParams()
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { teamsQuerySnapshot } = useTeamsContext()
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 	const [playerSnapshot] = useDocument(playerRef)
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 

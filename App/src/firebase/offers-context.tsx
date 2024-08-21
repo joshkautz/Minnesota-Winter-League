@@ -1,5 +1,5 @@
 // React
-import { PropsWithChildren, createContext } from 'react'
+import { PropsWithChildren, createContext, useContext } from 'react'
 
 // Firebase Hooks
 import { useCollection } from 'react-firebase-hooks/firestore'
@@ -28,7 +28,7 @@ interface OffersProps {
 	incomingOffersQuerySnapshotError: FirestoreError | undefined
 }
 
-const OffersContext = createContext<OffersProps>({
+export const OffersContext = createContext<OffersProps>({
 	outgoingOffersQuerySnapshot: undefined,
 	outgoingOffersQuerySnapshotLoading: false,
 	outgoingOffersQuerySnapshotError: undefined,
@@ -37,7 +37,11 @@ const OffersContext = createContext<OffersProps>({
 	incomingOffersQuerySnapshotError: undefined,
 })
 
-const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
+export const useOffersContext = () => useContext(OffersContext)
+
+export const OffersContextProvider: React.FC<PropsWithChildren> = ({
+	children,
+}) => {
 	const { authenticatedUserSnapshot } = useAuthContext()
 
 	const [
@@ -71,5 +75,3 @@ const OffersContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		</OffersContext.Provider>
 	)
 }
-
-export { OffersContext, OffersContextProvider }

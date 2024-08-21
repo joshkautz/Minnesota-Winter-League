@@ -18,7 +18,7 @@ import { toast } from './ui/use-toast'
 import { PlayerData, TeamData } from '@/lib/interfaces'
 import { Link } from 'react-router-dom'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
-import { useSeasonContext } from '@/firebase/season-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 
 export const TeamRequestCard = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
@@ -131,7 +131,7 @@ const TeamDetail = ({
 }
 
 export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
-	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
 		useContext(TeamsContext)
 	const {
