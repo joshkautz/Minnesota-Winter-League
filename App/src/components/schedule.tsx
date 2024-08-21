@@ -7,12 +7,7 @@ import {
 	CardTitle,
 } from './ui/card'
 import { TeamsContext } from '@/firebase/teams-context'
-import { useCollection } from 'react-firebase-hooks/firestore'
-import {
-	DocumentData,
-	QueryDocumentSnapshot,
-	currentSeasonGamesQuery,
-} from '@/firebase/firestore'
+import { DocumentData, QueryDocumentSnapshot } from '@/firebase/firestore'
 import { GameData, TeamData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
@@ -25,7 +20,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './ui/tooltip'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useGamesContext } from '@/firebase/games-context'
 
 const TeamIcon = ({
 	team,
@@ -138,16 +133,13 @@ const ScheduleCard = ({
 }
 
 export const Schedule = () => {
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
-
-	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
-		useCollection(currentSeasonGamesQuery(seasonQueryDocumentSnapshot))
+	const { gamesQuerySnapshot } = useGamesContext()
 
 	const rounds: GameData[][] = useMemo(() => {
 		const result: GameData[][] = []
 		let index: number = 0
 		let previousTimestamp: number = 0
-		gamesSnapshot?.docs
+		gamesQuerySnapshot?.docs
 			.sort((a, b) => a.data().date.seconds - b.data().date.seconds)
 			.forEach(
 				(
@@ -168,37 +160,35 @@ export const Schedule = () => {
 				}
 			)
 		return result
-	}, [gamesSnapshot])
+	}, [gamesQuerySnapshot])
 
 	return (
 		<div className={'sm:container'}>
 			<GradientHeader>Schedule</GradientHeader>
 
-			{gamesSnapshotLoading ? (
+			{!gamesQuerySnapshot ? (
 				<div className={'absolute inset-0 flex items-center justify-center'}>
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
+			) : gamesQuerySnapshot.docs.length == 0 ? (
+				<div className={'flex flex-wrap gap-8'}>
+					<ComingSoon
+						message={
+							'There is no schedule to display. Please wait for the registration period to end on November 1st, 2024.'
+						}
+					/>
+				</div>
 			) : (
 				<div className={'flex flex-wrap gap-8'}>
-					{gamesSnapshotError ? (
-						'Error'
-					) : !gamesSnapshot || rounds.length === 0 ? (
-						<ComingSoon
-							message={
-								'Full schedule details will be posted once the registration period ends. Minnesota Winter League 2023 games take place from November 4th through December 16th.'
-							}
+					{rounds.map((games, index) => (
+						<ScheduleCard
+							key={`schedule-card-${index}`}
+							games={games}
+							title={`Week ${Math.ceil((index + 1) / 4)} | Round ${
+								(index % 4) + 1
+							}`}
 						/>
-					) : (
-						rounds.map((games, index) => (
-							<ScheduleCard
-								key={`schedule-card-${index}`}
-								games={games}
-								title={`Week ${Math.ceil((index + 1) / 4)} | Round ${
-									(index % 4) + 1
-								}`}
-							/>
-						))
-					)}
+					))}
 				</div>
 			)}
 		</div>

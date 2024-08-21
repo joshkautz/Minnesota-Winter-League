@@ -113,7 +113,7 @@ export const Standings = () => {
 			) : Object.keys(standings).length === 0 ? (
 				<ComingSoon
 					message={
-						'Full team standings will become available as soon as the registration period ends.'
+						'There are no standings to display. Please wait for the registration period to end on November 1st, 2024.'
 					}
 				/>
 			) : (
