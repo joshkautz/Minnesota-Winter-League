@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { OffersContext } from '@/firebase/offers-context'
 import {
 	DocumentData,
@@ -10,7 +10,7 @@ import {
 } from '@/firebase/firestore'
 import { toast } from './ui/use-toast'
 import { useOffer } from '@/lib/use-offer'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { NotificationCard, NotificationCardItem } from './notification-card'
 import { TeamRequestCard, TeamRosterCard } from './team-request-card'
 import { UnrosteredPlayerList } from './unrostered-player-card'
@@ -28,15 +28,67 @@ import {
 } from './ui/dropdown-menu'
 import { GradientHeader } from './gradient-header'
 import { EditTeamDialog } from './edit-team-dialog'
+import { useSeasonContext } from '@/firebase/season-context'
 
 export const ManageTeam = () => {
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
 		useContext(OffersContext)
-	const { authStateLoading, documentSnapshot, documentSnapshotLoading } =
-		useContext(AuthContext)
-	const isCaptain = documentSnapshot?.data()?.captain
-	const isUnrostered = documentSnapshot?.data()?.team === null
+	const {
+		authStateUser,
+		authStateLoading,
+		authenticatedUserSnapshot,
+		authenticatedUserSnapshotLoading,
+	} = useAuthContext()
+
+	const isLoading = useMemo(
+		() =>
+			(!authStateUser &&
+				authStateLoading &&
+				!authenticatedUserSnapshot &&
+				authenticatedUserSnapshotLoading) ||
+			(!authStateUser &&
+				authStateLoading &&
+				!authenticatedUserSnapshot &&
+				!authenticatedUserSnapshotLoading) ||
+			(authStateUser &&
+				!authStateLoading &&
+				!authenticatedUserSnapshot &&
+				!authenticatedUserSnapshotLoading) ||
+			(authStateUser &&
+				!authStateLoading &&
+				!authenticatedUserSnapshot &&
+				authenticatedUserSnapshotLoading),
+		[
+			authStateUser,
+			authStateLoading,
+			authenticatedUserSnapshot,
+			authenticatedUserSnapshotLoading,
+		]
+	)
+
+	const isAuthenticatedUserCaptain = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.captain
+				),
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+	)
+
+	const isAuthenticatedUserRostered = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.team
+				),
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+	)
 
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
@@ -51,11 +103,11 @@ export const ManageTeam = () => {
 	)
 
 	const getOfferMessage = (
-		isCaptain: boolean | undefined,
+		isAuthenticatedUserCaptain: boolean | undefined,
 		num: number | undefined,
 		type: 'incoming' | 'outgoing'
 	) => {
-		if (isCaptain) {
+		if (isAuthenticatedUserCaptain) {
 			const term = type === 'incoming' ? 'request' : 'invite'
 			if (!num || num === 0) {
 				return `no ${term}s pending at this time.`
@@ -152,12 +204,13 @@ export const ManageTeam = () => {
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
 							}
 							onConfirm={() => {
-								if (documentSnapshot) {
-									const documentSnapshotData = documentSnapshot.data()
-									if (documentSnapshotData) {
+								if (authenticatedUserSnapshot) {
+									const authenticatedUserSnapshotData =
+										authenticatedUserSnapshot.data()
+									if (authenticatedUserSnapshotData) {
 										leaveTeam(
-											documentSnapshot.ref,
-											documentSnapshotData.team,
+											authenticatedUserSnapshot.ref,
+											authenticatedUserSnapshotData.team,
 											setLeaveTeamLoading
 										)
 									}
@@ -179,10 +232,14 @@ export const ManageTeam = () => {
 								'The entire team will be deleted. This action is irreversible.'
 							}
 							onConfirm={() => {
-								if (documentSnapshot) {
-									const documentSnapshotData = documentSnapshot.data()
-									if (documentSnapshotData) {
-										deleteTeam(documentSnapshotData.team, setDeleteTeamLoading)
+								if (authenticatedUserSnapshot) {
+									const authenticatedUserSnapshotData =
+										authenticatedUserSnapshot.data()
+									if (authenticatedUserSnapshotData) {
+										deleteTeam(
+											authenticatedUserSnapshotData.team,
+											setDeleteTeamLoading
+										)
 											.then(() => {
 												// navigate('/')
 											})
@@ -228,12 +285,13 @@ export const ManageTeam = () => {
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
 							}
 							onConfirm={() => {
-								if (documentSnapshot) {
-									const documentSnapshotData = documentSnapshot.data()
-									if (documentSnapshotData) {
+								if (authenticatedUserSnapshot) {
+									const authenticatedUserSnapshotData =
+										authenticatedUserSnapshot.data()
+									if (authenticatedUserSnapshotData) {
 										leaveTeam(
-											documentSnapshot.ref,
-											documentSnapshotData.team,
+											authenticatedUserSnapshot.ref,
+											authenticatedUserSnapshotData.team,
 											setLeaveTeamLoading
 										)
 									}
@@ -257,35 +315,39 @@ export const ManageTeam = () => {
 	return (
 		<div className={'container'}>
 			<GradientHeader>
-				{documentSnapshotLoading ||
-				authStateLoading ||
-				documentSnapshot?.data()?.team === undefined
+				{isLoading
 					? `Loading...`
-					: documentSnapshot?.data()?.team === null
+					: !isAuthenticatedUserRostered
 						? `Join Team`
-						: documentSnapshot?.data()?.captain
+						: isAuthenticatedUserCaptain
 							? `Manage Team`
 							: `Manage Player`}
 			</GradientHeader>
 			<div className={'flex flex-row justify-center gap-8 flex-wrap-reverse'}>
 				{/* LEFT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
-					{isUnrostered ? (
-						<TeamRequestCard />
-					) : (
+					{isAuthenticatedUserRostered ? (
 						<TeamRosterCard
-							actions={isCaptain ? captainActions : playerActions}
+							actions={
+								isAuthenticatedUserCaptain ? captainActions : playerActions
+							}
 						/>
+					) : (
+						<TeamRequestCard />
 					)}
-					{isCaptain && <UnrosteredPlayerList />}
+					{isAuthenticatedUserCaptain && <UnrosteredPlayerList />}
 				</div>
 				{/* RIGHT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
 					{/* INCOMING OFFERS */}
 					<NotificationCard
-						title={isCaptain ? 'Pending requests' : 'Pending invites'}
+						title={
+							isAuthenticatedUserCaptain
+								? 'Pending requests'
+								: 'Pending invites'
+						}
 						description={getOfferMessage(
-							isCaptain,
+							isAuthenticatedUserCaptain,
 							incomingPending,
 							'incoming'
 						)}
@@ -301,7 +363,9 @@ export const ManageTeam = () => {
 									data={incomingOffer}
 									statusColor={statusColor}
 									message={
-										isCaptain ? 'would like to join' : 'would like you to join'
+										isAuthenticatedUserCaptain
+											? 'would like to join'
+											: 'would like you to join'
 									}
 									actionOptions={incomingActions}
 								/>
@@ -310,9 +374,11 @@ export const ManageTeam = () => {
 					</NotificationCard>
 					{/* OUTGOING OFFERS*/}
 					<NotificationCard
-						title={isCaptain ? 'Sent invites' : 'Sent requests'}
+						title={
+							isAuthenticatedUserCaptain ? 'Sent invites' : 'Sent requests'
+						}
 						description={getOfferMessage(
-							isCaptain,
+							isAuthenticatedUserCaptain,
 							outgoingPending,
 							'outgoing'
 						)}
@@ -322,7 +388,11 @@ export const ManageTeam = () => {
 								key={`outgoingOffer-row-${index}`}
 								data={outgoingOffer}
 								statusColor={'bg-muted-foreground'}
-								message={isCaptain ? 'invite sent for' : 'request sent for'}
+								message={
+									isAuthenticatedUserCaptain
+										? 'invite sent for'
+										: 'request sent for'
+								}
 								actionOptions={outgoingActions}
 							/>
 						))}

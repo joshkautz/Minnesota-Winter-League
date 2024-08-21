@@ -1,10 +1,10 @@
 import { HamburgerMenuIcon, ReloadIcon } from '@radix-ui/react-icons'
-import { useState, useContext } from 'react'
+import { useState, useContext, useMemo } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { UserAvatar } from '@/components/user-avatar'
 import { Separator } from '@/components/ui/separator'
 import { ThemeToggle } from './theme-toggle'
@@ -12,34 +12,84 @@ import { OffersContext } from '@/firebase/offers-context'
 import { UserForm } from './user-form'
 import { toast } from './ui/use-toast'
 import { cn } from '@/lib/utils'
+import { useSeasonContext } from '@/firebase/season-context'
 
 export const TopNav = ({
-	title,
 	isOpen,
 	setIsOpen,
 }: {
-	title: string
 	isOpen: boolean
 	setIsOpen: () => void
 }) => {
 	const {
 		authStateUser,
 		authStateLoading,
-		documentSnapshot,
+		authenticatedUserSnapshot,
 		signOut,
 		signOutLoading,
-	} = useContext(AuthContext)
+	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 
 	const [open, setOpen] = useState(false)
 
-	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
-		(entry) => entry.data().status === 'pending'
-	).length
-	const isRostered = documentSnapshot?.data()?.team
-	const isCaptain = documentSnapshot?.data()?.captain
+	enum OfferStatus {
+		PENDING = 'pending',
+	}
+
+	const isAuthenticatedUserCaptain = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.captain
+				),
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+	)
+
+	const isAuthenticatedUserRostered = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.team
+				),
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+	)
+
+	const hasPendingOffers = useMemo(
+		() =>
+			incomingOffersQuerySnapshot?.docs.filter(
+				(offer) => offer.data().status === OfferStatus.PENDING
+			).length,
+		[incomingOffersQuerySnapshot]
+	)
+
+	const isAuthenticatedUserPaid = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find(
+					(item) =>
+						item.season.id === seasonQueryDocumentSnapshot?.id && item.paid
+				),
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+	)
+
+	const isAuthenticatedUserSigned = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+				)?.signed,
+		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+	)
+
 	const isVerified = authStateUser?.emailVerified
-	const isRegistered = documentSnapshot?.data()?.registered
+	const isRegistered = isAuthenticatedUserPaid && isAuthenticatedUserSigned
 	const hasRequiredTasks = !isVerified || !isRegistered
 
 	const navContent = [
@@ -65,9 +115,9 @@ export const TopNav = ({
 	const userContent = [
 		{ label: 'Edit Profile', path: '/profile', alt: 'user profile' },
 		...(authStateUser
-			? isCaptain
+			? isAuthenticatedUserCaptain
 				? captainContent
-				: isRostered
+				: isAuthenticatedUserRostered
 					? rosteredContent
 					: unrosteredContent
 			: []),
@@ -84,11 +134,8 @@ export const TopNav = ({
 			}
 		>
 			<div className={'container flex items-center h-14'}>
-				{/* Nav */}
+				{/* Desktop */}
 				<div className={'hidden mr-4 md:flex md:flex-1'}>
-					<Link to={'/'} className={'flex items-center mr-6 space-x-2'}>
-						<span className={'hidden font-bold sm:inline-block'}>{title}</span>
-					</Link>
 					<nav
 						className={
 							'flex items-center justify-start space-x-6 text-sm font-medium flex-1'
@@ -137,16 +184,6 @@ export const TopNav = ({
 						</Button>
 					</SheetTrigger>
 					<SheetContent side={'top'} className={'pr-0'}>
-						<Link
-							to={'/'}
-							className={'flex items-center'}
-							onClick={handleClick}
-						>
-							{/* <div className={'w-6 h-6 rounded-full bg-primary'} /> */}
-							{/* <span className={'ml-1 hidden font-bold sm:inline-block'}>
-								Minneapolis Winter League
-							</span> */}
-						</Link>
 						<ScrollArea className={'my-4 h-[calc(100vh-8rem)] pb-10 px-6'}>
 							<div className={'flex flex-col space-y-3'}>
 								{navContent.map(({ path, label, alt }) => (

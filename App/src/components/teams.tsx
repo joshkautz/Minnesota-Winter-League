@@ -82,7 +82,7 @@ export const Teams = () => {
 					</div>
 				)
 			)}
-			{teamsQuerySnapshot && teamsQuerySnapshot.size < 12 && (
+			{teamsQuerySnapshot && teamsQuerySnapshot.docs.length < 12 && (
 				<div className="flex flex-col items-center justify-center my-16">
 					<div>
 						<p>Not finding the team you are looking for? </p>

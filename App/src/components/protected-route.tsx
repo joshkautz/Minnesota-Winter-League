@@ -1,10 +1,10 @@
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { PropsWithChildren, useContext } from 'react'
+import { PropsWithChildren } from 'react'
 import { Navigate } from 'react-router-dom'
 
 export const ProtectedRoute: React.FC<PropsWithChildren> = ({ children }) => {
-	const { authStateUser, authStateLoading } = useContext(AuthContext)
+	const { authStateUser, authStateLoading } = useAuthContext()
 
 	if (authStateLoading) {
 		return (

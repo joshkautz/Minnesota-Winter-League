@@ -2,12 +2,17 @@ import { DocumentData, DocumentReference } from '@/firebase/firestore'
 import { Timestamp } from '@firebase/firestore'
 
 export interface PlayerData extends DocumentData {
-	captain: boolean
+	admin: boolean
 	email: string
 	firstname: string
 	lastname: string
-	registered: boolean
-	team: DocumentReference<TeamData, DocumentData>
+	seasons: {
+		captain: boolean
+		paid: boolean
+		season: DocumentReference<SeasonData, DocumentData>
+		signed: boolean
+		team: DocumentReference<TeamData, DocumentData>
+	}[]
 }
 
 export interface ExtendedPlayerData extends PlayerData {
@@ -15,13 +20,27 @@ export interface ExtendedPlayerData extends PlayerData {
 }
 
 export interface TeamData extends DocumentData {
-	captains: DocumentReference<PlayerData, DocumentData>[]
 	logo: string
 	name: string
+	placement: number
 	registered: boolean
 	registeredDate: Timestamp
-	roster: DocumentReference<PlayerData, DocumentData>[]
+	roster: {
+		captain: boolean
+		player: DocumentReference<PlayerData, DocumentData>
+	}[]
+	season: DocumentReference<SeasonData, DocumentData>
 	storagePath: string
+	teamId: string
+}
+
+export interface SeasonData extends DocumentData {
+	dateEnd: Timestamp
+	dateStart: Timestamp
+	name: string
+	registrationEnd: Timestamp
+	registrationStart: Timestamp
+	teams: DocumentReference<TeamData, DocumentData>[]
 }
 
 export interface OfferData extends DocumentData {
@@ -53,13 +72,15 @@ export interface StandingsData extends DocumentData {
 	losses: number
 	pointsFor: number
 	pointsAgainst: number
+	differential: number
 }
 
-export interface GamesData extends DocumentData {
+export interface GameData extends DocumentData {
 	away: DocumentReference<TeamData, DocumentData>
 	awayScore: number
 	date: Timestamp
 	field: number
 	home: DocumentReference<TeamData, DocumentData>
 	homeScore: number
+	season: DocumentReference<SeasonData, DocumentData>
 }

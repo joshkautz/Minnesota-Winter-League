@@ -9,11 +9,12 @@ import { ProtectedRoute } from '@/components/protected-route'
 import { Profile } from '@/components/profile'
 import { TeamProfile } from './components/team-profile'
 import { ManageTeam } from './components/manage-team'
-import { useContext, useEffect } from 'react'
-import { AuthContext } from './firebase/auth-context'
+import { useEffect } from 'react'
+import { useAuthContext } from './firebase/auth-context'
+import { CreateTeam } from './components/create-team'
 
 function App() {
-	const { authStateUser } = useContext(AuthContext)
+	const { authStateUser } = useAuthContext()
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -56,14 +57,14 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
-				{/* <Route
+				<Route
 					path={'/create'}
 					element={
 						<ProtectedRoute>
 							<CreateTeam />
 						</ProtectedRoute>
 					}
-				/> */}
+				/>
 				<Route
 					path={'/manage'}
 					element={

@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import {
 	Card,
 	CardContent,
@@ -11,9 +11,9 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import {
 	DocumentData,
 	QueryDocumentSnapshot,
-	gamesQuery,
+	currentSeasonGamesQuery,
 } from '@/firebase/firestore'
-import { GamesData, TeamData } from '@/lib/interfaces'
+import { GameData, TeamData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
 import { Link } from 'react-router-dom'
@@ -25,6 +25,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './ui/tooltip'
+import { useSeasonContext } from '@/firebase/season-context'
 
 const TeamIcon = ({
 	team,
@@ -55,7 +56,7 @@ const ScheduleCard = ({
 	games,
 	title,
 }: {
-	games: GamesData[]
+	games: GameData[]
 	title: string
 }) => {
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
@@ -137,29 +138,37 @@ const ScheduleCard = ({
 }
 
 export const Schedule = () => {
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
+
 	const [gamesSnapshot, gamesSnapshotLoading, gamesSnapshotError] =
-		useCollection(gamesQuery())
+		useCollection(currentSeasonGamesQuery(seasonQueryDocumentSnapshot))
 
-	const rounds: GamesData[][] = []
-	let previous: number = 0
-	let index: number = 0
-
-	gamesSnapshot?.docs.forEach(
-		(queryDocumentSnapshot: QueryDocumentSnapshot<GamesData, DocumentData>) => {
-			const time = queryDocumentSnapshot.data().date.toDate().getTime()
-			if (previous == 0) {
-				previous = time
-			}
-			if (previous !== time) {
-				previous = time
-				index++
-			}
-			if (!rounds[index]) {
-				rounds[index] = []
-			}
-			rounds[index].push(queryDocumentSnapshot.data())
-		}
-	)
+	const rounds: GameData[][] = useMemo(() => {
+		const result: GameData[][] = []
+		let index: number = 0
+		let previousTimestamp: number = 0
+		gamesSnapshot?.docs
+			.sort((a, b) => a.data().date.seconds - b.data().date.seconds)
+			.forEach(
+				(
+					queryDocumentSnapshot: QueryDocumentSnapshot<GameData, DocumentData>
+				) => {
+					const currentTimestamp = queryDocumentSnapshot.data().date.seconds
+					if (previousTimestamp == 0) {
+						previousTimestamp = currentTimestamp
+					}
+					if (previousTimestamp !== currentTimestamp) {
+						previousTimestamp = currentTimestamp
+						index++
+					}
+					if (!result[index]) {
+						result[index] = []
+					}
+					result[index].push(queryDocumentSnapshot.data())
+				}
+			)
+		return result
+	}, [gamesSnapshot])
 
 	return (
 		<div className={'sm:container'}>

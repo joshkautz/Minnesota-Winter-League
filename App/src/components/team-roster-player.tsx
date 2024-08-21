@@ -13,79 +13,139 @@ import {
 	DropdownMenuItem,
 } from './ui/dropdown-menu'
 import { DotsVerticalIcon, StarFilledIcon } from '@radix-ui/react-icons'
-import { useContext, useState } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { PlayerData } from '@/lib/interfaces'
 import { useDocument } from 'react-firebase-hooks/firestore'
 import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
 import { toast } from './ui/use-toast'
 import { Badge } from './ui/badge'
+import { useSeasonContext } from '@/firebase/season-context'
+import { useParams } from 'react-router-dom'
+import { useTeamsContext } from '@/firebase/teams-context'
 
 export const TeamRosterPlayer = ({
 	playerRef,
-	isDisabled,
 }: {
 	playerRef: DocumentReference<PlayerData, DocumentData>
-	isDisabled: boolean
 }) => {
-	const { documentSnapshot } = useContext(AuthContext)
+	const { id } = useParams()
+	const { authenticatedUserSnapshot } = useAuthContext()
+	const { teamsQuerySnapshot } = useTeamsContext()
+	const { seasonQueryDocumentSnapshot } = useSeasonContext()
 	const [playerSnapshot] = useDocument(playerRef)
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 
-	const demoteFromCaptainOnClickHandler = async () => {
-		if (documentSnapshot) {
-			const data = documentSnapshot.data()
-			if (data) {
-				demoteFromCaptain(playerRef, data.team)
-					.then(() => {
-						toast({
-							title: `${
-								playerSnapshot?.data()?.firstname ?? 'Player'
-							} is no longer a team captain`,
-							description: `They are still on your roster. You may be promote them back at any time.`,
-						})
-					})
-					.catch((error) => {
-						toast({
-							title: 'Unable to Demote',
-							description: error.message,
-							variant: 'destructive',
-						})
-					})
-			}
-		}
-	}
+	const team = useMemo(
+		() =>
+			id
+				? teamsQuerySnapshot?.docs.find((team) => team.id === id)
+				: teamsQuerySnapshot?.docs.find(
+						(team) =>
+							team.id ===
+							authenticatedUserSnapshot
+								?.data()
+								?.seasons.find(
+									(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+								)?.team.id
+					),
+		[
+			id,
+			authenticatedUserSnapshot,
+			teamsQuerySnapshot,
+			seasonQueryDocumentSnapshot,
+		]
+	)
 
-	const promoteToCaptainOnClickHandler = async () => {
-		if (documentSnapshot) {
-			const data = documentSnapshot.data()
-			if (data) {
-				promoteToCaptain(playerRef, data.team)
-					.then(() => {
-						toast({
-							title: 'Congratulations',
-							description: `${
-								playerSnapshot?.data()?.firstname ?? 'Player'
-							} has been promoted to team captain.`,
-						})
+	const isAuthenticatedUserCaptain = useMemo(
+		() =>
+			team
+				?.data()
+				.roster.some(
+					(item) =>
+						item.player.id === authenticatedUserSnapshot?.id && item.captain
+				),
+		[team, authenticatedUserSnapshot]
+	)
+
+	const isPlayerCaptain = useMemo(
+		() =>
+			playerSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+				)?.captain,
+		[playerSnapshot, seasonQueryDocumentSnapshot]
+	)
+
+	const isPlayerPaid = useMemo(
+		() =>
+			playerSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+				)?.paid,
+		[playerSnapshot, seasonQueryDocumentSnapshot]
+	)
+
+	const isPlayerSigned = useMemo(
+		() =>
+			playerSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+				)?.signed,
+		[playerSnapshot, seasonQueryDocumentSnapshot]
+	)
+
+	const demoteFromCaptainOnClickHandler = useCallback(
+		() =>
+			demoteFromCaptain(playerRef, team?.ref, seasonQueryDocumentSnapshot?.ref)
+				.then(() => {
+					toast({
+						title: `${
+							playerSnapshot?.data()?.firstname ?? 'Player'
+						} is no longer a team captain`,
+						description: `They are still on your roster. You may be promote them back at any time.`,
 					})
-					.catch(() => {
-						toast({
-							title: 'Unable to Promote',
-							description:
-								'Ensure your email is verified. Please try again later.',
-							variant: 'destructive',
-						})
+				})
+				.catch((error) => {
+					toast({
+						title: 'Unable to Demote',
+						description: error.message,
+						variant: 'destructive',
 					})
-			}
-		}
-	}
+				}),
+		[team, playerSnapshot, seasonQueryDocumentSnapshot]
+	)
+
+	const promoteToCaptainOnClickHandler = useCallback(
+		() =>
+			promoteToCaptain(playerRef, team?.ref, seasonQueryDocumentSnapshot?.ref)
+				.then(() => {
+					toast({
+						title: 'Congratulations',
+						description: `${
+							playerSnapshot?.data()?.firstname ?? 'Player'
+						} has been promoted to team captain.`,
+					})
+				})
+				.catch(() => {
+					toast({
+						title: 'Unable to Promote',
+						description:
+							'Ensure your email is verified. Please try again later.',
+						variant: 'destructive',
+					})
+				}),
+		[team, playerSnapshot, seasonQueryDocumentSnapshot]
+	)
 
 	const removeFromTeamOnClickHandler = async () => {
-		if (documentSnapshot) {
-			const data = documentSnapshot.data()
+		if (authenticatedUserSnapshot) {
+			const data = authenticatedUserSnapshot.data()
 			if (data) {
 				leaveTeam(playerRef, data.team, setLeaveTeamLoading)
 					.then(() => {
@@ -116,24 +176,20 @@ export const TeamRosterPlayer = ({
 							{playerSnapshot.data()?.firstname}{' '}
 							{playerSnapshot.data()?.lastname}{' '}
 						</p>
-						{playerSnapshot.data()?.captain && (
-							<StarFilledIcon className="text-primary" />
-						)}
+						{isPlayerCaptain && <StarFilledIcon className="text-primary" />}
 					</div>
 					<div className="flex justify-end flex-1 gap-2">
 						<div className="flex items-center">
 							<Badge
 								className={'select-none hover:bg-initial'}
 								variant={
-									playerSnapshot.data()?.registered ? 'secondary' : 'inverse'
+									isPlayerPaid && isPlayerSigned ? 'secondary' : 'inverse'
 								}
 							>
-								{playerSnapshot.data()?.registered
-									? 'registered'
-									: 'unregistered'}
+								{isPlayerPaid && isPlayerSigned ? 'registered' : 'unregistered'}
 							</Badge>
 						</div>
-						{!isDisabled && (
+						{isAuthenticatedUserCaptain && (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button size={'sm'} variant={'ghost'}>
@@ -143,25 +199,25 @@ export const TeamRosterPlayer = ({
 								<DropdownMenuContent className={'w-56'}>
 									<DropdownMenuGroup>
 										<DropdownMenuItem
-											disabled={isDisabled || !playerSnapshot.data()?.captain}
+											disabled={!isPlayerCaptain}
 											onClick={demoteFromCaptainOnClickHandler}
 										>
 											Demote from captain
 										</DropdownMenuItem>
 										<DropdownMenuItem
-											disabled={isDisabled || playerSnapshot.data()?.captain}
+											disabled={isPlayerCaptain}
 											onClick={promoteToCaptainOnClickHandler}
 										>
 											Promote to captain
 										</DropdownMenuItem>
 										<DestructiveConfirmationDialog
 											title={
-												playerSnapshot.id == documentSnapshot?.id
+												playerSnapshot.id == authenticatedUserSnapshot?.id
 													? 'Are you sure you want to leave?'
 													: 'Are you sure?'
 											}
 											description={
-												playerSnapshot.id == documentSnapshot?.id
+												playerSnapshot.id == authenticatedUserSnapshot?.id
 													? 'You will not be able to rejoin until a captain accepts you back on to the roster.'
 													: `${
 															playerSnapshot.data()?.firstname
@@ -171,10 +227,10 @@ export const TeamRosterPlayer = ({
 										>
 											<DropdownMenuItem
 												className="focus:bg-destructive focus:text-destructive-foreground"
-												disabled={isDisabled || leaveTeamLoading}
+												disabled={leaveTeamLoading}
 												onClick={(event) => event.preventDefault()}
 											>
-												{playerSnapshot.id === documentSnapshot?.id
+												{playerSnapshot.id === authenticatedUserSnapshot?.id
 													? 'Leave team'
 													: 'Remove from team'}
 											</DropdownMenuItem>

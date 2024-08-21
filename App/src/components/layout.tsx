@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { TopNav } from '@/components/top-nav'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
+import { SeasonSelect } from './season-select'
 
 export type OutletContext = {
 	toggleIsOpen: () => void
@@ -23,8 +24,9 @@ export const Layout = () => {
 				pathname !== '/' && 'pb-10'
 			)}
 		>
-			<TopNav title={'🥏'} isOpen={isOpen} setIsOpen={toggleIsOpen} />
+			<TopNav isOpen={isOpen} setIsOpen={toggleIsOpen} />
 			{/* pass toggleIsOpen using outlet context from react router dom */}
+			<SeasonSelect />
 			<Outlet context={{ toggleIsOpen } satisfies OutletContext} />
 		</div>
 	)

@@ -1,4 +1,4 @@
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -29,14 +29,15 @@ const editTeamSchema = z.object({
 type EditTeamSchema = z.infer<typeof editTeamSchema>
 
 export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
-	const { documentSnapshot } = useContext(AuthContext)
+	const { authenticatedUserSnapshot } = useAuthContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 
+	// TODO: FIX THIS
 	const team = useMemo(() => {
 		return teamsQuerySnapshot?.docs.find(
-			(team) => team.id === documentSnapshot?.data()?.team?.id
+			(team) => team.id === authenticatedUserSnapshot?.data()?.team?.id
 		)
-	}, [documentSnapshot, teamsQuerySnapshot])
+	}, [authenticatedUserSnapshot, teamsQuerySnapshot])
 
 	const [loading, setLoading] = useState(false)
 
@@ -141,7 +142,7 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 	}, [downloadUrl])
 
 	const onSubmit = async (data: EditTeamSchema) => {
-		if (documentSnapshot) {
+		if (authenticatedUserSnapshot) {
 			try {
 				setLoading(true)
 				// If team is updated to have an image.

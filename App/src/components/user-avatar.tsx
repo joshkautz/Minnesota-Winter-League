@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { useContext } from 'react'
 import { Button } from '@/components/ui/button'
@@ -24,24 +24,24 @@ export const UserAvatar = ({
 	const {
 		authStateUser,
 		authStateLoading,
-		documentSnapshot,
-		documentSnapshotLoading,
+		authenticatedUserSnapshot,
+		authenticatedUserSnapshotLoading,
 		signOut,
-	} = useContext(AuthContext)
+	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useContext(OffersContext)
 
 	const userInitials = `${
-		documentSnapshot?.data()?.firstname.slice(0, 1) ?? ''
-	}${documentSnapshot?.data()?.lastname.slice(0, 1) ?? ''}`
+		authenticatedUserSnapshot?.data()?.firstname.slice(0, 1) ?? ''
+	}${authenticatedUserSnapshot?.data()?.lastname.slice(0, 1) ?? ''}`
 
 	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
 		(entry) => entry.data().status === 'pending'
 	).length
 	const isVerified = authStateUser?.emailVerified
-	const isRegistered = documentSnapshot?.data()?.registered
+	const isRegistered = authenticatedUserSnapshot?.data()?.registered
 	const hasRequiredTasks = !isVerified || !isRegistered
 
-	if (authStateLoading || documentSnapshotLoading) {
+	if (authStateLoading || authenticatedUserSnapshotLoading) {
 		return <ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
 	}
 

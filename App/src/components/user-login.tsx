@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { useContext } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -14,7 +13,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
-import { AuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/firebase/auth-context'
 
 const loginSchema = z.object({
 	email: z.string().email(),
@@ -29,7 +28,7 @@ export const UserLogin = ({
 	closeMobileSheet?: () => void
 }) => {
 	const { signInWithEmailAndPassword, signInWithEmailAndPasswordError } =
-		useContext(AuthContext)
+		useAuthContext()
 	const form = useForm<LoginSchema>({
 		resolver: zodResolver(loginSchema),
 	})
