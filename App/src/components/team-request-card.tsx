@@ -131,7 +131,7 @@ const TeamDetail = ({
 }
 
 export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } =
 		useContext(TeamsContext)
 	const {
@@ -148,10 +148,15 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 					authenticatedUserSnapshot
 						?.data()
 						?.seasons.find(
-							(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+							(item) =>
+								item.season.id === selectedSeasonQueryDocumentSnapshot?.id
 						)?.team.id
 			),
-		[authenticatedUserSnapshot, teamsQuerySnapshot, seasonQueryDocumentSnapshot]
+		[
+			authenticatedUserSnapshot,
+			teamsQuerySnapshot,
+			selectedSeasonQueryDocumentSnapshot,
+		]
 	)
 
 	const isAuthenticatedUserCaptain = useMemo(
@@ -160,9 +165,10 @@ export const TeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === seasonQueryDocumentSnapshot?.id && item.captain
+						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.captain
 				),
-		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
 	)
 
 	const registrationStatus =

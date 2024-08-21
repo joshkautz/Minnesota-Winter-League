@@ -23,10 +23,10 @@ interface SeasonProps {
 	seasonsQuerySnapshot: QuerySnapshot<SeasonData, DocumentData> | undefined
 	seasonsQuerySnapshotLoading: boolean
 	seasonsQuerySnapshotError: FirestoreError | undefined
-	seasonQueryDocumentSnapshot:
+	selectedSeasonQueryDocumentSnapshot:
 		| QueryDocumentSnapshot<SeasonData, DocumentData>
 		| undefined
-	setSeasonQueryDocumentSnapshot: Dispatch<
+	setSelectedSeasonQueryDocumentSnapshot: Dispatch<
 		SetStateAction<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>
 	>
 }
@@ -35,8 +35,8 @@ export const SeasonsContext = createContext<SeasonProps>({
 	seasonsQuerySnapshot: undefined,
 	seasonsQuerySnapshotLoading: false,
 	seasonsQuerySnapshotError: undefined,
-	seasonQueryDocumentSnapshot: undefined,
-	setSeasonQueryDocumentSnapshot: () => {},
+	selectedSeasonQueryDocumentSnapshot: undefined,
+	setSelectedSeasonQueryDocumentSnapshot: () => {},
 })
 
 export const useSeasonsContext = () => useContext(SeasonsContext)
@@ -50,10 +50,14 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		seasonsQuerySnapshotError,
 	] = useCollection(seasonsQuery())
 
-	const [seasonQueryDocumentSnapshot, setSeasonQueryDocumentSnapshot] =
-		useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>(
-			undefined
-		)
+	console.log(seasonsQuerySnapshot)
+
+	const [
+		selectedSeasonQueryDocumentSnapshot,
+		setSelectedSeasonQueryDocumentSnapshot,
+	] = useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>(
+		undefined
+	)
 
 	const getMostRecentSeason = useCallback(() => {
 		return seasonsQuerySnapshot?.docs.sort(
@@ -62,8 +66,8 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 	}, [seasonsQuerySnapshot])
 
 	useEffect(() => {
-		setSeasonQueryDocumentSnapshot(getMostRecentSeason())
-	}, [setSeasonQueryDocumentSnapshot, getMostRecentSeason])
+		setSelectedSeasonQueryDocumentSnapshot(getMostRecentSeason())
+	}, [setSelectedSeasonQueryDocumentSnapshot, getMostRecentSeason])
 
 	return (
 		<SeasonsContext.Provider
@@ -71,8 +75,8 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 				seasonsQuerySnapshot,
 				seasonsQuerySnapshotLoading,
 				seasonsQuerySnapshotError,
-				seasonQueryDocumentSnapshot,
-				setSeasonQueryDocumentSnapshot,
+				selectedSeasonQueryDocumentSnapshot,
+				setSelectedSeasonQueryDocumentSnapshot,
 			}}
 		>
 			{children}

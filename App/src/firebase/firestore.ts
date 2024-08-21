@@ -404,6 +404,17 @@ const teamsQuery = (): Query<TeamData, DocumentData> => {
 	>
 }
 
+const teamsHistoryQuery = (
+	id: string | undefined
+): Query<TeamData, DocumentData> | undefined => {
+	if (!id) return undefined
+
+	return query(
+		collection(firestore, Collections.TEAMS),
+		where('teamId', '==', id)
+	) as Query<TeamData, DocumentData>
+}
+
 const currentSeasonTeamsQuery = (
 	seasonSnapshot: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
 ): Query<TeamData, DocumentData> | undefined => {
@@ -522,6 +533,7 @@ const stripeRegistration = async (
 }
 
 export {
+	teamsHistoryQuery,
 	currentSeasonTeamsQuery,
 	currentSeasonGamesQuery,
 	acceptOffer,

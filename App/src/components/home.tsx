@@ -32,7 +32,7 @@ const SnowFlake = ({ className }: { className?: string }) => {
 }
 
 export const Home = () => {
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const { toggleIsOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()
@@ -81,9 +81,10 @@ export const Home = () => {
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === seasonQueryDocumentSnapshot?.id && item.team
+						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.team
 				),
-		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
 	)
 
 	const handleCallToAction = () => {

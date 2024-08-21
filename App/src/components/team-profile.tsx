@@ -52,7 +52,7 @@ export const TeamProfile = () => {
 	const { id } = useParams()
 	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [teamProfileImageLoaded, setTeamProfileImageLoaded] = useState(false)
 
@@ -66,14 +66,15 @@ export const TeamProfile = () => {
 							authenticatedUserSnapshot
 								?.data()
 								?.seasons.find(
-									(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+									(item) =>
+										item.season.id === selectedSeasonQueryDocumentSnapshot?.id
 								)?.team.id
 					),
 		[
 			id,
 			authenticatedUserSnapshot,
 			teamsQuerySnapshot,
-			seasonQueryDocumentSnapshot,
+			selectedSeasonQueryDocumentSnapshot,
 		]
 	)
 
@@ -146,6 +147,15 @@ export const TeamProfile = () => {
 					className={'rounded-md'}
 				/>
 			</div>
+			<NotificationCard>
+				<Link
+					className="flex flex-col transition duration-300 group w-max"
+					to={`/history/${team?.data().teamId}`}
+				>
+					{`Team History`}
+					<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
+				</Link>
+			</NotificationCard>
 			<div className="flex justify-center items-start gap-8 flex-wrap max-w-[1040px] mx-auto">
 				<NotificationCard
 					title={'Roster'}

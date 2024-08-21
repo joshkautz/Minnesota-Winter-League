@@ -31,13 +31,15 @@ export const useGamesContext = () => useContext(GamesContext)
 export const GamesContextProvider: React.FC<PropsWithChildren> = ({
 	children,
 }) => {
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [
 		gamesQuerySnapshot,
 		gamesQuerySnapshotLoading,
 		gamesQuerySnapshotError,
-	] = useCollection(currentSeasonGamesQuery(seasonQueryDocumentSnapshot))
+	] = useCollection(
+		currentSeasonGamesQuery(selectedSeasonQueryDocumentSnapshot)
+	)
 
 	return (
 		<GamesContext.Provider
