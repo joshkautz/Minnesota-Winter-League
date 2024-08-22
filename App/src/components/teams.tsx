@@ -5,13 +5,40 @@ import { useTeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
 import { GradientHeader } from './gradient-header'
 import { ComingSoon } from './coming-soon'
+import { useSeasonsContext } from '@/firebase/seasons-context'
+import { Timestamp } from '@firebase/firestore'
 
 export const Teams = () => {
 	const { teamsQuerySnapshot } = useTeamsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	return (
 		<div className={'container'}>
 			<GradientHeader>Teams</GradientHeader>
+			{/* Season Registration window is in the future */}
+			{selectedSeasonQueryDocumentSnapshot &&
+				selectedSeasonQueryDocumentSnapshot.data().registrationStart.seconds >
+					Timestamp.now().seconds && (
+					<>
+						Registration for this season will begin on{' '}
+						{
+							selectedSeasonQueryDocumentSnapshot.data().registrationStart
+								.seconds
+						}
+						.
+					</>
+				)}
+			{/* Season Registration window is live */}
+			{selectedSeasonQueryDocumentSnapshot &&
+				selectedSeasonQueryDocumentSnapshot.data().registrationStart.seconds <
+					Timestamp.now().seconds &&
+				selectedSeasonQueryDocumentSnapshot.data().registrationEnd.seconds >
+					Timestamp.now().seconds && (
+					<>
+						Registration for this season is live. Go create a team or join a
+						team!
+					</>
+				)}
 			{!teamsQuerySnapshot ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />

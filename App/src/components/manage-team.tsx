@@ -31,7 +31,7 @@ import { EditTeamDialog } from './edit-team-dialog'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 
 export const ManageTeam = () => {
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 	const { teamsQuerySnapshot } = useContext(TeamsContext)
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
 		useOffersContext()
@@ -74,9 +74,10 @@ export const ManageTeam = () => {
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === seasonQueryDocumentSnapshot?.id && item.captain
+						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.captain
 				),
-		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserRostered = useMemo(
@@ -85,9 +86,10 @@ export const ManageTeam = () => {
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === seasonQueryDocumentSnapshot?.id && item.team
+						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.team
 				),
-		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
 	)
 
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)

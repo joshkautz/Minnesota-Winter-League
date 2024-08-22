@@ -20,7 +20,7 @@ interface TeamProps {
 	teamsQuerySnapshotError: FirestoreError | undefined
 }
 
-const TeamsContext = createContext<TeamProps>({
+export const TeamsContext = createContext<TeamProps>({
 	teamsQuerySnapshot: undefined,
 	teamsQuerySnapshotLoading: false,
 	teamsQuerySnapshotError: undefined,
@@ -28,14 +28,18 @@ const TeamsContext = createContext<TeamProps>({
 
 export const useTeamsContext = () => useContext(TeamsContext)
 
-const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+export const TeamsContextProvider: React.FC<PropsWithChildren> = ({
+	children,
+}) => {
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [
 		teamsQuerySnapshot,
 		teamsQuerySnapshotLoading,
 		teamsQuerySnapshotError,
-	] = useCollection(currentSeasonTeamsQuery(seasonQueryDocumentSnapshot))
+	] = useCollection(
+		currentSeasonTeamsQuery(selectedSeasonQueryDocumentSnapshot)
+	)
 
 	return (
 		<TeamsContext.Provider
@@ -49,5 +53,3 @@ const TeamsContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 		</TeamsContext.Provider>
 	)
 }
-
-export { TeamsContext, TeamsContextProvider }

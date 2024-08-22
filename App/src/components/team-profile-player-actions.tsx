@@ -25,7 +25,7 @@ export const TeamProfilePlayerActions = ({
 	const { id } = useParams()
 	const { teamsQuerySnapshot } = useTeamsContext()
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const team = useMemo(
 		() =>
@@ -37,14 +37,15 @@ export const TeamProfilePlayerActions = ({
 							authenticatedUserSnapshot
 								?.data()
 								?.seasons.find(
-									(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+									(item) =>
+										item.season.id === selectedSeasonQueryDocumentSnapshot?.id
 								)?.team.id
 					),
 		[
 			id,
 			authenticatedUserSnapshot,
 			teamsQuerySnapshot,
-			seasonQueryDocumentSnapshot,
+			selectedSeasonQueryDocumentSnapshot,
 		]
 	)
 

@@ -11,8 +11,8 @@ import { Skeleton } from './ui/skeleton'
 
 export const SeasonSelect = () => {
 	const {
-		seasonQueryDocumentSnapshot,
-		setSeasonQueryDocumentSnapshot,
+		selectedSeasonQueryDocumentSnapshot,
+		setSelectedSeasonQueryDocumentSnapshot,
 		seasonsQuerySnapshot,
 		seasonsQuerySnapshotLoading,
 	} = useSeasonsContext()
@@ -26,20 +26,24 @@ export const SeasonSelect = () => {
 			(doc) => doc.data().name === season
 		)
 		if (seasonDoc) {
-			setSeasonQueryDocumentSnapshot(seasonDoc)
+			setSelectedSeasonQueryDocumentSnapshot(seasonDoc)
 		}
 	}
 
 	useEffect(() => {
 		if (
 			!seasonsQuerySnapshotLoading &&
-			seasonQueryDocumentSnapshot &&
+			selectedSeasonQueryDocumentSnapshot &&
 			!isLoaded
 		) {
-			setStringValue(seasonQueryDocumentSnapshot.data().name)
+			setStringValue(selectedSeasonQueryDocumentSnapshot.data().name)
 			setIsLoaded(true)
 		}
-	}, [seasonsQuerySnapshotLoading, seasonQueryDocumentSnapshot, isLoaded])
+	}, [
+		seasonsQuerySnapshotLoading,
+		selectedSeasonQueryDocumentSnapshot,
+		isLoaded,
+	])
 
 	return (
 		<div className="inline-flex items-center justify-center py-16 space-x-2">
@@ -51,11 +55,16 @@ export const SeasonSelect = () => {
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
-						{seasonsQuerySnapshot?.docs.map((season) => (
-							<SelectItem key={season.id} value={season.data().name}>
-								{season.data().name}
-							</SelectItem>
-						))}
+						{seasonsQuerySnapshot?.docs
+							.sort(
+								(a, b) =>
+									b.data().dateStart.seconds - a.data().dateStart.seconds
+							)
+							.map((season) => (
+								<SelectItem key={season.id} value={season.data().name}>
+									{season.data().name}
+								</SelectItem>
+							))}
 					</SelectContent>
 				</Select>
 			)}

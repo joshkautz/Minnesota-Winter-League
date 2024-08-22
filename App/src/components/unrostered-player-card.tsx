@@ -93,7 +93,7 @@ const SearchBar = ({
 
 export const UnrosteredPlayerList = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 	const { teamsQuerySnapshot } = useTeamsContext()
 	const [unrosteredPlayersQuerySnapshot] = useCollection(
 		unrosteredPlayersQuery()
@@ -112,10 +112,15 @@ export const UnrosteredPlayerList = () => {
 					authenticatedUserSnapshot
 						?.data()
 						?.seasons.find(
-							(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+							(item) =>
+								item.season.id === selectedSeasonQueryDocumentSnapshot?.id
 						)?.team.id
 			),
-		[authenticatedUserSnapshot, teamsQuerySnapshot, seasonQueryDocumentSnapshot]
+		[
+			authenticatedUserSnapshot,
+			teamsQuerySnapshot,
+			selectedSeasonQueryDocumentSnapshot,
+		]
 	)
 
 	const handleInvite = (

@@ -30,7 +30,7 @@ export const TopNav = ({
 		signOutLoading,
 	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useOffersContext()
-	const { seasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [open, setOpen] = useState(false)
 
@@ -44,9 +44,10 @@ export const TopNav = ({
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === seasonQueryDocumentSnapshot?.id && item.captain
+						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.captain
 				),
-		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserRostered = useMemo(
@@ -55,9 +56,10 @@ export const TopNav = ({
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === seasonQueryDocumentSnapshot?.id && item.team
+						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.team
 				),
-		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
 	)
 
 	const hasPendingOffers = useMemo(
@@ -74,9 +76,10 @@ export const TopNav = ({
 				?.data()
 				?.seasons.find(
 					(item) =>
-						item.season.id === seasonQueryDocumentSnapshot?.id && item.paid
+						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.paid
 				),
-		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserSigned = useMemo(
@@ -84,9 +87,9 @@ export const TopNav = ({
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.find(
-					(item) => item.season.id === seasonQueryDocumentSnapshot?.id
+					(item) => item.season.id === selectedSeasonQueryDocumentSnapshot?.id
 				)?.signed,
-		[authenticatedUserSnapshot, seasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
 	)
 
 	const isVerified = authStateUser?.emailVerified
