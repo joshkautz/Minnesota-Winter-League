@@ -25,6 +25,7 @@ import {
 	Timestamp,
 	Query,
 	getCountFromServer,
+	documentId,
 } from 'firebase/firestore'
 
 import { app } from './app'
@@ -397,11 +398,15 @@ const updatePlayer = (
 	return updateDoc(doc(firestore, 'players', authValue!.uid), data)
 }
 
-const teamsQuery = (): Query<TeamData, DocumentData> => {
-	return query(collection(firestore, Collections.TEAMS)) as Query<
-		TeamData,
-		DocumentData
-	>
+const teamsQuery = (
+	teams: DocumentReference<TeamData, DocumentData>[] | undefined
+): Query<TeamData, DocumentData> | undefined => {
+	if (!teams) return
+
+	return query(
+		collection(firestore, Collections.TEAMS),
+		where(documentId(), 'in', teams)
+	) as Query<TeamData, DocumentData>
 }
 
 const teamsHistoryQuery = (

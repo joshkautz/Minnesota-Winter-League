@@ -71,7 +71,7 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 	const getMostRecentSeason = useCallback(() => {
 		return seasonsQuerySnapshot?.docs.sort(
 			(a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds
-		)[0]
+		)?.[0]
 	}, [seasonsQuerySnapshot])
 
 	useEffect(() => {
