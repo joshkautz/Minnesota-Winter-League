@@ -20,6 +20,9 @@ import {
 import { SeasonData } from '@/lib/interfaces'
 
 interface SeasonProps {
+	currentSeasonQueryDocumentSnapshot:
+		| QueryDocumentSnapshot<SeasonData, DocumentData>
+		| undefined
 	seasonsQuerySnapshot: QuerySnapshot<SeasonData, DocumentData> | undefined
 	seasonsQuerySnapshotLoading: boolean
 	seasonsQuerySnapshotError: FirestoreError | undefined
@@ -32,6 +35,7 @@ interface SeasonProps {
 }
 
 export const SeasonsContext = createContext<SeasonProps>({
+	currentSeasonQueryDocumentSnapshot: undefined,
 	seasonsQuerySnapshot: undefined,
 	seasonsQuerySnapshotLoading: false,
 	seasonsQuerySnapshotError: undefined,
@@ -50,11 +54,16 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		seasonsQuerySnapshotError,
 	] = useCollection(seasonsQuery())
 
-	console.log(seasonsQuerySnapshot)
-
 	const [
 		selectedSeasonQueryDocumentSnapshot,
 		setSelectedSeasonQueryDocumentSnapshot,
+	] = useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>(
+		undefined
+	)
+
+	const [
+		currentSeasonQueryDocumentSnapshot,
+		setCurrentSeasonQueryDocumentSnapshot,
 	] = useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>(
 		undefined
 	)
@@ -69,9 +78,14 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		setSelectedSeasonQueryDocumentSnapshot(getMostRecentSeason())
 	}, [setSelectedSeasonQueryDocumentSnapshot, getMostRecentSeason])
 
+	useEffect(() => {
+		setCurrentSeasonQueryDocumentSnapshot(getMostRecentSeason())
+	}, [setCurrentSeasonQueryDocumentSnapshot, getMostRecentSeason])
+
 	return (
 		<SeasonsContext.Provider
 			value={{
+				currentSeasonQueryDocumentSnapshot,
 				seasonsQuerySnapshot,
 				seasonsQuerySnapshotLoading,
 				seasonsQuerySnapshotError,
