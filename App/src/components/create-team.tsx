@@ -1,6 +1,6 @@
 import { useAuthContext } from '@/firebase/auth-context'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { toast } from './ui/use-toast'
@@ -21,6 +21,8 @@ import { createTeam } from '@/firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { StorageReference, ref, storage } from '@/firebase/storage'
 import { GradientHeader } from './gradient-header'
+import { useSeasonsContext } from '@/firebase/seasons-context'
+import { Timestamp } from '@firebase/firestore'
 
 const createTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -30,51 +32,66 @@ const createTeamSchema = z.object({
 type CreateTeamSchema = z.infer<typeof createTeamSchema>
 
 export const CreateTeam = () => {
-	const { authenticatedUserSnapshot } = useAuthContext()
-	const isOnTeam = authenticatedUserSnapshot?.data()?.team
 	const navigate = useNavigate()
-
+	const { authenticatedUserSnapshot } = useAuthContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 	const [loading, setLoading] = useState(false)
-
-	const form = useForm<CreateTeamSchema>({
-		resolver: zodResolver(createTeamSchema),
-	})
-
 	const [newTeamData, setNewTeamData] = useState<{
 		name: string
 		storageRef: StorageReference | undefined
 	}>()
 	const [blob, setBlob] = useState<Blob>()
 	const [storageRef, setStorageRef] = useState<StorageReference>()
-
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (!e.target.files?.[0]) {
-			return
-		}
-		setBlob(e.target.files[0])
-	}
-
 	const [uploadFile, uploadFileLoading, , uploadFileError] = useUploadFile()
 	const [downloadUrl] = useDownloadURL(storageRef)
 
-	const handleResult = ({
-		success,
-		message,
-		navigation,
-	}: {
-		success: boolean
-		message: string
-		navigation?: boolean
-	}) => {
-		toast({
-			title: success ? 'Success!' : 'Unable to create team',
-			description: message,
-			variant: success ? 'default' : 'destructive',
-		})
-		if (navigation) {
-			navigate('/manage')
-		}
-	}
+	const isAuthenticatedUserRostered = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) =>
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
+						item.team
+				),
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
+	)
+
+	const form = useForm<CreateTeamSchema>({
+		resolver: zodResolver(createTeamSchema),
+	})
+
+	const handleFileChange = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			if (!event.target.files?.[0]) {
+				return
+			}
+			setBlob(event.target.files[0])
+		},
+		[setBlob]
+	)
+
+	const handleResult = useCallback(
+		({
+			success,
+			message,
+			navigation,
+		}: {
+			success: boolean
+			message: string
+			navigation?: boolean
+		}) => {
+			toast({
+				title: success ? 'Success!' : 'Unable to create team',
+				description: message,
+				variant: success ? 'default' : 'destructive',
+			})
+			if (navigation) {
+				navigate('/manage')
+			}
+		},
+		[toast, navigate]
+	)
 
 	useEffect(() => {
 		if (newTeamData) {
@@ -107,7 +124,14 @@ export const CreateTeam = () => {
 				}
 			}
 		}
-	}, [newTeamData])
+	}, [
+		newTeamData,
+		authenticatedUserSnapshot,
+		setStorageRef,
+		createTeam,
+		handleResult,
+		setLoading,
+	])
 
 	useEffect(() => {
 		if (downloadUrl) {
@@ -148,34 +172,53 @@ export const CreateTeam = () => {
 				})
 			}
 		}
-	}, [downloadUrl])
+	}, [
+		downloadUrl,
+		handleResult,
+		setLoading,
+		authenticatedUserSnapshot,
+		newTeamData,
+	])
 
-	const onSubmit = async (data: CreateTeamSchema) => {
-		if (authenticatedUserSnapshot) {
-			try {
-				setLoading(true)
-				if (blob) {
-					const result = await uploadFile(
-						ref(storage, `teams/${uuidv4()}`),
-						blob,
-						{
-							contentType: 'image/jpeg',
+	const onSubmit = useCallback(
+		async (data: CreateTeamSchema) => {
+			if (authenticatedUserSnapshot) {
+				try {
+					setLoading(true)
+					if (blob) {
+						const result = await uploadFile(
+							ref(storage, `teams/${uuidv4()}`),
+							blob,
+							{
+								contentType: 'image/jpeg',
+							}
+						)
+						if (result) {
+							setNewTeamData({ name: data.name, storageRef: result.ref })
 						}
-					)
-					if (result) {
-						setNewTeamData({ name: data.name, storageRef: result.ref })
+					} else {
+						setNewTeamData({ name: data.name, storageRef: undefined })
 					}
-				} else {
-					setNewTeamData({ name: data.name, storageRef: undefined })
+				} catch {
+					handleResult({
+						success: false,
+						message: `Ensure your email is verified. Please try again later.`,
+					})
 				}
-			} catch {
-				handleResult({
-					success: false,
-					message: `Ensure your email is verified. Please try again later.`,
-				})
 			}
-		}
-	}
+		},
+		[
+			authenticatedUserSnapshot,
+			setLoading,
+			uploadFile,
+			blob,
+			ref,
+			storage,
+			uuidv4,
+			setNewTeamData,
+			handleResult,
+		]
+	)
 
 	useEffect(() => {
 		if (uploadFileError) {
@@ -184,13 +227,37 @@ export const CreateTeam = () => {
 				message: `Ensure your email is verified. Please try again later.`,
 			})
 		}
-	}, [uploadFileError])
+	}, [uploadFileError, handleResult])
+
+	const isRegistrationOpen = useMemo(
+		() =>
+			currentSeasonQueryDocumentSnapshot &&
+			Timestamp.now() >
+				currentSeasonQueryDocumentSnapshot?.data().registrationStart &&
+			Timestamp.now() <
+				currentSeasonQueryDocumentSnapshot?.data().registrationEnd,
+		[currentSeasonQueryDocumentSnapshot]
+	)
 
 	return (
 		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
-			{authenticatedUserSnapshot?.data()?.team === null ? (
+			{!currentSeasonQueryDocumentSnapshot || loading ? (
+				<div className={'absolute inset-0 flex items-center justify-center'}>
+					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+				</div>
+			) : isAuthenticatedUserRostered ? (
+				<div>You must first leave your team in order to create a new one.</div>
+			) : !isRegistrationOpen ? (
+				<div>Registration is not open.</div>
+			) : (
 				<>
 					<GradientHeader>Create a Team</GradientHeader>
+					<>
+						The registration window of the{' '}
+						{currentSeasonQueryDocumentSnapshot?.data().name} season is
+						currently open!
+					</>
+
 					<div className="max-w-[400px]">
 						<Form {...form}>
 							<form
@@ -244,12 +311,6 @@ export const CreateTeam = () => {
 						</Form>
 					</div>
 				</>
-			) : isOnTeam && !loading ? (
-				<div>You must first leave your team in order to create a new one.</div>
-			) : (
-				<div className={'absolute inset-0 flex items-center justify-center'}>
-					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
-				</div>
 			)}
 		</div>
 	)

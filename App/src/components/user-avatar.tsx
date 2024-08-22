@@ -86,41 +86,31 @@ export const UserAvatar = ({
 				{/* Mostly example and placeholder content for now */}
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
-						{userContent.map(({ label, path, alt }) => {
-							return path === '/create' ? (
-								<DropdownMenuItem
-									className="cursor-pointer"
-									disabled
-									key={path}
-								>
-									{label}
-								</DropdownMenuItem>
-							) : (
-								<Link key={path} to={path} aria-label={alt}>
-									{path === '/manage' && !!hasPendingOffers ? (
-										<DropdownMenuItem className={'gap-1 cursor-pointer'}>
-											{label}{' '}
-											<span className="relative flex w-2 h-2 -translate-y-1">
-												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
-												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
-											</span>
-										</DropdownMenuItem>
-									) : path === '/profile' && hasRequiredTasks ? (
-										<DropdownMenuItem className={'gap-1 cursor-pointer'}>
-											{label}{' '}
-											<span className="relative flex w-2 h-2 -translate-y-1">
-												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
-												<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
-											</span>
-										</DropdownMenuItem>
-									) : (
-										<DropdownMenuItem className="cursor-pointer">
-											{label}
-										</DropdownMenuItem>
-									)}
-								</Link>
-							)
-						})}
+						{userContent.map(({ label, path, alt }) => (
+							<Link key={path} to={path} aria-label={alt}>
+								{path === '/manage' && !!hasPendingOffers ? (
+									<DropdownMenuItem className={'gap-1 cursor-pointer'}>
+										{label}{' '}
+										<span className="relative flex w-2 h-2 -translate-y-1">
+											{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
+											<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+										</span>
+									</DropdownMenuItem>
+								) : path === '/profile' && hasRequiredTasks ? (
+									<DropdownMenuItem className={'gap-1 cursor-pointer'}>
+										{label}{' '}
+										<span className="relative flex w-2 h-2 -translate-y-1">
+											{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
+											<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+										</span>
+									</DropdownMenuItem>
+								) : (
+									<DropdownMenuItem className="cursor-pointer">
+										{label}
+									</DropdownMenuItem>
+								)}
+							</Link>
+						))}
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={signOut}>Log out</DropdownMenuItem>
