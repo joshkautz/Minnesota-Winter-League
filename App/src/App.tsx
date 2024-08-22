@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { FourOhFour } from '@/components/four-oh-four'
-import { Home } from '@/components/home'
+import { Home } from '@/components/home/home'
 import { Layout } from '@/components/layout'
 import { Schedule } from '@/components/schedule/schedule'
 import { Standings } from '@/components/standings/standings'
