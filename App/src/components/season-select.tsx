@@ -55,11 +55,16 @@ export const SeasonSelect = () => {
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
-						{seasonsQuerySnapshot?.docs.map((season) => (
-							<SelectItem key={season.id} value={season.data().name}>
-								{season.data().name}
-							</SelectItem>
-						))}
+						{seasonsQuerySnapshot?.docs
+							.sort(
+								(a, b) =>
+									b.data().dateStart.seconds - a.data().dateStart.seconds
+							)
+							.map((season) => (
+								<SelectItem key={season.id} value={season.data().name}>
+									{season.data().name}
+								</SelectItem>
+							))}
 					</SelectContent>
 				</Select>
 			)}
