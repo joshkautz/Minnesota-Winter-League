@@ -2,18 +2,20 @@ import { useMemo } from 'react'
 import { DocumentData, QuerySnapshot } from '@/firebase/firestore'
 import { GameData } from './interfaces'
 
+export type TeamStanding = {
+	pointsFor: number
+	pointsAgainst: number
+	wins: number
+	losses: number
+	differential: number
+}
+
 export const useStandings = (
 	gamesQuerySnapshot: QuerySnapshot<GameData, DocumentData> | undefined
 ) => {
 	const standings = useMemo(() => {
 		const result: {
-			[key: string]: {
-				pointsFor: number
-				pointsAgainst: number
-				wins: number
-				losses: number
-				differential: number
-			}
+			[key: string]: TeamStanding
 		} = {}
 
 		gamesQuerySnapshot?.docs.forEach((gameQueryDocumentSnapshot) => {
