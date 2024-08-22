@@ -7,12 +7,11 @@ import { Standings } from '@/components/standings/standings'
 import { Teams } from '@/components/teams/teams'
 import { ProtectedRoute } from '@/components/protected-route'
 import { Profile } from '@/components/profile'
-import { TeamProfile } from './components/team-profile'
+import { TeamProfile } from './components/team-profile/team-profile'
 import { ManageTeam } from './components/manage-team'
 import { useEffect } from 'react'
 import { useAuthContext } from './firebase/auth-context'
 import { CreateTeam } from './components/create-team'
-import { TeamHistory } from './components/team-history'
 
 function App() {
 	const { authStateUser } = useAuthContext()
@@ -50,7 +49,6 @@ function App() {
 				<Route path={'/team'} element={<TeamProfile />} />
 				<Route path={'/teams'} element={<Teams />} />
 				<Route path={'/teams/:id'} element={<TeamProfile />} />
-				<Route path={'/history/:id'} element={<TeamHistory />} />
 				<Route
 					path={'/profile'}
 					element={

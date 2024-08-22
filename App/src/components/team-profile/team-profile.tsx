@@ -1,12 +1,13 @@
 import { useTeamsContext } from '@/firebase/teams-context'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { NotificationCard } from './notification-card'
+import { NotificationCard } from '../notification-card'
 import {
 	DocumentReference,
 	DocumentData,
 	gamesByTeamQuery,
 	QueryDocumentSnapshot,
+	teamsHistoryQuery,
 } from '@/firebase/firestore'
 import { GameData, PlayerData, TeamData } from '@/lib/interfaces'
 import { TeamRosterPlayer } from './team-roster-player'
@@ -15,37 +16,38 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import { Timestamp } from '@firebase/firestore'
 
 import { CheckCircledIcon } from '@radix-ui/react-icons'
-import { TeamProfilePlayerActions } from './team-profile-player-actions'
-import { Skeleton } from './ui/skeleton'
+import { TeamProfilePlayerActions } from '../team-profile-player-actions'
+import { Skeleton } from '../ui/skeleton'
 import { useSeasonsContext } from '@/firebase/seasons-context'
+import { TeamHistory } from './team-history'
+import * as TeamRecord from './team-record'
 
-enum Opponent {
-	HOME = 'HOME',
-	AWAY = 'AWAY',
-}
+const OPPONENT = {
+	HOME: 'HOME',
+	AWAY: 'AWAY',
+} as const
 
-enum Result {
-	VS = 'vs',
-	UNREPORTED = 'Unreported',
-}
+const RESULT = {
+	VS: 'vs',
+	UNREPORTED: 'Unreported',
+} as const
 
 const formatGameResult = (
 	team: QueryDocumentSnapshot<TeamData, DocumentData> | undefined,
 	gameData: GameData
 ) => {
-	const homeScore = gameData.homeScore
-	const awayScore = gameData.awayScore
-	const opponent = team?.id == gameData.home.id ? Opponent.AWAY : Opponent.HOME
+	const { homeScore, awayScore } = gameData
+	const opponent = team?.id == gameData.home.id ? OPPONENT.AWAY : OPPONENT.HOME
 	const isInFuture = gameData.date > Timestamp.now()
 	const isScoreReported =
 		Number.isInteger(homeScore) && Number.isInteger(awayScore)
 	return isInFuture
-		? Result.VS
+		? RESULT.VS
 		: isScoreReported
-			? opponent == Opponent.AWAY
+			? opponent == OPPONENT.AWAY
 				? `${homeScore} - ${awayScore}`
 				: `${awayScore} - ${homeScore}`
-			: Result.UNREPORTED
+			: RESULT.UNREPORTED
 }
 
 export const TeamProfile = () => {
@@ -78,6 +80,10 @@ export const TeamProfile = () => {
 		]
 	)
 
+	const [historyQuerySnapshot] = useCollection(
+		teamsHistoryQuery(team?.data().teamId)
+	)
+
 	const isAuthenticatedUserCaptain = useMemo(
 		() =>
 			team
@@ -101,6 +107,8 @@ export const TeamProfile = () => {
 
 	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
 	const [imgSrc, setImgSrc] = useState<string | undefined>()
+
+	// const [teamsQuerySnapshot] = useCollection(teamsHistoryQuery(team?.data().teamId))
 
 	useEffect(() => {
 		setImgSrc(team?.data().logo + `&date=${Date.now()}`)
@@ -147,15 +155,7 @@ export const TeamProfile = () => {
 					className={'rounded-md'}
 				/>
 			</div>
-			<NotificationCard>
-				<Link
-					className="flex flex-col transition duration-300 group w-max"
-					to={`/history/${team?.data().teamId}`}
-				>
-					{`Team History`}
-					<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
-				</Link>
-			</NotificationCard>
+
 			<div className="flex justify-center items-start gap-8 flex-wrap max-w-[1040px] mx-auto">
 				<NotificationCard
 					title={'Roster'}
@@ -188,61 +188,45 @@ export const TeamProfile = () => {
 						)
 					)}
 				</NotificationCard>
-				<NotificationCard
-					title={'Record'}
-					// description={'2023 Minneapolis Winter League'}
-					className={'flex-1 basis-[360px] flex-shrink-0'}
-				>
-					<div className="flex flex-col items-end gap-2 py-2">
-						{gamesSnapshot?.docs.map((game, index) => {
-							const gameData = game.data()
-							const opponent =
-								team?.id == gameData.home.id ? Opponent.AWAY : Opponent.HOME
-							const result = formatGameResult(team, gameData)
+				<TeamRecord.Root>
+					{gamesSnapshot?.docs.map((game, index) => {
+						const gameData = game.data()
+						const opponent =
+							team?.id == gameData.home.id ? OPPONENT.AWAY : OPPONENT.HOME
+						const result = formatGameResult(team, gameData)
 
-							return (
-								<div
-									key={`row-${index}`}
-									className={'flex items-center justify-between w-full h-8'}
-								>
-									<p
-										className={
-											'flex grow-[1] select-none basis-[92px] shrink-0'
+						return (
+							<TeamRecord.Row key={index}>
+								<TeamRecord.RowDate>
+									{gameData.date.toDate().toLocaleDateString()}
+								</TeamRecord.RowDate>
+								<TeamRecord.RowResult>{result}</TeamRecord.RowResult>
+								<div className="flex grow-[3] shrink-0 basis-[100px] overflow-hidden text-clip">
+									<Link
+										className="flex flex-col transition duration-300 group w-max"
+										to={
+											opponent == OPPONENT.AWAY
+												? `/teams/${gameData.away.id}`
+												: `/teams/${gameData.home.id}`
 										}
 									>
-										{gameData.date.toDate().toLocaleDateString()}
-									</p>
-									<p
-										className={
-											'flex grow-[1] text-center basis-[74px] shrink-0 select-none'
-										}
-									>
-										{result}
-									</p>
-									<div className="flex grow-[3] shrink-0 basis-[100px] overflow-hidden text-clip">
-										<Link
-											className="flex flex-col transition duration-300 group w-max"
-											to={
-												opponent == Opponent.AWAY
-													? `/teams/${gameData.away.id}`
-													: `/teams/${gameData.home.id}`
-											}
-										>
-											{opponent == Opponent.AWAY
-												? teamsQuerySnapshot?.docs
-														.find((team) => team.id === gameData.away.id)
-														?.data().name
-												: teamsQuerySnapshot?.docs
-														.find((team) => team.id === gameData.home.id)
-														?.data().name}
-											<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
-										</Link>
-									</div>
+										{opponent == OPPONENT.AWAY
+											? teamsQuerySnapshot?.docs
+													.find((team) => team.id === gameData.away.id)
+													?.data().name
+											: teamsQuerySnapshot?.docs
+													.find((team) => team.id === gameData.home.id)
+													?.data().name}
+										<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
+									</Link>
 								</div>
-							)
-						})}
-					</div>
-				</NotificationCard>
+							</TeamRecord.Row>
+						)
+					})}
+				</TeamRecord.Root>
+				{historyQuerySnapshot && (
+					<TeamHistory historyQuerySnapshot={historyQuerySnapshot} />
+				)}
 			</div>
 		</div>
 	)

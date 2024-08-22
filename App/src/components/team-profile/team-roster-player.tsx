@@ -11,17 +11,17 @@ import {
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
-} from './ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import { DotsVerticalIcon, StarFilledIcon } from '@radix-ui/react-icons'
 import { useState, useCallback, useMemo } from 'react'
-import { Button } from './ui/button'
-import { Skeleton } from './ui/skeleton'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useAuthContext } from '@/firebase/auth-context'
 import { PlayerData } from '@/lib/interfaces'
 import { useDocument } from 'react-firebase-hooks/firestore'
-import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
-import { toast } from './ui/use-toast'
-import { Badge } from './ui/badge'
+import { DestructiveConfirmationDialog } from '../destructive-confirmation-dialog'
+import { toast } from '@/components/ui/use-toast'
+import { Badge } from '@/components/ui/badge'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { useParams } from 'react-router-dom'
 import { useTeamsContext } from '@/firebase/teams-context'
