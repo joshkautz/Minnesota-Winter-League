@@ -23,6 +23,15 @@ import { StorageReference, ref, storage } from '@/firebase/storage'
 import { GradientHeader } from './gradient-header'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Timestamp } from '@firebase/firestore'
+import { Skeleton } from './ui/skeleton'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from './ui/select'
+import { useTeamsContext } from '@/firebase/teams-context'
 
 const createTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -34,7 +43,10 @@ type CreateTeamSchema = z.infer<typeof createTeamSchema>
 export const CreateTeam = () => {
 	const navigate = useNavigate()
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { currentSeasonQueryDocumentSnapshot, seasonsQuerySnapshot } =
+		useSeasonsContext()
+	const { teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot } =
+		useTeamsContext()
 	const [loading, setLoading] = useState(false)
 	const [newTeamData, setNewTeamData] = useState<{
 		name: string
@@ -239,6 +251,21 @@ export const CreateTeam = () => {
 		[currentSeasonQueryDocumentSnapshot]
 	)
 
+	enum SelectValues {
+		CREATE_NEW = 'Create New',
+	}
+
+	const [stringValue, setStringValue] = useState<string | undefined>(
+		SelectValues.CREATE_NEW
+	)
+
+	const handleSeasonChange = useCallback(
+		(team: string) => {
+			setStringValue(team)
+		},
+		[setStringValue]
+	)
+
 	return (
 		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
 			{!currentSeasonQueryDocumentSnapshot || loading ? (
@@ -252,11 +279,55 @@ export const CreateTeam = () => {
 			) : (
 				<>
 					<GradientHeader>Create a Team</GradientHeader>
-					<>
+					<div>
 						The registration window of the{' '}
 						{currentSeasonQueryDocumentSnapshot?.data().name} season is
 						currently open!
-					</>
+					</div>
+
+					{`Teams you've captained`}
+					<div className="inline-flex items-center justify-center py-16 space-x-2">
+						{!teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot ||
+						!seasonsQuerySnapshot ? (
+							<Skeleton className="w-24 h-8" />
+						) : (
+							<Select value={stringValue} onValueChange={handleSeasonChange}>
+								<SelectTrigger>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem key={0} value={SelectValues.CREATE_NEW}>
+										{SelectValues.CREATE_NEW}
+									</SelectItem>
+									{teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs
+										.sort((a, b) => {
+											const docs = seasonsQuerySnapshot?.docs
+											if (docs) {
+												const seasonA = docs.find(
+													(season) => season.id === a.data().season.id
+												)
+												const seasonB = docs.find(
+													(season) => season.id === b.data().season.id
+												)
+												if (seasonA && seasonB) {
+													return (
+														seasonA.data()?.dateStart.seconds -
+														seasonB.data()?.dateStart.seconds
+													)
+												}
+												return 0
+											}
+											return 0
+										})
+										.map((team) => (
+											<SelectItem key={team.id} value={team.data().name}>
+												{team.data().name}
+											</SelectItem>
+										))}
+								</SelectContent>
+							</Select>
+						)}
+					</div>
 
 					<div className="max-w-[400px]">
 						<Form {...form}>

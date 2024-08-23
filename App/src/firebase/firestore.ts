@@ -25,6 +25,7 @@ import {
 	Timestamp,
 	Query,
 	getCountFromServer,
+	documentId,
 } from 'firebase/firestore'
 
 import { app } from './app'
@@ -397,11 +398,40 @@ const updatePlayer = (
 	return updateDoc(doc(firestore, 'players', authValue!.uid), data)
 }
 
-const teamsQuery = (): Query<TeamData, DocumentData> => {
-	return query(collection(firestore, Collections.TEAMS)) as Query<
+const getTeamById = (
+	id: string | undefined
+): DocumentReference<TeamData, DocumentData> | undefined => {
+	if (!id) return
+
+	return doc(firestore, Collections.TEAMS, id) as DocumentReference<
 		TeamData,
 		DocumentData
 	>
+}
+
+const getTeamByTeamIdAndSeason = (
+	teamId: string | undefined,
+	seasonRef: DocumentReference<SeasonData, DocumentData> | undefined
+): Query<TeamData, DocumentData> | undefined => {
+	if (!teamId) return
+	if (!seasonRef) return
+
+	return query(
+		collection(firestore, Collections.TEAMS),
+		where('teamId', '==', teamId),
+		where('teamId', '==', seasonRef)
+	) as Query<TeamData, DocumentData>
+}
+
+const teamsQuery = (
+	teams: DocumentReference<TeamData, DocumentData>[] | undefined
+): Query<TeamData, DocumentData> | undefined => {
+	if (!teams) return
+
+	return query(
+		collection(firestore, Collections.TEAMS),
+		where(documentId(), 'in', teams)
+	) as Query<TeamData, DocumentData>
 }
 
 const teamsHistoryQuery = (
@@ -561,6 +591,8 @@ export {
 	unrosteredPlayersQuery,
 	promoteToCaptain,
 	standingsQuery,
+	getTeamById,
+	getTeamByTeamIdAndSeason,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,

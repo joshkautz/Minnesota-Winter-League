@@ -18,7 +18,6 @@ export const SeasonSelect = () => {
 	} = useSeasonsContext()
 
 	const [stringValue, setStringValue] = useState<string | undefined>(undefined)
-	const [isLoaded, setIsLoaded] = useState(false)
 
 	const handleSeasonChange = (season: string) => {
 		setStringValue(season)
@@ -31,19 +30,10 @@ export const SeasonSelect = () => {
 	}
 
 	useEffect(() => {
-		if (
-			!seasonsQuerySnapshotLoading &&
-			selectedSeasonQueryDocumentSnapshot &&
-			!isLoaded
-		) {
+		if (selectedSeasonQueryDocumentSnapshot) {
 			setStringValue(selectedSeasonQueryDocumentSnapshot.data().name)
-			setIsLoaded(true)
 		}
-	}, [
-		seasonsQuerySnapshotLoading,
-		selectedSeasonQueryDocumentSnapshot,
-		isLoaded,
-	])
+	}, [selectedSeasonQueryDocumentSnapshot])
 
 	return (
 		<div className="inline-flex items-center justify-center py-16 space-x-2">
