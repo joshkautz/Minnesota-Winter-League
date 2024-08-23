@@ -363,13 +363,15 @@ export const CreateTeam = () => {
 		const defaultSelection =
 			teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs.sort(
 				(a, b) => {
-					const docs = seasonsQuerySnapshot?.docs
-					if (docs) {
-						const seasonA = docs.find(
-							(season) => season.id === a.data().season.id
+					const seasonsQuerySnapshots = seasonsQuerySnapshot?.docs
+					if (seasonsQuerySnapshots) {
+						const seasonA = seasonsQuerySnapshots.find(
+							(seasonQueryDocumentSnapshot) =>
+								seasonQueryDocumentSnapshot.id === a.data().season.id
 						)
-						const seasonB = docs.find(
-							(season) => season.id === b.data().season.id
+						const seasonB = seasonsQuerySnapshots.find(
+							(seasonQueryDocumentSnapshot) =>
+								seasonQueryDocumentSnapshot.id === b.data().season.id
 						)
 						if (seasonA && seasonB) {
 							return (

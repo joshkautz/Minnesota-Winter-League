@@ -69,11 +69,7 @@ export const HeroSection = () => {
 			toggleIsOpen()
 			return
 		}
-		if (isAuthenticatedUserRostered) {
-			navigate('/team')
-		} else {
-			navigate('/manage')
-		}
+		navigate('/manage')
 	}
 	return (
 		<section

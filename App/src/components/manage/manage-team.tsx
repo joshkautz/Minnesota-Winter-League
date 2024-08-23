@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { deleteTeam, leaveTeam } from '@/firebase/firestore'
+import { deleteTeam, removeFromTeam } from '@/firebase/firestore'
 import { toast } from '../ui/use-toast'
 import { useAuthContext } from '@/firebase/auth-context'
-import { TeamRequestCard, TeamRosterCard } from '../team-request-card'
+import { ManageTeamRequestCard } from './manage-team-request-card'
 import { UnrosteredPlayerList } from '../unrostered-player-card'
 import { Button } from '../ui/button'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
@@ -19,6 +19,7 @@ import { EditTeamDialog } from '../edit-team-dialog'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { OffersPanel } from './offers-panel'
 import { useTeamsContext } from '@/firebase/teams-context'
+import { ManageTeamRosterCard } from './manage-team-roster-card'
 
 export const ManageTeam = () => {
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
@@ -126,19 +127,13 @@ export const ManageTeam = () => {
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
 							}
 							onConfirm={() => {
-								if (authenticatedUserSnapshot) {
-									const authenticatedUserSnapshotData =
-										authenticatedUserSnapshot.data()
-									if (authenticatedUserSnapshotData) {
-										leaveTeam(
-											authenticatedUserSnapshot.ref,
-											authenticatedUserSnapshotData.team,
-											setLeaveTeamLoading
-										).finally(() => {
-											setLeaveTeamLoading(false)
-										})
-									}
-								}
+								removeFromTeam(
+									authenticatedUserSnapshot?.ref,
+									team?.ref,
+									currentSeasonQueryDocumentSnapshot?.ref
+								).finally(() => {
+									setLeaveTeamLoading(false)
+								})
 							}}
 						>
 							<DropdownMenuItem
@@ -199,19 +194,13 @@ export const ManageTeam = () => {
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
 							}
 							onConfirm={() => {
-								if (authenticatedUserSnapshot) {
-									const authenticatedUserSnapshotData =
-										authenticatedUserSnapshot.data()
-									if (authenticatedUserSnapshotData) {
-										leaveTeam(
-											authenticatedUserSnapshot.ref,
-											authenticatedUserSnapshotData.team,
-											setLeaveTeamLoading
-										).finally(() => {
-											setLeaveTeamLoading(false)
-										})
-									}
-								}
+								removeFromTeam(
+									authenticatedUserSnapshot?.ref,
+									team?.ref,
+									currentSeasonQueryDocumentSnapshot?.ref
+								).finally(() => {
+									setLeaveTeamLoading(false)
+								})
 							}}
 						>
 							<DropdownMenuItem
@@ -243,13 +232,13 @@ export const ManageTeam = () => {
 				{/* LEFT SIDE PANEL */}
 				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
 					{isAuthenticatedUserRostered ? (
-						<TeamRosterCard
+						<ManageTeamRosterCard
 							actions={
 								isAuthenticatedUserCaptain ? captainActions : playerActions
 							}
 						/>
 					) : (
-						<TeamRequestCard />
+						<ManageTeamRequestCard />
 					)}
 					{isAuthenticatedUserCaptain && <UnrosteredPlayerList />}
 				</div>

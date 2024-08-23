@@ -345,34 +345,33 @@ const demoteFromCaptain = async (
 	])
 }
 
-const leaveTeam = async (
+const removeFromTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
 	teamRef: DocumentReference<TeamData, DocumentData> | undefined,
-	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
+	seasonRef: DocumentReference<SeasonData, DocumentData> | undefined
 ) => {
 	if (!playerRef) return
 	if (!teamRef) return
+	if (!seasonRef) return
 
-	setLoadingState(true)
-
-	// Get the team document so we can check if the player is the last captain.
+	// Get the team document so we can update the team document.
 	const teamDocumentSnapshot = await getDoc(teamRef)
 
+	const roster = teamDocumentSnapshot
+		.data()
+		?.roster.filter((item) => item.player.id !== playerRef.id)
+
+	// Ensure not the last captain on the team.
 	if (
 		!teamDocumentSnapshot
 			.data()
 			?.roster.some((item) => item.captain && item.player.id !== playerRef.id)
 	) {
-		setLoadingState(false)
 		throw new Error('Cannot remove last captain.')
 	}
 
 	// Get the player document so we can update the player document.
 	const playerDocumentSnapshot = await getDoc(playerRef)
-
-	const roster = teamDocumentSnapshot
-		.data()
-		?.roster.filter((item) => item.player.id !== playerRef.id)
 
 	const seasons = playerDocumentSnapshot
 		.data()
@@ -666,7 +665,7 @@ export {
 	getPlayerRef,
 	updatePlayer,
 	getRegisteredPlayers,
-	leaveTeam,
+	removeFromTeam,
 	createTeam,
 	rolloverTeam,
 	deleteTeam,

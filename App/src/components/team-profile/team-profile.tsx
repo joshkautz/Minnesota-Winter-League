@@ -6,19 +6,17 @@ import {
 	DocumentReference,
 	DocumentData,
 	gamesByTeamQuery,
-	QueryDocumentSnapshot,
 	teamsHistoryQuery,
+	getTeamById,
+	DocumentSnapshot,
 } from '@/firebase/firestore'
 import { GameData, PlayerData, TeamData } from '@/lib/interfaces'
 import { TeamRosterPlayer } from './team-roster-player'
-import { useAuthContext } from '@/firebase/auth-context'
-import { useCollection } from 'react-firebase-hooks/firestore'
+import { useCollection, useDocument } from 'react-firebase-hooks/firestore'
 import { Timestamp } from '@firebase/firestore'
 
 import { CheckCircledIcon } from '@radix-ui/react-icons'
-import { TeamProfilePlayerActions } from '../team-profile-player-actions'
 import { Skeleton } from '../ui/skeleton'
-import { useSeasonsContext } from '@/firebase/seasons-context'
 import { TeamHistory } from './team-history'
 import * as TeamRecord from './team-record'
 
@@ -33,7 +31,7 @@ const RESULT = {
 } as const
 
 const formatGameResult = (
-	team: QueryDocumentSnapshot<TeamData, DocumentData> | undefined,
+	team: DocumentSnapshot<TeamData, DocumentData> | undefined,
 	gameData: GameData
 ) => {
 	const { homeScore, awayScore } = gameData
@@ -56,78 +54,37 @@ export const TeamProfile = () => {
 		selectedSeasonTeamsQuerySnapshot,
 		selectedSeasonTeamsQuerySnapshotLoading,
 	} = useTeamsContext()
-	const { authenticatedUserSnapshot } = useAuthContext()
-	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
+
+	const [teamDocumentSnapshot] = useDocument(getTeamById(id))
 
 	const [teamProfileImageLoaded, setTeamProfileImageLoaded] = useState(false)
 
-	const team = useMemo(
-		() =>
-			id
-				? selectedSeasonTeamsQuerySnapshot?.docs.find((team) => team.id === id)
-				: selectedSeasonTeamsQuerySnapshot?.docs.find(
-						(team) =>
-							team.id ===
-							authenticatedUserSnapshot
-								?.data()
-								?.seasons.find(
-									(item) =>
-										item.season.id === selectedSeasonQueryDocumentSnapshot?.id
-								)?.team.id
-					),
-		[
-			id,
-			authenticatedUserSnapshot,
-			selectedSeasonTeamsQuerySnapshot,
-			selectedSeasonQueryDocumentSnapshot,
-		]
-	)
-
 	const [historyQuerySnapshot] = useCollection(
-		teamsHistoryQuery(team?.data().teamId)
+		teamsHistoryQuery(teamDocumentSnapshot?.data()?.teamId)
 	)
 
-	const isAuthenticatedUserCaptain = useMemo(
-		() =>
-			team
-				?.data()
-				.roster.some(
-					(item) =>
-						item.player.id === authenticatedUserSnapshot?.id && item.captain
-				),
-		[team, authenticatedUserSnapshot]
+	const [gamesSnapshot] = useCollection(
+		gamesByTeamQuery(teamDocumentSnapshot?.ref)
 	)
-
-	const isAuthenticatedUserOnTeam = useMemo(
-		() =>
-			team
-				?.data()
-				.roster.some(
-					(item) => item.player.id === authenticatedUserSnapshot?.id
-				),
-		[team, authenticatedUserSnapshot]
-	)
-
-	const [gamesSnapshot] = useCollection(gamesByTeamQuery(team?.ref))
 	const [imgSrc, setImgSrc] = useState<string | undefined>()
 
 	// const [teamsQuerySnapshot] = useCollection(teamsHistoryQuery(team?.data().teamId))
 
 	useEffect(() => {
-		setImgSrc(team?.data().logo + `&date=${Date.now()}`)
-	}, [team])
+		setImgSrc(teamDocumentSnapshot?.data()?.logo + `&date=${Date.now()}`)
+	}, [teamDocumentSnapshot])
 
 	const registrationStatus = useMemo(
 		() =>
 			selectedSeasonTeamsQuerySnapshotLoading ? (
 				<p className="text-sm text-muted-foreground">Loading...</p>
-			) : team?.data().registered ? (
+			) : teamDocumentSnapshot?.data()?.registered ? (
 				<p
 					className={
 						'text-sm text-muted-foreground inline-flex gap-2 items-center'
 					}
 				>
-					{team?.data().name} is fully registered
+					{teamDocumentSnapshot?.data()?.name} is fully registered
 					<CheckCircledIcon className="w-4 h-4" />
 				</p>
 			) : (
@@ -136,7 +93,7 @@ export const TeamProfile = () => {
 					requirement. Registration ends Tuesday, October 31st, at 11:59pm.
 				</p>
 			),
-		[selectedSeasonTeamsQuerySnapshotLoading, team]
+		[selectedSeasonTeamsQuerySnapshotLoading, teamDocumentSnapshot]
 	)
 
 	return (
@@ -163,23 +120,14 @@ export const TeamProfile = () => {
 				<NotificationCard
 					title={'Roster'}
 					description={
-						team ? `${team?.data().name} team players and captains` : ``
+						teamDocumentSnapshot
+							? `${teamDocumentSnapshot?.data()?.name} team players and captains`
+							: ``
 					}
 					className={'flex-1 basis-[360px] flex-shrink-0'}
-					moreActions={
-						isAuthenticatedUserOnTeam && (
-							<TeamProfilePlayerActions
-								closeDialog={() => {
-									setImgSrc(team?.data().logo + `&date=${Date.now()}`)
-								}}
-							/>
-						)
-					}
-					footerContent={
-						isAuthenticatedUserCaptain ? registrationStatus : <></>
-					}
+					footerContent={registrationStatus}
 				>
-					{team?.data().roster?.map(
+					{teamDocumentSnapshot?.data()?.roster?.map(
 						(
 							item: {
 								captain: boolean
@@ -195,8 +143,10 @@ export const TeamProfile = () => {
 					{gamesSnapshot?.docs.map((game, index) => {
 						const gameData = game.data()
 						const opponent =
-							team?.id == gameData.home.id ? OPPONENT.AWAY : OPPONENT.HOME
-						const result = formatGameResult(team, gameData)
+							teamDocumentSnapshot?.id == gameData.home.id
+								? OPPONENT.AWAY
+								: OPPONENT.HOME
+						const result = formatGameResult(teamDocumentSnapshot, gameData)
 
 						return (
 							<TeamRecord.Row key={index}>

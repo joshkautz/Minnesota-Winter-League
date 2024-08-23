@@ -46,7 +46,6 @@ function App() {
 				<Route index element={<Home />} />
 				<Route path={'/schedule'} element={<Schedule />} />
 				<Route path={'/standings'} element={<Standings />} />
-				<Route path={'/team'} element={<TeamProfile />} />
 				<Route path={'/teams'} element={<Teams />} />
 				<Route path={'/teams/:id'} element={<TeamProfile />} />
 				<Route

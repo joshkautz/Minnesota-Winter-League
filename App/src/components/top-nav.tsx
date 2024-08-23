@@ -108,7 +108,7 @@ export const TopNav = ({
 	]
 
 	const rosteredContent = [
-		{ label: 'Your Team', path: '/team', alt: 'team profile' },
+		{ label: 'Your Team', path: '/manage', alt: 'team profile' },
 	]
 
 	const unrosteredContent = [
