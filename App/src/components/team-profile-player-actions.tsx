@@ -23,15 +23,15 @@ export const TeamProfilePlayerActions = ({
 	closeDialog?: () => void
 }) => {
 	const { id } = useParams()
-	const { teamsQuerySnapshot } = useTeamsContext()
+	const { selectedSeasonTeamsQuerySnapshot } = useTeamsContext()
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const team = useMemo(
 		() =>
 			id
-				? teamsQuerySnapshot?.docs.find((team) => team.id === id)
-				: teamsQuerySnapshot?.docs.find(
+				? selectedSeasonTeamsQuerySnapshot?.docs.find((team) => team.id === id)
+				: selectedSeasonTeamsQuerySnapshot?.docs.find(
 						(team) =>
 							team.id ===
 							authenticatedUserSnapshot
@@ -44,7 +44,7 @@ export const TeamProfilePlayerActions = ({
 		[
 			id,
 			authenticatedUserSnapshot,
-			teamsQuerySnapshot,
+			selectedSeasonTeamsQuerySnapshot,
 			selectedSeasonQueryDocumentSnapshot,
 		]
 	)
@@ -94,7 +94,9 @@ export const TeamProfilePlayerActions = ({
 											authenticatedUserSnapshot.ref,
 											authenticatedUserSnapshotData.team,
 											setLeaveTeamLoading
-										)
+										).finally(() => {
+											setLeaveTeamLoading(false)
+										})
 									}
 								}
 							}}
@@ -118,10 +120,7 @@ export const TeamProfilePlayerActions = ({
 										const authenticatedUserSnapshotData =
 											authenticatedUserSnapshot.data()
 										if (authenticatedUserSnapshotData) {
-											deleteTeam(
-												authenticatedUserSnapshotData.team,
-												setDeleteTeamLoading
-											)
+											deleteTeam(team?.ref, setDeleteTeamLoading)
 												.then(() => {
 													// navigate('/')
 												})

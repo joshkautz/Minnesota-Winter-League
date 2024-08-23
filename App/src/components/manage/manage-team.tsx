@@ -18,9 +18,11 @@ import { GradientHeader } from '../gradient-header'
 import { EditTeamDialog } from '../edit-team-dialog'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { OffersPanel } from './offers-panel'
+import { useTeamsContext } from '@/firebase/teams-context'
 
 export const ManageTeam = () => {
-	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
 
 	const {
 		authStateUser,
@@ -55,16 +57,35 @@ export const ManageTeam = () => {
 		]
 	)
 
+	const team = useMemo(
+		() =>
+			currentSeasonTeamsQuerySnapshot?.docs.find(
+				(team) =>
+					team.id ===
+					authenticatedUserSnapshot
+						?.data()
+						?.seasons.find(
+							(item) =>
+								item.season.id === currentSeasonQueryDocumentSnapshot?.id
+						)?.team.id
+			),
+		[
+			authenticatedUserSnapshot,
+			currentSeasonTeamsQuerySnapshot,
+			currentSeasonQueryDocumentSnapshot,
+		]
+	)
+
 	const isAuthenticatedUserCaptain = useMemo(
 		() =>
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
 						item.captain
 				),
-		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserRostered = useMemo(
@@ -73,10 +94,10 @@ export const ManageTeam = () => {
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
 						item.team
 				),
-		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
@@ -113,7 +134,9 @@ export const ManageTeam = () => {
 											authenticatedUserSnapshot.ref,
 											authenticatedUserSnapshotData.team,
 											setLeaveTeamLoading
-										)
+										).finally(() => {
+											setLeaveTeamLoading(false)
+										})
 									}
 								}
 							}}
@@ -133,27 +156,17 @@ export const ManageTeam = () => {
 								'The entire team will be deleted. This action is irreversible.'
 							}
 							onConfirm={() => {
-								if (authenticatedUserSnapshot) {
-									const authenticatedUserSnapshotData =
-										authenticatedUserSnapshot.data()
-									if (authenticatedUserSnapshotData) {
-										deleteTeam(
-											authenticatedUserSnapshotData.team,
-											setDeleteTeamLoading
-										)
-											.then(() => {
-												// navigate('/')
-											})
-											.catch(() => {
-												toast({
-													title: 'Unable to delete team',
-													description:
-														'Ensure your email is verified. Please try again later.',
-													variant: 'destructive',
-												})
-											})
-									}
-								}
+								deleteTeam(team?.ref, setDeleteTeamLoading)
+									.catch((error) => {
+										toast({
+											title: 'Unable to delete team',
+											description: error.message,
+											variant: 'destructive',
+										})
+									})
+									.finally(() => {
+										setDeleteTeamLoading(false)
+									})
 							}}
 						>
 							<DropdownMenuItem
@@ -194,7 +207,9 @@ export const ManageTeam = () => {
 											authenticatedUserSnapshot.ref,
 											authenticatedUserSnapshotData.team,
 											setLeaveTeamLoading
-										)
+										).finally(() => {
+											setLeaveTeamLoading(false)
+										})
 									}
 								}
 							}}

@@ -83,11 +83,11 @@ export const NotificationCard = ({
 	footerContent?: ReactNode
 }) => {
 	return (
-		<Card className={className}>
+		<Card className={cn('max-w-[888px]', className)}>
 			<CardHeader className="relative">
 				<CardTitle className="select-none">{title}</CardTitle>
 				{description && (
-					<CardDescription className="select-none">
+					<CardDescription className="select-none max-w-[600px]">
 						{description}
 					</CardDescription>
 				)}

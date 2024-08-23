@@ -9,7 +9,6 @@ import {
 	getFirestore,
 	DocumentData,
 	FirestoreError,
-	arrayRemove,
 	orderBy,
 	updateDoc,
 	UpdateData,
@@ -42,6 +41,7 @@ import {
 	ExtendedPlayerData,
 } from '@/lib/interfaces'
 import { deleteImage, ref, storage } from './storage'
+import { v4 as uuidv4 } from 'uuid'
 
 interface PlayerDocumentData {
 	captain: boolean
@@ -91,38 +91,101 @@ const getRegisteredPlayers = async (
 }
 
 const createTeam = async (
-	playerRef: DocumentReference<PlayerData, DocumentData>,
-	name: string,
-	logo?: string,
-	storagePath?: string
+	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
+	name: string | undefined,
+	logo: string | undefined,
+	season: DocumentReference<SeasonData, DocumentData> | undefined,
+	storagePath: string | undefined
 ) => {
-	const team = await addDoc(collection(firestore, Collections.TEAMS), {
-		captains: [playerRef],
-		logo: logo ? logo : null,
-		name: name,
-		registered: false,
-		registeredDate: Timestamp.now(),
-		roster: [playerRef],
-		storagePath: storagePath ? storagePath : null,
-	})
+	if (!playerRef) return
+	if (!name) return
+	if (!season) return
 
-	await updateDoc(playerRef, {
+	// Create the team document so we can upate the player document.
+	const teamDocumentReference = (await addDoc(
+		collection(firestore, Collections.TEAMS),
+		{
+			logo: logo ? logo : null,
+			name: name,
+			placement: null,
+			registered: false,
+			registeredDate: Timestamp.now(),
+			roster: [{ captain: true, player: playerRef }],
+			season: season,
+			storagePath: storagePath ? storagePath : null,
+			teamId: uuidv4(),
+		}
+	)) as DocumentReference<TeamData, DocumentData>
+
+	// Get the player document so we can update the player document.
+	const playerDocumentSnapshot = await getDoc(playerRef)
+
+	const seasons = playerDocumentSnapshot.data()?.seasons
+	seasons?.push({
 		captain: true,
-		team: team,
+		paid: false, // TODO: Handle logic for this....?
+		season: season,
+		signed: false, // TODO: Handle logic for this....?
+		team: teamDocumentReference,
 	})
 
-	const offersQuerySnapshot = await getDocs(
-		query(
-			collection(firestore, Collections.OFFERS),
-			where('player', '==', playerRef)
-		)
-	)
+	return Promise.all([
+		// Updated the player document.
+		updateDoc(playerRef, {
+			seasons: seasons,
+		}),
+	])
+}
 
-	const offersPromises = offersQuerySnapshot.docs.map(
-		(offer: QueryDocumentSnapshot) => deleteDoc(offer.ref)
-	)
+const rolloverTeam = async (
+	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
+	name: string | undefined,
+	logo: string | undefined,
+	season: DocumentReference<SeasonData, DocumentData> | undefined,
+	storagePath: string | undefined,
+	teamId: string | undefined
+) => {
+	if (!playerRef) return
+	if (!name) return
+	if (!logo) return
+	if (!season) return
+	if (!storagePath) return
+	if (!teamId) return
 
-	return Promise.all(offersPromises)
+	// Create the team document so we can upate the player document.
+	const teamDocumentReference = (await addDoc(
+		collection(firestore, Collections.TEAMS),
+		{
+			logo: logo,
+			name: name,
+			placement: null,
+			registered: false,
+			registeredDate: Timestamp.now(),
+			roster: [{ captain: true, player: playerRef }],
+			season: season,
+			storagePath: storagePath,
+			teamId: teamId,
+		}
+	)) as DocumentReference<TeamData, DocumentData>
+
+	// Get the player document so we can update the player document.
+	const playerDocumentSnapshot = await getDoc(playerRef)
+
+	const seasons = playerDocumentSnapshot.data()?.seasons
+	seasons?.push({
+		captain: true,
+		paid: false, // TODO: Handle logic for this....?
+		season: season,
+		signed: false, // TODO: Handle logic for this....?
+		team: teamDocumentReference,
+	})
+
+	return Promise.all([
+		// Updated the player document.
+		updateDoc(playerRef, {
+			seasons: seasons,
+		}),
+	])
 }
 
 const updateTeam = async (
@@ -159,11 +222,14 @@ const createPlayer = (
 }
 
 const deleteTeam = async (
-	teamRef: DocumentReference<TeamData, DocumentData>,
-	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
+	teamRef: DocumentReference<TeamData, DocumentData> | undefined,
+	setDeleteTeamLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-	setLoadingState(true)
+	if (!teamRef) return
 
+	setDeleteTeamLoading(true)
+
+	// Delete all offers related to this team.
 	const offersQuerySnapshot = await getDocs(
 		query(
 			collection(firestore, Collections.OFFERS),
@@ -175,30 +241,29 @@ const deleteTeam = async (
 		(offer: QueryDocumentSnapshot) => deleteDoc(offer.ref)
 	)
 
-	const playersQuerySnapshot = await getDocs(
-		query(collection(firestore, 'players'), where('team', '==', teamRef))
-	)
-
-	const playersPromises = playersQuerySnapshot.docs.map(
-		(player: QueryDocumentSnapshot) =>
-			updateDoc(player.ref, {
-				captain: false,
-				team: null,
-			})
-	)
-
+	// Update all players on this team to remove them from the team.
 	const teamDocumentSnapshot = await getDoc(teamRef)
+	const playersPromises = teamDocumentSnapshot
+		.data()
+		?.roster.map(async (item) =>
+			getDoc(item.player).then((playerDocumentSnapshot) =>
+				updateDoc(playerDocumentSnapshot.ref, {
+					seasons: playerDocumentSnapshot
+						.data()
+						?.seasons.filter((season) => season.team.id !== teamRef.id),
+				})
+			)
+		)
 
-	if (teamDocumentSnapshot) {
-		const teamDocumentSnapshotData = teamDocumentSnapshot.data()
-		if (teamDocumentSnapshotData?.storagePath) {
-			await deleteImage(ref(storage, teamDocumentSnapshotData.storagePath))
-		}
-	}
+	// Delete team's image from storage.
+	const imagePromise = teamDocumentSnapshot.data()?.storagePath
+		? deleteImage(ref(storage, teamDocumentSnapshot.data()?.storagePath))
+		: Promise.resolve()
 
-	await Promise.all([offersPromises, playersPromises, deleteDoc(teamRef)])
+	// Delete the team document.
+	const teamPromise = deleteDoc(teamRef)
 
-	setLoadingState(false)
+	Promise.all([offersPromises, playersPromises, imagePromise, teamPromise])
 }
 
 const promoteToCaptain = async (
@@ -281,29 +346,48 @@ const demoteFromCaptain = async (
 }
 
 const leaveTeam = async (
-	playerRef: DocumentReference<PlayerData, DocumentData>,
-	teamRef: DocumentReference<TeamData, DocumentData>,
+	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
+	teamRef: DocumentReference<TeamData, DocumentData> | undefined,
 	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+	if (!playerRef) return
+	if (!teamRef) return
+
 	setLoadingState(true)
-	if ((await getDoc(playerRef)).data()?.captain) {
-		if ((await getDoc(teamRef)).data()?.captains.length === 1) {
-			setLoadingState(false)
-			throw new Error('Cannot remove last captain.')
-		}
+
+	// Get the team document so we can check if the player is the last captain.
+	const teamDocumentSnapshot = await getDoc(teamRef)
+
+	if (
+		!teamDocumentSnapshot
+			.data()
+			?.roster.some((item) => item.captain && item.player.id !== playerRef.id)
+	) {
+		setLoadingState(false)
+		throw new Error('Cannot remove last captain.')
 	}
 
-	await updateDoc(teamRef, {
-		captains: arrayRemove(playerRef),
-		roster: arrayRemove(playerRef),
-	})
+	// Get the player document so we can update the player document.
+	const playerDocumentSnapshot = await getDoc(playerRef)
 
-	await updateDoc(playerRef, {
-		captain: false,
-		team: null,
-	})
+	const roster = teamDocumentSnapshot
+		.data()
+		?.roster.filter((item) => item.player.id !== playerRef.id)
 
-	setLoadingState(false)
+	const seasons = playerDocumentSnapshot
+		.data()
+		?.seasons.filter((item) => item.team.id !== teamRef.id)
+
+	return Promise.all([
+		// Updated the team document.
+		updateDoc(teamRef, {
+			roster: roster,
+		}),
+		// Updated the player document.
+		updateDoc(playerRef, {
+			seasons: seasons,
+		}),
+	])
 }
 
 const invitePlayerToJoinTeam = (
@@ -584,6 +668,7 @@ export {
 	getRegisteredPlayers,
 	leaveTeam,
 	createTeam,
+	rolloverTeam,
 	deleteTeam,
 	updateTeam,
 	stripeRegistration,

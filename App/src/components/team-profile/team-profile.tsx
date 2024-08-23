@@ -52,7 +52,10 @@ const formatGameResult = (
 
 export const TeamProfile = () => {
 	const { id } = useParams()
-	const { teamsQuerySnapshot, teamsQuerySnapshotLoading } = useTeamsContext()
+	const {
+		selectedSeasonTeamsQuerySnapshot,
+		selectedSeasonTeamsQuerySnapshotLoading,
+	} = useTeamsContext()
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
@@ -61,8 +64,8 @@ export const TeamProfile = () => {
 	const team = useMemo(
 		() =>
 			id
-				? teamsQuerySnapshot?.docs.find((team) => team.id === id)
-				: teamsQuerySnapshot?.docs.find(
+				? selectedSeasonTeamsQuerySnapshot?.docs.find((team) => team.id === id)
+				: selectedSeasonTeamsQuerySnapshot?.docs.find(
 						(team) =>
 							team.id ===
 							authenticatedUserSnapshot
@@ -75,7 +78,7 @@ export const TeamProfile = () => {
 		[
 			id,
 			authenticatedUserSnapshot,
-			teamsQuerySnapshot,
+			selectedSeasonTeamsQuerySnapshot,
 			selectedSeasonQueryDocumentSnapshot,
 		]
 	)
@@ -116,7 +119,7 @@ export const TeamProfile = () => {
 
 	const registrationStatus = useMemo(
 		() =>
-			teamsQuerySnapshotLoading ? (
+			selectedSeasonTeamsQuerySnapshotLoading ? (
 				<p className="text-sm text-muted-foreground">Loading...</p>
 			) : team?.data().registered ? (
 				<p
@@ -133,7 +136,7 @@ export const TeamProfile = () => {
 					requirement. Registration ends Tuesday, October 31st, at 11:59pm.
 				</p>
 			),
-		[teamsQuerySnapshotLoading, team]
+		[selectedSeasonTeamsQuerySnapshotLoading, team]
 	)
 
 	return (
@@ -211,10 +214,10 @@ export const TeamProfile = () => {
 										}
 									>
 										{opponent == OPPONENT.AWAY
-											? teamsQuerySnapshot?.docs
+											? selectedSeasonTeamsQuerySnapshot?.docs
 													.find((team) => team.id === gameData.away.id)
 													?.data().name
-											: teamsQuerySnapshot?.docs
+											: selectedSeasonTeamsQuerySnapshot?.docs
 													.find((team) => team.id === gameData.home.id)
 													?.data().name}
 										<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>

@@ -11,7 +11,7 @@ import { TeamProfile } from './components/team-profile/team-profile'
 import { ManageTeam } from './components/manage/manage-team'
 import { useEffect } from 'react'
 import { useAuthContext } from './firebase/auth-context'
-import { CreateTeam } from './components/create-team'
+import { CreateTeam } from './components/create/create-team'
 
 function App() {
 	const { authStateUser } = useAuthContext()
