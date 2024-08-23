@@ -7,11 +7,13 @@ import {
 	DocumentData,
 	gamesByTeamQuery,
 	QueryDocumentSnapshot,
+	getTeamById,
+	getTeamByTeamIdAndSeason,
 } from '@/firebase/firestore'
 import { GameData, PlayerData, TeamData } from '@/lib/interfaces'
 import { TeamRosterPlayer } from './team-roster-player'
 import { useAuthContext } from '@/firebase/auth-context'
-import { useCollection } from 'react-firebase-hooks/firestore'
+import { useCollection, useDocument } from 'react-firebase-hooks/firestore'
 import { Timestamp } from '@firebase/firestore'
 
 import { CheckCircledIcon } from '@radix-ui/react-icons'
@@ -76,6 +78,21 @@ export const TeamProfile = () => {
 			teamsQuerySnapshot,
 			selectedSeasonQueryDocumentSnapshot,
 		]
+	)
+
+	const [baseTeam] = useDocument(getTeamById(id))
+	const [correctTeam] = useCollection(
+		getTeamByTeamIdAndSeason(
+			baseTeam?.data()?.teamId,
+			selectedSeasonQueryDocumentSnapshot?.ref
+		)
+	)
+
+	console.log(
+		team?.data().name,
+		baseTeam?.data()?.teamId,
+		selectedSeasonQueryDocumentSnapshot?.id,
+		correctTeam?.docs
 	)
 
 	const isAuthenticatedUserCaptain = useMemo(
