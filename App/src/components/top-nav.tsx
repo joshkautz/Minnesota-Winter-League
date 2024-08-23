@@ -30,7 +30,7 @@ export const TopNav = ({
 		signOutLoading,
 	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useOffersContext()
-	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [open, setOpen] = useState(false)
 
@@ -44,10 +44,10 @@ export const TopNav = ({
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
 						item.captain
 				),
-		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserRostered = useMemo(
@@ -56,10 +56,10 @@ export const TopNav = ({
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
 						item.team
 				),
-		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const hasPendingOffers = useMemo(
@@ -76,10 +76,10 @@ export const TopNav = ({
 				?.data()
 				?.seasons.find(
 					(item) =>
-						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
 						item.paid
 				),
-		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const isAuthenticatedUserSigned = useMemo(
@@ -87,9 +87,9 @@ export const TopNav = ({
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.find(
-					(item) => item.season.id === selectedSeasonQueryDocumentSnapshot?.id
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
 				)?.signed,
-		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const isVerified = authStateUser?.emailVerified
