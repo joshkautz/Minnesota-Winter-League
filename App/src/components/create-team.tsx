@@ -3,8 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { toast } from './ui/use-toast'
-import { Button } from './ui/button'
+import { toast } from '@/components/ui/use-toast'
+import { Button } from '@/components/ui/button'
 import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
 import {
 	Form,
@@ -13,8 +13,9 @@ import {
 	FormLabel,
 	FormControl,
 	FormMessage,
-} from './ui/form'
-import { Input } from './ui/input'
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { v4 as uuidv4 } from 'uuid'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { createTeam } from '@/firebase/firestore'
@@ -23,15 +24,16 @@ import { StorageReference, ref, storage } from '@/firebase/storage'
 import { GradientHeader } from './gradient-header'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Timestamp } from '@firebase/firestore'
-import { Skeleton } from './ui/skeleton'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from './ui/select'
+} from '@/components/ui/select'
 import { useTeamsContext } from '@/firebase/teams-context'
+import { Switch } from '@/components/ui/switch'
 
 const createTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -45,8 +47,10 @@ export const CreateTeam = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { currentSeasonQueryDocumentSnapshot, seasonsQuerySnapshot } =
 		useSeasonsContext()
-	const { teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot } =
-		useTeamsContext()
+	const {
+		teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot,
+		teamsForWhichAuthenticatedUserIsCaptainQuerySnapshotLoading,
+	} = useTeamsContext()
 	const [loading, setLoading] = useState(false)
 	const [newTeamData, setNewTeamData] = useState<{
 		name: string
@@ -251,13 +255,7 @@ export const CreateTeam = () => {
 		[currentSeasonQueryDocumentSnapshot]
 	)
 
-	enum SelectValues {
-		CREATE_NEW = 'Create New',
-	}
-
-	const [stringValue, setStringValue] = useState<string | undefined>(
-		SelectValues.CREATE_NEW
-	)
+	const [stringValue, setStringValue] = useState<string | undefined>()
 
 	const handleSeasonChange = useCallback(
 		(team: string) => {
@@ -265,6 +263,34 @@ export const CreateTeam = () => {
 		},
 		[setStringValue]
 	)
+
+	useEffect(() => {
+		const defaultSelection =
+			teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs.sort(
+				(a, b) => {
+					const docs = seasonsQuerySnapshot?.docs
+					if (docs) {
+						const seasonA = docs.find(
+							(season) => season.id === a.data().season.id
+						)
+						const seasonB = docs.find(
+							(season) => season.id === b.data().season.id
+						)
+						if (seasonA && seasonB) {
+							return (
+								seasonA.data()?.dateStart.seconds -
+								seasonB.data()?.dateStart.seconds
+							)
+						}
+						return 0
+					}
+					return 0
+				}
+			)?.[0]
+		setStringValue(defaultSelection?.data().name)
+	}, [teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot, setStringValue])
+
+	const [rolloverMode, setRolloverMode] = useState(false)
 
 	return (
 		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
@@ -279,108 +305,112 @@ export const CreateTeam = () => {
 			) : (
 				<>
 					<GradientHeader>Create a Team</GradientHeader>
-					<div>
-						The registration window of the{' '}
-						{currentSeasonQueryDocumentSnapshot?.data().name} season is
-						currently open!
+
+					{/* ROLLOVER SWITCH */}
+					<div className="flex items-center space-x-2">
+						<Switch
+							id="rollover"
+							checked={rolloverMode}
+							onCheckedChange={() => setRolloverMode(!rolloverMode)}
+						/>
+						<Label htmlFor="rollover">Rollover past team</Label>
 					</div>
 
-					{`Teams you've captained`}
-					<div className="inline-flex items-center justify-center py-16 space-x-2">
-						{!teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot ||
-						!seasonsQuerySnapshot ? (
-							<Skeleton className="w-24 h-8" />
-						) : (
-							<Select value={stringValue} onValueChange={handleSeasonChange}>
-								<SelectTrigger>
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem key={0} value={SelectValues.CREATE_NEW}>
-										{SelectValues.CREATE_NEW}
-									</SelectItem>
-									{teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs
-										.sort((a, b) => {
-											const docs = seasonsQuerySnapshot?.docs
-											if (docs) {
-												const seasonA = docs.find(
-													(season) => season.id === a.data().season.id
-												)
-												const seasonB = docs.find(
-													(season) => season.id === b.data().season.id
-												)
-												if (seasonA && seasonB) {
-													return (
-														seasonA.data()?.dateStart.seconds -
-														seasonB.data()?.dateStart.seconds
+					{rolloverMode ? (
+						<div className="inline-flex items-center justify-center py-16 space-x-2">
+							{teamsForWhichAuthenticatedUserIsCaptainQuerySnapshotLoading ? (
+								<Skeleton className="w-24 h-8" />
+							) : !teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot ? (
+								<p>No previous teams available for rollover</p>
+							) : (
+								<Select value={stringValue} onValueChange={handleSeasonChange}>
+									<SelectTrigger>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs
+											.sort((a, b) => {
+												const docs = seasonsQuerySnapshot?.docs
+												if (docs) {
+													const seasonA = docs.find(
+														(season) => season.id === a.data().season.id
 													)
+													const seasonB = docs.find(
+														(season) => season.id === b.data().season.id
+													)
+													if (seasonA && seasonB) {
+														return (
+															seasonA.data()?.dateStart.seconds -
+															seasonB.data()?.dateStart.seconds
+														)
+													}
+													return 0
 												}
 												return 0
-											}
-											return 0
-										})
-										.map((team) => (
-											<SelectItem key={team.id} value={team.data().name}>
-												{team.data().name}
-											</SelectItem>
-										))}
-								</SelectContent>
-							</Select>
-						)}
-					</div>
-
-					<div className="max-w-[400px]">
-						<Form {...form}>
-							<form
-								onSubmit={form.handleSubmit(onSubmit)}
-								className={'w-full space-y-6'}
-							>
-								<FormField
-									control={form.control}
-									name={'name'}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Team name</FormLabel>
-											<FormControl>
-												<Input
-													placeholder={'Team name'}
-													{...field}
-													value={field.value ?? ''}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name={'logo'}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Team logo</FormLabel>
-											<FormControl>
-												<Input
-													id="image-upload"
-													type={'file'}
-													accept="image/*"
-													placeholder={'Upload Image'}
-													{...field}
-													onChange={handleFileChange}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<Button type={'submit'} disabled={uploadFileLoading}>
-									{uploadFileLoading && (
-										<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-									)}
-									Create
-								</Button>
-							</form>
-						</Form>
-					</div>
+											})
+											.map((team) => (
+												<SelectItem key={team.id} value={team.data().name}>
+													{team.data().name}
+												</SelectItem>
+											))}
+									</SelectContent>
+								</Select>
+							)}
+						</div>
+					) : (
+						<div className="max-w-[400px]">
+							<Form {...form}>
+								<form
+									onSubmit={form.handleSubmit(onSubmit)}
+									className={'w-full space-y-6'}
+								>
+									<FormField
+										control={form.control}
+										name={'name'}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Team name</FormLabel>
+												<FormControl>
+													<Input
+														placeholder={'Team name'}
+														{...field}
+														value={field.value ?? ''}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name={'logo'}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Team logo</FormLabel>
+												<FormControl>
+													<Input
+														id="image-upload"
+														type={'file'}
+														accept="image/*"
+														placeholder={'Upload Image'}
+														{...field}
+														onChange={handleFileChange}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<Button type={'submit'} disabled={uploadFileLoading}>
+										{uploadFileLoading && (
+											<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+										)}
+										Create
+									</Button>
+								</form>
+							</Form>
+						</div>
+					)}
 				</>
 			)}
 		</div>

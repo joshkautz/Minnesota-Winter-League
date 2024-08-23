@@ -427,6 +427,7 @@ const teamsQuery = (
 	teams: DocumentReference<TeamData, DocumentData>[] | undefined
 ): Query<TeamData, DocumentData> | undefined => {
 	if (!teams) return
+	if (!teams.length) return
 
 	return query(
 		collection(firestore, Collections.TEAMS),

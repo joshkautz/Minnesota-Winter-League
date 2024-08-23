@@ -69,6 +69,8 @@ export const TeamsContextProvider: React.FC<PropsWithChildren> = ({
 		teamsForWhichAuthenticatedUserIsCaptainQuerySnapshotError,
 	] = useCollection(teamsQuery(teamsForWhichAuthenticatedUserIsCaptain))
 
+	console.log(teamsForWhichAuthenticatedUserIsCaptainQuerySnapshotLoading)
+
 	return (
 		<TeamsContext.Provider
 			value={{
