@@ -22,7 +22,7 @@ export const ScheduleCard = ({
 	games: GameData[]
 	title: string
 }) => {
-	const { teamsQuerySnapshot } = useTeamsContext()
+	const { selectedSeasonTeamsQuerySnapshot } = useTeamsContext()
 
 	return (
 		<Card className={'flex-1 flex-shrink-0 basis-80'}>
@@ -43,11 +43,11 @@ export const ScheduleCard = ({
 				{games
 					.sort((a, b) => a.field - b.field)
 					.map((game, index) => {
-						const homeTeam = teamsQuerySnapshot?.docs.find(
+						const homeTeam = selectedSeasonTeamsQuerySnapshot?.docs.find(
 							(team) => team.id === game.home.id
 						)
 
-						const awayTeam = teamsQuerySnapshot?.docs.find(
+						const awayTeam = selectedSeasonTeamsQuerySnapshot?.docs.find(
 							(team) => team.id === game.away.id
 						)
 

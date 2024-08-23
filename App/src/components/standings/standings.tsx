@@ -7,7 +7,7 @@ import { useStandings } from '@/lib/use-standings'
 import { StandingsTable } from './standings-table'
 
 export const Standings = () => {
-	const { teamsQuerySnapshot } = useTeamsContext()
+	const { selectedSeasonTeamsQuerySnapshot } = useTeamsContext()
 	const { gamesQuerySnapshot } = useGamesContext()
 
 	const standings = useStandings(gamesQuerySnapshot)
@@ -28,7 +28,7 @@ export const Standings = () => {
 			) : (
 				<StandingsTable
 					standings={standings}
-					teamsQuerySnapshot={teamsQuerySnapshot}
+					teamsQuerySnapshot={selectedSeasonTeamsQuerySnapshot}
 				/>
 			)}
 		</div>

@@ -9,7 +9,7 @@ import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Timestamp } from '@firebase/firestore'
 
 export const Teams = () => {
-	const { teamsQuerySnapshot } = useTeamsContext()
+	const { selectedSeasonTeamsQuerySnapshot } = useTeamsContext()
 	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	return (
@@ -39,11 +39,11 @@ export const Teams = () => {
 						team!
 					</>
 				)}
-			{!teamsQuerySnapshot ? (
+			{!selectedSeasonTeamsQuerySnapshot ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
-			) : teamsQuerySnapshot.docs.length == 0 ? (
+			) : selectedSeasonTeamsQuerySnapshot.docs.length == 0 ? (
 				<ComingSoon
 					message={
 						'There are no teams to display. Please wait for the registration period to start on October 1st, 2024.'
@@ -53,7 +53,7 @@ export const Teams = () => {
 				<div
 					className={'flex flex-row flex-wrap justify-center gap-y-8 gap-x-8'}
 				>
-					{teamsQuerySnapshot.docs.map((team) => {
+					{selectedSeasonTeamsQuerySnapshot.docs.map((team) => {
 						return (
 							<Link key={`link-${team.id}`} to={`/teams/${team.id}`}>
 								<Card className={'group'}>
