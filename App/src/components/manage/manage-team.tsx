@@ -1,40 +1,27 @@
-import { useContext, useMemo, useState } from 'react'
-import { useOffersContext } from '@/firebase/offers-context'
-import {
-	DocumentData,
-	DocumentReference,
-	acceptOffer,
-	deleteTeam,
-	leaveTeam,
-	rejectOffer,
-} from '@/firebase/firestore'
-import { toast } from './ui/use-toast'
-import { useOffer } from '@/lib/use-offer'
+import { useMemo, useState } from 'react'
+import { deleteTeam, leaveTeam } from '@/firebase/firestore'
+import { toast } from '../ui/use-toast'
 import { useAuthContext } from '@/firebase/auth-context'
-import { NotificationCard, NotificationCardItem } from './notification-card'
-import { TeamRequestCard, TeamRosterCard } from './team-request-card'
-import { UnrosteredPlayerList } from './unrostered-player-card'
-import { TeamsContext } from '@/firebase/teams-context'
-import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
-import { Button } from './ui/button'
+import { TeamRequestCard, TeamRosterCard } from '../team-request-card'
+import { UnrosteredPlayerList } from '../unrostered-player-card'
+import { Button } from '../ui/button'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
-import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
+import { DestructiveConfirmationDialog } from '../destructive-confirmation-dialog'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from './ui/dropdown-menu'
-import { GradientHeader } from './gradient-header'
-import { EditTeamDialog } from './edit-team-dialog'
+} from '../ui/dropdown-menu'
+import { GradientHeader } from '../gradient-header'
+import { EditTeamDialog } from '../edit-team-dialog'
 import { useSeasonsContext } from '@/firebase/seasons-context'
+import { OffersPanel } from './offers-panel'
 
 export const ManageTeam = () => {
 	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
-	const { teamsQuerySnapshot } = useContext(TeamsContext)
-	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
-		useOffersContext()
+
 	const {
 		authStateUser,
 		authStateLoading,
@@ -94,94 +81,6 @@ export const ManageTeam = () => {
 
 	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
 	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
-
-	const outgoingOffers = useOffer(
-		outgoingOffersQuerySnapshot,
-		teamsQuerySnapshot
-	)
-	const incomingOffers = useOffer(
-		incomingOffersQuerySnapshot,
-		teamsQuerySnapshot
-	)
-
-	const getOfferMessage = (
-		isAuthenticatedUserCaptain: boolean | undefined,
-		num: number | undefined,
-		type: 'incoming' | 'outgoing'
-	) => {
-		if (isAuthenticatedUserCaptain) {
-			const term = type === 'incoming' ? 'request' : 'invite'
-			if (!num || num === 0) {
-				return `no ${term}s pending at this time.`
-			}
-			if (num === 1) {
-				return `you have one pending ${term}.`
-			}
-			return `you have ${num} pending ${term}s.`
-		}
-
-		const term = type === 'incoming' ? 'invite' : 'request'
-		if (!num || num === 0) {
-			return `no ${term}s pending at this time.`
-		}
-		if (num === 1) {
-			return `you have one pending ${term}.`
-		}
-		return `you have ${num} pending ${term}s.`
-	}
-
-	const handleReject = (
-		offerRef: DocumentReference<OfferData, DocumentData>
-	) => {
-		rejectOffer(offerRef)
-			.then(() => {
-				toast({
-					title: 'Invite Rejected',
-					description: 'success',
-					variant: 'default',
-				})
-			})
-			.catch(() => {
-				toast({
-					title: 'Unable to reject invite',
-					description: 'failure',
-					variant: 'destructive',
-				})
-			})
-	}
-
-	const handleAccept = (
-		offerRef: DocumentReference<OfferData, DocumentData>
-	) => {
-		acceptOffer(offerRef)
-			.then(() => {
-				toast({
-					title: 'Invite accepted',
-					description: 'success',
-					variant: 'default',
-				})
-			})
-			.catch(() => {
-				toast({
-					title: 'Unable to accept invite',
-					description: 'failure',
-					variant: 'destructive',
-				})
-			})
-	}
-
-	const outgoingPending = outgoingOffers?.filter(
-		(offer) => offer.status === 'pending'
-	).length
-	const incomingPending = incomingOffers?.filter(
-		(offer) => offer.status === 'pending'
-	).length
-
-	const outgoingActions = [{ title: 'Cancel', action: handleReject }]
-	const incomingActions = [
-		{ title: 'Accept', action: handleAccept },
-		{ title: 'Reject', action: handleReject },
-	]
 
 	const [open, setOpen] = useState(false)
 
@@ -340,66 +239,7 @@ export const ManageTeam = () => {
 					{isAuthenticatedUserCaptain && <UnrosteredPlayerList />}
 				</div>
 				{/* RIGHT SIDE PANEL */}
-				<div className="max-w-[600px] flex-1 basis-80 space-y-4">
-					{/* INCOMING OFFERS */}
-					<NotificationCard
-						title={
-							isAuthenticatedUserCaptain
-								? 'Pending requests'
-								: 'Pending invites'
-						}
-						description={getOfferMessage(
-							isAuthenticatedUserCaptain,
-							incomingPending,
-							'incoming'
-						)}
-					>
-						{incomingOffers?.map((incomingOffer: ExtendedOfferData, index) => {
-							const statusColor =
-								incomingOffer.status === 'pending'
-									? 'bg-primary'
-									: 'bg-muted-foreground'
-							return (
-								<NotificationCardItem
-									key={`incomingOffer-row-${index}`}
-									data={incomingOffer}
-									statusColor={statusColor}
-									message={
-										isAuthenticatedUserCaptain
-											? 'would like to join'
-											: 'would like you to join'
-									}
-									actionOptions={incomingActions}
-								/>
-							)
-						})}
-					</NotificationCard>
-					{/* OUTGOING OFFERS*/}
-					<NotificationCard
-						title={
-							isAuthenticatedUserCaptain ? 'Sent invites' : 'Sent requests'
-						}
-						description={getOfferMessage(
-							isAuthenticatedUserCaptain,
-							outgoingPending,
-							'outgoing'
-						)}
-					>
-						{outgoingOffers?.map((outgoingOffer: ExtendedOfferData, index) => (
-							<NotificationCardItem
-								key={`outgoingOffer-row-${index}`}
-								data={outgoingOffer}
-								statusColor={'bg-muted-foreground'}
-								message={
-									isAuthenticatedUserCaptain
-										? 'invite sent for'
-										: 'request sent for'
-								}
-								actionOptions={outgoingActions}
-							/>
-						))}
-					</NotificationCard>
-				</div>
+				<OffersPanel isCaptain={isAuthenticatedUserCaptain} />
 			</div>
 		</div>
 	)
