@@ -12,12 +12,9 @@ import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { v4 as uuidv4 } from 'uuid'
-import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
-import { toast } from '@/components/ui/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { useNavigate } from 'react-router-dom'
 import { StorageReference, ref, storage } from '@/firebase/storage'
 
 const createTeamSchema = z.object({
@@ -27,20 +24,45 @@ const createTeamSchema = z.object({
 
 type CreateTeamSchema = z.infer<typeof createTeamSchema>
 
-export const CreateTeamForm = () => {
-	const { authenticatedUserSnapshot } = useAuthContext()
-	const navigate = useNavigate()
+interface CreateFormProps {
+	setLoading: React.Dispatch<React.SetStateAction<boolean>>
+	setNewTeamData: React.Dispatch<
+		React.SetStateAction<
+			| {
+					name: string | undefined
+					storageRef: StorageReference | undefined
+					teamId: string | undefined
+			  }
+			| undefined
+		>
+	>
+	handleResult: ({
+		success,
+		message,
+		navigation,
+	}: {
+		success: boolean
+		message: string
+		navigation?: boolean
+	}) => void
+	uploadFileLoading: boolean
+	uploadFile: (
+		ref: StorageReference,
+		blob: Blob,
+		metadata: { contentType: string }
+	) => Promise<{ ref: StorageReference } | undefined>
+}
 
-	const [loading, setLoading] = useState(false)
-	const [uploadFile, uploadFileLoading, uploadFileError] = useUploadFile()
-	const [newTeamData, setNewTeamData] = useState<{
-		name: string | undefined
-		storageRef: StorageReference | undefined
-		teamId: string | undefined
-	}>()
+export const CreateTeamForm = ({
+	setLoading,
+	setNewTeamData,
+	handleResult,
+	uploadFileLoading,
+	uploadFile,
+}: CreateFormProps) => {
+	const { authenticatedUserSnapshot } = useAuthContext()
+
 	const [blob, setBlob] = useState<Blob>()
-	const [storageRef, setStorageRef] = useState<StorageReference>()
-	const [downloadUrl] = useDownloadURL(storageRef)
 
 	const form = useForm<CreateTeamSchema>({
 		resolver: zodResolver(createTeamSchema),
@@ -54,28 +76,6 @@ export const CreateTeamForm = () => {
 			setBlob(event.target.files[0])
 		},
 		[setBlob]
-	)
-
-	const handleResult = useCallback(
-		({
-			success,
-			message,
-			navigation,
-		}: {
-			success: boolean
-			message: string
-			navigation?: boolean
-		}) => {
-			toast({
-				title: success ? 'Success!' : 'Unable to create team',
-				description: message,
-				variant: success ? 'default' : 'destructive',
-			})
-			if (navigation) {
-				navigate('/manage')
-			}
-		},
-		[toast, navigate]
 	)
 
 	const onCreateSubmit = useCallback(
