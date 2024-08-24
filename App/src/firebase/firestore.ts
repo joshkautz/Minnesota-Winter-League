@@ -94,12 +94,12 @@ const createTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
 	name: string | undefined,
 	logo: string | undefined,
-	season: DocumentReference<SeasonData, DocumentData> | undefined,
+	seasonRef: DocumentReference<SeasonData, DocumentData> | undefined,
 	storagePath: string | undefined
 ) => {
 	if (!playerRef) return
 	if (!name) return
-	if (!season) return
+	if (!seasonRef) return
 
 	// Create the team document so we can upate the player document.
 	const teamDocumentReference = (await addDoc(
@@ -111,7 +111,7 @@ const createTeam = async (
 			registered: false,
 			registeredDate: Timestamp.now(),
 			roster: [{ captain: true, player: playerRef }],
-			season: season,
+			season: seasonRef,
 			storagePath: storagePath ? storagePath : null,
 			teamId: uuidv4(),
 		}
@@ -124,15 +124,25 @@ const createTeam = async (
 	seasons?.push({
 		captain: true,
 		paid: false, // TODO: Handle logic for this....?
-		season: season,
+		season: seasonRef,
 		signed: false, // TODO: Handle logic for this....?
 		team: teamDocumentReference,
 	})
+
+	// Get the season document so we can update the season document.
+	const seasonDocumentSnapshot = await getDoc(seasonRef)
+
+	const teams = seasonDocumentSnapshot.data()?.teams
+	teams?.push(teamDocumentReference)
 
 	return Promise.all([
 		// Updated the player document.
 		updateDoc(playerRef, {
 			seasons: seasons,
+		}),
+		// Updated the season document.
+		updateDoc(seasonRef, {
+			teams: teams,
 		}),
 	])
 }
@@ -141,14 +151,14 @@ const rolloverTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
 	name: string | undefined,
 	logo: string | undefined,
-	season: DocumentReference<SeasonData, DocumentData> | undefined,
+	seasonRef: DocumentReference<SeasonData, DocumentData> | undefined,
 	storagePath: string | undefined,
 	teamId: string | undefined
 ) => {
 	if (!playerRef) return
 	if (!name) return
 	if (!logo) return
-	if (!season) return
+	if (!seasonRef) return
 	if (!storagePath) return
 	if (!teamId) return
 
@@ -162,7 +172,7 @@ const rolloverTeam = async (
 			registered: false,
 			registeredDate: Timestamp.now(),
 			roster: [{ captain: true, player: playerRef }],
-			season: season,
+			season: seasonRef,
 			storagePath: storagePath,
 			teamId: teamId,
 		}
@@ -175,15 +185,25 @@ const rolloverTeam = async (
 	seasons?.push({
 		captain: true,
 		paid: false, // TODO: Handle logic for this....?
-		season: season,
+		season: seasonRef,
 		signed: false, // TODO: Handle logic for this....?
 		team: teamDocumentReference,
 	})
+
+	// Get the season document so we can update the season document.
+	const seasonDocumentSnapshot = await getDoc(seasonRef)
+
+	const teams = seasonDocumentSnapshot.data()?.teams
+	teams?.push(teamDocumentReference)
 
 	return Promise.all([
 		// Updated the player document.
 		updateDoc(playerRef, {
 			seasons: seasons,
+		}),
+		// Updated the season document.
+		updateDoc(seasonRef, {
+			teams: teams,
 		}),
 	])
 }

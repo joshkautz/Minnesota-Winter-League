@@ -31,6 +31,7 @@ export const ManageTeamDetail = ({
 		)
 	)
 
+	// TODO: Fix this!
 	const [creatorSnapshot, creatorSnapshotLoading] = useDocument(
 		currentSeasonTeamsQueryDocumentSnapshot.data().captains[0]
 	)

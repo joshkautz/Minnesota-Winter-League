@@ -207,7 +207,7 @@ export const CreateTeam = () => {
 
 	return (
 		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
-			{isLoading ? (
+			{isLoading || isSubmitting ? (
 				<div className={'absolute inset-0 flex items-center justify-center'}>
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>

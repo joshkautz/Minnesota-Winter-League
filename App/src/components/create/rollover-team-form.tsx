@@ -68,7 +68,7 @@ export const RolloverTeamForm = ({
 	)
 
 	useEffect(() => {
-		const defaultSelection =
+		const defaultTeamQueryDocumentSnapshot =
 			teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs.sort(
 				(a, b) => {
 					const seasonsQuerySnapshots = seasonsQuerySnapshot?.docs
@@ -92,8 +92,13 @@ export const RolloverTeamForm = ({
 					return 0
 				}
 			)?.[0]
-		setStringValue(defaultSelection?.data().name)
-	}, [teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot, setStringValue])
+		setStringValue(defaultTeamQueryDocumentSnapshot?.data().name)
+		setSelectedTeamQueryDocumentSnapshot(defaultTeamQueryDocumentSnapshot)
+	}, [
+		teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot,
+		setStringValue,
+		setSelectedTeamQueryDocumentSnapshot,
+	])
 
 	const onRolloverSubmit = useCallback(async () => {
 		try {
@@ -116,7 +121,15 @@ export const RolloverTeamForm = ({
 				})
 			}
 		}
-	}, [uploadFile, ref, storage, uuidv4, setNewTeamData, handleResult])
+	}, [
+		selectedTeamQueryDocumentSnapshot,
+		uploadFile,
+		ref,
+		storage,
+		uuidv4,
+		setNewTeamData,
+		handleResult,
+	])
 
 	const handleSeasonChange = useCallback(
 		(team: string) => {
