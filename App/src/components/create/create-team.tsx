@@ -1,20 +1,8 @@
 import { useAuthContext } from '@/firebase/auth-context'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
 import { toast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
-import {
-	Form,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormControl,
-	FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { v4 as uuidv4 } from 'uuid'
 import { ReloadIcon } from '@radix-ui/react-icons'
@@ -41,13 +29,7 @@ import { useTeamsContext } from '@/firebase/teams-context'
 import { Switch } from '@/components/ui/switch'
 import { NotificationCard } from '@/components/notification-card'
 import { TeamData } from '@/lib/interfaces'
-
-const createTeamSchema = z.object({
-	logo: z.string().optional(),
-	name: z.string().min(2),
-})
-
-type CreateTeamSchema = z.infer<typeof createTeamSchema>
+import { CreateTeamForm } from './create-team-form'
 
 export const CreateTeam = () => {
 	const navigate = useNavigate()
@@ -65,7 +47,6 @@ export const CreateTeam = () => {
 		storageRef: StorageReference | undefined
 		teamId: string | undefined
 	}>()
-	const [blob, setBlob] = useState<Blob>()
 	const [storageRef, setStorageRef] = useState<StorageReference>()
 	const [uploadFile, uploadFileLoading, uploadFileError] = useUploadFile()
 	const [downloadUrl] = useDownloadURL(storageRef)
@@ -80,20 +61,6 @@ export const CreateTeam = () => {
 						item.team
 				),
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
-	)
-
-	const form = useForm<CreateTeamSchema>({
-		resolver: zodResolver(createTeamSchema),
-	})
-
-	const handleFileChange = useCallback(
-		(event: React.ChangeEvent<HTMLInputElement>) => {
-			if (!event.target.files?.[0]) {
-				return
-			}
-			setBlob(event.target.files[0])
-		},
-		[setBlob]
 	)
 
 	const handleResult = useCallback(
@@ -240,54 +207,6 @@ export const CreateTeam = () => {
 		authenticatedUserSnapshot,
 		newTeamData,
 	])
-
-	const onCreateSubmit = useCallback(
-		async (data: CreateTeamSchema) => {
-			if (authenticatedUserSnapshot) {
-				try {
-					setLoading(true)
-					if (blob) {
-						const result = await uploadFile(
-							ref(storage, `teams/${uuidv4()}`),
-							blob,
-							{
-								contentType: 'image/jpeg',
-							}
-						)
-						if (result) {
-							setNewTeamData({
-								name: data.name,
-								storageRef: result.ref,
-								teamId: undefined,
-							})
-						}
-					} else {
-						setNewTeamData({
-							name: data.name,
-							storageRef: undefined,
-							teamId: undefined,
-						})
-					}
-				} catch {
-					handleResult({
-						success: false,
-						message: `Ensure your email is verified. Please try again later.`,
-					})
-				}
-			}
-		},
-		[
-			authenticatedUserSnapshot,
-			setLoading,
-			uploadFile,
-			blob,
-			ref,
-			storage,
-			uuidv4,
-			setNewTeamData,
-			handleResult,
-		]
-	)
 
 	const onRolloverSubmit = useCallback(async () => {
 		try {
@@ -474,58 +393,13 @@ export const CreateTeam = () => {
 								)}
 							</div>
 						) : (
-							<div className="max-w-[400px]">
-								<Form {...form}>
-									<form
-										onSubmit={form.handleSubmit(onCreateSubmit)}
-										className={'w-full space-y-6'}
-									>
-										<FormField
-											control={form.control}
-											name={'name'}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Team name</FormLabel>
-													<FormControl>
-														<Input
-															placeholder={'Team name'}
-															{...field}
-															value={field.value ?? ''}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={'logo'}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Team logo</FormLabel>
-													<FormControl>
-														<Input
-															id="image-upload"
-															type={'file'}
-															accept="image/*"
-															placeholder={'Upload Image'}
-															{...field}
-															onChange={handleFileChange}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<Button type={'submit'} disabled={uploadFileLoading}>
-											{uploadFileLoading && (
-												<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-											)}
-											Create
-										</Button>
-									</form>
-								</Form>
-							</div>
+							<CreateTeamForm
+								uploadFile={uploadFile}
+								uploadFileLoading={uploadFileLoading}
+								setLoading={setLoading}
+								setNewTeamData={setNewTeamData}
+								handleResult={handleResult}
+							/>
 						)}
 					</NotificationCard>
 				</>
