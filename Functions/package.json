@@ -18,9 +18,9 @@
 		"firebase-functions": "^5.1.0"
 	},
 	"devDependencies": {
-		"@eslint/js": "^9.9.0",
+		"@eslint/js": "^9.9.1",
 		"@types/eslint__js": "^8.42.3",
-		"eslint": "^9.9.0",
+		"eslint": "^9.9.1",
 		"firebase-functions-test": "^3.3.0",
 		"prettier": "^3.3.3",
 		"typescript": "^5.5.4",
