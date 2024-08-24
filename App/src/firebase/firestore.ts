@@ -465,13 +465,22 @@ const currentSeasonGamesQuery = (
 const gamesByTeamQuery = (
 	teamRef: DocumentReference<TeamData, DocumentData> | undefined
 ): Query<GameData, DocumentData> | undefined => {
-	if (teamRef)
-		return query(
-			collection(firestore, Collections.GAMES),
-			or(where('home', '==', teamRef), where('away', '==', teamRef)),
-			orderBy('date', 'asc')
-		) as Query<GameData, DocumentData>
-	return undefined
+	if (!teamRef) return
+	return query(
+		collection(firestore, Collections.GAMES),
+		or(where('home', '==', teamRef), where('away', '==', teamRef)),
+		orderBy('date', 'asc')
+	) as Query<GameData, DocumentData>
+}
+
+const teamsBySeasonQuery = (
+	seasonRef: DocumentReference<SeasonData, DocumentData> | undefined
+): Query<TeamData, DocumentData> | undefined => {
+	if (!seasonRef) return
+	return query(
+		collection(firestore, Collections.TEAMS),
+		where('season', '==', seasonRef)
+	) as Query<TeamData, DocumentData>
 }
 
 const updatePlayer = (
@@ -672,6 +681,7 @@ export {
 	updateTeam,
 	stripeRegistration,
 	gamesByTeamQuery,
+	teamsBySeasonQuery,
 	demoteFromCaptain,
 	unrosteredPlayersQuery,
 	promoteToCaptain,

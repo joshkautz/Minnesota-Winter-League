@@ -1,4 +1,3 @@
-import { useTeamsContext } from '@/firebase/teams-context'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { NotificationCard } from '../notification-card'
@@ -9,6 +8,7 @@ import {
 	teamsHistoryQuery,
 	getTeamById,
 	DocumentSnapshot,
+	teamsBySeasonQuery,
 } from '@/firebase/firestore'
 import { GameData, PlayerData, TeamData } from '@/lib/interfaces'
 import { TeamRosterPlayer } from './team-roster-player'
@@ -55,25 +55,39 @@ const formatGameResult = (
 
 export const TeamProfile = () => {
 	const { id } = useParams()
-	const {
-		selectedSeasonTeamsQuerySnapshot,
-		selectedSeasonTeamsQuerySnapshotLoading,
-	} = useTeamsContext()
 
-	const [teamDocumentSnapshot] = useDocument(getTeamById(id))
+	const [teamDocumentSnapshot, teamDocumentSnapshotLoading] = useDocument(
+		getTeamById(id)
+	)
 
-	const [teamProfileImageLoaded, setTeamProfileImageLoaded] = useState(false)
-
-	const [historyQuerySnapshot] = useCollection(
+	const [historyQuerySnapshot, historyQuerySnapshotLoading] = useCollection(
 		teamsHistoryQuery(teamDocumentSnapshot?.data()?.teamId)
 	)
 
-	const [gamesSnapshot] = useCollection(
+	const [teamsQuerySnapshot, teamsQuerySnapshotLoading] = useCollection(
+		teamsBySeasonQuery(teamDocumentSnapshot?.data()?.season)
+	)
+
+	const [gamesQuerySnapshot, gamesQuerySnapshotLoading] = useCollection(
 		gamesByTeamQuery(teamDocumentSnapshot?.ref)
 	)
-	const [imgSrc, setImgSrc] = useState<string | undefined>()
 
-	// const [teamsQuerySnapshot] = useCollection(teamsHistoryQuery(team?.data().teamId))
+	const isLoading = useMemo(
+		() =>
+			teamDocumentSnapshotLoading ||
+			historyQuerySnapshotLoading ||
+			teamsQuerySnapshotLoading ||
+			gamesQuerySnapshotLoading,
+		[
+			teamDocumentSnapshotLoading,
+			historyQuerySnapshotLoading,
+			teamsQuerySnapshotLoading,
+			gamesQuerySnapshotLoading,
+		]
+	)
+
+	const [teamProfileImageLoaded, setTeamProfileImageLoaded] = useState(false)
+	const [imgSrc, setImgSrc] = useState<string | undefined>()
 
 	useEffect(() => {
 		setImgSrc(teamDocumentSnapshot?.data()?.logo + `&date=${Date.now()}`)
@@ -81,7 +95,7 @@ export const TeamProfile = () => {
 
 	const registrationStatus = useMemo(
 		() =>
-			selectedSeasonTeamsQuerySnapshotLoading ? (
+			isLoading ? (
 				<p className="text-sm text-muted-foreground">Loading...</p>
 			) : teamDocumentSnapshot?.data()?.registered ? (
 				<p
@@ -94,11 +108,12 @@ export const TeamProfile = () => {
 				</p>
 			) : (
 				<p className={'text-sm text-muted-foreground'}>
+					{/* TODO: Fix this Hard Coding. */}
 					You need 10 registered players in order to meet the minimum
 					requirement. Registration ends Tuesday, October 31st, at 11:59pm.
 				</p>
 			),
-		[selectedSeasonTeamsQuerySnapshotLoading, teamDocumentSnapshot]
+		[isLoading, teamDocumentSnapshot]
 	)
 
 	return (
@@ -140,12 +155,16 @@ export const TeamProfile = () => {
 							},
 							index: number
 						) => (
-							<TeamRosterPlayer key={`team-${index}`} playerRef={item.player} />
+							<TeamRosterPlayer
+								key={`team-${index}`}
+								playerRef={item.player}
+								seasonRef={teamDocumentSnapshot.data()?.season}
+							/>
 						)
 					)}
 				</NotificationCard>
 				<TeamRecordRoot>
-					{gamesSnapshot?.docs.map((game, index) => {
+					{gamesQuerySnapshot?.docs.map((game, index) => {
 						const gameData = game.data()
 						const opponent =
 							teamDocumentSnapshot?.id == gameData.home.id
@@ -169,10 +188,10 @@ export const TeamProfile = () => {
 										}
 									>
 										{opponent == OPPONENT.AWAY
-											? selectedSeasonTeamsQuerySnapshot?.docs
+											? teamsQuerySnapshot?.docs
 													.find((team) => team.id === gameData.away.id)
 													?.data().name
-											: selectedSeasonTeamsQuerySnapshot?.docs
+											: teamsQuerySnapshot?.docs
 													.find((team) => team.id === gameData.home.id)
 													?.data().name}
 										<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
@@ -183,7 +202,10 @@ export const TeamProfile = () => {
 					})}
 				</TeamRecordRoot>
 				{historyQuerySnapshot && (
-					<TeamHistory historyQuerySnapshot={historyQuerySnapshot} />
+					<TeamHistory
+						teamDocumentSnapshot={teamDocumentSnapshot}
+						historyQuerySnapshot={historyQuerySnapshot}
+					/>
 				)}
 			</div>
 		</div>

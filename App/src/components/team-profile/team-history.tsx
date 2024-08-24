@@ -1,6 +1,9 @@
-import { useMemo } from 'react'
 import { NotificationCard } from '../notification-card'
-import { DocumentData, QuerySnapshot } from '@/firebase/firestore'
+import {
+	DocumentData,
+	DocumentSnapshot,
+	QuerySnapshot,
+} from '@/firebase/firestore'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { TeamData } from '@/lib/interfaces'
 
@@ -18,28 +21,18 @@ const formatPlacement = (placement: number) => {
 }
 
 export const TeamHistory = ({
+	teamDocumentSnapshot,
 	historyQuerySnapshot,
 }: {
+	teamDocumentSnapshot: DocumentSnapshot<TeamData, DocumentData> | undefined
 	historyQuerySnapshot: QuerySnapshot<TeamData, DocumentData>
 }) => {
-	const {
-		seasonsQuerySnapshot,
-		selectedSeasonQueryDocumentSnapshot /*TODO: Change this name to selectedSeasonQueryDocumentSnapshot. And ADD a new variable in context for currentSeasonQueryDocumentSnapshot*/,
-	} = useSeasonsContext()
-
-	const team = useMemo(
-		() =>
-			historyQuerySnapshot?.docs.find(
-				(team) =>
-					team.data().season.id === selectedSeasonQueryDocumentSnapshot?.id
-			),
-		[historyQuerySnapshot, selectedSeasonQueryDocumentSnapshot]
-	)
+	const { seasonsQuerySnapshot } = useSeasonsContext()
 
 	return (
 		<NotificationCard
 			title={'History'}
-			description={`${team?.data().name} past seasons`}
+			description={`${teamDocumentSnapshot?.data()?.name} past seasons`}
 			className={'flex-1 basis-[360px] flex-shrink-0'}
 		>
 			{historyQuerySnapshot?.docs.map((historyQueryDocumentSnapshot) => (
