@@ -1,57 +1,53 @@
 import { useAuthContext } from '@/firebase/auth-context'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from '@/components/ui/use-toast'
-import { Button } from '@/components/ui/button'
 import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
 import { Label } from '@/components/ui/label'
-import { v4 as uuidv4 } from 'uuid'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import {
-	createTeam,
-	rolloverTeam,
-	DocumentData,
-	QueryDocumentSnapshot,
-} from '@/firebase/firestore'
+import { createTeam, rolloverTeam } from '@/firebase/firestore'
 import { useNavigate } from 'react-router-dom'
-import { StorageReference, ref, storage } from '@/firebase/storage'
+import { StorageReference } from '@/firebase/storage'
 import { GradientHeader } from '@/components/gradient-header'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Timestamp } from '@firebase/firestore'
-import { Skeleton } from '@/components/ui/skeleton'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
-import { useTeamsContext } from '@/firebase/teams-context'
+
 import { Switch } from '@/components/ui/switch'
 import { NotificationCard } from '@/components/notification-card'
-import { TeamData } from '@/lib/interfaces'
 import { CreateTeamForm } from './create-team-form'
+import { Card, CardContent } from '../ui/card'
+import { cn } from '@/lib/utils'
+import { RolloverTeamForm } from './rollover-team-form'
+
+const formatTimestamp = (timestamp: Timestamp | undefined) => {
+	if (!timestamp) return
+	const date = new Date(timestamp.seconds * 1000)
+	return date.toLocaleDateString('en-US', {
+		month: 'long',
+		day: 'numeric',
+		year: 'numeric',
+	})
+}
 
 export const CreateTeam = () => {
 	const navigate = useNavigate()
-	const { authenticatedUserSnapshot } = useAuthContext()
-	const { currentSeasonQueryDocumentSnapshot, seasonsQuerySnapshot } =
-		useSeasonsContext()
+	const { authenticatedUserSnapshot, authenticatedUserSnapshotLoading } =
+		useAuthContext()
 	const {
-		teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot,
-		teamsForWhichAuthenticatedUserIsCaptainQuerySnapshotLoading,
-	} = useTeamsContext()
+		currentSeasonQueryDocumentSnapshot,
+		currentSeasonQueryDocumentSnapshotLoading,
+		seasonsQuerySnapshot,
+		seasonsQuerySnapshotLoading,
+	} = useSeasonsContext()
 
-	const [loading, setLoading] = useState(false)
 	const [newTeamData, setNewTeamData] = useState<{
 		name: string | undefined
 		storageRef: StorageReference | undefined
 		teamId: string | undefined
 	}>()
 	const [storageRef, setStorageRef] = useState<StorageReference>()
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [uploadFile, uploadFileLoading, uploadFileSnapshot, uploadFileError] =
-		useUploadFile()
+	const [uploadFile] = useUploadFile()
 	const [downloadUrl] = useDownloadURL(storageRef)
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
 	const isAuthenticatedUserRostered = useMemo(
 		() =>
@@ -110,15 +106,13 @@ export const CreateTeam = () => {
 						})
 					})
 					.catch((error) => {
+						setIsSubmitting(false)
 						handleResult({
 							success: false,
 							title: 'Error',
 							description: error.message,
 							navigation: false,
 						})
-					})
-					.finally(() => {
-						setLoading(false)
 					})
 			}
 		}
@@ -144,15 +138,13 @@ export const CreateTeam = () => {
 						})
 					})
 					.catch((error) => {
+						setIsSubmitting(false)
 						handleResult({
 							success: false,
 							title: 'Error',
 							description: error.message,
 							navigation: false,
 						})
-					})
-					.finally(() => {
-						setLoading(false)
 					})
 			} else {
 				createTeam(
@@ -171,6 +163,7 @@ export const CreateTeam = () => {
 						})
 					})
 					.catch((error) => {
+						setIsSubmitting(false)
 						handleResult({
 							success: false,
 							title: 'Error',
@@ -178,54 +171,9 @@ export const CreateTeam = () => {
 							navigation: false,
 						})
 					})
-					.finally(() => {
-						setLoading(false)
-					})
 			}
 		}
 	}, [downloadUrl])
-
-	const onRolloverSubmit = useCallback(async () => {
-		try {
-			setLoading(true)
-			setNewTeamData({
-				name: selectedTeamQueryDocumentSnapshot?.data().name,
-				storageRef: ref(
-					storage,
-					selectedTeamQueryDocumentSnapshot?.data().logo
-				),
-				teamId: selectedTeamQueryDocumentSnapshot?.data().teamId,
-			})
-		} catch (error) {
-			if (error instanceof Error) {
-				handleResult({
-					success: false,
-					title: 'Error',
-					description: error.message,
-					navigation: false,
-				})
-			}
-		}
-	}, [
-		setLoading,
-		uploadFile,
-		ref,
-		storage,
-		uuidv4,
-		setNewTeamData,
-		handleResult,
-	])
-
-	useEffect(() => {
-		if (uploadFileError) {
-			handleResult({
-				success: false,
-				title: 'Error',
-				description: uploadFileError.message,
-				navigation: false,
-			})
-		}
-	}, [uploadFileError])
 
 	const isRegistrationOpen = useMemo(
 		() =>
@@ -237,70 +185,40 @@ export const CreateTeam = () => {
 		[currentSeasonQueryDocumentSnapshot]
 	)
 
-	const [stringValue, setStringValue] = useState<string | undefined>()
-
-	const [
-		selectedTeamQueryDocumentSnapshot,
-		setSelectedTeamQueryDocumentSnapshot,
-	] = useState<QueryDocumentSnapshot<TeamData, DocumentData> | undefined>(
-		undefined
-	)
-
-	const handleSeasonChange = useCallback(
-		(team: string) => {
-			setStringValue(team)
-			const teamQueryDocumentSnapshot =
-				teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs.find(
-					(teamQueryDocumentSnapshot) =>
-						teamQueryDocumentSnapshot.data().name === team
-				)
-			if (teamQueryDocumentSnapshot) {
-				setSelectedTeamQueryDocumentSnapshot(teamQueryDocumentSnapshot)
-			}
-		},
-		[setStringValue]
-	)
-
-	useEffect(() => {
-		const defaultSelection =
-			teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs.sort(
-				(a, b) => {
-					const seasonsQuerySnapshots = seasonsQuerySnapshot?.docs
-					if (seasonsQuerySnapshots) {
-						const seasonA = seasonsQuerySnapshots.find(
-							(seasonQueryDocumentSnapshot) =>
-								seasonQueryDocumentSnapshot.id === a.data().season.id
-						)
-						const seasonB = seasonsQuerySnapshots.find(
-							(seasonQueryDocumentSnapshot) =>
-								seasonQueryDocumentSnapshot.id === b.data().season.id
-						)
-						if (seasonA && seasonB) {
-							return (
-								seasonA.data()?.dateStart.seconds -
-								seasonB.data()?.dateStart.seconds
-							)
-						}
-						return 0
-					}
-					return 0
-				}
-			)?.[0]
-		setStringValue(defaultSelection?.data().name)
-	}, [teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot, setStringValue])
-
 	const [rolloverMode, setRolloverMode] = useState(false)
+
+	const isLoading = useMemo(
+		() =>
+			!authenticatedUserSnapshot ||
+			authenticatedUserSnapshotLoading ||
+			!currentSeasonQueryDocumentSnapshot ||
+			currentSeasonQueryDocumentSnapshotLoading ||
+			!seasonsQuerySnapshot ||
+			seasonsQuerySnapshotLoading,
+		[
+			authenticatedUserSnapshot,
+			authenticatedUserSnapshotLoading,
+			currentSeasonQueryDocumentSnapshot,
+			currentSeasonQueryDocumentSnapshotLoading,
+			seasonsQuerySnapshot,
+			seasonsQuerySnapshotLoading,
+		]
+	)
 
 	return (
 		<div className="container flex flex-col items-center md:min-h-[calc(100vh-60px)] gap-10">
-			{!currentSeasonQueryDocumentSnapshot || loading ? (
+			{isLoading ? (
 				<div className={'absolute inset-0 flex items-center justify-center'}>
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
 			) : isAuthenticatedUserRostered ? (
-				<div>You must first leave your team in order to create a new one.</div>
+				<Card className={cn('max-w-[800px] w-full mx-auto')}>
+					<CardContent>{`You must first leave your team in order to create a new one.`}</CardContent>
+				</Card>
 			) : !isRegistrationOpen ? (
-				<div>Registration is not open.</div>
+				<Card className={cn('max-w-[800px] w-full mx-auto')}>
+					<CardContent>{`Registration does not begin until ${formatTimestamp(currentSeasonQueryDocumentSnapshot?.data()?.registrationStart)}`}</CardContent>
+				</Card>
 			) : (
 				<>
 					<GradientHeader>Create a Team</GradientHeader>
@@ -314,72 +232,27 @@ export const CreateTeam = () => {
 								<Switch
 									id="rollover"
 									checked={rolloverMode}
-									onCheckedChange={() => setRolloverMode(!rolloverMode)}
+									onCheckedChange={() =>
+										setRolloverMode((prevRolloverMode) => !prevRolloverMode)
+									}
 								/>
 								<Label htmlFor="rollover">Rollover past team</Label>
 							</div>
 						}
 					>
 						{rolloverMode ? (
-							<div className="inline-flex items-start justify-start w-full space-x-2">
-								{teamsForWhichAuthenticatedUserIsCaptainQuerySnapshotLoading ? (
-									<Skeleton className="w-24 h-8" />
-								) : !teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot ? (
-									<p>No previous teams eligible for rollover</p>
-								) : (
-									<div className="flex flex-col space-y-6">
-										<div className="space-y-2">
-											<Label>Teams eligible for rollover</Label>
-											<Select
-												value={stringValue}
-												onValueChange={handleSeasonChange}
-											>
-												<SelectTrigger>
-													<SelectValue placeholder={'Select a previous team'} />
-												</SelectTrigger>
-												<SelectContent>
-													{teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs
-														.sort((a, b) => {
-															const docs = seasonsQuerySnapshot?.docs
-															if (docs) {
-																const seasonA = docs.find(
-																	(season) => season.id === a.data().season.id
-																)
-																const seasonB = docs.find(
-																	(season) => season.id === b.data().season.id
-																)
-																if (seasonA && seasonB) {
-																	return (
-																		seasonA.data()?.dateStart.seconds -
-																		seasonB.data()?.dateStart.seconds
-																	)
-																}
-																return 0
-															}
-															return 0
-														})
-														.map((team) => (
-															<SelectItem
-																key={team.id}
-																value={team.data().name}
-															>
-																{team.data().name}
-															</SelectItem>
-														))}
-												</SelectContent>
-											</Select>
-										</div>
-										<Button type={'submit'} onClick={onRolloverSubmit}>
-											Rollover
-										</Button>
-									</div>
-								)}
-							</div>
+							<RolloverTeamForm
+								isSubmitting={isSubmitting}
+								setIsSubmitting={setIsSubmitting}
+								uploadFile={uploadFile}
+								setNewTeamData={setNewTeamData}
+								handleResult={handleResult}
+							/>
 						) : (
 							<CreateTeamForm
+								isSubmitting={isSubmitting}
+								setIsSubmitting={setIsSubmitting}
 								uploadFile={uploadFile}
-								uploadFileLoading={uploadFileLoading}
-								setLoading={setLoading}
 								setNewTeamData={setNewTeamData}
 								handleResult={handleResult}
 							/>

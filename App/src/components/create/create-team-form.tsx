@@ -13,7 +13,6 @@ import * as z from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { ReloadIcon } from '@radix-ui/react-icons'
 import { StorageReference, ref, storage } from '@/firebase/storage'
 
 const createTeamSchema = z.object({
@@ -24,7 +23,8 @@ const createTeamSchema = z.object({
 type CreateTeamSchema = z.infer<typeof createTeamSchema>
 
 interface CreateFormProps {
-	setLoading: React.Dispatch<React.SetStateAction<boolean>>
+	isSubmitting: boolean
+	setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>
 	setNewTeamData: React.Dispatch<
 		React.SetStateAction<
 			| {
@@ -46,7 +46,6 @@ interface CreateFormProps {
 		description: string
 		navigation: boolean
 	}) => void
-	uploadFileLoading: boolean
 	uploadFile: (
 		ref: StorageReference,
 		blob: Blob,
@@ -55,10 +54,10 @@ interface CreateFormProps {
 }
 
 export const CreateTeamForm = ({
-	setLoading,
+	isSubmitting,
+	setIsSubmitting,
 	setNewTeamData,
 	handleResult,
-	uploadFileLoading,
 	uploadFile,
 }: CreateFormProps) => {
 	const [blob, setBlob] = useState<Blob>()
@@ -80,7 +79,7 @@ export const CreateTeamForm = ({
 	const onCreateSubmit = useCallback(
 		async (data: CreateTeamSchema) => {
 			try {
-				setLoading(true)
+				setIsSubmitting(true)
 				if (blob) {
 					const result = await uploadFile(
 						ref(storage, `teams/${uuidv4()}`),
@@ -114,16 +113,7 @@ export const CreateTeamForm = ({
 				}
 			}
 		},
-		[
-			setLoading,
-			uploadFile,
-			blob,
-			ref,
-			storage,
-			uuidv4,
-			setNewTeamData,
-			handleResult,
-		]
+		[uploadFile, blob, ref, storage, uuidv4, setNewTeamData, handleResult]
 	)
 
 	return (
@@ -170,10 +160,7 @@ export const CreateTeamForm = ({
 							</FormItem>
 						)}
 					/>
-					<Button type={'submit'} disabled={uploadFileLoading}>
-						{uploadFileLoading && (
-							<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-						)}
+					<Button type={'submit'} disabled={isSubmitting}>
 						Create
 					</Button>
 				</form>
