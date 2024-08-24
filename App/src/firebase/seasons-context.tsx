@@ -23,6 +23,7 @@ interface SeasonProps {
 	currentSeasonQueryDocumentSnapshot:
 		| QueryDocumentSnapshot<SeasonData, DocumentData>
 		| undefined
+	currentSeasonQueryDocumentSnapshotLoading: boolean
 	seasonsQuerySnapshot: QuerySnapshot<SeasonData, DocumentData> | undefined
 	seasonsQuerySnapshotLoading: boolean
 	seasonsQuerySnapshotError: FirestoreError | undefined
@@ -36,6 +37,7 @@ interface SeasonProps {
 
 export const SeasonsContext = createContext<SeasonProps>({
 	currentSeasonQueryDocumentSnapshot: undefined,
+	currentSeasonQueryDocumentSnapshotLoading: false,
 	seasonsQuerySnapshot: undefined,
 	seasonsQuerySnapshotLoading: false,
 	seasonsQuerySnapshotError: undefined,
@@ -57,16 +59,12 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 	const [
 		selectedSeasonQueryDocumentSnapshot,
 		setSelectedSeasonQueryDocumentSnapshot,
-	] = useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>(
-		undefined
-	)
+	] = useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>()
 
 	const [
 		currentSeasonQueryDocumentSnapshot,
 		setCurrentSeasonQueryDocumentSnapshot,
-	] = useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>(
-		undefined
-	)
+	] = useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>()
 
 	const getMostRecentSeason = useCallback(() => {
 		return seasonsQuerySnapshot?.docs.sort(
@@ -86,6 +84,7 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 		<SeasonsContext.Provider
 			value={{
 				currentSeasonQueryDocumentSnapshot,
+				currentSeasonQueryDocumentSnapshotLoading: seasonsQuerySnapshotLoading,
 				seasonsQuerySnapshot,
 				seasonsQuerySnapshotLoading,
 				seasonsQuerySnapshotError,

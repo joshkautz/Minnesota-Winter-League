@@ -2,58 +2,75 @@ import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { useTeamsContext } from '@/firebase/teams-context'
-import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
-import { GradientHeader } from './gradient-header'
-import { ComingSoon } from './coming-soon'
+import { Card, CardContent, CardFooter, CardHeader } from '../ui/card'
+import { GradientHeader } from '../gradient-header'
+import { ComingSoon } from '../coming-soon'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Timestamp } from '@firebase/firestore'
+import { useMemo } from 'react'
+
+const formatTimestamp = (timestamp: Timestamp | undefined) => {
+	if (!timestamp) return
+	const date = new Date(timestamp.seconds * 1000)
+	return date.toLocaleDateString('en-US', {
+		month: 'long',
+		day: 'numeric',
+		year: 'numeric',
+	})
+}
 
 export const Teams = () => {
-	const { teamsQuerySnapshot } = useTeamsContext()
+	const { selectedSeasonTeamsQuerySnapshot } = useTeamsContext()
 	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
+
+	enum SeasonStart {
+		FUTURE = 'FUTURE',
+		NOW = 'NOW',
+		PAST = 'PAST',
+	}
+
+	const seasonStart = useMemo(
+		() =>
+			selectedSeasonQueryDocumentSnapshot &&
+			selectedSeasonQueryDocumentSnapshot.data().registrationStart.seconds <
+				Timestamp.now().seconds &&
+			selectedSeasonQueryDocumentSnapshot.data().registrationEnd.seconds >
+				Timestamp.now().seconds
+				? SeasonStart.NOW
+				: selectedSeasonQueryDocumentSnapshot &&
+					  selectedSeasonQueryDocumentSnapshot.data().registrationStart
+							.seconds > Timestamp.now().seconds
+					? SeasonStart.FUTURE
+					: SeasonStart.PAST,
+		[selectedSeasonQueryDocumentSnapshot]
+	)
 
 	return (
 		<div className={'container'}>
 			<GradientHeader>Teams</GradientHeader>
-			{/* Season Registration window is in the future */}
-			{selectedSeasonQueryDocumentSnapshot &&
-				selectedSeasonQueryDocumentSnapshot.data().registrationStart.seconds >
-					Timestamp.now().seconds && (
-					<>
-						Registration for this season will begin on{' '}
-						{
-							selectedSeasonQueryDocumentSnapshot.data().registrationStart
-								.seconds
-						}
-						.
-					</>
-				)}
-			{/* Season Registration window is live */}
-			{selectedSeasonQueryDocumentSnapshot &&
-				selectedSeasonQueryDocumentSnapshot.data().registrationStart.seconds <
-					Timestamp.now().seconds &&
-				selectedSeasonQueryDocumentSnapshot.data().registrationEnd.seconds >
-					Timestamp.now().seconds && (
-					<>
-						Registration for this season is live. Go create a team or join a
-						team!
-					</>
-				)}
-			{!teamsQuerySnapshot ? (
+			{!selectedSeasonTeamsQuerySnapshot ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
-			) : teamsQuerySnapshot.docs.length == 0 ? (
-				<ComingSoon
-					message={
-						'There are no teams to display. Please wait for the registration period to start on October 1st, 2024.'
-					}
-				/>
+			) : selectedSeasonTeamsQuerySnapshot.docs.length == 0 ? (
+				<ComingSoon>
+					<p className={' pt-6 '}>
+						{seasonStart == SeasonStart.PAST
+							? `There are no teams to display.`
+							: seasonStart == SeasonStart.FUTURE
+								? `Registration for this season is will go live on ${formatTimestamp(
+										selectedSeasonQueryDocumentSnapshot?.data()
+											?.registrationStart
+									)}!`
+								: seasonStart == SeasonStart.NOW &&
+									`Registration for this season is currently live. Create a new team or join an existing team!`}
+					</p>
+				</ComingSoon>
 			) : (
 				<div
 					className={'flex flex-row flex-wrap justify-center gap-y-8 gap-x-8'}
 				>
-					{teamsQuerySnapshot.docs.map((team) => {
+					{selectedSeasonTeamsQuerySnapshot.docs.map((team) => {
 						return (
 							<Link key={`link-${team.id}`} to={`/teams/${team.id}`}>
 								<Card className={'group'}>

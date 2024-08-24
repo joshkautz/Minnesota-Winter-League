@@ -1,18 +1,17 @@
 import { Routes, Route } from 'react-router-dom'
 import { FourOhFour } from '@/components/four-oh-four'
-import { Home } from '@/components/home'
+import { Home } from '@/components/home/home'
 import { Layout } from '@/components/layout'
-import { Schedule } from '@/components/schedule'
-import { Standings } from '@/components/standings'
-import { Teams } from '@/components/teams'
+import { Schedule } from '@/components/schedule/schedule'
+import { Standings } from '@/components/standings/standings'
+import { Teams } from '@/components/teams/teams'
 import { ProtectedRoute } from '@/components/protected-route'
 import { Profile } from '@/components/profile'
-import { TeamProfile } from './components/team-profile'
-import { ManageTeam } from './components/manage-team'
+import { TeamProfile } from './components/team-profile/team-profile'
+import { ManageTeam } from './components/manage/manage-team'
 import { useEffect } from 'react'
 import { useAuthContext } from './firebase/auth-context'
-import { CreateTeam } from './components/create-team'
-import { TeamHistory } from './components/team-history'
+import { CreateTeam } from './components/create/create-team'
 
 function App() {
 	const { authStateUser } = useAuthContext()
@@ -47,10 +46,8 @@ function App() {
 				<Route index element={<Home />} />
 				<Route path={'/schedule'} element={<Schedule />} />
 				<Route path={'/standings'} element={<Standings />} />
-				<Route path={'/team'} element={<TeamProfile />} />
 				<Route path={'/teams'} element={<Teams />} />
 				<Route path={'/teams/:id'} element={<TeamProfile />} />
-				<Route path={'/history/:id'} element={<TeamHistory />} />
 				<Route
 					path={'/profile'}
 					element={

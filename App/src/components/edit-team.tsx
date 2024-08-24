@@ -1,6 +1,6 @@
 import { useAuthContext } from '@/firebase/auth-context'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { toast } from './ui/use-toast'
@@ -19,7 +19,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { updateTeam } from '@/firebase/firestore'
 import { StorageReference, ref, storage } from '@/firebase/storage'
-import { TeamsContext } from '@/firebase/teams-context'
+import { useTeamsContext } from '@/firebase/teams-context'
+import { useSeasonsContext } from '@/firebase/seasons-context'
 
 const editTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -30,14 +31,27 @@ type EditTeamSchema = z.infer<typeof editTeamSchema>
 
 export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { teamsQuerySnapshot } = useContext(TeamsContext)
+	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
-	// TODO: FIX THIS
-	const team = useMemo(() => {
-		return teamsQuerySnapshot?.docs.find(
-			(team) => team.id === authenticatedUserSnapshot?.data()?.team?.id
-		)
-	}, [authenticatedUserSnapshot, teamsQuerySnapshot])
+	const team = useMemo(
+		() =>
+			currentSeasonTeamsQuerySnapshot?.docs.find(
+				(team) =>
+					team.id ===
+					authenticatedUserSnapshot
+						?.data()
+						?.seasons.find(
+							(item) =>
+								item.season.id === currentSeasonQueryDocumentSnapshot?.id
+						)?.team.id
+			),
+		[
+			authenticatedUserSnapshot,
+			currentSeasonTeamsQuerySnapshot,
+			currentSeasonQueryDocumentSnapshot,
+		]
+	)
 
 	const [loading, setLoading] = useState(false)
 

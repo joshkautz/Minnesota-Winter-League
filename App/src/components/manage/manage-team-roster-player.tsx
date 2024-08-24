@@ -2,8 +2,8 @@ import {
 	DocumentReference,
 	DocumentData,
 	promoteToCaptain,
-	leaveTeam,
 	demoteFromCaptain,
+	removeFromTeam,
 } from '@/firebase/firestore'
 import {
 	DropdownMenu,
@@ -11,52 +11,46 @@ import {
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
-} from './ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import { DotsVerticalIcon, StarFilledIcon } from '@radix-ui/react-icons'
-import { useState, useCallback, useMemo } from 'react'
-import { Button } from './ui/button'
-import { Skeleton } from './ui/skeleton'
+import { useCallback, useMemo } from 'react'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useAuthContext } from '@/firebase/auth-context'
 import { PlayerData } from '@/lib/interfaces'
 import { useDocument } from 'react-firebase-hooks/firestore'
-import { DestructiveConfirmationDialog } from './destructive-confirmation-dialog'
-import { toast } from './ui/use-toast'
-import { Badge } from './ui/badge'
+import { DestructiveConfirmationDialog } from '../destructive-confirmation-dialog'
+import { toast } from '@/components/ui/use-toast'
+import { Badge } from '@/components/ui/badge'
 import { useSeasonsContext } from '@/firebase/seasons-context'
-import { useParams } from 'react-router-dom'
 import { useTeamsContext } from '@/firebase/teams-context'
 
-export const TeamRosterPlayer = ({
+export const ManageTeamRosterPlayer = ({
 	playerRef,
 }: {
 	playerRef: DocumentReference<PlayerData, DocumentData>
 }) => {
-	const { id } = useParams()
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { teamsQuerySnapshot } = useTeamsContext()
-	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 	const [playerSnapshot] = useDocument(playerRef)
-	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
 
 	const team = useMemo(
 		() =>
-			id
-				? teamsQuerySnapshot?.docs.find((team) => team.id === id)
-				: teamsQuerySnapshot?.docs.find(
-						(team) =>
-							team.id ===
-							authenticatedUserSnapshot
-								?.data()
-								?.seasons.find(
-									(item) =>
-										item.season.id === selectedSeasonQueryDocumentSnapshot?.id
-								)?.team.id
-					),
+			currentSeasonTeamsQuerySnapshot?.docs.find(
+				(team) =>
+					team.id ===
+					authenticatedUserSnapshot
+						?.data()
+						?.seasons.find(
+							(item) =>
+								item.season.id === currentSeasonQueryDocumentSnapshot?.id
+						)?.team.id
+			),
 		[
-			id,
 			authenticatedUserSnapshot,
-			teamsQuerySnapshot,
-			selectedSeasonQueryDocumentSnapshot,
+			currentSeasonTeamsQuerySnapshot,
+			currentSeasonQueryDocumentSnapshot,
 		]
 	)
 
@@ -76,9 +70,9 @@ export const TeamRosterPlayer = ({
 			playerSnapshot
 				?.data()
 				?.seasons.find(
-					(item) => item.season.id === selectedSeasonQueryDocumentSnapshot?.id
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
 				)?.captain,
-		[playerSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[playerSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const isPlayerPaid = useMemo(
@@ -86,9 +80,9 @@ export const TeamRosterPlayer = ({
 			playerSnapshot
 				?.data()
 				?.seasons.find(
-					(item) => item.season.id === selectedSeasonQueryDocumentSnapshot?.id
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
 				)?.paid,
-		[playerSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[playerSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const isPlayerSigned = useMemo(
@@ -96,9 +90,9 @@ export const TeamRosterPlayer = ({
 			playerSnapshot
 				?.data()
 				?.seasons.find(
-					(item) => item.season.id === selectedSeasonQueryDocumentSnapshot?.id
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
 				)?.signed,
-		[playerSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[playerSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const demoteFromCaptainOnClickHandler = useCallback(
@@ -106,7 +100,7 @@ export const TeamRosterPlayer = ({
 			demoteFromCaptain(
 				playerRef,
 				team?.ref,
-				selectedSeasonQueryDocumentSnapshot?.ref
+				currentSeasonQueryDocumentSnapshot?.ref
 			)
 				.then(() => {
 					toast({
@@ -123,7 +117,7 @@ export const TeamRosterPlayer = ({
 						variant: 'destructive',
 					})
 				}),
-		[team, playerSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[team, playerSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
 	const promoteToCaptainOnClickHandler = useCallback(
@@ -131,7 +125,7 @@ export const TeamRosterPlayer = ({
 			promoteToCaptain(
 				playerRef,
 				team?.ref,
-				selectedSeasonQueryDocumentSnapshot?.ref
+				currentSeasonQueryDocumentSnapshot?.ref
 			)
 				.then(() => {
 					toast({
@@ -149,32 +143,31 @@ export const TeamRosterPlayer = ({
 						variant: 'destructive',
 					})
 				}),
-		[team, playerSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[team, playerSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
-	const removeFromTeamOnClickHandler = async () => {
-		if (authenticatedUserSnapshot) {
-			const data = authenticatedUserSnapshot.data()
-			if (data) {
-				leaveTeam(playerRef, data.team, setLeaveTeamLoading)
-					.then(() => {
-						toast({
-							title: `${
-								playerSnapshot?.data()?.firstname ?? 'Player'
-							} has left the team`,
-							description: 'Send player invites to build up your roster.',
-						})
-					})
-					.catch((error) => {
-						toast({
-							title: 'Unable to Remove',
-							description: error.message,
-							variant: 'destructive',
-						})
-					})
-			}
-		}
-	}
+	const removeFromTeamOnClickHandler = useCallback(async () => {
+		removeFromTeam(
+			playerRef,
+			team?.ref,
+			currentSeasonQueryDocumentSnapshot?.ref
+		)
+			.then(() => {
+				toast({
+					title: `${
+						playerSnapshot?.data()?.firstname ?? 'Player'
+					} has left the team`,
+					description: 'Send player invites to build up your roster.',
+				})
+			})
+			.catch((error) => {
+				toast({
+					title: 'Unable to Remove',
+					description: error.message,
+					variant: 'destructive',
+				})
+			})
+	}, [team, playerSnapshot, currentSeasonQueryDocumentSnapshot])
 
 	return (
 		<div>
@@ -236,7 +229,6 @@ export const TeamRosterPlayer = ({
 										>
 											<DropdownMenuItem
 												className="focus:bg-destructive focus:text-destructive-foreground"
-												disabled={leaveTeamLoading}
 												onClick={(event) => event.preventDefault()}
 											>
 												{playerSnapshot.id === authenticatedUserSnapshot?.id
