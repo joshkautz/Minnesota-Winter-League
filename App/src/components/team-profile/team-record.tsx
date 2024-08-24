@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { NotificationCard } from '../notification-card'
 
-export const Root = ({ children }: { children: ReactNode }) => {
+export const TeamRecordRoot = ({ children }: { children: ReactNode }) => {
 	return (
 		<NotificationCard
 			title={'Record'}
@@ -12,7 +12,7 @@ export const Root = ({ children }: { children: ReactNode }) => {
 	)
 }
 
-export const Row = ({ children }: { children: ReactNode }) => {
+export const TeamRecordRow = ({ children }: { children: ReactNode }) => {
 	return (
 		<div className={'flex items-center justify-between w-full h-8'}>
 			{children}
@@ -20,7 +20,7 @@ export const Row = ({ children }: { children: ReactNode }) => {
 	)
 }
 
-export const RowDate = ({ children }: { children: ReactNode }) => {
+export const TeamRecordRowDate = ({ children }: { children: ReactNode }) => {
 	return (
 		<p className={'flex grow-[1] select-none basis-[92px] shrink-0'}>
 			{children}
@@ -28,7 +28,7 @@ export const RowDate = ({ children }: { children: ReactNode }) => {
 	)
 }
 
-export const RowResult = ({ children }: { children: ReactNode }) => {
+export const TeamRecordRowResult = ({ children }: { children: ReactNode }) => {
 	return (
 		<p
 			className={'flex grow-[1] text-center basis-[74px] shrink-0 select-none'}
