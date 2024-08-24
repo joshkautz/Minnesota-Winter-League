@@ -18,7 +18,12 @@ import { Timestamp } from '@firebase/firestore'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { Skeleton } from '../ui/skeleton'
 import { TeamHistory } from './team-history'
-import * as TeamRecord from './team-record'
+import {
+	TeamRecordRoot,
+	TeamRecordRow,
+	TeamRecordRowDate,
+	TeamRecordRowResult,
+} from './team-record'
 
 const OPPONENT = {
 	HOME: 'HOME',
@@ -139,7 +144,7 @@ export const TeamProfile = () => {
 						)
 					)}
 				</NotificationCard>
-				<TeamRecord.Root>
+				<TeamRecordRoot>
 					{gamesSnapshot?.docs.map((game, index) => {
 						const gameData = game.data()
 						const opponent =
@@ -149,11 +154,11 @@ export const TeamProfile = () => {
 						const result = formatGameResult(teamDocumentSnapshot, gameData)
 
 						return (
-							<TeamRecord.Row key={index}>
-								<TeamRecord.RowDate>
+							<TeamRecordRow key={index}>
+								<TeamRecordRowDate>
 									{gameData.date.toDate().toLocaleDateString()}
-								</TeamRecord.RowDate>
-								<TeamRecord.RowResult>{result}</TeamRecord.RowResult>
+								</TeamRecordRowDate>
+								<TeamRecordRowResult>{result}</TeamRecordRowResult>
 								<div className="flex grow-[3] shrink-0 basis-[100px] overflow-hidden text-clip">
 									<Link
 										className="flex flex-col transition duration-300 group w-max"
@@ -173,10 +178,10 @@ export const TeamProfile = () => {
 										<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
 									</Link>
 								</div>
-							</TeamRecord.Row>
+							</TeamRecordRow>
 						)
 					})}
-				</TeamRecord.Root>
+				</TeamRecordRoot>
 				{historyQuerySnapshot && (
 					<TeamHistory historyQuerySnapshot={historyQuerySnapshot} />
 				)}
