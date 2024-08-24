@@ -222,12 +222,9 @@ const createPlayer = (
 }
 
 const deleteTeam = async (
-	teamRef: DocumentReference<TeamData, DocumentData> | undefined,
-	setDeleteTeamLoading: React.Dispatch<React.SetStateAction<boolean>>
+	teamRef: DocumentReference<TeamData, DocumentData> | undefined
 ) => {
 	if (!teamRef) return
-
-	setDeleteTeamLoading(true)
 
 	// Delete all offers related to this team.
 	const offersQuerySnapshot = await getDocs(

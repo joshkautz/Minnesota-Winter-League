@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { deleteTeam, removeFromTeam } from '@/firebase/firestore'
 import { toast } from '../ui/use-toast'
 import { useAuthContext } from '@/firebase/auth-context'
@@ -101,10 +101,49 @@ export const ManageTeam = () => {
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
-	const [deleteTeamLoading, setDeleteTeamLoading] = useState(false)
-	const [leaveTeamLoading, setLeaveTeamLoading] = useState(false)
-
 	const [open, setOpen] = useState(false)
+
+	const removeFromTeamOnClickHandler = useCallback(async () => {
+		removeFromTeam(
+			authenticatedUserSnapshot?.ref,
+			team?.ref,
+			currentSeasonQueryDocumentSnapshot?.ref
+		)
+			.then(() => {
+				toast({
+					title: `${
+						authenticatedUserSnapshot?.data()?.firstname ?? 'Player'
+					} has left the team`,
+					description: 'Send player invites to build up your roster.',
+				})
+			})
+			.catch((error) => {
+				toast({
+					title: 'Unable to Remove',
+					description: error.message,
+					variant: 'destructive',
+				})
+			})
+	}, [authenticatedUserSnapshot, team, currentSeasonQueryDocumentSnapshot])
+
+	const deleteTeamOnClickHandler = useCallback(async () => {
+		deleteTeam(team?.ref)
+			.then(() => {
+				toast({
+					title: `${
+						authenticatedUserSnapshot?.data()?.firstname ?? 'Player'
+					} has left the team`,
+					description: 'Send player invites to build up your roster.',
+				})
+			})
+			.catch((error) => {
+				toast({
+					title: 'Unable to Delete Team',
+					description: error.message,
+					variant: 'destructive',
+				})
+			})
+	}, [authenticatedUserSnapshot, team, currentSeasonQueryDocumentSnapshot])
 
 	const captainActions = (
 		<div className="absolute right-6 top-6">
@@ -126,19 +165,10 @@ export const ManageTeam = () => {
 							description={
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
 							}
-							onConfirm={() => {
-								removeFromTeam(
-									authenticatedUserSnapshot?.ref,
-									team?.ref,
-									currentSeasonQueryDocumentSnapshot?.ref
-								).finally(() => {
-									setLeaveTeamLoading(false)
-								})
-							}}
+							onConfirm={removeFromTeamOnClickHandler}
 						>
 							<DropdownMenuItem
 								className="focus:bg-destructive focus:text-destructive-foreground"
-								disabled={leaveTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
 								Leave team
@@ -150,23 +180,10 @@ export const ManageTeam = () => {
 							description={
 								'The entire team will be deleted. This action is irreversible.'
 							}
-							onConfirm={() => {
-								deleteTeam(team?.ref, setDeleteTeamLoading)
-									.catch((error) => {
-										toast({
-											title: 'Unable to delete team',
-											description: error.message,
-											variant: 'destructive',
-										})
-									})
-									.finally(() => {
-										setDeleteTeamLoading(false)
-									})
-							}}
+							onConfirm={deleteTeamOnClickHandler}
 						>
 							<DropdownMenuItem
 								className="focus:bg-destructive focus:text-destructive-foreground"
-								disabled={deleteTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
 								Delete team
@@ -193,19 +210,10 @@ export const ManageTeam = () => {
 							description={
 								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
 							}
-							onConfirm={() => {
-								removeFromTeam(
-									authenticatedUserSnapshot?.ref,
-									team?.ref,
-									currentSeasonQueryDocumentSnapshot?.ref
-								).finally(() => {
-									setLeaveTeamLoading(false)
-								})
-							}}
+							onConfirm={removeFromTeamOnClickHandler}
 						>
 							<DropdownMenuItem
 								className="focus:bg-destructive focus:text-destructive-foreground"
-								disabled={leaveTeamLoading}
 								onClick={(event) => event.preventDefault()}
 							>
 								Leave team
