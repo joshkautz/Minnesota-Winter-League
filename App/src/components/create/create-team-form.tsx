@@ -12,13 +12,13 @@ import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { v4 as uuidv4 } from 'uuid'
-import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
+import { useUploadFile } from 'react-firebase-hooks/storage'
 import { toast } from '@/components/ui/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { useNavigate } from 'react-router-dom'
-import { StorageReference, ref, storage } from '@/firebase/storage'
+import { ref, storage } from '@/firebase/storage'
 
 const createTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -31,16 +31,15 @@ export const CreateTeamForm = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const navigate = useNavigate()
 
-	const [loading, setLoading] = useState(false)
-	const [uploadFile, uploadFileLoading, uploadFileError] = useUploadFile()
-	const [newTeamData, setNewTeamData] = useState<{
-		name: string | undefined
-		storageRef: StorageReference | undefined
-		teamId: string | undefined
-	}>()
+	const [uploadFile, uploadFileLoading] = useUploadFile()
+	// const [newTeamData, setNewTeamData] = useState<{
+	// 	name: string | undefined
+	// 	storageRef: StorageReference | undefined
+	// 	teamId: string | undefined
+	// }>()
 	const [blob, setBlob] = useState<Blob>()
-	const [storageRef, setStorageRef] = useState<StorageReference>()
-	const [downloadUrl] = useDownloadURL(storageRef)
+	// const [storageRef, setStorageRef] = useState<StorageReference>()
+	// const [downloadUrl] = useDownloadURL(storageRef)
 
 	const form = useForm<CreateTeamSchema>({
 		resolver: zodResolver(createTeamSchema),
@@ -78,53 +77,48 @@ export const CreateTeamForm = () => {
 		[toast, navigate]
 	)
 
-	const onCreateSubmit = useCallback(
-		async (data: CreateTeamSchema) => {
-			if (authenticatedUserSnapshot) {
-				try {
-					setLoading(true)
-					if (blob) {
-						const result = await uploadFile(
-							ref(storage, `teams/${uuidv4()}`),
-							blob,
-							{
-								contentType: 'image/jpeg',
-							}
-						)
-						if (result) {
-							setNewTeamData({
-								name: data.name,
-								storageRef: result.ref,
-								teamId: undefined,
-							})
+	const onCreateSubmit = useCallback(async () => {
+		if (authenticatedUserSnapshot) {
+			try {
+				if (blob) {
+					const result = await uploadFile(
+						ref(storage, `teams/${uuidv4()}`),
+						blob,
+						{
+							contentType: 'image/jpeg',
 						}
-					} else {
-						setNewTeamData({
-							name: data.name,
-							storageRef: undefined,
-							teamId: undefined,
-						})
+					)
+					if (result) {
+						// setNewTeamData({
+						// 	name: data.name,
+						// 	storageRef: result.ref,
+						// 	teamId: undefined,
+						// })
 					}
-				} catch {
-					handleResult({
-						success: false,
-						message: `Ensure your email is verified. Please try again later.`,
-					})
+				} else {
+					// setNewTeamData({
+					// 	name: data.name,
+					// 	storageRef: undefined,
+					// 	teamId: undefined,
+					// })
 				}
+			} catch {
+				handleResult({
+					success: false,
+					message: `Ensure your email is verified. Please try again later.`,
+				})
 			}
-		},
-		[
-			authenticatedUserSnapshot,
-			setLoading,
-			uploadFile,
-			blob,
-			ref,
-			storage,
-			uuidv4,
-			setNewTeamData,
-			handleResult,
-		]
-	)
+		}
+	}, [
+		authenticatedUserSnapshot,
+		uploadFile,
+		blob,
+		ref,
+		storage,
+		uuidv4,
+		// setNewTeamData,
+		handleResult,
+	])
 
 	return (
 		<div className="max-w-[400px]">
