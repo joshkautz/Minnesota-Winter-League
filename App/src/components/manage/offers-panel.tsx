@@ -84,15 +84,15 @@ export const OffersCard = ({
 export const OffersPanel = ({ isCaptain }: { isCaptain?: boolean }) => {
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
 		useOffersContext()
-	const { teamsQuerySnapshot } = useTeamsContext()
+	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
 
 	const outgoingOffers = useOffer(
 		outgoingOffersQuerySnapshot,
-		teamsQuerySnapshot
+		currentSeasonTeamsQuerySnapshot
 	)
 	const incomingOffers = useOffer(
 		incomingOffersQuerySnapshot,
-		teamsQuerySnapshot
+		currentSeasonTeamsQuerySnapshot
 	)
 
 	const outgoingPending = outgoingOffers?.filter(

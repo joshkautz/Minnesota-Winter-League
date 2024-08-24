@@ -93,8 +93,8 @@ const SearchBar = ({
 
 export const UnrosteredPlayerList = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
-	const { teamsQuerySnapshot } = useTeamsContext()
+	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 	const [unrosteredPlayersQuerySnapshot] = useCollection(
 		unrosteredPlayersQuery()
 	)
@@ -106,20 +106,20 @@ export const UnrosteredPlayerList = () => {
 
 	const team = useMemo(
 		() =>
-			teamsQuerySnapshot?.docs.find(
+			currentSeasonTeamsQuerySnapshot?.docs.find(
 				(team) =>
 					team.id ===
 					authenticatedUserSnapshot
 						?.data()
 						?.seasons.find(
 							(item) =>
-								item.season.id === selectedSeasonQueryDocumentSnapshot?.id
+								item.season.id === currentSeasonQueryDocumentSnapshot?.id
 						)?.team.id
 			),
 		[
 			authenticatedUserSnapshot,
-			teamsQuerySnapshot,
-			selectedSeasonQueryDocumentSnapshot,
+			currentSeasonTeamsQuerySnapshot,
+			currentSeasonQueryDocumentSnapshot,
 		]
 	)
 
