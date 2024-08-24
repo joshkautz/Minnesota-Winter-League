@@ -48,53 +48,24 @@ export const Teams = () => {
 	return (
 		<div className={'container'}>
 			<GradientHeader>Teams</GradientHeader>
-
-			{seasonStart == SeasonStart.FUTURE && (
-				<Card className={cn('max-w-[800px] w-full mx-auto')}>
-					<CardContent className="items-center justify-center  rounded-t-lg ">
-						Registration for this season is will go live on{' '}
-						{formatTimestamp(
-							selectedSeasonQueryDocumentSnapshot?.data()?.registrationStart
-						)}
-						!
-					</CardContent>
-				</Card>
-			)}
-
-			{seasonStart == SeasonStart.NOW && (
-				<Card className={cn('max-w-[800px] w-full mx-auto')}>
-					<CardContent className="items-center justify-center  rounded-t-lg ">
-						Registration for this season is currently live. Go{' '}
-						<Link
-							className="flex flex-col transition duration-300 group w-max"
-							to={'/'}
-						>
-							create a team
-							<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
-						</Link>{' '}
-						or{' '}
-						<Link
-							className="flex flex-col transition duration-300 group w-max"
-							to={'/'}
-						>
-							join a team
-							<span className="max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-primary"></span>
-						</Link>
-						!
-					</CardContent>
-				</Card>
-			)}
-
 			{!selectedSeasonTeamsQuerySnapshot ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
 			) : selectedSeasonTeamsQuerySnapshot.docs.length == 0 ? (
-				<ComingSoon
-					message={
-						'There are no teams to display. Please wait for the registration period to start on October 1st, 2024.'
-					}
-				/>
+				<ComingSoon>
+					<p className={' pt-6 '}>
+						{seasonStart == SeasonStart.PAST
+							? `There are no teams to display.`
+							: seasonStart == SeasonStart.FUTURE
+								? `Registration for this season is will go live on ${formatTimestamp(
+										selectedSeasonQueryDocumentSnapshot?.data()
+											?.registrationStart
+									)}!`
+								: seasonStart == SeasonStart.NOW &&
+									`Registration for this season is currently live. Create a new team or join an existing team!`}
+					</p>
+				</ComingSoon>
 			) : (
 				<div
 					className={'flex flex-row flex-wrap justify-center gap-y-8 gap-x-8'}

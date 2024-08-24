@@ -4,12 +4,24 @@ import { GameData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from '../gradient-header'
 import { ComingSoon } from '../coming-soon'
-
+import { Timestamp } from '@firebase/firestore'
 import { useGamesContext } from '@/firebase/games-context'
 import { ScheduleCard } from './schedule-card'
+import { useSeasonsContext } from '@/firebase/seasons-context'
+
+const formatTimestamp = (timestamp: Timestamp | undefined) => {
+	if (!timestamp) return
+	const date = new Date(timestamp.seconds * 1000)
+	return date.toLocaleDateString('en-US', {
+		month: 'long',
+		day: 'numeric',
+		year: 'numeric',
+	})
+}
 
 export const Schedule = () => {
 	const { gamesQuerySnapshot } = useGamesContext()
+	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const rounds: GameData[][] = useMemo(() => {
 		const result: GameData[][] = []
@@ -48,11 +60,11 @@ export const Schedule = () => {
 				</div>
 			) : gamesQuerySnapshot.docs.length == 0 ? (
 				<div className={'flex flex-wrap gap-8'}>
-					<ComingSoon
-						message={
-							'There is no schedule to display. Please wait for the registration period to end on November 1st, 2024.'
-						}
-					/>
+					<ComingSoon>
+						<p className={' pt-6 '}>
+							{`There is no schedule to display. Please wait for registration to end on ${formatTimestamp(selectedSeasonQueryDocumentSnapshot?.data()?.registrationEnd)}.`}
+						</p>
+					</ComingSoon>
 				</div>
 			) : (
 				<div className={'flex flex-wrap gap-8'}>
