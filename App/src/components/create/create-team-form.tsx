@@ -6,7 +6,6 @@ import {
 	FormControl,
 	FormMessage,
 } from '@/components/ui/form'
-import { useAuthContext } from '@/firebase/auth-context'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -38,12 +37,14 @@ interface CreateFormProps {
 	>
 	handleResult: ({
 		success,
-		message,
+		title,
+		description,
 		navigation,
 	}: {
 		success: boolean
-		message: string
-		navigation?: boolean
+		title: string
+		description: string
+		navigation: boolean
 	}) => void
 	uploadFileLoading: boolean
 	uploadFile: (
@@ -60,8 +61,6 @@ export const CreateTeamForm = ({
 	uploadFileLoading,
 	uploadFile,
 }: CreateFormProps) => {
-	const { authenticatedUserSnapshot } = useAuthContext()
-
 	const [blob, setBlob] = useState<Blob>()
 
 	const form = useForm<CreateTeamSchema>({
@@ -80,41 +79,42 @@ export const CreateTeamForm = ({
 
 	const onCreateSubmit = useCallback(
 		async (data: CreateTeamSchema) => {
-			if (authenticatedUserSnapshot) {
-				try {
-					setLoading(true)
-					if (blob) {
-						const result = await uploadFile(
-							ref(storage, `teams/${uuidv4()}`),
-							blob,
-							{
-								contentType: 'image/jpeg',
-							}
-						)
-						if (result) {
-							setNewTeamData({
-								name: data.name,
-								storageRef: result.ref,
-								teamId: undefined,
-							})
+			try {
+				setLoading(true)
+				if (blob) {
+					const result = await uploadFile(
+						ref(storage, `teams/${uuidv4()}`),
+						blob,
+						{
+							contentType: 'image/jpeg',
 						}
-					} else {
+					)
+					if (result) {
 						setNewTeamData({
 							name: data.name,
-							storageRef: undefined,
+							storageRef: result.ref,
 							teamId: undefined,
 						})
 					}
-				} catch {
+				} else {
+					setNewTeamData({
+						name: data.name,
+						storageRef: undefined,
+						teamId: undefined,
+					})
+				}
+			} catch (error) {
+				if (error instanceof Error) {
 					handleResult({
 						success: false,
-						message: `Ensure your email is verified. Please try again later.`,
+						title: 'Error',
+						description: error.message,
+						navigation: false,
 					})
 				}
 			}
 		},
 		[
-			authenticatedUserSnapshot,
 			setLoading,
 			uploadFile,
 			blob,

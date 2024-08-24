@@ -33,7 +33,7 @@ import { CreateTeamForm } from './create-team-form'
 
 export const CreateTeam = () => {
 	const navigate = useNavigate()
-	const { authenticatedUserSnapshot, authStateUser } = useAuthContext()
+	const { authenticatedUserSnapshot } = useAuthContext()
 	const { currentSeasonQueryDocumentSnapshot, seasonsQuerySnapshot } =
 		useSeasonsContext()
 	const {
@@ -48,7 +48,9 @@ export const CreateTeam = () => {
 		teamId: string | undefined
 	}>()
 	const [storageRef, setStorageRef] = useState<StorageReference>()
-	const [uploadFile, uploadFileLoading, uploadFileError] = useUploadFile()
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [uploadFile, uploadFileLoading, uploadFileSnapshot, uploadFileError] =
+		useUploadFile()
 	const [downloadUrl] = useDownloadURL(storageRef)
 
 	const isAuthenticatedUserRostered = useMemo(
@@ -66,16 +68,18 @@ export const CreateTeam = () => {
 	const handleResult = useCallback(
 		({
 			success,
-			message,
+			title,
+			description,
 			navigation,
 		}: {
 			success: boolean
-			message: string
-			navigation?: boolean
+			title: string
+			description: string
+			navigation: boolean
 		}) => {
 			toast({
-				title: success ? 'Success!' : 'Unable to create team',
-				description: message,
+				title: title,
+				description: description,
 				variant: success ? 'default' : 'destructive',
 			})
 			if (navigation) {
@@ -90,123 +94,96 @@ export const CreateTeam = () => {
 			if (newTeamData.storageRef) {
 				setStorageRef(newTeamData.storageRef)
 			} else {
-				if (authenticatedUserSnapshot) {
-					console.log(authStateUser?.emailVerified)
-					createTeam(
-						authenticatedUserSnapshot.ref,
-						newTeamData.name,
-						undefined,
-						currentSeasonQueryDocumentSnapshot?.ref,
-						undefined
-					)
-						.then(() => {
-							handleResult({
-								success: true,
-								message: `Created team: ${newTeamData.name}`,
-								navigation: true,
-							})
+				createTeam(
+					authenticatedUserSnapshot?.ref,
+					newTeamData.name,
+					undefined,
+					currentSeasonQueryDocumentSnapshot?.ref,
+					undefined
+				)
+					.then(() => {
+						handleResult({
+							success: true,
+							title: 'Team Created',
+							description: `Welcome to the league, ${newTeamData.name}!`,
+							navigation: true,
 						})
-						.catch((error) => {
-							console.log(error.message)
-							handleResult({
-								success: false,
-								message: `Ensure your email is verified. Please try again later.`,
-							})
-						})
-						.finally(() => {
-							setLoading(false)
-						})
-				} else {
-					handleResult({
-						success: false,
-						message: 'Ensure your email is verified. Please try again later.',
 					})
-				}
+					.catch((error) => {
+						handleResult({
+							success: false,
+							title: 'Error',
+							description: error.message,
+							navigation: false,
+						})
+					})
+					.finally(() => {
+						setLoading(false)
+					})
 			}
 		}
-	}, [
-		newTeamData,
-		authenticatedUserSnapshot,
-		setStorageRef,
-		createTeam,
-		handleResult,
-		setLoading,
-	])
+	}, [newTeamData])
 
 	useEffect(() => {
 		if (downloadUrl) {
-			if (authenticatedUserSnapshot) {
-				if (newTeamData) {
-					if (rolloverMode) {
-						rolloverTeam(
-							authenticatedUserSnapshot.ref,
-							newTeamData.name,
-							downloadUrl,
-							currentSeasonQueryDocumentSnapshot?.ref,
-							newTeamData.storageRef?.fullPath,
-							newTeamData.teamId
-						)
-							.then(() => {
-								handleResult({
-									success: true,
-									message: `Created team: ${newTeamData.name}`,
-									navigation: true,
-								})
-							})
-							.catch(() => {
-								handleResult({
-									success: false,
-									message: `Ensure your email is verified. Please try again later.`,
-								})
-							})
-							.finally(() => {
-								setLoading(false)
-							})
-					} else {
-						createTeam(
-							authenticatedUserSnapshot.ref,
-							newTeamData.name,
-							downloadUrl,
-							currentSeasonQueryDocumentSnapshot?.ref,
-							newTeamData.storageRef?.fullPath
-						)
-							.then(() => {
-								handleResult({
-									success: true,
-									message: `Created team: ${newTeamData.name}`,
-									navigation: true,
-								})
-							})
-							.catch(() => {
-								handleResult({
-									success: false,
-									message: `Ensure your email is verified. Please try again later.`,
-								})
-							})
-							.finally(() => {
-								setLoading(false)
-							})
-					}
-				} else {
-					handleResult({
-						success: false,
-						message: 'Ensure your email is verified. Please try again later.',
+			if (rolloverMode) {
+				rolloverTeam(
+					authenticatedUserSnapshot?.ref,
+					newTeamData?.name,
+					downloadUrl,
+					currentSeasonQueryDocumentSnapshot?.ref,
+					newTeamData?.storageRef?.fullPath,
+					newTeamData?.teamId
+				)
+					.then(() => {
+						handleResult({
+							success: true,
+							title: 'Team Created',
+							description: `Welcome to the league, ${newTeamData?.name}!`,
+							navigation: true,
+						})
 					})
-				}
+					.catch((error) => {
+						handleResult({
+							success: false,
+							title: 'Error',
+							description: error.message,
+							navigation: false,
+						})
+					})
+					.finally(() => {
+						setLoading(false)
+					})
 			} else {
-				handleResult({
-					success: false,
-					message: 'Ensure your email is verified. Please try again later.',
-				})
+				createTeam(
+					authenticatedUserSnapshot?.ref,
+					newTeamData?.name,
+					downloadUrl,
+					currentSeasonQueryDocumentSnapshot?.ref,
+					newTeamData?.storageRef?.fullPath
+				)
+					.then(() => {
+						handleResult({
+							success: true,
+							title: 'Team Created',
+							description: `Welcome to the league, ${newTeamData?.name}!`,
+							navigation: true,
+						})
+					})
+					.catch((error) => {
+						handleResult({
+							success: false,
+							title: 'Error',
+							description: error.message,
+							navigation: false,
+						})
+					})
+					.finally(() => {
+						setLoading(false)
+					})
 			}
 		}
-	}, [
-		downloadUrl,
-		handleResult,
-		setLoading,
-		authenticatedUserSnapshot,
-		newTeamData,
-	])
+	}, [downloadUrl])
 
 	const onRolloverSubmit = useCallback(async () => {
 		try {
@@ -219,11 +196,15 @@ export const CreateTeam = () => {
 				),
 				teamId: selectedTeamQueryDocumentSnapshot?.data().teamId,
 			})
-		} catch {
-			handleResult({
-				success: false,
-				message: `Ensure your email is verified. Please try again later.`,
-			})
+		} catch (error) {
+			if (error instanceof Error) {
+				handleResult({
+					success: false,
+					title: 'Error',
+					description: error.message,
+					navigation: false,
+				})
+			}
 		}
 	}, [
 		setLoading,
@@ -239,10 +220,12 @@ export const CreateTeam = () => {
 		if (uploadFileError) {
 			handleResult({
 				success: false,
-				message: `Ensure your email is verified. Please try again later.`,
+				title: 'Error',
+				description: uploadFileError.message,
+				navigation: false,
 			})
 		}
-	}, [uploadFileError, handleResult])
+	}, [uploadFileError])
 
 	const isRegistrationOpen = useMemo(
 		() =>
