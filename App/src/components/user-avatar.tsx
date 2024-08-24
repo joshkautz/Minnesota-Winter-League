@@ -14,7 +14,15 @@ import {
 } from './ui/dropdown-menu'
 import { Link } from 'react-router-dom'
 import { useOffersContext } from '@/firebase/offers-context'
+import { useMemo } from 'react'
 
+const getInitials = (
+	firstname: string | undefined,
+	lastname: string | undefined
+) => {
+	if (!firstname || !lastname) return 'NA'
+	return firstname.slice(0, 1) + lastname.slice(0, 1)
+}
 export const UserAvatar = ({
 	userContent,
 }: {
@@ -24,14 +32,18 @@ export const UserAvatar = ({
 		authStateUser,
 		authStateLoading,
 		authenticatedUserSnapshot,
-		authenticatedUserSnapshotLoading,
 		signOut,
 	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useOffersContext()
 
-	const userInitials = `${
-		authenticatedUserSnapshot?.data()?.firstname.slice(0, 1) ?? ''
-	}${authenticatedUserSnapshot?.data()?.lastname.slice(0, 1) ?? ''}`
+	const userInitials = useMemo(
+		() =>
+			getInitials(
+				authenticatedUserSnapshot?.data()?.firstname,
+				authenticatedUserSnapshot?.data()?.lastname
+			),
+		[authenticatedUserSnapshot]
+	)
 
 	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
 		(entry) => entry.data().status === 'pending'
@@ -40,7 +52,14 @@ export const UserAvatar = ({
 	const isRegistered = authenticatedUserSnapshot?.data()?.registered
 	const hasRequiredTasks = !isVerified || !isRegistered
 
-	if (authStateLoading || authenticatedUserSnapshotLoading) {
+	const isLoading = useMemo(
+		() =>
+			(!authStateUser && authStateLoading) ||
+			(authStateUser && !authenticatedUserSnapshot),
+		[authStateUser, authStateLoading, authenticatedUserSnapshot]
+	)
+
+	if (isLoading) {
 		return <ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
 	}
 
@@ -79,7 +98,7 @@ export const UserAvatar = ({
 								'transition-colors bg-secondary hover:bg-accent dark:hover:text-background uppercase'
 							}
 						>
-							{!userInitials ? 'NA' : userInitials}
+							{userInitials}
 						</AvatarFallback>
 					</Avatar>
 				</DropdownMenuTrigger>
