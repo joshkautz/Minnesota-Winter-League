@@ -22,6 +22,8 @@ import { Link } from 'react-router-dom'
 import { useOffersContext } from '@/firebase/offers-context'
 import { useMemo } from 'react'
 
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+
 const getInitials = (
 	firstname: string | undefined,
 	lastname: string | undefined
@@ -75,11 +77,10 @@ export const UserAvatar = ({
 				<DialogTrigger asChild>
 					<Button variant={'default'}>Login</Button>
 				</DialogTrigger>
-				{/* TODO: USE THIS COMPONENT FROM RADIX UI */}
-				{/* <VisuallyHidden> */}
-				<DialogTitle>Login</DialogTitle>
-				{/* </VisuallyHidden> */}
-				<DialogDescription>Login</DialogDescription>
+				<VisuallyHidden>
+					<DialogTitle>Login</DialogTitle>
+					<DialogDescription>Login</DialogDescription>
+				</VisuallyHidden>
 				<DialogContent className={'sm:max-w-[425px] pt-10'}>
 					<UserForm />
 				</DialogContent>
