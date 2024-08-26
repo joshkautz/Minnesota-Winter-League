@@ -1,6 +1,6 @@
 import { DocumentData, DocumentReference } from '@/firebase/firestore'
 import { TeamsContext } from '@/firebase/teams-context'
-import { ReactNode, useContext, useMemo } from 'react'
+import { ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 import { NotificationCard } from '../notification-card'
 import { ManageTeamRosterPlayer } from './manage-team-roster-player'
 import { useAuthContext } from '@/firebase/auth-context'
@@ -8,6 +8,7 @@ import { PlayerData } from '@/lib/interfaces'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Timestamp } from '@firebase/firestore'
+import { Skeleton } from '../ui/skeleton'
 
 const formatTimestamp = (timestamp: Timestamp | undefined) => {
 	if (!timestamp) return
@@ -86,11 +87,32 @@ export const ManageTeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 			</p>
 		)
 
+	const [imgLoaded, setImgLoaded] = useState(false)
+	const [imgSrc, setImgSrc] = useState<string | undefined>()
+
+	useEffect(() => {
+		setImgSrc(team?.data()?.logo + `&date=${Date.now()}`)
+	}, [team])
+
 	const titleData = (
 		<div className={'inline-flex items-center gap-2 h-4'}>
 			<p>{team?.data().name}</p>
 			<div className={'h-8 w-8 rounded-full overflow-hidden'}>
-				<img className={'object-cover'} src={team?.data().logo} />
+				{!imgLoaded && (
+					<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
+				)}
+				<img
+					onError={() => {
+						setImgLoaded(false)
+					}}
+					style={imgLoaded ? {} : { display: 'none' }}
+					src={imgSrc}
+					onLoad={() => {
+						setImgLoaded(true)
+					}}
+					alt={'team logo'}
+					className={'rounded-md object-cover'}
+				/>
 			</div>
 		</div>
 	)

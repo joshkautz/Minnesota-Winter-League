@@ -36,9 +36,9 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [isLoading, setIsLoading] = useState(false)
-	const [blob, setBlob] = useState<Blob>()
+	const [uploadedFile, setUploadedFile] = useState<Blob>()
 	const [storageRef, setStorageRef] = useState<StorageReference>()
-	const [uploadFile, uploadFileLoading] = useUploadFile()
+	const [uploadFile] = useUploadFile()
 	const [downloadUrl] = useDownloadURL(storageRef)
 	const [editedTeamData, setEditedTeamData] = useState<{
 		name: string
@@ -74,120 +74,117 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 			if (!e.target.files?.[0]) {
 				return
 			}
-			setBlob(e.target.files[0])
+			setUploadedFile(e.target.files[0])
 		},
-		[setBlob]
+		[setUploadedFile]
 	)
 
-	useEffect(() => {
-		if (uploadFileLoading) {
-			setIsLoading(true)
-		} else {
-			setIsLoading(false)
-		}
-	}, [uploadFileLoading])
-
+	// Set the team name in the form.
 	useEffect(() => {
 		if (team?.data().name) {
 			form.setValue('name', team?.data().name)
 		}
+	}, [team, form])
+
+	// Use the existing storage path/reference if it exists.
+	useEffect(() => {
 		if (team?.data().storagePath) {
 			setStorageRef(ref(storage, team?.data().storagePath))
 		}
-	}, [team, form, storage, setStorageRef, ref])
+	}, [team, storage, setStorageRef, ref])
 
 	useEffect(() => {
-		if (editedTeamData) {
-			if (editedTeamData.storageRef) {
-				setStorageRef(editedTeamData.storageRef)
-			} else {
-				// We don't upload a new logo.
-				console.log(`We don't upload a new logo.`)
-				editTeam(team?.ref, editedTeamData.name, undefined, undefined)
-					.then(() => {
-						setIsLoading(false)
-						toast({
-							variant: 'default',
-							title: 'Team Edited',
-							description: `Changes have been saved, ${editedTeamData.name}!`,
-						})
-						closeDialog()
-					})
-					.catch((error) => {
-						setIsLoading(false)
-						toast({
-							variant: 'destructive',
-							title: 'Error',
-							description: error.message,
-						})
-					})
-			}
-		}
-	}, [editedTeamData])
+		if (!downloadUrl) return
+		if (!editedTeamData) return
+		editTeam(
+			team?.ref,
+			editedTeamData.name,
+			downloadUrl,
+			editedTeamData.storageRef?.fullPath
+		)
+			.then(() => {
+				setIsLoading(false)
+				toast({
+					variant: 'default',
+					title: 'Team Edited',
+					description: `Changes have been saved, ${editedTeamData?.name}!`,
+				})
+				closeDialog()
+			})
+			.catch((error) => {
+				setIsLoading(false)
+				toast({
+					variant: 'destructive',
+					title: 'Error',
+					description: error.message,
+				})
+			})
+	}, [downloadUrl, editedTeamData, team, editTeam, setIsLoading, toast])
 
-	useEffect(() => {
-		if (downloadUrl) {
-			if (editedTeamData) {
-				// We upload a new logo.
-				console.log(`We upload a new logo.`)
-				editTeam(
-					team?.ref,
-					editedTeamData.name,
-					downloadUrl,
-					editedTeamData.storageRef?.fullPath
-				)
-					.then(() => {
-						setIsLoading(false)
-						toast({
-							variant: 'default',
-							title: `Updated ${editedTeamData.name}`,
-							description: 'Changes saved successfully.',
-						})
-						closeDialog()
-					})
-					.catch((error) => {
-						setIsLoading(false)
-						toast({
-							variant: 'destructive',
-							title: 'Error',
-							description: error.message,
-						})
-					})
-			}
-		}
-	}, [downloadUrl])
-
-	const onSubmit = async (data: EditTeamSchema) => {
-		if (authenticatedUserSnapshot) {
+	const onSubmit = useCallback(
+		async (data: EditTeamSchema) => {
 			try {
 				setIsLoading(true)
-				if (blob) {
+				if (uploadedFile) {
 					if (storageRef) {
-						// Team already has a logo, and we upload a new logo.
-						console.log(`Team already has a logo, and we upload a new logo.`)
-						uploadFile(storageRef, blob, {
-							contentType: 'image/jpeg',
-						}).then(() => {
-							setEditedTeamData({ name: data.name, storageRef: storageRef })
-						})
-					} else {
-						// Team doesn't already have a logo, and we upload a new logo.
-						console.log(
-							`Team doesn't already have a logo, and we upload a new logo.`
-						)
-						uploadFile(ref(storage, `teams/${uuidv4()}`), blob, {
+						uploadFile(storageRef, uploadedFile, {
 							contentType: 'image/jpeg',
 						}).then((result) => {
+							setStorageRef(result?.ref)
+							setEditedTeamData({ name: data.name, storageRef: result?.ref })
+						})
+					} else {
+						uploadFile(ref(storage, `teams/${uuidv4()}`), uploadedFile, {
+							contentType: 'image/jpeg',
+						}).then((result) => {
+							setStorageRef(result?.ref)
 							setEditedTeamData({ name: data.name, storageRef: result?.ref })
 						})
 					}
 				} else {
-					// We don't upload a new logo.
-					console.log(`We don't upload a new logo.`)
-					setEditedTeamData({ name: data.name, storageRef: undefined })
+					if (storageRef) {
+						editTeam(team?.ref, data.name, undefined, undefined)
+							.then(() => {
+								setIsLoading(false)
+								toast({
+									variant: 'default',
+									title: 'Team Edited',
+									description: `Changes have been saved, ${editedTeamData?.name}!`,
+								})
+								closeDialog()
+							})
+							.catch((error) => {
+								setIsLoading(false)
+								toast({
+									variant: 'destructive',
+									title: 'Error',
+									description: error.message,
+								})
+							})
+					} else {
+						editTeam(team?.ref, data.name, undefined, undefined)
+							.then(() => {
+								setIsLoading(false)
+								toast({
+									variant: 'default',
+									title: 'Team Edited',
+									description: `Changes have been saved, ${editedTeamData?.name}!`,
+								})
+								closeDialog()
+							})
+							.catch((error) => {
+								setIsLoading(false)
+								toast({
+									variant: 'destructive',
+									title: 'Error',
+									description: error.message,
+								})
+							})
+					}
 				}
 			} catch (error) {
 				if (error instanceof Error) {
+					setIsLoading(false)
 					toast({
 						variant: 'destructive',
 						title: 'Error',
@@ -195,8 +192,20 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 					})
 				}
 			}
-		}
-	}
+		},
+		[
+			uploadedFile,
+			storageRef,
+			uploadFile,
+			setIsLoading,
+			setEditedTeamData,
+			uuidv4,
+			storage,
+			ref,
+			setStorageRef,
+			toast,
+		]
+	)
 
 	return (
 		<div className="max-w-[400px]">
@@ -242,9 +251,13 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 							</FormItem>
 						)}
 					/>
-					{team?.data().logo ? (
+					{uploadedFile ? (
 						<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
-							<img src={blob ? URL.createObjectURL(blob) : team?.data().logo} />
+							<img src={URL.createObjectURL(uploadedFile)} />
+						</div>
+					) : team?.data().logo ? (
+						<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
+							<img src={team?.data().logo} />
 						</div>
 					) : (
 						<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
