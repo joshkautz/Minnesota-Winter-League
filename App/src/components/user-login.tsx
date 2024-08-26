@@ -22,6 +22,7 @@ import {
 	DialogTrigger,
 } from './ui/dialog'
 import { ResetPasswordCard } from './reset-password-card'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 const loginSchema = z.object({
 	email: z.string().email(),
@@ -102,18 +103,18 @@ export const UserLogin = ({
 				/>
 				<Button type={'submit'}>Login</Button>
 
-				<div>
-					<Dialog>
-						<DialogTrigger asChild>
-							<Button variant={'link'}>Forgot Password?</Button>
-						</DialogTrigger>
+				<Dialog>
+					<DialogTrigger asChild>
+						<Button variant={'link'}>Forgot Password?</Button>
+					</DialogTrigger>
+					<VisuallyHidden>
 						<DialogTitle>Reset Password</DialogTitle>
 						<DialogDescription>Reset your password</DialogDescription>
-						<DialogContent className={'sm:max-w-[425px] pt-10'}>
-							<ResetPasswordCard />
-						</DialogContent>
-					</Dialog>
-				</div>
+					</VisuallyHidden>
+					<DialogContent className={'sm:max-w-[425px] pt-10'}>
+						<ResetPasswordCard />
+					</DialogContent>
+				</Dialog>
 			</form>
 		</Form>
 	)
