@@ -14,7 +14,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
 import { useAuthContext } from '@/firebase/auth-context'
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	DialogDescription,
+	DialogTrigger,
+} from './ui/dialog'
 import { ResetPasswordCard } from './reset-password-card'
 
 const loginSchema = z.object({
@@ -68,6 +74,7 @@ export const UserLogin = ({
 									placeholder={'Email'}
 									{...field}
 									value={field.value ?? ''}
+									autoComplete="email"
 								/>
 							</FormControl>
 							<FormMessage />
@@ -86,6 +93,7 @@ export const UserLogin = ({
 									placeholder={'Password'}
 									{...field}
 									value={field.value ?? ''}
+									autoComplete="current-password"
 								/>
 							</FormControl>
 							<FormMessage />
@@ -99,6 +107,8 @@ export const UserLogin = ({
 						<DialogTrigger asChild>
 							<Button variant={'link'}>Forgot Password?</Button>
 						</DialogTrigger>
+						<DialogTitle>Reset Password</DialogTitle>
+						<DialogDescription>Reset your password</DialogDescription>
 						<DialogContent className={'sm:max-w-[425px] pt-10'}>
 							<ResetPasswordCard />
 						</DialogContent>

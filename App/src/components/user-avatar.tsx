@@ -2,7 +2,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuthContext } from '@/firebase/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog'
 import { UserForm } from '@/components/user-form'
 import {
 	DropdownMenu,
@@ -69,6 +75,11 @@ export const UserAvatar = ({
 				<DialogTrigger asChild>
 					<Button variant={'default'}>Login</Button>
 				</DialogTrigger>
+				{/* TODO: USE THIS COMPONENT FROM RADIX UI */}
+				{/* <VisuallyHidden> */}
+				<DialogTitle>Login</DialogTitle>
+				{/* </VisuallyHidden> */}
+				<DialogDescription>Login</DialogDescription>
 				<DialogContent className={'sm:max-w-[425px] pt-10'}>
 					<UserForm />
 				</DialogContent>

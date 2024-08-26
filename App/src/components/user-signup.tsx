@@ -117,6 +117,7 @@ export const UserSignup = ({
 									placeholder={'Email'}
 									{...field}
 									value={field.value ?? ''}
+									autoComplete="email"
 								/>
 							</FormControl>
 							<FormMessage />
@@ -135,6 +136,7 @@ export const UserSignup = ({
 									placeholder={'Password'}
 									{...field}
 									value={field.value ?? ''}
+									autoComplete="new-password"
 								/>
 							</FormControl>
 							<FormMessage />
