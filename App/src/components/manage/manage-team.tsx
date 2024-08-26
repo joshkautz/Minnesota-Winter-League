@@ -15,7 +15,7 @@ import {
 	DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
 import { GradientHeader } from '../gradient-header'
-import { EditTeamDialog } from '../edit-team-dialog'
+import { ManageEditTeamDialog } from './manage-edit-team-dialog'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { OffersPanel } from './offers-panel'
 import { useTeamsContext } from '@/firebase/teams-context'
@@ -155,11 +155,11 @@ export const ManageTeam = () => {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className={'w-56'}>
 					<DropdownMenuGroup>
-						<EditTeamDialog closeDialog={() => setOpen(false)}>
+						<ManageEditTeamDialog closeDialog={() => setOpen(false)}>
 							<DropdownMenuItem onClick={(event) => event.preventDefault()}>
 								Edit team
 							</DropdownMenuItem>
-						</EditTeamDialog>
+						</ManageEditTeamDialog>
 						<DestructiveConfirmationDialog
 							title={'Are you sure you want to leave?'}
 							description={

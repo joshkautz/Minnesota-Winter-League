@@ -31,7 +31,7 @@ export const Footer = () => {
 								rel="noreferrer"
 							>
 								<img
-									src={'/Mallard.png'}
+									src={'/mallard.png'}
 									alt="Minneapolis Mallard"
 									width={80}
 								/>

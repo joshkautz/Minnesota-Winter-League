@@ -6,10 +6,10 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from './ui/dialog'
-import { EditTeam } from './edit-team'
+} from '../ui/dialog'
+import { EditTeam } from '../edit-team'
 
-export const EditTeamDialog = ({
+export const ManageEditTeamDialog = ({
 	closeDialog,
 	children,
 }: {
