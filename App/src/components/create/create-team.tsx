@@ -90,30 +90,58 @@ export const CreateTeam = () => {
 			if (newTeamData.storageRef) {
 				setStorageRef(newTeamData.storageRef)
 			} else {
-				createTeam(
-					authenticatedUserSnapshot?.ref,
-					newTeamData.name,
-					undefined,
-					currentSeasonQueryDocumentSnapshot?.ref,
-					undefined
-				)
-					.then(() => {
-						handleResult({
-							success: true,
-							title: 'Team Created',
-							description: `Welcome to the league, ${newTeamData.name}!`,
-							navigation: true,
+				if (rolloverMode) {
+					rolloverTeam(
+						authenticatedUserSnapshot?.ref,
+						newTeamData?.name,
+						undefined,
+						currentSeasonQueryDocumentSnapshot?.ref,
+						undefined,
+						newTeamData?.teamId
+					)
+						.then(() => {
+							handleResult({
+								success: true,
+								title: 'Team Rolled Over',
+								description: `Welcome back to the league, ${newTeamData?.name}!`,
+								navigation: true,
+							})
 						})
-					})
-					.catch((error) => {
-						setIsSubmitting(false)
-						handleResult({
-							success: false,
-							title: 'Error',
-							description: error.message,
-							navigation: false,
+						.catch((error) => {
+							setIsSubmitting(false)
+							handleResult({
+								success: false,
+								title: 'Error',
+								description: error.message,
+								navigation: false,
+							})
 						})
-					})
+				} else {
+					createTeam(
+						authenticatedUserSnapshot?.ref,
+						newTeamData.name,
+						undefined,
+						currentSeasonQueryDocumentSnapshot?.ref,
+						undefined
+					)
+						.then(() => {
+							handleResult({
+								success: true,
+								title: 'Team Created',
+								description: `Welcome to the league, ${newTeamData.name}!`,
+								navigation: true,
+							})
+						})
+						.catch((error) => {
+							setIsSubmitting(false)
+							handleResult({
+								success: false,
+								title: 'Error',
+								description: error.message,
+								navigation: false,
+							})
+						})
+				}
 			}
 		}
 	}, [newTeamData])
@@ -132,8 +160,8 @@ export const CreateTeam = () => {
 					.then(() => {
 						handleResult({
 							success: true,
-							title: 'Team Created',
-							description: `Welcome to the league, ${newTeamData?.name}!`,
+							title: 'Team Rolled Over',
+							description: `Welcome back to the league, ${newTeamData?.name}!`,
 							navigation: true,
 						})
 					})

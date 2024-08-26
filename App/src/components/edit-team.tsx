@@ -1,6 +1,6 @@
 import { useAuthContext } from '@/firebase/auth-context'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { toast } from './ui/use-toast'
@@ -17,10 +17,11 @@ import {
 import { Input } from './ui/input'
 import { v4 as uuidv4 } from 'uuid'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { updateTeam } from '@/firebase/firestore'
+import { editTeam } from '@/firebase/firestore'
 import { StorageReference, ref, storage } from '@/firebase/storage'
 import { useTeamsContext } from '@/firebase/teams-context'
 import { useSeasonsContext } from '@/firebase/seasons-context'
+import { Skeleton } from './ui/skeleton'
 
 const editTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -33,6 +34,16 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
+
+	const [isLoading, setIsLoading] = useState(false)
+	const [blob, setBlob] = useState<Blob>()
+	const [storageRef, setStorageRef] = useState<StorageReference>()
+	const [uploadFile, uploadFileLoading] = useUploadFile()
+	const [downloadUrl] = useDownloadURL(storageRef)
+	const [editedTeamData, setEditedTeamData] = useState<{
+		name: string
+		storageRef: StorageReference | undefined
+	}>()
 
 	const team = useMemo(
 		() =>
@@ -53,29 +64,28 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 		]
 	)
 
-	const [loading, setLoading] = useState(false)
-
 	const form = useForm<EditTeamSchema>({
 		resolver: zodResolver(editTeamSchema),
 		defaultValues: { name: '', logo: '' },
 	})
 
-	const [updatedTeamData, setUpdatedTeamData] = useState<{
-		name: string
-		storageRef: StorageReference | undefined
-	}>()
-	const [blob, setBlob] = useState<Blob>()
-	const [storageRef, setStorageRef] = useState<StorageReference>()
+	const handleFileChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			if (!e.target.files?.[0]) {
+				return
+			}
+			setBlob(e.target.files[0])
+		},
+		[setBlob]
+	)
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (!e.target.files?.[0]) {
-			return
+	useEffect(() => {
+		if (uploadFileLoading) {
+			setIsLoading(true)
+		} else {
+			setIsLoading(false)
 		}
-		setBlob(e.target.files[0])
-	}
-
-	const [uploadFile, uploadFileLoading, , uploadFileError] = useUploadFile()
-	const [downloadUrl] = useDownloadURL(storageRef)
+	}, [uploadFileLoading])
 
 	useEffect(() => {
 		if (team?.data().name) {
@@ -84,73 +94,65 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 		if (team?.data().storagePath) {
 			setStorageRef(ref(storage, team?.data().storagePath))
 		}
-	}, [team])
+	}, [team, form, storage, setStorageRef, ref])
 
 	useEffect(() => {
-		if (updatedTeamData) {
-			// If team is updated to have an image for the first time.
-			if (updatedTeamData.storageRef) {
-				setStorageRef(updatedTeamData.storageRef)
-			}
-			// If team is not setting an image for the first time.
-			else {
-				if (team) {
-					updateTeam(team?.ref, updatedTeamData.name)
-						.then(() => {
-							toast({
-								variant: 'default',
-								title: `Updated ${updatedTeamData.name}`,
-								description: 'Changes saved successfully.',
-							})
-							closeDialog()
+		if (editedTeamData) {
+			if (editedTeamData.storageRef) {
+				setStorageRef(editedTeamData.storageRef)
+			} else {
+				// We don't upload a new logo.
+				console.log(`We don't upload a new logo.`)
+				editTeam(team?.ref, editedTeamData.name, undefined, undefined)
+					.then(() => {
+						setIsLoading(false)
+						toast({
+							variant: 'default',
+							title: 'Team Edited',
+							description: `Changes have been saved, ${editedTeamData.name}!`,
 						})
-						.catch((error) => {
-							toast({
-								variant: 'destructive',
-								title: 'Unable to upload file',
-								description: `Error: ${error}`,
-							})
+						closeDialog()
+					})
+					.catch((error) => {
+						setIsLoading(false)
+						toast({
+							variant: 'destructive',
+							title: 'Error',
+							description: error.message,
 						})
-						.finally(() => {
-							setLoading(false)
-						})
-				}
+					})
 			}
 		}
-	}, [updatedTeamData])
+	}, [editedTeamData])
 
 	useEffect(() => {
 		if (downloadUrl) {
-			if (team) {
-				if (updatedTeamData) {
-					if (updatedTeamData.storageRef) {
-						// If team is updated to have an image for the first time.
-						updateTeam(
-							team?.ref,
-							updatedTeamData.name,
-							downloadUrl,
-							updatedTeamData.storageRef?.fullPath
-						)
-							.then(() => {
-								toast({
-									variant: 'default',
-									title: `Updated ${updatedTeamData.name}`,
-									description: 'Changes saved successfully.',
-								})
-								closeDialog()
-							})
-							.catch((error) => {
-								toast({
-									variant: 'destructive',
-									title: 'Unable to save changes',
-									description: `Error: ${error}`,
-								})
-							})
-							.finally(() => {
-								setLoading(false)
-							})
-					}
-				}
+			if (editedTeamData) {
+				// We upload a new logo.
+				console.log(`We upload a new logo.`)
+				editTeam(
+					team?.ref,
+					editedTeamData.name,
+					downloadUrl,
+					editedTeamData.storageRef?.fullPath
+				)
+					.then(() => {
+						setIsLoading(false)
+						toast({
+							variant: 'default',
+							title: `Updated ${editedTeamData.name}`,
+							description: 'Changes saved successfully.',
+						})
+						closeDialog()
+					})
+					.catch((error) => {
+						setIsLoading(false)
+						toast({
+							variant: 'destructive',
+							title: 'Error',
+							description: error.message,
+						})
+					})
 			}
 		}
 	}, [downloadUrl])
@@ -158,83 +160,50 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 	const onSubmit = async (data: EditTeamSchema) => {
 		if (authenticatedUserSnapshot) {
 			try {
-				setLoading(true)
-				// If team is updated to have an image.
+				setIsLoading(true)
 				if (blob) {
-					// If team is updated to have an image, but not for the first time.
 					if (storageRef) {
-						await uploadFile(storageRef, blob, {
+						// Team already has a logo, and we upload a new logo.
+						console.log(`Team already has a logo, and we upload a new logo.`)
+						uploadFile(storageRef, blob, {
 							contentType: 'image/jpeg',
+						}).then(() => {
+							setEditedTeamData({ name: data.name, storageRef: storageRef })
 						})
-						setUpdatedTeamData({ name: data.name, storageRef: storageRef })
-						toast({
-							variant: 'default',
-							title: `Updated team ${data.name}`,
-							description: 'Changes saved successfully',
-						})
-						closeDialog()
-					}
-					// If team is updated to have an image for the first time.
-					else {
-						const result = await uploadFile(
-							ref(storage, `teams/${uuidv4()}`),
-							blob,
-							{
-								contentType: 'image/jpeg',
-							}
+					} else {
+						// Team doesn't already have a logo, and we upload a new logo.
+						console.log(
+							`Team doesn't already have a logo, and we upload a new logo.`
 						)
-						if (result) {
-							setUpdatedTeamData({ name: data.name, storageRef: result.ref })
-							toast({
-								variant: 'default',
-								title: `Updated team ${data.name}`,
-								description: 'Changes saved successfully',
-							})
-							closeDialog()
-						}
+						uploadFile(ref(storage, `teams/${uuidv4()}`), blob, {
+							contentType: 'image/jpeg',
+						}).then((result) => {
+							setEditedTeamData({ name: data.name, storageRef: result?.ref })
+						})
 					}
-				}
-				// If team is updated without a change to the image.
-				else {
-					setUpdatedTeamData({ name: data.name, storageRef: undefined })
-					toast({
-						variant: 'default',
-						title: `Updated team ${data.name}`,
-						description: 'Changes saved successfully',
-					})
-					closeDialog()
+				} else {
+					// We don't upload a new logo.
+					console.log(`We don't upload a new logo.`)
+					setEditedTeamData({ name: data.name, storageRef: undefined })
 				}
 			} catch (error) {
-				toast({
-					variant: 'destructive',
-					title: 'Unable to save changes',
-					description: `Error: ${error}`,
-				})
+				if (error instanceof Error) {
+					toast({
+						variant: 'destructive',
+						title: 'Error',
+						description: error.message,
+					})
+				}
 			}
 		}
 	}
-
-	useEffect(() => {
-		if (uploadFileError) {
-			toast({
-				variant: 'destructive',
-				title: 'Unable to upload file',
-				description: `Error: ${uploadFileError}`,
-			})
-		}
-	}, [uploadFileError])
-
-	const teamLogo = team?.data().logo
-	const teamName = team?.data().name
-
-	const previewImage = blob ? URL.createObjectURL(blob) : undefined
 
 	return (
 		<div className="max-w-[400px]">
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
-					className={'w-full space-y-6'}
+					className={'w-full space-y-6 items-center justify-center'}
 				>
 					<FormField
 						control={form.control}
@@ -244,7 +213,7 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 								<FormLabel>Team name</FormLabel>
 								<FormControl>
 									<Input
-										placeholder={teamName ?? 'Team name'}
+										placeholder={team?.data().name ?? 'Team name'}
 										{...field}
 										value={field.value ?? ''}
 									/>
@@ -273,16 +242,19 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 							</FormItem>
 						)}
 					/>
-					{teamLogo && (
+					{team?.data().logo ? (
 						<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
-							<img src={previewImage ?? teamLogo} />
+							<img src={blob ? URL.createObjectURL(blob) : team?.data().logo} />
 						</div>
+					) : (
+						<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
 					)}
-					<Button type={'submit'} disabled={uploadFileLoading || loading}>
-						{(uploadFileLoading || loading) && (
-							<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+					<Button type={'submit'} disabled={isLoading}>
+						{isLoading ? (
+							<ReloadIcon className={'animate-spin'} />
+						) : (
+							`Save changes`
 						)}
-						Save changes
 					</Button>
 				</form>
 			</Form>

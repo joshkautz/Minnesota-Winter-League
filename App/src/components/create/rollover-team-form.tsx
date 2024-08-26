@@ -55,7 +55,6 @@ export const RolloverTeamForm = ({
 }: RolloverTeamFormProps) => {
 	const { teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot } =
 		useTeamsContext()
-
 	const { seasonsQuerySnapshot } = useSeasonsContext()
 
 	const [stringValue, setStringValue] = useState<string | undefined>()
@@ -103,14 +102,27 @@ export const RolloverTeamForm = ({
 	const onRolloverSubmit = useCallback(async () => {
 		try {
 			setIsSubmitting(true)
-			setNewTeamData({
-				name: selectedTeamQueryDocumentSnapshot?.data().name,
-				storageRef: ref(
-					storage,
-					selectedTeamQueryDocumentSnapshot?.data().logo
-				),
-				teamId: selectedTeamQueryDocumentSnapshot?.data().teamId,
-			})
+			if (selectedTeamQueryDocumentSnapshot?.data().logo) {
+				fetch(selectedTeamQueryDocumentSnapshot?.data().logo)
+					.then((response) => response.blob())
+					.then((blob) => {
+						uploadFile(ref(storage, `teams/${uuidv4()}`), blob, {
+							contentType: 'image/jpeg',
+						}).then((result) => {
+							setNewTeamData({
+								name: selectedTeamQueryDocumentSnapshot?.data().name,
+								storageRef: result?.ref,
+								teamId: selectedTeamQueryDocumentSnapshot?.data().teamId,
+							})
+						})
+					})
+			} else {
+				setNewTeamData({
+					name: selectedTeamQueryDocumentSnapshot?.data().name,
+					storageRef: undefined,
+					teamId: selectedTeamQueryDocumentSnapshot?.data().teamId,
+				})
+			}
 		} catch (error) {
 			if (error instanceof Error) {
 				handleResult({

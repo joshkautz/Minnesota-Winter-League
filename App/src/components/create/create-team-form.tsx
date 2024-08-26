@@ -81,20 +81,15 @@ export const CreateTeamForm = ({
 			try {
 				setIsSubmitting(true)
 				if (blob) {
-					const result = await uploadFile(
-						ref(storage, `teams/${uuidv4()}`),
-						blob,
-						{
-							contentType: 'image/jpeg',
-						}
-					)
-					if (result) {
+					uploadFile(ref(storage, `teams/${uuidv4()}`), blob, {
+						contentType: 'image/jpeg',
+					}).then((result) => {
 						setNewTeamData({
 							name: data.name,
-							storageRef: result.ref,
+							storageRef: result?.ref,
 							teamId: undefined,
 						})
-					}
+					})
 				} else {
 					setNewTeamData({
 						name: data.name,

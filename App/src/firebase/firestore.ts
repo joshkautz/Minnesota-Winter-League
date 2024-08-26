@@ -157,23 +157,21 @@ const rolloverTeam = async (
 ) => {
 	if (!playerRef) return
 	if (!name) return
-	if (!logo) return
 	if (!seasonRef) return
-	if (!storagePath) return
 	if (!teamId) return
 
 	// Create the team document so we can upate the player document.
 	const teamDocumentReference = (await addDoc(
 		collection(firestore, Collections.TEAMS),
 		{
-			logo: logo,
+			logo: logo ? logo : null,
 			name: name,
 			placement: null,
 			registered: false,
 			registeredDate: Timestamp.now(),
 			roster: [{ captain: true, player: playerRef }],
 			season: seasonRef,
-			storagePath: storagePath,
+			storagePath: storagePath ? storagePath : null,
 			teamId: teamId,
 		}
 	)) as DocumentReference<TeamData, DocumentData>
@@ -208,12 +206,15 @@ const rolloverTeam = async (
 	])
 }
 
-const updateTeam = async (
-	teamRef: DocumentReference<TeamData, DocumentData>,
-	name?: string,
-	logo?: string,
-	storagePath?: string
+const editTeam = async (
+	teamRef: DocumentReference<TeamData, DocumentData> | undefined,
+	name: string | undefined,
+	logo: string | undefined,
+	storagePath: string | undefined
 ) => {
+	if (!teamRef) return
+	if (!name) return
+
 	const teamDocumentSnapshot = await getDoc(teamRef)
 
 	return updateDoc(teamRef, {
@@ -695,7 +696,7 @@ export {
 	createTeam,
 	rolloverTeam,
 	deleteTeam,
-	updateTeam,
+	editTeam,
 	stripeRegistration,
 	gamesByTeamQuery,
 	teamsBySeasonQuery,
