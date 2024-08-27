@@ -36,6 +36,8 @@ export const ResetPassword = ({
 	const onSubmit = async (data: PasswordResetEmailSchema) => {
 		const res = await sendPasswordResetEmail(data.email)
 
+		console.log(res)
+
 		toast({
 			title: res
 				? 'Password reset email sent'
@@ -68,6 +70,7 @@ export const ResetPassword = ({
 									placeholder={'Email'}
 									{...field}
 									value={field.value ?? ''}
+									autoComplete="email"
 								/>
 							</FormControl>
 							<FormMessage />

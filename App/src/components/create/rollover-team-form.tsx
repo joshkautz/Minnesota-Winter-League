@@ -53,8 +53,10 @@ export const RolloverTeamForm = ({
 	handleResult,
 	uploadFile,
 }: RolloverTeamFormProps) => {
-	const { teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot } =
-		useTeamsContext()
+	const {
+		teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot,
+		currentSeasonTeamsQuerySnapshot,
+	} = useTeamsContext()
 	const { seasonsQuerySnapshot } = useSeasonsContext()
 
 	const [stringValue, setStringValue] = useState<string | undefined>()
@@ -68,8 +70,8 @@ export const RolloverTeamForm = ({
 
 	useEffect(() => {
 		const defaultTeamQueryDocumentSnapshot =
-			teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs.sort(
-				(a, b) => {
+			teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs
+				.sort((a, b) => {
 					const seasonsQuerySnapshots = seasonsQuerySnapshot?.docs
 					if (seasonsQuerySnapshots) {
 						const seasonA = seasonsQuerySnapshots.find(
@@ -89,12 +91,24 @@ export const RolloverTeamForm = ({
 						return 0
 					}
 					return 0
-				}
-			)?.[0]
-		setStringValue(defaultTeamQueryDocumentSnapshot?.data().name)
-		setSelectedTeamQueryDocumentSnapshot(defaultTeamQueryDocumentSnapshot)
+				})
+				.find((team) => team)
+
+		const defaultTeamHasBeenRolledOver =
+			currentSeasonTeamsQuerySnapshot?.docs.some(
+				(teamQueryDocumentSnapshot) =>
+					teamQueryDocumentSnapshot.data().teamId ===
+					defaultTeamQueryDocumentSnapshot?.data().teamId
+			)
+
+		if (!defaultTeamHasBeenRolledOver) {
+			setStringValue(defaultTeamQueryDocumentSnapshot?.data().name)
+			setSelectedTeamQueryDocumentSnapshot(defaultTeamQueryDocumentSnapshot)
+		}
 	}, [
 		teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot,
+		seasonsQuerySnapshot,
+		currentSeasonTeamsQuerySnapshot,
 		setStringValue,
 		setSelectedTeamQueryDocumentSnapshot,
 	])
@@ -145,17 +159,20 @@ export const RolloverTeamForm = ({
 
 	const handleSeasonChange = useCallback(
 		(team: string) => {
+			console.log(team)
 			setStringValue(team)
 			const teamQueryDocumentSnapshot =
 				teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs.find(
 					(teamQueryDocumentSnapshot) =>
 						teamQueryDocumentSnapshot.data().name === team
 				)
-			if (teamQueryDocumentSnapshot) {
-				setSelectedTeamQueryDocumentSnapshot(teamQueryDocumentSnapshot)
-			}
+			setSelectedTeamQueryDocumentSnapshot(teamQueryDocumentSnapshot)
 		},
-		[setStringValue]
+		[
+			setStringValue,
+			setSelectedTeamQueryDocumentSnapshot,
+			teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot,
+		]
 	)
 
 	return (
@@ -165,7 +182,7 @@ export const RolloverTeamForm = ({
 			) : (
 				<div className="flex flex-col space-y-6">
 					<div className="space-y-2">
-						<Label>Teams eligible for rollover</Label>
+						<Label>{`Teams you've captained in the past`}</Label>
 						<Select value={stringValue} onValueChange={handleSeasonChange}>
 							<SelectTrigger>
 								<SelectValue placeholder={'Select a previous team'} />
@@ -191,18 +208,37 @@ export const RolloverTeamForm = ({
 										}
 										return 0
 									})
-									.map((team) => (
-										<SelectItem key={team.id} value={team.data().name}>
-											{team.data().name}
-										</SelectItem>
-									))}
+									.map((team) => {
+										const teamHasBeenRolledOver =
+											currentSeasonTeamsQuerySnapshot?.docs.some(
+												(teamQueryDocumentSnapshot) =>
+													teamQueryDocumentSnapshot.data().teamId ===
+													team.data().teamId
+											)
+										const seasonQueryDocumentSnapshot =
+											seasonsQuerySnapshot?.docs.find(
+												(season) => season.id === team.data().season.id
+											)
+
+										return (
+											<SelectItem
+												key={team.id}
+												value={team.data().name}
+												disabled={teamHasBeenRolledOver}
+											>
+												{!teamHasBeenRolledOver
+													? `${team.data().name} - ${seasonQueryDocumentSnapshot?.data().name}`
+													: `${team.data().name} - ${seasonQueryDocumentSnapshot?.data().name} (Already Rolled Over)`}
+											</SelectItem>
+										)
+									})}
 							</SelectContent>
 						</Select>
 					</div>
 					<Button
 						type={'submit'}
 						onClick={onRolloverSubmit}
-						disabled={isSubmitting}
+						disabled={isSubmitting || !selectedTeamQueryDocumentSnapshot}
 					>
 						Rollover
 					</Button>

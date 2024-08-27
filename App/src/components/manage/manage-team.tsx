@@ -127,7 +127,7 @@ export const ManageTeam = () => {
 	}, [authenticatedUserSnapshot, team, currentSeasonQueryDocumentSnapshot])
 
 	const deleteTeamOnClickHandler = useCallback(async () => {
-		deleteTeam(team?.ref)
+		deleteTeam(team?.ref, currentSeasonQueryDocumentSnapshot?.ref)
 			.then(() => {
 				toast({
 					title: `${

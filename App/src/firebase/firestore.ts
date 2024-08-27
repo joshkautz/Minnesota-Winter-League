@@ -243,9 +243,11 @@ const createPlayer = (
 }
 
 const deleteTeam = async (
-	teamRef: DocumentReference<TeamData, DocumentData> | undefined
+	teamRef: DocumentReference<TeamData, DocumentData> | undefined,
+	seasonRef: DocumentReference<SeasonData, DocumentData> | undefined
 ) => {
 	if (!teamRef) return
+	if (!seasonRef) return
 
 	// Delete all offers related to this team.
 	const offersQuerySnapshot = await getDocs(
@@ -273,6 +275,14 @@ const deleteTeam = async (
 			)
 		)
 
+	// Update season document to remove the team.
+	const seasonDocumentSnapshot = await getDoc(seasonRef)
+	const seasonPromise = updateDoc(seasonRef, {
+		teams: seasonDocumentSnapshot
+			.data()
+			?.teams.filter((team) => team.id !== teamRef.id),
+	})
+
 	// Delete team's image from storage.
 	const imagePromise = teamDocumentSnapshot.data()?.storagePath
 		? deleteImage(ref(storage, teamDocumentSnapshot.data()?.storagePath))
@@ -281,7 +291,13 @@ const deleteTeam = async (
 	// Delete the team document.
 	const teamPromise = deleteDoc(teamRef)
 
-	Promise.all([offersPromises, playersPromises, imagePromise, teamPromise])
+	Promise.all([
+		offersPromises,
+		playersPromises,
+		seasonPromise,
+		imagePromise,
+		teamPromise,
+	])
 }
 
 const promoteToCaptain = async (

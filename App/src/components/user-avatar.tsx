@@ -2,7 +2,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuthContext } from '@/firebase/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog'
 import { UserForm } from '@/components/user-form'
 import {
 	DropdownMenu,
@@ -15,6 +21,8 @@ import {
 import { Link } from 'react-router-dom'
 import { useOffersContext } from '@/firebase/offers-context'
 import { useMemo } from 'react'
+
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 const getInitials = (
 	firstname: string | undefined,
@@ -69,6 +77,10 @@ export const UserAvatar = ({
 				<DialogTrigger asChild>
 					<Button variant={'default'}>Login</Button>
 				</DialogTrigger>
+				<VisuallyHidden>
+					<DialogTitle>Login</DialogTitle>
+					<DialogDescription>Login</DialogDescription>
+				</VisuallyHidden>
 				<DialogContent className={'sm:max-w-[425px] pt-10'}>
 					<UserForm />
 				</DialogContent>
