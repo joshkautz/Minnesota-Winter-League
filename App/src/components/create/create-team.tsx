@@ -254,7 +254,7 @@ export const CreateTeam = () => {
 					<NotificationCard
 						className="w-full min-w-0"
 						title="Team Creation Form"
-						description="Create a team to compete in the upcoming season. You can create a team from scratch or rollover a team from a previous season."
+						description="Create a team to compete in the upcoming season. You can create a new team from scratch, or rollover a team you've captained in a previous season."
 						moreActions={
 							<div className="flex items-center space-x-2">
 								<Switch
