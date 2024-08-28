@@ -18,7 +18,7 @@ import {
 	onDocumentCreated,
 } from 'firebase-functions/v2/firestore'
 import { onRequest } from 'firebase-functions/v2/https'
-import { error, debug } from 'firebase-functions/logger'
+import { error } from 'firebase-functions/logger'
 
 // Firebase Firestore SDK
 import {
@@ -172,7 +172,7 @@ export const OnOfferAccepted = onDocumentUpdated(
 			const firestore = getFirestore()
 
 			const newValue = event.data?.after.data() as OfferData
-			const previousValue = event.data?.after.data() as OfferData
+			const previousValue = event.data?.before.data() as OfferData
 
 			if (
 				previousValue.status === Offers.PENDING &&
@@ -263,25 +263,13 @@ export const OnOfferRejected = onDocumentUpdated(
 	async (event) => {
 		try {
 			const newValue = event.data?.after.data() as OfferData
-			const previousValue = event.data?.after.data() as OfferData
+			const previousValue = event.data?.before.data() as OfferData
 
 			if (
 				newValue.status === Offers.REJECTED &&
 				previousValue.status === Offers.PENDING
 			) {
-				debug(event.data?.after.ref)
 				return Promise.all([event.data?.after.ref.delete()])
-			} else {
-				debug(newValue.status)
-				debug(Offers.REJECTED)
-				debug('Checking ===')
-				debug(newValue.status === Offers.REJECTED)
-
-				debug(previousValue.status)
-				debug(Offers.PENDING)
-				debug('Checking ==')
-				debug(previousValue.status == Offers.PENDING)
-				return Promise.resolve()
 			}
 
 			return
