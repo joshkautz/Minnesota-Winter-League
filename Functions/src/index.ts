@@ -265,16 +265,23 @@ export const OnOfferRejected = onDocumentUpdated(
 			const newValue = event.data?.after.data() as OfferData
 			const previousValue = event.data?.after.data() as OfferData
 
-			debug(newValue)
-			debug(previousValue)
-			debug(event.data?.after.id)
-
 			if (
 				newValue.status === Offers.REJECTED &&
 				previousValue.status === Offers.PENDING
 			) {
 				debug(event.data?.after.ref)
 				return Promise.all([event.data?.after.ref.delete()])
+			} else {
+				debug(newValue.status)
+				debug(Offers.REJECTED)
+				debug('Checking ===')
+				debug(newValue.status === Offers.REJECTED)
+
+				debug(previousValue.status)
+				debug(Offers.PENDING)
+				debug('Checking ==')
+				debug(previousValue.status == Offers.PENDING)
+				return Promise.resolve()
 			}
 
 			return
