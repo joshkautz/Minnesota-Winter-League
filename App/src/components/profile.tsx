@@ -1,6 +1,6 @@
 import { useAuthContext } from '@/firebase/auth-context'
 import { Input } from '@/components/ui/input'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
 	Form,
@@ -19,6 +19,8 @@ import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
 import { Label } from './ui/label'
 import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
+import { useSeasonsContext } from '@/firebase/seasons-context'
+import { Timestamp } from '@firebase/firestore'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -35,6 +37,8 @@ export const Profile = () => {
 		authenticatedUserSnapshotLoading,
 		sendEmailVerification,
 	} = useAuthContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
+
 	const [sentEmail, setSentEmail] = useState(false)
 	const [stripeLoading, setStripeLoading] = useState(false)
 
@@ -81,8 +85,47 @@ export const Profile = () => {
 		setSentEmail(true)
 	}
 
-	const isVerified = authStateUser?.emailVerified
-	const isRegistered = authenticatedUserSnapshot?.data()?.registered
+	const isAuthenticatedUserPaid = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find(
+					(item) =>
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
+						item.paid
+				),
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
+	)
+
+	const isAuthenticatedUserSigned = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
+				)?.signed,
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
+	)
+
+	const isVerified = useMemo(
+		() => authStateUser?.emailVerified,
+		[authStateUser]
+	)
+
+	const isRegistrationOpen = useMemo(
+		() =>
+			currentSeasonQueryDocumentSnapshot &&
+			Timestamp.now() >
+				currentSeasonQueryDocumentSnapshot?.data().registrationStart &&
+			Timestamp.now() <
+				currentSeasonQueryDocumentSnapshot?.data().registrationEnd,
+		[currentSeasonQueryDocumentSnapshot]
+	)
+
+	const isLoading = useMemo(
+		() => !authenticatedUserSnapshot || authenticatedUserSnapshotLoading,
+		[authenticatedUserSnapshot, authenticatedUserSnapshotLoading]
+	)
 
 	return (
 		<div
@@ -169,19 +212,27 @@ export const Profile = () => {
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
 									Email Verification
-									{!isVerified && (
-										<span className={'relative flex w-2 h-2 ml-1'}>
-											{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
-											<span
-												className={
-													'relative inline-flex w-2 h-2 rounded-full bg-primary'
-												}
-											></span>
-										</span>
+									{isLoading ? (
+										<></>
+									) : (
+										!isVerified && (
+											<span className={'relative flex w-2 h-2 ml-1'}>
+												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
+												<span
+													className={
+														'relative inline-flex w-2 h-2 rounded-full bg-primary'
+													}
+												></span>
+											</span>
+										)
 									)}
 								</Label>
 								<div>
-									{isVerified ? (
+									{isLoading ? (
+										<div className={'inline-flex items-center gap-2'}>
+											Loading...
+										</div>
+									) : isVerified ? (
 										<div
 											className={
 												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
@@ -207,14 +258,12 @@ export const Profile = () => {
 							</fieldset>
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
-									Registration
-									{!authenticatedUserSnapshot ||
-									authenticatedUserSnapshotLoading ? (
+									Payment
+									{isLoading ? (
 										<></>
 									) : (
-										!isRegistered && (
+										!isAuthenticatedUserPaid && (
 											<span className={'relative flex w-2 h-2 ml-1'}>
-												{/* <span className={'absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary'}></span> */}
 												<span
 													className={
 														'relative inline-flex w-2 h-2 rounded-full bg-primary'
@@ -225,12 +274,11 @@ export const Profile = () => {
 									)}
 								</Label>
 								<div>
-									{!authenticatedUserSnapshot ||
-									authenticatedUserSnapshotLoading ? (
+									{isLoading ? (
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
-									) : isRegistered ? (
+									) : isAuthenticatedUserPaid ? (
 										<div
 											className={
 												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
@@ -243,15 +291,63 @@ export const Profile = () => {
 											<Button
 												variant={'default'}
 												onClick={registrationButtonOnClickHandler}
-												disabled={false} // TODO: Check to see if current time is between the current season start and end registration dates.
+												disabled={!isRegistrationOpen}
 											>
 												{stripeLoading && (
 													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
 												)}
-												Continue to Stripe
+												Pay
 											</Button>
 											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
 												Complete registration by paying via Stripe.
+											</p>
+										</>
+									)}
+								</div>
+							</fieldset>
+							<fieldset className={'space-y-2'}>
+								<Label className={'inline-flex'}>
+									Waiver
+									{isLoading ? (
+										<></>
+									) : (
+										!isAuthenticatedUserSigned && (
+											<span className={'relative flex w-2 h-2 ml-1'}>
+												<span
+													className={
+														'relative inline-flex w-2 h-2 rounded-full bg-primary'
+													}
+												></span>
+											</span>
+										)
+									)}
+								</Label>
+								<div>
+									{isLoading ? (
+										<div className={'inline-flex items-center gap-2'}>
+											Loading...
+										</div>
+									) : isAuthenticatedUserSigned ? (
+										<div
+											className={
+												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
+											}
+										>
+											Complete <CheckCircledIcon className={'w-4 h-4'} />
+										</div>
+									) : (
+										<>
+											<Button
+												variant={'default'}
+												disabled={!isRegistrationOpen}
+											>
+												{stripeLoading && (
+													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+												)}
+												Sign
+											</Button>
+											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
+												Complete registration by signing via Dropbox.
 											</p>
 										</>
 									)}

@@ -6,17 +6,7 @@ import { ReloadIcon } from '@radix-ui/react-icons'
 import { useStandings } from '@/lib/use-standings'
 import { StandingsTable } from './standings-table'
 import { useSeasonsContext } from '@/firebase/seasons-context'
-import { Timestamp } from '@firebase/firestore'
-
-const formatTimestamp = (timestamp: Timestamp | undefined) => {
-	if (!timestamp) return
-	const date = new Date(timestamp.seconds * 1000)
-	return date.toLocaleDateString('en-US', {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	})
-}
+import { formatTimestamp } from '@/lib/utils'
 
 export const Standings = () => {
 	const { selectedSeasonTeamsQuerySnapshot } = useTeamsContext()

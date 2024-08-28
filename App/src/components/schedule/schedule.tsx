@@ -4,20 +4,10 @@ import { GameData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from '../gradient-header'
 import { ComingSoon } from '../coming-soon'
-import { Timestamp } from '@firebase/firestore'
 import { useGamesContext } from '@/firebase/games-context'
 import { ScheduleCard } from './schedule-card'
 import { useSeasonsContext } from '@/firebase/seasons-context'
-
-const formatTimestamp = (timestamp: Timestamp | undefined) => {
-	if (!timestamp) return
-	const date = new Date(timestamp.seconds * 1000)
-	return date.toLocaleDateString('en-US', {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	})
-}
+import { formatTimestamp } from '@/lib/utils'
 
 export const Schedule = () => {
 	const { gamesQuerySnapshot } = useGamesContext()

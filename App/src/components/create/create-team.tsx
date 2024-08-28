@@ -15,18 +15,8 @@ import { Switch } from '@/components/ui/switch'
 import { NotificationCard } from '@/components/notification-card'
 import { CreateTeamForm } from './create-team-form'
 import { Card, CardContent } from '../ui/card'
-import { cn } from '@/lib/utils'
+import { cn, formatTimestamp } from '@/lib/utils'
 import { RolloverTeamForm } from './rollover-team-form'
-
-const formatTimestamp = (timestamp: Timestamp | undefined) => {
-	if (!timestamp) return
-	const date = new Date(timestamp.seconds * 1000)
-	return date.toLocaleDateString('en-US', {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	})
-}
 
 export const CreateTeam = () => {
 	const navigate = useNavigate()

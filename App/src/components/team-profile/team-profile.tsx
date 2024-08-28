@@ -24,6 +24,8 @@ import {
 	TeamRecordRowDate,
 	TeamRecordRowResult,
 } from './team-record'
+import { useSeasonsContext } from '@/firebase/seasons-context'
+import { formatTimestamp } from '@/lib/utils'
 
 const OPPONENT = {
 	HOME: 'HOME',
@@ -55,6 +57,7 @@ const formatGameResult = (
 
 export const TeamProfile = () => {
 	const { id } = useParams()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [teamDocumentSnapshot, teamDocumentSnapshotLoading] = useDocument(
 		getTeamById(id)
@@ -108,9 +111,12 @@ export const TeamProfile = () => {
 				</p>
 			) : (
 				<p className={'text-sm text-muted-foreground'}>
-					{/* TODO: Fix this Hard Coding. */}
 					You need 10 registered players in order to meet the minimum
-					requirement. Registration ends Tuesday, October 31st, at 11:59pm.
+					requirement. Registration ends{' '}
+					{formatTimestamp(
+						currentSeasonQueryDocumentSnapshot?.data().registrationEnd
+					)}
+					.
 				</p>
 			),
 		[isLoading, teamDocumentSnapshot]

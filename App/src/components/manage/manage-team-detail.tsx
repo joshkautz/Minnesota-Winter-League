@@ -31,18 +31,9 @@ export const ManageTeamDetail = ({
 		)
 	)
 
-	// TODO: Fix this!
-	// const [creatorSnapshot, creatorSnapshotLoading] = useDocument(
-	// 	currentSeasonTeamsQueryDocumentSnapshot.data().
-	// )
 	const isDisabled =
 		offersForUnrosteredPlayersQuerySnapshot &&
 		offersForUnrosteredPlayersQuerySnapshot.size > 0
-
-	// TODO: WRONG! Fix this!
-	// const captainZero = `${creatorSnapshot?.data()?.firstname ?? ''} ${
-	// 	creatorSnapshot?.data()?.lastname ?? ''
-	// }`
 
 	return (
 		<div className="flex items-end gap-2 py-2">
@@ -63,11 +54,6 @@ export const ManageTeamDetail = ({
 			<Link to={`/teams/${currentSeasonTeamsQueryDocumentSnapshot.id}`}>
 				<div className="mr-2">
 					<p>{currentSeasonTeamsQueryDocumentSnapshot.data().name}</p>
-					{/* <p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-						{creatorSnapshotLoading
-							? 'created by...'
-							: `created by ${captainZero ?? 'unknown...'}`}
-					</p> */}
 				</div>
 			</Link>
 			<div className="flex justify-end flex-1 gap-2">

@@ -67,9 +67,9 @@ export const SeasonsContextProvider: FC<{ children: ReactNode }> = ({
 	] = useState<QueryDocumentSnapshot<SeasonData, DocumentData> | undefined>()
 
 	const getMostRecentSeason = useCallback(() => {
-		return seasonsQuerySnapshot?.docs.sort(
-			(a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds
-		)?.[0]
+		return seasonsQuerySnapshot?.docs
+			.sort((a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds)
+			?.find((season) => season)
 	}, [seasonsQuerySnapshot])
 
 	useEffect(() => {

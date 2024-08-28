@@ -29,14 +29,17 @@ export const ScheduleCard = ({
 			<CardHeader>
 				<CardTitle>{title}</CardTitle>
 				<CardDescription>
-					{games[0].date.toDate().toLocaleString(undefined, {
-						weekday: 'long', // Full weekday name
-						month: 'long', // Full month name
-						day: 'numeric', // Day of the month
-						hour: 'numeric', // Hour (1-12)
-						minute: '2-digit', // Minute (2-digit)
-						hour12: true, // Use 12-hour clock format (AM/PM)
-					})}
+					{games
+						.find((game) => game)
+						?.date.toDate()
+						.toLocaleString(undefined, {
+							weekday: 'long', // Full weekday name
+							month: 'long', // Full month name
+							day: 'numeric', // Day of the month
+							hour: 'numeric', // Hour (1-12)
+							minute: '2-digit', // Minute (2-digit)
+							hour12: true, // Use 12-hour clock format (AM/PM)
+						})}
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="flex flex-col gap-2">

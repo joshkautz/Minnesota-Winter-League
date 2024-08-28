@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { cn } from '@/lib/utils'
+import { cn, formatTimestamp } from '@/lib/utils'
 import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { useTeamsContext } from '@/firebase/teams-context'
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card'
@@ -8,16 +8,6 @@ import { ComingSoon } from '../coming-soon'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Timestamp } from '@firebase/firestore'
 import { useMemo } from 'react'
-
-const formatTimestamp = (timestamp: Timestamp | undefined) => {
-	if (!timestamp) return
-	const date = new Date(timestamp.seconds * 1000)
-	return date.toLocaleDateString('en-US', {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	})
-}
 
 export const Teams = () => {
 	const { selectedSeasonTeamsQuerySnapshot } = useTeamsContext()

@@ -43,15 +43,6 @@ import {
 import { deleteImage, ref, storage } from './storage'
 import { v4 as uuidv4 } from 'uuid'
 
-interface PlayerDocumentData {
-	captain: boolean
-	email: string
-	firstname: string
-	lastname: string
-	registered: boolean
-	team: DocumentReference<TeamData, DocumentData>
-}
-
 enum Collections {
 	OFFERS = 'offers',
 	GAMES = 'games',
@@ -270,7 +261,7 @@ const deleteTeam = async (
 				updateDoc(playerDocumentSnapshot.ref, {
 					seasons: playerDocumentSnapshot
 						.data()
-						?.seasons.filter((season) => season.team.id !== teamRef.id),
+						?.seasons.filter((season) => season.team?.id !== teamRef.id),
 				})
 			)
 		)
@@ -409,7 +400,7 @@ const removeFromTeam = async (
 
 	const seasons = playerDocumentSnapshot
 		.data()
-		?.seasons.filter((item) => item.team.id !== teamRef.id)
+		?.seasons.filter((item) => item.team?.id !== teamRef.id)
 
 	return Promise.all([
 		// Updated the team document.
@@ -519,7 +510,7 @@ const teamsBySeasonQuery = (
 
 const updatePlayer = (
 	authValue: User | null | undefined,
-	data: UpdateData<PlayerDocumentData>
+	data: UpdateData<PlayerData>
 ): Promise<void> => {
 	return updateDoc(doc(firestore, 'players', authValue!.uid), data)
 }

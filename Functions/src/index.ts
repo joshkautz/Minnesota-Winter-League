@@ -22,51 +22,75 @@ import { error } from 'firebase-functions/logger'
 
 // Firebase Firestore SDK
 import {
+	CollectionReference,
 	DocumentData,
 	DocumentReference,
 	FieldValue,
 	Timestamp,
+	WriteResult,
 	getFirestore,
 } from 'firebase-admin/firestore'
 
-interface Player extends DocumentData {
-	captain: boolean
+interface PlayerData extends DocumentData {
+	admin: boolean
 	email: string
 	firstname: string
 	lastname: string
-	paid: boolean
-	signed: boolean
-	team: DocumentReference<Team> | null
+	seasons: {
+		captain: boolean
+		paid: boolean
+		season: DocumentReference<SeasonData, DocumentData>
+		signed: boolean
+		team: DocumentReference<TeamData, DocumentData> | null
+	}[]
 }
-
-interface Team extends DocumentData {
-	captains: DocumentReference<Player>[]
+interface TeamData extends DocumentData {
 	logo: string
 	name: string
+	placement: number
 	registered: boolean
 	registeredDate: Timestamp
-	roster: DocumentReference<Player>[]
+	roster: {
+		captain: boolean
+		player: DocumentReference<PlayerData, DocumentData>
+	}[]
+	season: DocumentReference<SeasonData, DocumentData>
+	storagePath: string
+	teamId: string
 }
 
-interface Offer extends DocumentData {
+interface SeasonData extends DocumentData {
+	dateEnd: Timestamp
+	dateStart: Timestamp
+	name: string
+	registrationEnd: Timestamp
+	registrationStart: Timestamp
+	teams: DocumentReference<TeamData, DocumentData>[]
+}
+
+interface OfferData extends DocumentData {
 	creator: string
-	player: DocumentReference<Player>
+	player: DocumentReference<PlayerData, DocumentData>
 	status: string
-	team: DocumentReference<Team>
+	team: DocumentReference<TeamData, DocumentData>
 }
-
-interface Waiver extends DocumentData {
-	player: DocumentReference<Player>
+interface WaiverData extends DocumentData {
+	player: DocumentReference<PlayerData>
 }
-
-initializeApp()
 
 const REGION = 'us-central1'
 
 const COLLECTIONS = {
+	SEASONS: 'seasons',
 	WAIVERS: 'waivers',
 	OFFERS: 'offers',
 	PLAYERS: 'players',
+}
+
+enum Offers {
+	ACCEPTED = 'accepted',
+	PENDING = 'pending',
+	REJECTED = 'rejected',
 }
 
 const FIELDS = {
@@ -80,8 +104,11 @@ const FIELDS = {
 const DROPBOX_SIGN_API_KEY = 'DROPBOX_SIGN_API_KEY'
 const DROPBOX_TEMPLATE_ID = '0fb30e5f0123f06cc20fe3155f51a539c65f9218'
 
+initializeApp()
+
+// Fixed August 27, 2024.
 /**
- * When a user is deleted via Firebase Authentication, delete the corresponding `Players` document, update the corresponding `Teams` document, and delete the corresponding `Offers` documents.
+ * When a user is deleted via Firebase Authentication, delete the corresponding `Players` document, update the corresponding `Teams` documents, and delete the corresponding `Offers` documents.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/auth-events#trigger_a_function_on_user_deletion Trigger a function on user deletion.}
  */
@@ -89,33 +116,41 @@ const DROPBOX_TEMPLATE_ID = '0fb30e5f0123f06cc20fe3155f51a539c65f9218'
 export const OnUserDeleted = functions
 	.region(REGION)
 	.auth.user()
-	.onDelete(async (user) => {
+	.onDelete((user) => {
 		try {
 			const firestore = getFirestore()
 
-			const playerRef = firestore.collection(COLLECTIONS.PLAYERS).doc(user.uid)
+			const playerRef = firestore
+				.collection(COLLECTIONS.PLAYERS)
+				.doc(user.uid) as DocumentReference<PlayerData, DocumentData>
 
-			// Delete all the `Offers` Firestore Documents for the player.
-			const offers = await firestore
+			// Delete all the offers for the player.
+			const offersDeletionPromises = firestore
 				.collection(COLLECTIONS.OFFERS)
 				.where(FIELDS.PLAYER, '==', playerRef)
 				.get()
+				.then((offers) => offers.docs.map((offer) => offer.ref.delete()))
 
-			const offersDeletionPromises = offers.docs.map((offer) =>
-				offer.ref.delete()
+			// Remove player from all their teams.
+			const teamsUpdatePromises = playerRef.get().then((player) =>
+				player.data()?.seasons.map((item) =>
+					item.team?.get().then((teamDocumentSnapshot) =>
+						item.team?.update({
+							roster: teamDocumentSnapshot
+								?.data()
+								?.roster.filter((item) => item.player.id !== user.uid),
+						})
+					)
+				)
 			)
 
-			// Update the `Teams` Firestore Documents for the player.
-			const player = await playerRef.get()
-			const teamUpdatePromise = player.data()?.team?.update({
-				captains: FieldValue.arrayRemove(playerRef),
-				roster: FieldValue.arrayRemove(playerRef),
-			})
+			// Delete player.
+			const deletePlayerPromise = playerRef.delete()
 
 			return Promise.all([
 				offersDeletionPromises,
-				teamUpdatePromise,
-				playerRef.delete(),
+				teamsUpdatePromises,
+				deletePlayerPromise,
 			])
 		} catch (e) {
 			error(e)
@@ -123,6 +158,7 @@ export const OnUserDeleted = functions
 		}
 	})
 
+// Fixed August 27, 2024.
 /**
  * When an offer is accepted, update the corresponding `Player` document, update the corresponding `Team` document, and delete all the coresponding `Offer` documents.
  *
@@ -135,30 +171,77 @@ export const OnOfferAccepted = onDocumentUpdated(
 		try {
 			const firestore = getFirestore()
 
-			const newValue = event.data?.after.data() as Offer
-			const previousValue = event.data?.after.data() as Offer
+			const newValue = event.data?.after.data() as OfferData
+			const previousValue = event.data?.after.data() as OfferData
 
 			if (
-				newValue.status === 'accepted' &&
-				previousValue.status === 'pending'
+				previousValue.status === Offers.PENDING &&
+				newValue.status === Offers.ACCEPTED
 			) {
-				// Add the team to the player.
-				await newValue.player.update({
-					team: newValue.team,
-				})
+				const playerDocumentReference = newValue.player
+				const teamDocumentReference = newValue.team
 
-				// Add the player to the team.
-				await newValue.team.update({
-					roster: FieldValue.arrayUnion(newValue.player),
-				})
+				const seasonsCollectionReference = firestore.collection(
+					COLLECTIONS.SEASONS
+				) as CollectionReference<SeasonData, DocumentData>
+
+				// Update player document - Add team to the player's seasons.
+				const updatePlayerPromise = seasonsCollectionReference
+					.get()
+					.then((seasonQuerySnapshot): Promise<void | WriteResult> => {
+						const currentSeason = seasonQuerySnapshot.docs
+							.sort(
+								(a, b) =>
+									b.data().dateStart.seconds - a.data().dateStart.seconds
+							)
+							.find((season) => season)
+
+						if (!currentSeason) return Promise.resolve()
+						return playerDocumentReference
+							.get()
+							.then((playerDocumentSnapshot) =>
+								playerDocumentReference.update({
+									seasons: playerDocumentSnapshot.data()?.seasons.map((item) =>
+										item.season.id == currentSeason?.id
+											? {
+													captain: item.captain,
+													paid: item.paid,
+													season: item.season,
+													signed: item.signed,
+													team: teamDocumentReference,
+												}
+											: item
+									),
+								})
+							)
+					})
+
+				// Update team document.
+				const updateTeamPromise = teamDocumentReference
+					.get()
+					.then((teamDocumentSnapshot) => {
+						const roster = teamDocumentSnapshot.data()?.roster
+						roster?.push({
+							captain: false,
+							player: playerDocumentReference,
+						})
+						teamDocumentReference.update({
+							roster: roster,
+						})
+					})
 
 				// Delete all the offers for the player.
-				const offers = await firestore
+				const offersDeletionPromises = firestore
 					.collection(COLLECTIONS.OFFERS)
 					.where(FIELDS.PLAYER, '==', newValue.player)
 					.get()
+					.then((offers) => offers.docs.map((offer) => offer.ref.delete()))
 
-				return Promise.all(offers.docs.map((offer) => offer.ref.delete()))
+				return Promise.all([
+					updatePlayerPromise,
+					updateTeamPromise,
+					offersDeletionPromises,
+				])
 			}
 
 			return
@@ -169,6 +252,7 @@ export const OnOfferAccepted = onDocumentUpdated(
 	}
 )
 
+// Fixed August 27, 2024.
 /**
  * When an offer is rejected, delete the corresponding `Offer` document.
  *
@@ -178,12 +262,12 @@ export const OnOfferRejected = onDocumentUpdated(
 	{ document: 'offers/{offerId}', region: REGION },
 	async (event) => {
 		try {
-			const newValue = event.data?.after.data() as Offer
-			const previousValue = event.data?.after.data() as Offer
+			const newValue = event.data?.after.data() as OfferData
+			const previousValue = event.data?.after.data() as OfferData
 
 			if (
-				newValue.status === 'rejected' &&
-				previousValue.status === 'pending'
+				newValue.status === Offers.REJECTED &&
+				previousValue.status === Offers.PENDING
 			) {
 				return event.data?.after.ref.delete()
 			}
@@ -222,7 +306,7 @@ export const OnPaymentCreated = onDocumentCreated(
 						.doc(event.params.uid)
 						.get()
 						.then((playerSnapshot) => {
-							const player = playerSnapshot.data() as Player
+							const player = playerSnapshot.data() as PlayerData
 							dropbox
 								.signatureRequestSendWithTemplate({
 									templateIds: [DROPBOX_TEMPLATE_ID],
@@ -287,8 +371,8 @@ export const SetTeamRegistered_OnPlayerSignedChange = onDocumentUpdated(
 		try {
 			const firestore = getFirestore()
 
-			const newValue = event.data?.after.data() as Player
-			const previousValue = event.data?.before.data() as Player
+			const newValue = event.data?.after.data() as PlayerData
+			const previousValue = event.data?.before.data() as PlayerData
 
 			if (newValue.signed != previousValue.signed) {
 				const registeredPlayers = (
@@ -335,8 +419,8 @@ export const SetTeamRegistered_OnPlayerPaidChange = onDocumentUpdated(
 		try {
 			const firestore = getFirestore()
 
-			const newValue = event.data?.after.data() as Player
-			const previousValue = event.data?.before.data() as Player
+			const newValue = event.data?.after.data() as PlayerData
+			const previousValue = event.data?.before.data() as PlayerData
 
 			if (newValue.paid != previousValue.paid) {
 				const registeredPlayers = (
@@ -380,8 +464,8 @@ export const SetTeamRegistered_OnTeamRosterChange = onDocumentUpdated(
 		try {
 			const firestore = getFirestore()
 
-			const newValue = event.data?.after.data() as Team
-			const previousValue = event.data?.before.data() as Team
+			const newValue = event.data?.after.data() as TeamData
+			const previousValue = event.data?.before.data() as TeamData
 			const teamRef = event.data?.after.ref
 
 			if (newValue.roster.length != previousValue.roster.length) {
@@ -424,8 +508,8 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange = onDocumentUpdated(
 	{ document: 'teams/{teamId}', region: REGION },
 	async (event) => {
 		try {
-			const newValue = event.data?.after.data() as Team
-			const previousValue = event.data?.before.data() as Team
+			const newValue = event.data?.after.data() as TeamData
+			const previousValue = event.data?.before.data() as TeamData
 			const teamRef = event.data?.after.ref
 
 			if (newValue.registered != previousValue.registered) {
@@ -477,7 +561,7 @@ export const dropboxSignHandleWebhookEvents = onRequest(
 								.doc(signatureRequestId)
 								.get()
 
-							const waiver = waiverSnapshot.data() as Waiver
+							const waiver = waiverSnapshot.data() as WaiverData
 
 							await waiver.player.update({
 								signed: true,

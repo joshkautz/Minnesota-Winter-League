@@ -11,7 +11,7 @@ export interface PlayerData extends DocumentData {
 		paid: boolean
 		season: DocumentReference<SeasonData, DocumentData>
 		signed: boolean
-		team: DocumentReference<TeamData, DocumentData>
+		team: DocumentReference<TeamData, DocumentData> | null
 	}[]
 }
 

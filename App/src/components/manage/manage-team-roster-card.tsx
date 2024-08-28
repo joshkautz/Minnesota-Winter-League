@@ -7,18 +7,8 @@ import { useAuthContext } from '@/firebase/auth-context'
 import { PlayerData } from '@/lib/interfaces'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { useSeasonsContext } from '@/firebase/seasons-context'
-import { Timestamp } from '@firebase/firestore'
 import { Skeleton } from '../ui/skeleton'
-
-const formatTimestamp = (timestamp: Timestamp | undefined) => {
-	if (!timestamp) return
-	const date = new Date(timestamp.seconds * 1000)
-	return date.toLocaleDateString('en-US', {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	})
-}
+import { formatTimestamp } from '@/lib/utils'
 
 export const ManageTeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
@@ -42,7 +32,7 @@ export const ManageTeamRosterCard = ({ actions }: { actions: ReactNode }) => {
 						?.seasons.find(
 							(item) =>
 								item.season.id === currentSeasonQueryDocumentSnapshot?.id
-						)?.team.id
+						)?.team?.id
 			),
 		[
 			authenticatedUserSnapshot,
