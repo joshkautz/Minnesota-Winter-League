@@ -541,7 +541,7 @@ const getTeamByTeamIdAndSeason = (
 }
 
 const teamsQuery = (
-	teams: DocumentReference<TeamData, DocumentData>[] | undefined
+	teams: (DocumentReference<TeamData, DocumentData> | null)[] | undefined
 ): Query<TeamData, DocumentData> | undefined => {
 	if (!teams) return
 	if (!teams.length) return

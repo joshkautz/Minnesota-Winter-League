@@ -68,7 +68,7 @@ export const ManageTeam = () => {
 						?.seasons.find(
 							(item) =>
 								item.season.id === currentSeasonQueryDocumentSnapshot?.id
-						)?.team.id
+						)?.team?.id
 			),
 		[
 			authenticatedUserSnapshot,

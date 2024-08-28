@@ -7,7 +7,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '../ui/dialog'
-import { EditTeam } from '../edit-team'
+import { ManageEditTeam } from './manage-edit-team'
 
 export const ManageEditTeamDialog = ({
 	closeDialog,
@@ -36,7 +36,7 @@ export const ManageEditTeamDialog = ({
 					<DialogDescription>{`Update your team's name or logo`}</DialogDescription>
 				</DialogHeader>
 				<div className="max-w-[400px]">
-					<EditTeam
+					<ManageEditTeam
 						closeDialog={() => {
 							setOpen(false)
 							if (closeDialog) {

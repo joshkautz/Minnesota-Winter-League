@@ -3,8 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { toast } from './ui/use-toast'
-import { Button } from './ui/button'
+import { toast } from '../ui/use-toast'
+import { Button } from '../ui/button'
 import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
 import {
 	Form,
@@ -13,24 +13,28 @@ import {
 	FormLabel,
 	FormControl,
 	FormMessage,
-} from './ui/form'
-import { Input } from './ui/input'
+} from '../ui/form'
+import { Input } from '../ui/input'
 import { v4 as uuidv4 } from 'uuid'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { editTeam } from '@/firebase/firestore'
 import { StorageReference, ref, storage } from '@/firebase/storage'
 import { useTeamsContext } from '@/firebase/teams-context'
 import { useSeasonsContext } from '@/firebase/seasons-context'
-import { Skeleton } from './ui/skeleton'
+import { Skeleton } from '../ui/skeleton'
 
-const editTeamSchema = z.object({
+const manageEditTeamSchema = z.object({
 	logo: z.string().optional(),
 	name: z.string().min(2),
 })
 
-type EditTeamSchema = z.infer<typeof editTeamSchema>
+type ManageEditTeamSchema = z.infer<typeof manageEditTeamSchema>
 
-export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
+export const ManageEditTeam = ({
+	closeDialog,
+}: {
+	closeDialog: () => void
+}) => {
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
@@ -55,7 +59,7 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 						?.seasons.find(
 							(item) =>
 								item.season.id === currentSeasonQueryDocumentSnapshot?.id
-						)?.team.id
+						)?.team?.id
 			),
 		[
 			authenticatedUserSnapshot,
@@ -64,8 +68,8 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 		]
 	)
 
-	const form = useForm<EditTeamSchema>({
-		resolver: zodResolver(editTeamSchema),
+	const form = useForm<ManageEditTeamSchema>({
+		resolver: zodResolver(manageEditTeamSchema),
 		defaultValues: { name: '', logo: '' },
 	})
 
@@ -122,7 +126,7 @@ export const EditTeam = ({ closeDialog }: { closeDialog: () => void }) => {
 	}, [downloadUrl, editedTeamData, team, editTeam, setIsLoading, toast])
 
 	const onSubmit = useCallback(
-		async (data: EditTeamSchema) => {
+		async (data: ManageEditTeamSchema) => {
 			try {
 				setIsLoading(true)
 				if (uploadedFile) {
