@@ -35,6 +35,7 @@ export const Toaster = () => {
 						{'Your changes will be lost. Come back later.'}
 					</ToastDescription>
 				</div>
+				<ToastClose />
 			</ToastForever>
 
 			<ToastViewport />
