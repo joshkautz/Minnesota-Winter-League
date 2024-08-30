@@ -22,6 +22,7 @@ import { StorageReference, ref, storage } from '@/firebase/storage'
 import { useTeamsContext } from '@/firebase/teams-context'
 import { useSeasonsContext } from '@/firebase/seasons-context'
 import { Skeleton } from '../ui/skeleton'
+import { FocusScope } from '@radix-ui/react-focus-scope'
 
 const manageEditTeamSchema = z.object({
 	logo: z.string().optional(),
@@ -212,69 +213,71 @@ export const ManageEditTeam = ({
 	)
 
 	return (
-		<div className="max-w-[400px]">
-			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit(onSubmit)}
-					className={'w-full space-y-6 items-center justify-center'}
-				>
-					<FormField
-						control={form.control}
-						name={'name'}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Team name</FormLabel>
-								<FormControl>
-									<Input
-										placeholder={team?.data().name ?? 'Team name'}
-										{...field}
-										value={field.value ?? ''}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name={'logo'}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Team logo</FormLabel>
-								<FormControl>
-									<Input
-										id="image-upload"
-										type={'file'}
-										accept="image/*"
-										placeholder={'Upload Image'}
-										{...field}
-										onChange={handleFileChange}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					{uploadedFile ? (
-						<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
-							<img src={URL.createObjectURL(uploadedFile)} />
-						</div>
-					) : team?.data().logo ? (
-						<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
-							<img src={team?.data().logo} />
-						</div>
-					) : (
-						<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
-					)}
-					<Button type={'submit'} disabled={isLoading}>
-						{isLoading ? (
-							<ReloadIcon className={'animate-spin'} />
+		<FocusScope asChild loop trapped>
+			<div className="max-w-[400px]">
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className={'w-full space-y-6 items-center justify-center'}
+					>
+						<FormField
+							control={form.control}
+							name={'name'}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Team name</FormLabel>
+									<FormControl>
+										<Input
+											placeholder={team?.data().name ?? 'Team name'}
+											{...field}
+											value={field.value ?? ''}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name={'logo'}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Team logo</FormLabel>
+									<FormControl>
+										<Input
+											id="image-upload"
+											type={'file'}
+											accept="image/*"
+											placeholder={'Upload Image'}
+											{...field}
+											onChange={handleFileChange}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						{uploadedFile ? (
+							<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
+								<img src={URL.createObjectURL(uploadedFile)} />
+							</div>
+						) : team?.data().logo ? (
+							<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
+								<img src={team?.data().logo} />
+							</div>
 						) : (
-							`Save changes`
+							<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
 						)}
-					</Button>
-				</form>
-			</Form>
-		</div>
+						<Button type={'submit'} disabled={isLoading}>
+							{isLoading ? (
+								<ReloadIcon className={'animate-spin'} />
+							) : (
+								`Save changes`
+							)}
+						</Button>
+					</form>
+				</Form>
+			</div>
+		</FocusScope>
 	)
 }
