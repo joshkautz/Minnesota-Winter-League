@@ -35,9 +35,8 @@ export const Toaster = () => {
 						{'Your changes will be lost. Come back later.'}
 					</ToastDescription>
 				</div>
-				<ToastClose />
+				<ToastClose className="text-danger hover:text-danger" />
 			</ToastForever>
-
 			<ToastViewport />
 		</ToastProvider>
 	)

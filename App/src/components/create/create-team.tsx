@@ -14,7 +14,7 @@ import { Timestamp } from '@firebase/firestore'
 import { Switch } from '@/components/ui/switch'
 import { NotificationCard } from '@/components/notification-card'
 import { CreateTeamForm } from './create-team-form'
-import { Card, CardContent } from '../ui/card'
+import { Card, CardContent, CardHeader } from '../ui/card'
 import { cn, formatTimestamp } from '@/lib/utils'
 import { RolloverTeamForm } from './rollover-team-form'
 
@@ -230,12 +230,14 @@ export const CreateTeam = () => {
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 				</div>
 			) : isAuthenticatedUserRostered ? (
-				<Card className={cn('max-w-[800px] w-full mx-auto')}>
-					<CardContent>{`You must first leave your team in order to create a new one.`}</CardContent>
+				<Card className={cn('max-w-[800px] w-full mx-auto my-8')}>
+					<CardHeader>{`You're already on a team!`}</CardHeader>
+					<CardContent>{`Leave your current team in order to create a new one.`}</CardContent>
 				</Card>
 			) : !isRegistrationOpen ? (
-				<Card className={cn('max-w-[800px] w-full mx-auto')}>
-					<CardContent>{`Registration does not begin until ${formatTimestamp(currentSeasonQueryDocumentSnapshot?.data()?.registrationStart)}`}</CardContent>
+				<Card className={cn('max-w-[800px] w-full mx-auto my-8')}>
+					<CardHeader>Registration closed</CardHeader>
+					<CardContent>{`The next registration period begins on ${formatTimestamp(currentSeasonQueryDocumentSnapshot?.data()?.registrationStart)}`}</CardContent>
 				</Card>
 			) : (
 				<>
