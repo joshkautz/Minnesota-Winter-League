@@ -108,7 +108,7 @@ export const HeroSection = () => {
 							<Skeleton className="w-24 mt-8 rounded sm:mt-12 bg-accent h-9" />
 						) : (
 							<Button
-								className="mt-8 sm:mt-12 bg-accent"
+								className="mt-8 sm:mt-12 bg-accent text-foreground dark:text-background"
 								onClick={handleCallToAction}
 							>
 								{!isAuthenticated
