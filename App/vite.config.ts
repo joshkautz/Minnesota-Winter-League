@@ -11,6 +11,7 @@ export default defineConfig({
 		alias: {
 			'@': path.resolve(__dirname, './src'),
 		},
+		dedupe: ['@radix-ui/react-dismissable-layer'],
 	},
 	server: {
 		host: true,
