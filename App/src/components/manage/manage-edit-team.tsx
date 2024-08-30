@@ -111,7 +111,7 @@ export const ManageEditTeam = ({
 				toast({
 					variant: 'default',
 					title: 'Team Edited',
-					description: `Changes have been saved, ${editedTeamData?.name}!`,
+					description: `Changes have been saved, ${editedTeamData.name}!`,
 				})
 				closeDialog()
 			})
@@ -153,7 +153,7 @@ export const ManageEditTeam = ({
 								toast({
 									variant: 'default',
 									title: 'Team Edited',
-									description: `Changes have been saved, ${editedTeamData?.name}!`,
+									description: `Changes have been saved, ${data.name}!`,
 								})
 								closeDialog()
 							})
@@ -172,7 +172,7 @@ export const ManageEditTeam = ({
 								toast({
 									variant: 'default',
 									title: 'Team Edited',
-									description: `Changes have been saved, ${editedTeamData?.name}!`,
+									description: `Changes have been saved, ${data.name}!`,
 								})
 								closeDialog()
 							})

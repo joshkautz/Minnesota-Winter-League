@@ -35,7 +35,6 @@ export const ManageEditTeamDialog = ({
 					<DialogTitle>Edit team</DialogTitle>
 					<DialogDescription>{`Update your team's name or logo`}</DialogDescription>
 				</DialogHeader>
-
 				<ManageEditTeam
 					closeDialog={() => {
 						setOpen(false)
