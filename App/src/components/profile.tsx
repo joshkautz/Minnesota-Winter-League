@@ -1,4 +1,4 @@
-import { useAuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/contexts/auth-context'
 import { Input } from '@/components/ui/input'
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -19,7 +19,7 @@ import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
 import { Label } from './ui/label'
 import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { Timestamp } from '@firebase/firestore'
 
 const profileSchema = z.object({

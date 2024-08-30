@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
-import { useAuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/contexts/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { createPlayer } from '@/firebase/firestore'
 

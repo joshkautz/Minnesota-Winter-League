@@ -24,7 +24,7 @@ import {
 	TeamRecordRowDate,
 	TeamRecordRowResult,
 } from './team-record'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { formatTimestamp } from '@/lib/utils'
 
 const OPPONENT = {

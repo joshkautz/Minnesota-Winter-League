@@ -15,10 +15,6 @@ export interface PlayerData extends DocumentData {
 	}[]
 }
 
-export interface ExtendedPlayerData extends PlayerData {
-	ref: DocumentReference<PlayerData, DocumentData>
-}
-
 export interface TeamData extends DocumentData {
 	logo: string
 	name: string

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { Button } from '@/components/ui/button'
 import { StorageReference, ref, storage } from '@/firebase/storage'
-import { useTeamsContext } from '@/firebase/teams-context'
+import { useTeamsContext } from '@/contexts/teams-context'
 import { Label } from '../ui/label'
 import {
 	Select,
@@ -13,7 +13,7 @@ import {
 } from '../ui/select'
 import { DocumentData, QueryDocumentSnapshot } from '@/firebase/firestore'
 import { TeamData } from '@/lib/interfaces'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 
 interface RolloverTeamFormProps {
 	isSubmitting: boolean

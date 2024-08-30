@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 import { cn, formatTimestamp } from '@/lib/utils'
 import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
-import { useTeamsContext } from '@/firebase/teams-context'
+import { useTeamsContext } from '@/contexts/teams-context'
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card'
 import { GradientHeader } from '../gradient-header'
 import { ComingSoon } from '../coming-soon'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { Timestamp } from '@firebase/firestore'
 import { useMemo } from 'react'
 

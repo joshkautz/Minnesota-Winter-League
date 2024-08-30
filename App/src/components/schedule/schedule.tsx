@@ -4,9 +4,9 @@ import { GameData } from '@/lib/interfaces'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from '../gradient-header'
 import { ComingSoon } from '../coming-soon'
-import { useGamesContext } from '@/firebase/games-context'
+import { useGamesContext } from '@/contexts/games-context'
 import { ScheduleCard } from './schedule-card'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { formatTimestamp } from '@/lib/utils'
 
 export const Schedule = () => {

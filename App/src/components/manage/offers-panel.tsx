@@ -1,8 +1,8 @@
 import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
 import { NotificationCard, NotificationCardItem } from '../notification-card'
-import { useOffersContext } from '@/firebase/offers-context'
+import { useOffersContext } from '@/contexts/offers-context'
 import { useOffer } from '@/lib/use-offer'
-import { useTeamsContext } from '@/firebase/teams-context'
+import { useTeamsContext } from '@/contexts/teams-context'
 import {
 	DocumentReference,
 	DocumentData,

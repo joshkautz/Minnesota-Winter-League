@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useAuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/contexts/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,7 +19,7 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Link } from 'react-router-dom'
-import { useOffersContext } from '@/firebase/offers-context'
+import { useOffersContext } from '@/contexts/offers-context'
 import { useMemo } from 'react'
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'

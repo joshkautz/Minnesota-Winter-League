@@ -10,7 +10,7 @@ import { Profile } from '@/components/profile'
 import { TeamProfile } from './components/team-profile/team-profile'
 import { ManageTeam } from './components/manage/manage-team'
 import { useEffect } from 'react'
-import { useAuthContext } from './firebase/auth-context'
+import { useAuthContext } from './contexts/auth-context'
 import { CreateTeam } from './components/create/create-team'
 
 function App() {

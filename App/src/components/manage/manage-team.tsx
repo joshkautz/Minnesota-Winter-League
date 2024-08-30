@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
 import { deleteTeam, removeFromTeam } from '@/firebase/firestore'
 import { toast } from '../ui/use-toast'
-import { useAuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/contexts/auth-context'
 import { ManageTeamRequestCard } from './manage-team-request-card'
-import { UnrosteredPlayerList } from '../unrostered-player-card'
+import { UnrosteredPlayerList } from '../unrostered-player-list'
 import { Button } from '../ui/button'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from '../destructive-confirmation-dialog'
@@ -16,9 +16,9 @@ import {
 } from '../ui/dropdown-menu'
 import { GradientHeader } from '../gradient-header'
 import { ManageEditTeamDialog } from './manage-edit-team-dialog'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { OffersPanel } from './offers-panel'
-import { useTeamsContext } from '@/firebase/teams-context'
+import { useTeamsContext } from '@/contexts/teams-context'
 import { ManageTeamRosterCard } from './manage-team-roster-card'
 
 export const ManageTeam = () => {

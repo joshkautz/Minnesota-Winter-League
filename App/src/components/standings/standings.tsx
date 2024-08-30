@@ -1,11 +1,11 @@
 import { GradientHeader } from '../gradient-header'
 import { ComingSoon } from '../coming-soon'
-import { useTeamsContext } from '@/firebase/teams-context'
-import { useGamesContext } from '@/firebase/games-context'
+import { useTeamsContext } from '@/contexts/teams-context'
+import { useGamesContext } from '@/contexts/games-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { useStandings } from '@/lib/use-standings'
 import { StandingsTable } from './standings-table'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { formatTimestamp } from '@/lib/utils'
 
 export const Standings = () => {

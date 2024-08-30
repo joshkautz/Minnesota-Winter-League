@@ -12,7 +12,7 @@ import {
 	FirestoreError,
 	QuerySnapshot,
 } from '@/firebase/firestore'
-import { useAuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/contexts/auth-context'
 import { OfferData } from '@/lib/interfaces'
 
 interface OffersProps {

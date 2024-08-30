@@ -16,14 +16,14 @@ import { DotsVerticalIcon, StarFilledIcon } from '@radix-ui/react-icons'
 import { useCallback, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useAuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/contexts/auth-context'
 import { PlayerData } from '@/lib/interfaces'
 import { useDocument } from 'react-firebase-hooks/firestore'
 import { DestructiveConfirmationDialog } from '../destructive-confirmation-dialog'
 import { toast } from '@/components/ui/use-toast'
 import { Badge } from '@/components/ui/badge'
-import { useSeasonsContext } from '@/firebase/seasons-context'
-import { useTeamsContext } from '@/firebase/teams-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
+import { useTeamsContext } from '@/contexts/teams-context'
 
 export const ManageTeamRosterPlayer = ({
 	playerRef,

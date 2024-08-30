@@ -1,5 +1,5 @@
-import { useAuthContext } from '@/firebase/auth-context'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useAuthContext } from '@/contexts/auth-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { useAnchorScroll } from '@/lib/use-anchor-scroll'
 import { useMemo } from 'react'
 import { useOutletContext, useNavigate } from 'react-router-dom'

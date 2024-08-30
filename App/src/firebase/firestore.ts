@@ -38,12 +38,12 @@ import {
 	StandingsData,
 	TeamData,
 	SeasonData,
-	ExtendedPlayerData,
 } from '@/lib/interfaces'
 import { deleteImage, ref, storage } from './storage'
 import { v4 as uuidv4 } from 'uuid'
 
 enum Collections {
+	PLAYERS = 'players',
 	OFFERS = 'offers',
 	GAMES = 'games',
 	TEAMS = 'teams',
@@ -73,7 +73,7 @@ const getRegisteredPlayers = async (
 ) => {
 	const aggregateQuerySnapshot = await getCountFromServer(
 		query(
-			collection(firestore, 'players'),
+			collection(firestore, Collections.PLAYERS),
 			where('team', '==', teamRef),
 			where('registered', '==', true)
 		)
@@ -223,7 +223,7 @@ const createPlayer = (
 	lastname: string,
 	email: string
 ): Promise<void> => {
-	return setDoc(doc(firestore, 'players', uid), {
+	return setDoc(doc(firestore, Collections.PLAYERS, uid), {
 		captain: false,
 		firstname: firstname,
 		lastname: lastname,
@@ -455,10 +455,11 @@ const getPlayerRef = (
 	authValue: User | null | undefined
 ): DocumentReference<PlayerData, DocumentData> | undefined => {
 	if (!authValue) return undefined
-	return doc(firestore, 'players', authValue.uid) as DocumentReference<
-		PlayerData,
-		DocumentData
-	>
+	return doc(
+		firestore,
+		Collections.PLAYERS,
+		authValue.uid
+	) as DocumentReference<PlayerData, DocumentData>
 }
 
 const standingsQuery = (): Query<StandingsData, DocumentData> => {
@@ -512,7 +513,7 @@ const updatePlayer = (
 	authValue: User | null | undefined,
 	data: UpdateData<PlayerData>
 ): Promise<void> => {
-	return updateDoc(doc(firestore, 'players', authValue!.uid), data)
+	return updateDoc(doc(firestore, Collections.PLAYERS, authValue!.uid), data)
 }
 
 const getTeamById = (
@@ -584,7 +585,6 @@ const seasonsQuery = (): Query<SeasonData, DocumentData> => {
 const offersForUnrosteredPlayersQuery = (
 	playerDocumentSnapshot:
 		| DocumentSnapshot<PlayerData, DocumentData>
-		| ExtendedPlayerData
 		| undefined,
 	teamQueryDocumentSnapshot:
 		| QueryDocumentSnapshot<TeamData, DocumentData>
@@ -599,11 +599,11 @@ const offersForUnrosteredPlayersQuery = (
 	) as Query<OfferData, DocumentData>
 }
 
-const unrosteredPlayersQuery = (): Query<PlayerData, DocumentData> => {
-	return query(
-		collection(firestore, 'players'),
-		where('team', '==', null)
-	) as Query<PlayerData, DocumentData>
+const playersQuery = (): Query<PlayerData, DocumentData> => {
+	return query(collection(firestore, Collections.PLAYERS)) as Query<
+		PlayerData,
+		DocumentData
+	>
 }
 
 const outgoingOffersQuery = (
@@ -708,7 +708,7 @@ export {
 	gamesByTeamQuery,
 	teamsBySeasonQuery,
 	demoteFromCaptain,
-	unrosteredPlayersQuery,
+	playersQuery,
 	promoteToCaptain,
 	standingsQuery,
 	getTeamById,

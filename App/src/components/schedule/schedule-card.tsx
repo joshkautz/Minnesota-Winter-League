@@ -6,7 +6,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card'
-import { useTeamsContext } from '@/firebase/teams-context'
+import { useTeamsContext } from '@/contexts/teams-context'
 import {
 	TooltipProvider,
 	Tooltip,

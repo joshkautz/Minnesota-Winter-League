@@ -3,10 +3,10 @@ import {
 	QueryDocumentSnapshot,
 	requestToJoinTeam,
 } from '@/firebase/firestore'
-import { TeamsContext } from '@/firebase/teams-context'
+import { TeamsContext } from '@/contexts/teams-context'
 import { useCallback, useContext } from 'react'
 import { NotificationCard } from '../notification-card'
-import { useAuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/contexts/auth-context'
 import { toast } from '../ui/use-toast'
 import { TeamData } from '@/lib/interfaces'
 import { ManageTeamDetail } from './manage-team-detail'

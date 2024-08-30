@@ -1,4 +1,4 @@
-import { useAuthContext } from '@/firebase/auth-context'
+import { useAuthContext } from '@/contexts/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { PropsWithChildren } from 'react'
 import { Navigate } from 'react-router-dom'

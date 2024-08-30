@@ -4,7 +4,7 @@ import {
 	DocumentSnapshot,
 	QuerySnapshot,
 } from '@/firebase/firestore'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { TeamData } from '@/lib/interfaces'
 
 const formatPlacement = (placement: number) => {

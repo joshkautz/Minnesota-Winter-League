@@ -5,7 +5,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { useSeasonsContext } from '@/firebase/seasons-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { useEffect, useState } from 'react'
 import { Skeleton } from './ui/skeleton'
 
