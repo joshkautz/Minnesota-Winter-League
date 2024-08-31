@@ -58,7 +58,7 @@ export const ManageTeam = () => {
 		]
 	)
 
-	const team = useMemo(
+	const teamQueryDocumentSnapshot = useMemo(
 		() =>
 			currentSeasonTeamsQuerySnapshot?.docs.find(
 				(team) =>
@@ -106,7 +106,7 @@ export const ManageTeam = () => {
 	const removeFromTeamOnClickHandler = useCallback(async () => {
 		removeFromTeam(
 			authenticatedUserSnapshot?.ref,
-			team?.ref,
+			teamQueryDocumentSnapshot?.ref,
 			currentSeasonQueryDocumentSnapshot?.ref
 		)
 			.then(() => {
@@ -124,10 +124,17 @@ export const ManageTeam = () => {
 					variant: 'destructive',
 				})
 			})
-	}, [authenticatedUserSnapshot, team, currentSeasonQueryDocumentSnapshot])
+	}, [
+		authenticatedUserSnapshot,
+		teamQueryDocumentSnapshot,
+		currentSeasonQueryDocumentSnapshot,
+	])
 
 	const deleteTeamOnClickHandler = useCallback(async () => {
-		deleteTeam(team?.ref, currentSeasonQueryDocumentSnapshot?.ref)
+		deleteTeam(
+			teamQueryDocumentSnapshot?.ref,
+			currentSeasonQueryDocumentSnapshot?.ref
+		)
 			.then(() => {
 				toast({
 					title: `${
@@ -143,7 +150,11 @@ export const ManageTeam = () => {
 					variant: 'destructive',
 				})
 			})
-	}, [authenticatedUserSnapshot, team, currentSeasonQueryDocumentSnapshot])
+	}, [
+		authenticatedUserSnapshot,
+		teamQueryDocumentSnapshot,
+		currentSeasonQueryDocumentSnapshot,
+	])
 
 	const captainActions = (
 		<div className="absolute right-6 top-6">
@@ -248,7 +259,11 @@ export const ManageTeam = () => {
 					) : (
 						<ManageTeamRequestCard />
 					)}
-					{isAuthenticatedUserCaptain && <UnrosteredPlayerList />}
+					{isAuthenticatedUserCaptain && (
+						<UnrosteredPlayerList
+							teamQueryDocumentSnapshot={teamQueryDocumentSnapshot}
+						/>
+					)}
 				</div>
 				{/* RIGHT SIDE PANEL */}
 				<OffersPanel isCaptain={isAuthenticatedUserCaptain} />

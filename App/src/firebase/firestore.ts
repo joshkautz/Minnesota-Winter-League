@@ -17,6 +17,7 @@ import {
 	onSnapshot,
 	Unsubscribe,
 	or,
+	and,
 	DocumentSnapshot,
 	QueryDocumentSnapshot,
 	DocumentReference,
@@ -35,7 +36,6 @@ import {
 	GameData,
 	OfferData,
 	PlayerData,
-	StandingsData,
 	TeamData,
 	SeasonData,
 } from '@/lib/interfaces'
@@ -462,14 +462,6 @@ const getPlayerRef = (
 	) as DocumentReference<PlayerData, DocumentData>
 }
 
-const standingsQuery = (): Query<StandingsData, DocumentData> => {
-	return query(
-		collection(firestore, 'standings'),
-		orderBy('wins', 'desc'),
-		orderBy('differential', 'desc')
-	) as Query<StandingsData, DocumentData>
-}
-
 const gamesQuery = (): Query<GameData, DocumentData> => {
 	return query(
 		collection(firestore, Collections.GAMES),
@@ -599,11 +591,66 @@ const offersForUnrosteredPlayersQuery = (
 	) as Query<OfferData, DocumentData>
 }
 
-const playersQuery = (): Query<PlayerData, DocumentData> => {
-	return query(collection(firestore, Collections.PLAYERS)) as Query<
-		PlayerData,
-		DocumentData
-	>
+const getPlayersQuery = (
+	search: string
+): Query<PlayerData, DocumentData> | undefined => {
+	if (search === '') return undefined
+	if (search.includes(' ')) {
+		const [firstname, lastname] = search.split(' ', 2)
+		return query(
+			collection(firestore, Collections.PLAYERS),
+			where(
+				'firstname',
+				'>=',
+				firstname.charAt(0).toUpperCase() + firstname.slice(1)
+			),
+			where(
+				'firstname',
+				'<=',
+				firstname.charAt(0).toUpperCase() + firstname.slice(1) + '\uf8ff'
+			),
+			where(
+				'lastname',
+				'>=',
+				lastname.charAt(0).toUpperCase() + lastname.slice(1)
+			),
+			where(
+				'lastname',
+				'<=',
+				lastname.charAt(0).toUpperCase() + lastname.slice(1) + '\uf8ff'
+			)
+		) as Query<PlayerData, DocumentData>
+	} else {
+		return query(
+			collection(firestore, Collections.PLAYERS),
+			or(
+				and(
+					where(
+						'firstname',
+						'>=',
+						search.charAt(0).toUpperCase() + search.slice(1)
+					),
+					where(
+						'firstname',
+						'<=',
+						search.charAt(0).toUpperCase() + search.slice(1) + '\uf8ff'
+					)
+				),
+				and(
+					where(
+						'lastname',
+						'>=',
+						search.charAt(0).toUpperCase() + search.slice(1)
+					),
+					where(
+						'lastname',
+						'<=',
+						search.charAt(0).toUpperCase() + search.slice(1) + '\uf8ff'
+					)
+				)
+			)
+		) as Query<PlayerData, DocumentData>
+	}
 }
 
 const outgoingOffersQuery = (
@@ -708,9 +755,8 @@ export {
 	gamesByTeamQuery,
 	teamsBySeasonQuery,
 	demoteFromCaptain,
-	playersQuery,
+	getPlayersQuery,
 	promoteToCaptain,
-	standingsQuery,
 	getTeamById,
 	getTeamByTeamIdAndSeason,
 	type DocumentData,

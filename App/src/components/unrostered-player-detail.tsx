@@ -11,20 +11,23 @@ import { PlayerData, TeamData } from '@/lib/interfaces'
 
 export const UnrosteredPlayerDetail = ({
 	teamQueryDocumentSnapshot,
-	unrosteredPlayer,
+	playerQueryDocumentSnapshot,
 	statusColor,
 	handleInvite,
 }: {
 	teamQueryDocumentSnapshot:
 		| QueryDocumentSnapshot<TeamData, DocumentData>
 		| undefined
-	unrosteredPlayer: QueryDocumentSnapshot<PlayerData, DocumentData>
+	playerQueryDocumentSnapshot: QueryDocumentSnapshot<PlayerData, DocumentData>
 	statusColor?: string
 	message?: string
 	handleInvite: (arg: DocumentReference<PlayerData, DocumentData>) => void
 }) => {
 	const [offersForUnrosteredPlayersQuerySnapshot] = useCollection(
-		offersForUnrosteredPlayersQuery(unrosteredPlayer, teamQueryDocumentSnapshot)
+		offersForUnrosteredPlayersQuery(
+			playerQueryDocumentSnapshot,
+			teamQueryDocumentSnapshot
+		)
 	)
 
 	return (
@@ -38,9 +41,9 @@ export const UnrosteredPlayerDetail = ({
 				/>
 			)}
 			<div className="mr-2">
-				<p>{`${unrosteredPlayer.data().firstname} ${unrosteredPlayer.data().lastname}`}</p>
+				<p>{`${playerQueryDocumentSnapshot.data().firstname} ${playerQueryDocumentSnapshot.data().lastname}`}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-					{`${unrosteredPlayer.data().email}`}
+					{`${playerQueryDocumentSnapshot.data().email}`}
 				</p>
 			</div>
 			<div className="flex justify-end flex-1 gap-2">
@@ -52,7 +55,7 @@ export const UnrosteredPlayerDetail = ({
 					size={'sm'}
 					variant={'outline'}
 					onClick={() => {
-						handleInvite(unrosteredPlayer.ref)
+						handleInvite(playerQueryDocumentSnapshot.ref)
 					}}
 				>
 					Invite
