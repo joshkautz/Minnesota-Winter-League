@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { Button } from './ui/button'
 import { PlayerData, TeamData } from '@/lib/interfaces'
+import { Badge } from './ui/badge'
+import { useTeamsContext } from '@/contexts/teams-context'
 
 export const UnrosteredPlayerDetail = ({
 	teamQueryDocumentSnapshot,
@@ -29,6 +31,16 @@ export const UnrosteredPlayerDetail = ({
 			teamQueryDocumentSnapshot
 		)
 	)
+	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
+
+	const { firstname, lastname, email } = playerQueryDocumentSnapshot.data()
+
+	// help me do this better
+	const team = playerQueryDocumentSnapshot.data().seasons[1].team
+	const currentTeam = currentSeasonTeamsQuerySnapshot?.docs.find(
+		(val) => val.id === team?.id
+	)
+	const currentTeamname = currentTeam?.data().name
 
 	return (
 		<div className="flex items-end gap-2 py-2">
@@ -41,11 +53,16 @@ export const UnrosteredPlayerDetail = ({
 				/>
 			)}
 			<div className="mr-2">
-				<p>{`${playerQueryDocumentSnapshot.data().firstname} ${playerQueryDocumentSnapshot.data().lastname}`}</p>
+				<p>{`${firstname} ${lastname}`}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-					{`${playerQueryDocumentSnapshot.data().email}`}
+					{`${email}`}
 				</p>
 			</div>
+			{currentTeamname && (
+				<div>
+					<Badge variant={'outline'}>{currentTeamname}</Badge>
+				</div>
+			)}
 			<div className="flex justify-end flex-1 gap-2">
 				<Button
 					disabled={
