@@ -14,6 +14,7 @@ import { Skeleton } from './ui/skeleton'
 import { UnrosteredPlayerDetail } from './unrostered-player-detail'
 import { UnrosteredPlayerSearchBar } from './unrostered-player-search-bar'
 import { usePlayersSearch } from './use-players-search'
+import { useDebounce } from '@/lib/use-debounce'
 
 export const UnrosteredPlayerList = ({
 	teamQueryDocumentSnapshot,
@@ -23,8 +24,12 @@ export const UnrosteredPlayerList = ({
 		| undefined
 }) => {
 	const [search, setSearch] = useState('')
+	const debouncedSearch = useDebounce(search)
 
-	const playersQuery = useMemo(() => getPlayersQuery(search), [search])
+	const playersQuery = useMemo(
+		() => getPlayersQuery(debouncedSearch),
+		[debouncedSearch]
+	)
 
 	const { playersQuerySnapshot, playersQuerySnapshotLoading } =
 		usePlayersSearch(playersQuery)
