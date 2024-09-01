@@ -1,34 +1,37 @@
 import {
 	DocumentData,
-	DocumentReference,
 	QueryDocumentSnapshot,
-	offersForUnrosteredPlayersQuery,
+	offersForPlayerByTeamQuery,
 } from '@/firebase/firestore'
 import { cn } from '@/lib/utils'
 import { useCollection } from 'react-firebase-hooks/firestore'
-import { Button } from './ui/button'
+import { Button } from '../ui/button'
 import { PlayerData, TeamData } from '@/lib/interfaces'
-import { Badge } from './ui/badge'
+import { Badge } from '../ui/badge'
 import { useTeamsContext } from '@/contexts/teams-context'
 import { useMemo } from 'react'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 
-export const UnrosteredPlayerDetail = ({
+export const ManageInvitePlayerDetail = ({
 	teamQueryDocumentSnapshot,
 	playerQueryDocumentSnapshot,
 	statusColor,
 	handleInvite,
 }: {
-	teamQueryDocumentSnapshot:
-		| QueryDocumentSnapshot<TeamData, DocumentData>
-		| undefined
+	teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
 	playerQueryDocumentSnapshot: QueryDocumentSnapshot<PlayerData, DocumentData>
 	statusColor?: string
 	message?: string
-	handleInvite: (arg: DocumentReference<PlayerData, DocumentData>) => void
+	handleInvite: (
+		playerQueryDocumentSnapshot: QueryDocumentSnapshot<
+			PlayerData,
+			DocumentData
+		>,
+		teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+	) => void
 }) => {
-	const [offersForUnrosteredPlayersQuerySnapshot] = useCollection(
-		offersForUnrosteredPlayersQuery(
+	const [offersForPlayerByTeamQuerySnapshot] = useCollection(
+		offersForPlayerByTeamQuery(
 			playerQueryDocumentSnapshot,
 			teamQueryDocumentSnapshot
 		)
@@ -76,14 +79,11 @@ export const UnrosteredPlayerDetail = ({
 			)}
 			<div className="flex justify-end flex-1 gap-2">
 				<Button
-					disabled={
-						offersForUnrosteredPlayersQuerySnapshot &&
-						offersForUnrosteredPlayersQuerySnapshot.size > 0
-					}
+					disabled={!offersForPlayerByTeamQuerySnapshot?.empty}
 					size={'sm'}
 					variant={'outline'}
 					onClick={() => {
-						handleInvite(playerQueryDocumentSnapshot.ref)
+						handleInvite(playerQueryDocumentSnapshot, teamQueryDocumentSnapshot)
 					}}
 				>
 					Invite

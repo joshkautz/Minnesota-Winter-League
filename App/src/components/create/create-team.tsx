@@ -102,7 +102,7 @@ export const CreateTeam = () => {
 							handleResult({
 								success: false,
 								title: 'Error',
-								description: error.message,
+								description: `${error.message}. Ensure your email is verified. Please try again later.`,
 								navigation: false,
 							})
 						})
@@ -127,7 +127,7 @@ export const CreateTeam = () => {
 							handleResult({
 								success: false,
 								title: 'Error',
-								description: error.message,
+								description: `${error.message}. Ensure your email is verified. Please try again later.`,
 								navigation: false,
 							})
 						})
@@ -160,7 +160,7 @@ export const CreateTeam = () => {
 						handleResult({
 							success: false,
 							title: 'Error',
-							description: error.message,
+							description: `${error.message}. Ensure your email is verified. Please try again later.`,
 							navigation: false,
 						})
 					})
@@ -185,7 +185,7 @@ export const CreateTeam = () => {
 						handleResult({
 							success: false,
 							title: 'Error',
-							description: error.message,
+							description: `${error.message}. Ensure your email is verified. Please try again later.`,
 							navigation: false,
 						})
 					})

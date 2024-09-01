@@ -29,7 +29,7 @@ import {
 } from 'firebase/firestore'
 
 import { app } from './app'
-import { User } from './auth'
+import { User, UserCredential } from './auth'
 import { Products } from './stripe'
 import {
 	CheckoutSessionData,
@@ -111,29 +111,24 @@ const createTeam = async (
 	// Get the player document so we can update the player document.
 	const playerDocumentSnapshot = await getDoc(playerRef)
 
-	const seasons = playerDocumentSnapshot.data()?.seasons
-	seasons?.push({
-		captain: true,
-		paid: false, // TODO: Handle logic for this....?
-		season: seasonRef,
-		signed: false, // TODO: Handle logic for this....?
-		team: teamDocumentReference,
-	})
-
 	// Get the season document so we can update the season document.
 	const seasonDocumentSnapshot = await getDoc(seasonRef)
-
-	const teams = seasonDocumentSnapshot.data()?.teams
-	teams?.push(teamDocumentReference)
 
 	return Promise.all([
 		// Updated the player document.
 		updateDoc(playerRef, {
-			seasons: seasons,
+			seasons: playerDocumentSnapshot.data()?.seasons.map((item) => ({
+				captain: item.season.id === seasonRef.id ? true : item.captain,
+				paid: item.paid,
+				season: item.season,
+				signed: item.signed,
+				team:
+					item.season.id === seasonRef.id ? teamDocumentReference : item.team,
+			})),
 		}),
 		// Updated the season document.
 		updateDoc(seasonRef, {
-			teams: teams,
+			teams: seasonDocumentSnapshot.data()?.teams.concat(teamDocumentReference),
 		}),
 	])
 }
@@ -170,29 +165,24 @@ const rolloverTeam = async (
 	// Get the player document so we can update the player document.
 	const playerDocumentSnapshot = await getDoc(playerRef)
 
-	const seasons = playerDocumentSnapshot.data()?.seasons
-	seasons?.push({
-		captain: true,
-		paid: false, // TODO: Handle logic for this....?
-		season: seasonRef,
-		signed: false, // TODO: Handle logic for this....?
-		team: teamDocumentReference,
-	})
-
 	// Get the season document so we can update the season document.
 	const seasonDocumentSnapshot = await getDoc(seasonRef)
-
-	const teams = seasonDocumentSnapshot.data()?.teams
-	teams?.push(teamDocumentReference)
 
 	return Promise.all([
 		// Updated the player document.
 		updateDoc(playerRef, {
-			seasons: seasons,
+			seasons: playerDocumentSnapshot.data()?.seasons.map((item) => ({
+				captain: item.season.id === seasonRef.id ? true : item.captain,
+				paid: item.paid,
+				season: item.season,
+				signed: item.signed,
+				team:
+					item.season.id === seasonRef.id ? teamDocumentReference : item.team,
+			})),
 		}),
 		// Updated the season document.
 		updateDoc(seasonRef, {
-			teams: teams,
+			teams: seasonDocumentSnapshot.data()?.teams.concat(teamDocumentReference),
 		}),
 	])
 }
@@ -218,18 +208,30 @@ const editTeam = async (
 }
 
 const createPlayer = (
-	uid: string,
+	res: UserCredential | undefined,
 	firstname: string,
 	lastname: string,
-	email: string
+	email: string,
+	season: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
 ): Promise<void> => {
-	return setDoc(doc(firestore, Collections.PLAYERS, uid), {
-		captain: false,
+	if (!res) return Promise.resolve()
+	if (!season) return Promise.resolve()
+
+	// TODO: Get current season.
+	return setDoc(doc(firestore, Collections.PLAYERS, res.user.uid), {
+		admin: false,
 		firstname: firstname,
 		lastname: lastname,
 		email: email,
-		registered: false,
-		team: null,
+		seasons: [
+			{
+				captain: false,
+				paid: false,
+				season: season.ref,
+				signed: false,
+				team: null,
+			},
+		],
 	})
 }
 
@@ -414,17 +416,19 @@ const removeFromTeam = async (
 	])
 }
 
-const invitePlayerToJoinTeam = (
-	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
+const invitePlayer = (
+	playerQueryDocumentSnapshot:
+		| QueryDocumentSnapshot<PlayerData, DocumentData>
+		| undefined,
 	teamQueryDocumentSnapshot:
 		| QueryDocumentSnapshot<TeamData, DocumentData>
 		| undefined
 ) => {
-	if (!playerRef) return
+	if (!playerQueryDocumentSnapshot) return
 	if (!teamQueryDocumentSnapshot) return
 	return addDoc(collection(firestore, Collections.OFFERS), {
 		creator: 'captain',
-		player: playerRef,
+		player: playerQueryDocumentSnapshot.ref,
 		team: teamQueryDocumentSnapshot.ref,
 		status: 'pending',
 	})
@@ -574,7 +578,7 @@ const seasonsQuery = (): Query<SeasonData, DocumentData> => {
 	>
 }
 
-const offersForUnrosteredPlayersQuery = (
+const offersForPlayerByTeamQuery = (
 	playerDocumentSnapshot:
 		| DocumentSnapshot<PlayerData, DocumentData>
 		| undefined,
@@ -779,12 +783,12 @@ export {
 	rejectOffer,
 	getPlayerSnapshot,
 	requestToJoinTeam,
-	invitePlayerToJoinTeam,
+	invitePlayer,
 	teamsQuery,
 	seasonsQuery,
 	gamesQuery,
 	outgoingOffersQuery,
-	offersForUnrosteredPlayersQuery,
+	offersForPlayerByTeamQuery,
 	createPlayer,
 	incomingOffersQuery,
 	getPlayerRef,

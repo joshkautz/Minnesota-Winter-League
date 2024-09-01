@@ -4,32 +4,41 @@ import { useEffect, useState } from 'react'
 import { ExtendedOfferData, OfferData, TeamData } from './interfaces'
 
 export const useOffer = (
-	offerSnapshot: QuerySnapshot<OfferData, DocumentData> | undefined,
-	teamSnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
-): ExtendedOfferData[] | undefined => {
-	const [offer, setOffer] = useState<ExtendedOfferData[] | undefined>()
+	offersQuerySnapshot: QuerySnapshot<OfferData, DocumentData> | undefined,
+	teamsQuerySnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
+) => {
+	const [offers, setOffers] = useState<ExtendedOfferData[] | undefined>()
+	const [offersLoading, setOffersLoading] = useState<boolean>(true)
 
 	useEffect(() => {
-		if (offerSnapshot) {
-			Promise.all(
-				offerSnapshot.docs.map(async (offer: DocumentData, index: number) =>
-					getPlayerSnapshot(offer.data().player).then(
-						(playerSnapshot) =>
-							({
-								...offer.data(),
-								playerName: `${
-									playerSnapshot.data()?.firstname
-								} ${playerSnapshot.data()?.lastname}`,
-								teamName: teamSnapshot?.docs
-									.find((team) => team.id == offer.data().team.id)
-									?.data().name,
-								ref: offerSnapshot.docs[index].ref,
-							}) as ExtendedOfferData
-					)
-				)
-			).then((updatedOffers) => setOffer(updatedOffers))
+		if (!offersQuerySnapshot || !teamsQuerySnapshot) {
+			setOffersLoading(false)
+			return undefined
 		}
-	}, [offerSnapshot, teamSnapshot])
 
-	return offer
+		setOffersLoading(true)
+
+		Promise.all(
+			offersQuerySnapshot.docs.map(async (offer: DocumentData, index: number) =>
+				getPlayerSnapshot(offer.data().player).then(
+					(playerSnapshot) =>
+						({
+							...offer.data(),
+							playerName: `${
+								playerSnapshot.data()?.firstname
+							} ${playerSnapshot.data()?.lastname}`,
+							teamName: teamsQuerySnapshot?.docs
+								.find((team) => team.id == offer.data().team.id)
+								?.data().name,
+							ref: offersQuerySnapshot.docs[index].ref,
+						}) as ExtendedOfferData
+				)
+			)
+		).then((updatedOffers) => {
+			setOffersLoading(false)
+			setOffers(updatedOffers)
+		})
+	}, [offersQuerySnapshot, teamsQuerySnapshot])
+
+	return { offers, offersLoading }
 }

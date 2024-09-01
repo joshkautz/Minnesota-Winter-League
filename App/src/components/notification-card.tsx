@@ -39,7 +39,7 @@ export const NotificationCardItem = ({
 				/>
 			)}
 			<div className="mr-2">
-				<p>{data.playerName}</p>
+				<p>{data.creator === 'player' ? data.playerName : data.teamName}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
 					{`${message} ${data.teamName}`}
 				</p>
@@ -47,7 +47,6 @@ export const NotificationCardItem = ({
 			<div className="flex justify-end flex-1 gap-2">
 				{actionOptions.map(({ title, action }, index) => (
 					<Button
-						disabled={title === 'Accept' ? true : false}
 						key={`action-${index}-${title}`}
 						size={'sm'}
 						variant={'outline'}

@@ -1,7 +1,7 @@
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { Input } from './ui/input'
+import { Input } from '../ui/input'
 
-export const UnrosteredPlayerSearchBar = ({
+export const ManageInvitePlayerSearchBar = ({
 	value,
 	onChange,
 	searching,

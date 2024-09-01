@@ -2,7 +2,7 @@ import {
 	DocumentData,
 	DocumentSnapshot,
 	QueryDocumentSnapshot,
-	offersForUnrosteredPlayersQuery,
+	offersForPlayerByTeamQuery,
 } from '@/firebase/firestore'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar'
@@ -24,16 +24,12 @@ export const ManageTeamDetail = ({
 	>
 	playerDocumentSnapshot: DocumentSnapshot<PlayerData, DocumentData> | undefined
 }) => {
-	const [offersForUnrosteredPlayersQuerySnapshot] = useCollection(
-		offersForUnrosteredPlayersQuery(
+	const [offersForPlayerByTeamQuerySnapshot] = useCollection(
+		offersForPlayerByTeamQuery(
 			playerDocumentSnapshot,
 			currentSeasonTeamsQueryDocumentSnapshot
 		)
 	)
-
-	const isDisabled =
-		offersForUnrosteredPlayersQuerySnapshot &&
-		offersForUnrosteredPlayersQuerySnapshot.size > 0
 
 	return (
 		<div className="flex items-end gap-2 py-2">
@@ -60,7 +56,7 @@ export const ManageTeamDetail = ({
 				<Button
 					size={'sm'}
 					variant={'default'}
-					disabled={isDisabled}
+					disabled={!offersForPlayerByTeamQuerySnapshot?.empty}
 					onClick={() => handleRequest(currentSeasonTeamsQueryDocumentSnapshot)}
 				>
 					Request to join

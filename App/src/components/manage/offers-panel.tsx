@@ -13,6 +13,7 @@ import { toast } from '@/components/ui/use-toast'
 import { ReactNode, useMemo } from 'react'
 import { useAuthContext } from '@/contexts/auth-context'
 import { useSeasonsContext } from '@/contexts/seasons-context'
+import { ReloadIcon } from '@radix-ui/react-icons'
 
 interface OfferAction {
 	title: string
@@ -87,8 +88,12 @@ export const OffersPanel = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
 	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
-	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
-		useOffersContext()
+	const {
+		outgoingOffersQuerySnapshot,
+		outgoingOffersQuerySnapshotLoading,
+		incomingOffersQuerySnapshot,
+		incomingOffersQuerySnapshotLoading,
+	} = useOffersContext()
 
 	const isAuthenticatedUserCaptain = useMemo(
 		() =>
@@ -102,14 +107,10 @@ export const OffersPanel = () => {
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
-	const outgoingOffers = useOffer(
-		outgoingOffersQuerySnapshot,
-		currentSeasonTeamsQuerySnapshot
-	)
-	const incomingOffers = useOffer(
-		incomingOffersQuerySnapshot,
-		currentSeasonTeamsQuerySnapshot
-	)
+	const { offers: outgoingOffers, offersLoading: outgoingOffersLoading } =
+		useOffer(outgoingOffersQuerySnapshot, currentSeasonTeamsQuerySnapshot)
+	const { offers: incomingOffers, offersLoading: incomingOffersLoading } =
+		useOffer(incomingOffersQuerySnapshot, currentSeasonTeamsQuerySnapshot)
 
 	const outgoingPending = outgoingOffers?.filter(
 		(offer) => offer.status === 'pending'
@@ -176,23 +177,29 @@ export const OffersPanel = () => {
 					'incoming'
 				)}
 			>
-				{incomingOffers?.map((incomingOffer: ExtendedOfferData, index) => (
-					<OfferRow
-						key={`incomingOffer-row-${index}`}
-						data={incomingOffer}
-						color={
-							incomingOffer.status === 'pending'
-								? 'bg-primary'
-								: 'bg-muted-foreground'
-						}
-						message={
-							isAuthenticatedUserCaptain
-								? 'would like to join'
-								: 'would like you to join'
-						}
-						actions={incomingActions}
-					/>
-				))}
+				{incomingOffersQuerySnapshotLoading || incomingOffersLoading ? (
+					<div className={'inset-0 flex items-center justify-center'}>
+						<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+					</div>
+				) : (
+					incomingOffers?.map((incomingOffer: ExtendedOfferData, index) => (
+						<OfferRow
+							key={`incomingOffer-row-${index}`}
+							data={incomingOffer}
+							color={
+								incomingOffer.status === 'pending'
+									? 'bg-primary'
+									: 'bg-muted-foreground'
+							}
+							message={
+								isAuthenticatedUserCaptain
+									? 'would like to join'
+									: 'would like you to join'
+							}
+							actions={incomingActions}
+						/>
+					))
+				)}
 			</OffersCard>
 			<OffersCard
 				title={isAuthenticatedUserCaptain ? 'Sent invites' : 'Sent requests'}
@@ -202,19 +209,25 @@ export const OffersPanel = () => {
 					'outgoing'
 				)}
 			>
-				{outgoingOffers?.map((outgoingOffer: ExtendedOfferData, index) => (
-					<OfferRow
-						key={`outgoingOffer-row-${index}`}
-						data={outgoingOffer}
-						color={'bg-muted-foreground'}
-						message={
-							isAuthenticatedUserCaptain
-								? 'invite sent for'
-								: 'request sent for'
-						}
-						actions={outgoingActions}
-					/>
-				))}
+				{outgoingOffersQuerySnapshotLoading || outgoingOffersLoading ? (
+					<div className={'inset-0 flex items-center justify-center'}>
+						<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+					</div>
+				) : (
+					outgoingOffers?.map((outgoingOffer: ExtendedOfferData, index) => (
+						<OfferRow
+							key={`outgoingOffer-row-${index}`}
+							data={outgoingOffer}
+							color={'bg-muted-foreground'}
+							message={
+								isAuthenticatedUserCaptain
+									? 'invite sent for'
+									: 'request sent for'
+							}
+							actions={outgoingActions}
+						/>
+					))
+				)}
 			</OffersCard>
 		</div>
 	)

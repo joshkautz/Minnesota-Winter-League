@@ -3,7 +3,7 @@ import { deleteTeam, removeFromTeam } from '@/firebase/firestore'
 import { toast } from '../ui/use-toast'
 import { useAuthContext } from '@/contexts/auth-context'
 import { ManageTeamRequestCard } from './manage-team-request-card'
-import { UnrosteredPlayerList } from '../unrostered-player-list'
+import { ManageInvitePlayerList } from './manage-invite-player-list'
 import { Button } from '../ui/button'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
 import { DestructiveConfirmationDialog } from '../destructive-confirmation-dialog'
@@ -259,8 +259,8 @@ export const ManageTeam = () => {
 					) : (
 						<ManageTeamRequestCard />
 					)}
-					{isAuthenticatedUserCaptain && (
-						<UnrosteredPlayerList
+					{isAuthenticatedUserCaptain && teamQueryDocumentSnapshot && (
+						<ManageInvitePlayerList
 							teamQueryDocumentSnapshot={teamQueryDocumentSnapshot}
 						/>
 					)}

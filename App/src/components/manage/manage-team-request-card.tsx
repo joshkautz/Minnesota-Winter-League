@@ -10,10 +10,14 @@ import { useAuthContext } from '@/contexts/auth-context'
 import { toast } from '../ui/use-toast'
 import { TeamData } from '@/lib/interfaces'
 import { ManageTeamDetail } from './manage-team-detail'
+import { ReloadIcon } from '@radix-ui/react-icons'
 
 export const ManageTeamRequestCard = () => {
 	const { authenticatedUserSnapshot } = useAuthContext()
-	const { currentSeasonTeamsQuerySnapshot } = useContext(TeamsContext)
+	const {
+		currentSeasonTeamsQuerySnapshot,
+		currentSeasonTeamsQuerySnapshotLoading,
+	} = useContext(TeamsContext)
 
 	const handleRequest = useCallback(
 		(
@@ -43,16 +47,22 @@ export const ManageTeamRequestCard = () => {
 			title={'Team list'}
 			description={'request to join a team below'}
 		>
-			{currentSeasonTeamsQuerySnapshot?.docs.map(
-				(currentSeasonTeamsQueryDocumentSnapshot) => (
-					<ManageTeamDetail
-						key={currentSeasonTeamsQueryDocumentSnapshot.id}
-						handleRequest={handleRequest}
-						currentSeasonTeamsQueryDocumentSnapshot={
-							currentSeasonTeamsQueryDocumentSnapshot
-						}
-						playerDocumentSnapshot={authenticatedUserSnapshot}
-					/>
+			{currentSeasonTeamsQuerySnapshotLoading ? (
+				<div className={'inset-0 flex items-center justify-center'}>
+					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+				</div>
+			) : (
+				currentSeasonTeamsQuerySnapshot?.docs.map(
+					(currentSeasonTeamsQueryDocumentSnapshot) => (
+						<ManageTeamDetail
+							key={currentSeasonTeamsQueryDocumentSnapshot.id}
+							handleRequest={handleRequest}
+							currentSeasonTeamsQueryDocumentSnapshot={
+								currentSeasonTeamsQueryDocumentSnapshot
+							}
+							playerDocumentSnapshot={authenticatedUserSnapshot}
+						/>
+					)
 				)
 			)}
 		</NotificationCard>

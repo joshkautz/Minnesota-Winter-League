@@ -16,6 +16,8 @@ import { toast } from '@/components/ui/use-toast'
 import { useAuthContext } from '@/contexts/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { createPlayer } from '@/firebase/firestore'
+import { useCallback } from 'react'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 
 const signupSchema = z.object({
 	firstname: z.string().min(2),
@@ -37,34 +39,49 @@ export const UserSignup = ({
 		createUserWithEmailAndPasswordError,
 		sendEmailVerification,
 	} = useAuthContext()
+
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
+
 	const form = useForm<SignupSchema>({
 		resolver: zodResolver(signupSchema),
 	})
 
-	const onSubmit = async (data: SignupSchema) => {
-		const res = await createUserWithEmailAndPassword(data.email, data.password)
-		if (res) {
-			await sendEmailVerification()
-			await createPlayer(
-				res.user.uid,
-				data.firstname,
-				data.lastname,
-				data.email
+	const onSubmit = useCallback(
+		(data: SignupSchema) => {
+			createUserWithEmailAndPassword(data.email, data.password).then((res) =>
+				Promise.all([
+					sendEmailVerification(),
+					createPlayer(
+						res,
+						data.firstname,
+						data.lastname,
+						data.email,
+						currentSeasonQueryDocumentSnapshot
+					),
+				]).then(() => {
+					toast({
+						title: res?.user
+							? 'User created'
+							: `${createUserWithEmailAndPasswordError?.message}`,
+						variant: res?.user ? 'default' : 'destructive',
+						description: 'Welcome to Minneapolis Winter League!',
+					})
+
+					if (closeMobileSheet) {
+						closeMobileSheet()
+					}
+				})
 			)
-		}
-
-		toast({
-			title: res?.user
-				? 'Account creation succeeded!'
-				: `Account creation failed: ${createUserWithEmailAndPasswordError}`,
-			variant: res?.user ? 'default' : 'destructive',
-			description: 'Welcome to Minneapolis Winter League!',
-		})
-
-		if (closeMobileSheet) {
-			closeMobileSheet()
-		}
-	}
+		},
+		[
+			createUserWithEmailAndPassword,
+			sendEmailVerification,
+			createPlayer,
+			toast,
+			createUserWithEmailAndPasswordError,
+			currentSeasonQueryDocumentSnapshot,
+		]
+	)
 
 	return (
 		<Form {...form}>
