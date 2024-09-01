@@ -266,6 +266,7 @@ export const ManageTeam = () => {
 					)}
 				</div>
 				{/* RIGHT SIDE PANEL */}
+				{/* TODO: Create distinct componenets for incoming and outcoming and for captain and non-captain players */}
 				<OffersPanel />
 			</div>
 		</div>

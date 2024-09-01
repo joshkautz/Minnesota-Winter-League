@@ -58,11 +58,6 @@ export const OfferRow = ({ data, color, message, actions }: OfferRowProps) => {
 			data={data}
 			statusColor={color}
 			message={message}
-			// message={
-			// 	isAuthenticatedUserCaptain
-			// 		? 'would like to join'
-			// 		: 'would like you to join'
-			// }
 			actionOptions={actions}
 		/>
 	)

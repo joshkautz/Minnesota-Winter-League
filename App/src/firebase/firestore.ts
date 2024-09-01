@@ -68,19 +68,6 @@ const rejectOffer = (
 	})
 }
 
-const getRegisteredPlayers = async (
-	teamRef: DocumentReference<TeamData, DocumentData>
-) => {
-	const aggregateQuerySnapshot = await getCountFromServer(
-		query(
-			collection(firestore, Collections.PLAYERS),
-			where('team', '==', teamRef),
-			where('registered', '==', true)
-		)
-	)
-	return aggregateQuerySnapshot.data().count
-}
-
 const createTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
 	name: string | undefined,
@@ -217,7 +204,6 @@ const createPlayer = (
 	if (!res) return Promise.resolve()
 	if (!season) return Promise.resolve()
 
-	// TODO: Get current season.
 	return setDoc(doc(firestore, Collections.PLAYERS, res.user.uid), {
 		admin: false,
 		firstname: firstname,
@@ -242,44 +228,50 @@ const deleteTeam = async (
 	if (!teamRef) return
 	if (!seasonRef) return
 
-	// Delete all offers related to this team.
-	const offersQuerySnapshot = await getDocs(
+	// Delete all offers involving this team.
+	const offersPromises = getDocs(
 		query(
 			collection(firestore, Collections.OFFERS),
 			where('team', '==', teamRef)
 		)
-	)
-
-	const offersPromises = offersQuerySnapshot.docs.map(
-		(offer: QueryDocumentSnapshot) => deleteDoc(offer.ref)
+	).then((offersQuerySnapshot) =>
+		offersQuerySnapshot.docs.map((offer: QueryDocumentSnapshot) =>
+			deleteDoc(offer.ref)
+		)
 	)
 
 	// Update all players on this team to remove them from the team.
-	const teamDocumentSnapshot = await getDoc(teamRef)
-	const playersPromises = teamDocumentSnapshot
-		.data()
-		?.roster.map(async (item) =>
+	const playersPromises = getDoc(teamRef).then((teamDocumentSnapshot) =>
+		teamDocumentSnapshot.data()?.roster.map(async (item) =>
 			getDoc(item.player).then((playerDocumentSnapshot) =>
 				updateDoc(playerDocumentSnapshot.ref, {
-					seasons: playerDocumentSnapshot
-						.data()
-						?.seasons.filter((season) => season.team?.id !== teamRef.id),
+					seasons: playerDocumentSnapshot.data()?.seasons.map((item) => ({
+						captain: item.season.id === seasonRef.id ? false : item.team,
+						paid: item.paid,
+						season: item.season,
+						signed: item.signed,
+						team: item.season.id === seasonRef.id ? null : item.team,
+					})),
 				})
 			)
 		)
+	)
 
 	// Update season document to remove the team.
-	const seasonDocumentSnapshot = await getDoc(seasonRef)
-	const seasonPromise = updateDoc(seasonRef, {
-		teams: seasonDocumentSnapshot
-			.data()
-			?.teams.filter((team) => team.id !== teamRef.id),
-	})
+	const seasonPromise = getDoc(seasonRef).then((seasonDocumentSnapshot) =>
+		updateDoc(seasonRef, {
+			teams: seasonDocumentSnapshot
+				.data()
+				?.teams.filter((team) => team.id !== teamRef.id),
+		})
+	)
 
 	// Delete team's image from storage.
-	const imagePromise = teamDocumentSnapshot.data()?.storagePath
-		? deleteImage(ref(storage, teamDocumentSnapshot.data()?.storagePath))
-		: Promise.resolve()
+	const imagePromise = getDoc(teamRef).then((teamDocumentSnapshot) =>
+		teamDocumentSnapshot.data()?.storagePath
+			? deleteImage(ref(storage, teamDocumentSnapshot.data()?.storagePath))
+			: Promise.resolve()
+	)
 
 	// Delete the team document.
 	const teamPromise = deleteDoc(teamRef)
@@ -381,39 +373,43 @@ const removeFromTeam = async (
 	if (!teamRef) return
 	if (!seasonRef) return
 
-	// Get the team document so we can update the team document.
-	const teamDocumentSnapshot = await getDoc(teamRef)
+	await getDoc(teamRef)
+		// Ensure this player isn't the last captain on the team.
+		.then((teamDocumentSnapshot) => {
+			if (
+				!teamDocumentSnapshot
+					.data()
+					?.roster.some(
+						(item) => item.captain && item.player.id !== playerRef.id
+					)
+			) {
+				throw new Error('Cannot remove last captain.')
+			}
+		})
 
-	const roster = teamDocumentSnapshot
-		.data()
-		?.roster.filter((item) => item.player.id !== playerRef.id)
-
-	// Ensure not the last captain on the team.
-	if (
-		!teamDocumentSnapshot
-			.data()
-			?.roster.some((item) => item.captain && item.player.id !== playerRef.id)
-	) {
-		throw new Error('Cannot remove last captain.')
-	}
-
-	// Get the player document so we can update the player document.
-	const playerDocumentSnapshot = await getDoc(playerRef)
-
-	const seasons = playerDocumentSnapshot
-		.data()
-		?.seasons.filter((item) => item.team?.id !== teamRef.id)
-
-	return Promise.all([
-		// Updated the team document.
+	// Update the team document to remove the player from the team.
+	const teamPromise = getDoc(teamRef).then((teamDocumentSnapshot) =>
 		updateDoc(teamRef, {
-			roster: roster,
-		}),
-		// Updated the player document.
+			roster: teamDocumentSnapshot
+				.data()
+				?.roster.filter((item) => item.player.id !== playerRef.id),
+		})
+	)
+
+	// Update the player document to remove the team from their season.
+	const playerPromise = getDoc(playerRef).then((playerDocumentSnapshot) =>
 		updateDoc(playerRef, {
-			seasons: seasons,
-		}),
-	])
+			seasons: playerDocumentSnapshot.data()?.seasons.map((item) => ({
+				captain: item.season.id === seasonRef.id ? false : item.team,
+				paid: item.paid,
+				season: item.season,
+				signed: item.signed,
+				team: item.season.id === seasonRef.id ? null : item.team,
+			})),
+		})
+	)
+
+	return Promise.all([teamPromise, playerPromise])
 }
 
 const invitePlayer = (
@@ -441,6 +437,7 @@ const requestToJoinTeam = (
 	teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
 ) => {
 	if (!playerDocumentSnapshot) return
+	if (!teamQueryDocumentSnapshot) return
 	return addDoc(collection(firestore, Collections.OFFERS), {
 		creator: 'player',
 		player: playerDocumentSnapshot.ref,
@@ -464,13 +461,6 @@ const getPlayerRef = (
 		Collections.PLAYERS,
 		authValue.uid
 	) as DocumentReference<PlayerData, DocumentData>
-}
-
-const gamesQuery = (): Query<GameData, DocumentData> => {
-	return query(
-		collection(firestore, Collections.GAMES),
-		orderBy('date')
-	) as Query<GameData, DocumentData>
 }
 
 const currentSeasonGamesQuery = (
@@ -521,20 +511,6 @@ const getTeamById = (
 		TeamData,
 		DocumentData
 	>
-}
-
-const getTeamByTeamIdAndSeason = (
-	teamId: string | undefined,
-	seasonRef: DocumentReference<SeasonData, DocumentData> | undefined
-): Query<TeamData, DocumentData> | undefined => {
-	if (!teamId) return
-	if (!seasonRef) return
-
-	return query(
-		collection(firestore, Collections.TEAMS),
-		where('teamId', '==', teamId),
-		where('teamId', '==', seasonRef)
-	) as Query<TeamData, DocumentData>
 }
 
 const teamsQuery = (
@@ -776,24 +752,23 @@ const stripeRegistration = async (
 }
 
 export {
-	teamsHistoryQuery,
-	currentSeasonTeamsQuery,
-	currentSeasonGamesQuery,
 	acceptOffer,
 	rejectOffer,
 	getPlayerSnapshot,
+	getPlayerRef,
+	getPlayersQuery,
+	teamsHistoryQuery,
+	currentSeasonTeamsQuery,
+	currentSeasonGamesQuery,
 	requestToJoinTeam,
 	invitePlayer,
 	teamsQuery,
 	seasonsQuery,
-	gamesQuery,
 	outgoingOffersQuery,
 	offersForPlayerByTeamQuery,
 	createPlayer,
 	incomingOffersQuery,
-	getPlayerRef,
 	updatePlayer,
-	getRegisteredPlayers,
 	removeFromTeam,
 	createTeam,
 	rolloverTeam,
@@ -803,10 +778,8 @@ export {
 	gamesByTeamQuery,
 	teamsBySeasonQuery,
 	demoteFromCaptain,
-	getPlayersQuery,
 	promoteToCaptain,
 	getTeamById,
-	getTeamByTeamIdAndSeason,
 	type DocumentData,
 	type FirestoreError,
 	type DocumentSnapshot,
