@@ -159,7 +159,6 @@ export const RolloverTeamForm = ({
 
 	const handleSeasonChange = useCallback(
 		(team: string) => {
-			console.log(team)
 			setStringValue(team)
 			const teamQueryDocumentSnapshot =
 				teamsForWhichAuthenticatedUserIsCaptainQuerySnapshot?.docs.find(

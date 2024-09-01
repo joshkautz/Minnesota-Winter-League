@@ -5,7 +5,7 @@ import {
 	getPlayersQuery,
 	QueryDocumentSnapshot,
 } from '@/firebase/firestore'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { NotificationCard } from './notification-card'
 import { Button } from './ui/button'
 import { toast } from './ui/use-toast'
@@ -28,10 +28,6 @@ export const UnrosteredPlayerList = ({
 
 	const { playersQuerySnapshot, playersQuerySnapshotLoading } =
 		usePlayersSearch(playersQuery)
-
-	useEffect(() => {
-		console.log(playersQuerySnapshotLoading)
-	}, [playersQuerySnapshotLoading])
 
 	const handleInvite = (
 		playerRef: DocumentReference<PlayerData, DocumentData>
