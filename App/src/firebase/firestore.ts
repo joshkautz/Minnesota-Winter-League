@@ -654,15 +654,37 @@ const getPlayersQuery = (
 }
 
 const outgoingOffersQuery = (
-	playerSnapshot: DocumentSnapshot<PlayerData, DocumentData> | undefined
+	playerDocumentSnapshot:
+		| DocumentSnapshot<PlayerData, DocumentData>
+		| undefined,
+	currentSeasonQueryDocumentSnapshot:
+		| QueryDocumentSnapshot<SeasonData, DocumentData>
+		| undefined
 ): Query<OfferData, DocumentData> | undefined => {
-	if (!playerSnapshot) return undefined
+	if (!playerDocumentSnapshot) return undefined
+	if (!currentSeasonQueryDocumentSnapshot) return undefined
+
+	const isCaptain = playerDocumentSnapshot
+		?.data()
+		?.seasons.some(
+			(item) =>
+				item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
+				item.captain
+		)
+
+	const team = playerDocumentSnapshot
+		?.data()
+		?.seasons.find(
+			(item) =>
+				item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
+				item.captain
+		)?.team
 
 	// If the user is a captain, show all the invitations to join their team.
-	if (playerSnapshot.data()?.captain) {
+	if (isCaptain) {
 		return query(
 			collection(firestore, Collections.OFFERS),
-			where('team', '==', playerSnapshot.data()?.team),
+			where('team', '==', team),
 			where('creator', '==', 'captain')
 		) as Query<OfferData, DocumentData>
 	}
@@ -670,21 +692,43 @@ const outgoingOffersQuery = (
 	// If the user is a player, show all their requests to join teams.
 	return query(
 		collection(firestore, Collections.OFFERS),
-		where('player', '==', playerSnapshot?.ref),
+		where('player', '==', playerDocumentSnapshot.ref),
 		where('creator', '==', 'player')
 	) as Query<OfferData, DocumentData>
 }
 
 const incomingOffersQuery = (
-	playerSnapshot: DocumentSnapshot<PlayerData, DocumentData> | undefined
+	playerDocumentSnapshot:
+		| DocumentSnapshot<PlayerData, DocumentData>
+		| undefined,
+	currentSeasonQueryDocumentSnapshot:
+		| QueryDocumentSnapshot<SeasonData, DocumentData>
+		| undefined
 ): Query<OfferData, DocumentData> | undefined => {
-	if (!playerSnapshot) return undefined
+	if (!playerDocumentSnapshot) return undefined
+	if (!currentSeasonQueryDocumentSnapshot) return undefined
+
+	const isCaptain = playerDocumentSnapshot
+		?.data()
+		?.seasons.some(
+			(item) =>
+				item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
+				item.captain
+		)
+
+	const team = playerDocumentSnapshot
+		?.data()
+		?.seasons.find(
+			(item) =>
+				item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
+				item.captain
+		)?.team
 
 	// If the user is a captain, show all the requests to join their team.
-	if (playerSnapshot.data()?.captain) {
+	if (isCaptain) {
 		return query(
 			collection(firestore, Collections.OFFERS),
-			where('team', '==', playerSnapshot.data()?.team),
+			where('team', '==', team),
 			where('creator', '==', 'player')
 		) as Query<OfferData, DocumentData>
 	}
@@ -692,7 +736,7 @@ const incomingOffersQuery = (
 	// If the user is a player, show all their invitations to join teams.
 	return query(
 		collection(firestore, Collections.OFFERS),
-		where('player', '==', playerSnapshot.ref),
+		where('player', '==', playerDocumentSnapshot.ref),
 		where('creator', '==', 'captain')
 	) as Query<OfferData, DocumentData>
 }

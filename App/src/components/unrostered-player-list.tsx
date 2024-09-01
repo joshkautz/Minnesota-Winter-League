@@ -54,7 +54,7 @@ export const UnrosteredPlayerList = ({
 
 	return (
 		<NotificationCard
-			title={'Unrostered players'}
+			title={'Invite players'}
 			description={'players eligible for team roster invitations.'}
 			scrollArea
 			searchBar={

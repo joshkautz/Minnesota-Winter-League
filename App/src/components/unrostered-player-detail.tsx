@@ -10,6 +10,8 @@ import { Button } from './ui/button'
 import { PlayerData, TeamData } from '@/lib/interfaces'
 import { Badge } from './ui/badge'
 import { useTeamsContext } from '@/contexts/teams-context'
+import { useMemo } from 'react'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 
 export const UnrosteredPlayerDetail = ({
 	teamQueryDocumentSnapshot,
@@ -32,15 +34,22 @@ export const UnrosteredPlayerDetail = ({
 		)
 	)
 	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
-	const { firstname, lastname, email } = playerQueryDocumentSnapshot.data()
-
-	// help me do this better
-	const team = playerQueryDocumentSnapshot.data().seasons[1].team
-	const currentTeam = currentSeasonTeamsQuerySnapshot?.docs.find(
-		(val) => val.id === team?.id
+	const currentTeamQueryDocumentSnapshot = useMemo(
+		() =>
+			currentSeasonTeamsQuerySnapshot?.docs.find(
+				(team) =>
+					team.id ===
+					playerQueryDocumentSnapshot
+						?.data()
+						?.seasons.find(
+							(item) =>
+								item.season.id === currentSeasonQueryDocumentSnapshot?.id
+						)?.team?.id
+			),
+		[currentSeasonTeamsQuerySnapshot, currentSeasonQueryDocumentSnapshot]
 	)
-	const currentTeamname = currentTeam?.data().name
 
 	return (
 		<div className="flex items-end gap-2 py-2">
@@ -53,14 +62,16 @@ export const UnrosteredPlayerDetail = ({
 				/>
 			)}
 			<div className="mr-2">
-				<p>{`${firstname} ${lastname}`}</p>
+				<p>{`${playerQueryDocumentSnapshot.data().firstname} ${playerQueryDocumentSnapshot.data().lastname}`}</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
-					{`${email}`}
+					{`${playerQueryDocumentSnapshot.data().email}`}
 				</p>
 			</div>
-			{currentTeamname && (
+			{currentTeamQueryDocumentSnapshot && (
 				<div>
-					<Badge variant={'outline'}>{currentTeamname}</Badge>
+					<Badge variant={'outline'}>
+						{currentTeamQueryDocumentSnapshot.data().name}
+					</Badge>
 				</div>
 			)}
 			<div className="flex justify-end flex-1 gap-2">

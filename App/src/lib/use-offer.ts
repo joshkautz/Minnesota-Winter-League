@@ -10,30 +10,25 @@ export const useOffer = (
 	const [offer, setOffer] = useState<ExtendedOfferData[] | undefined>()
 
 	useEffect(() => {
-		const updateOffers = async () => {
-			if (offerSnapshot) {
-				const updatedOffers: ExtendedOfferData[] = await Promise.all(
-					offerSnapshot.docs.map(async (offer: DocumentData, index: number) => {
-						const playerSnapshot = await getPlayerSnapshot(offer.data().player)
-						const result: ExtendedOfferData = {
-							...offer.data(),
-							playerName: `${
-								playerSnapshot.data()?.firstname
-							} ${playerSnapshot.data()?.lastname}`,
-							teamName: teamSnapshot?.docs
-								.find((team) => team.id == offer.data().team.id)
-								?.data().name,
-							ref: offerSnapshot.docs[index].ref,
-						}
-						return result
-					})
+		if (offerSnapshot) {
+			Promise.all(
+				offerSnapshot.docs.map(async (offer: DocumentData, index: number) =>
+					getPlayerSnapshot(offer.data().player).then(
+						(playerSnapshot) =>
+							({
+								...offer.data(),
+								playerName: `${
+									playerSnapshot.data()?.firstname
+								} ${playerSnapshot.data()?.lastname}`,
+								teamName: teamSnapshot?.docs
+									.find((team) => team.id == offer.data().team.id)
+									?.data().name,
+								ref: offerSnapshot.docs[index].ref,
+							}) as ExtendedOfferData
+					)
 				)
-
-				setOffer(updatedOffers)
-			}
+			).then((updatedOffers) => setOffer(updatedOffers))
 		}
-
-		updateOffers()
 	}, [offerSnapshot, teamSnapshot])
 
 	return offer

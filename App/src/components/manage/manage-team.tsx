@@ -266,7 +266,7 @@ export const ManageTeam = () => {
 					)}
 				</div>
 				{/* RIGHT SIDE PANEL */}
-				<OffersPanel isCaptain={isAuthenticatedUserCaptain} />
+				<OffersPanel />
 			</div>
 		</div>
 	)

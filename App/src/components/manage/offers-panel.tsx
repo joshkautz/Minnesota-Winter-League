@@ -10,7 +10,9 @@ import {
 	acceptOffer,
 } from '@/firebase/firestore'
 import { toast } from '@/components/ui/use-toast'
-import { ReactNode } from 'react'
+import { ReactNode, useMemo } from 'react'
+import { useAuthContext } from '@/contexts/auth-context'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 
 interface OfferAction {
 	title: string
@@ -81,10 +83,24 @@ export const OffersCard = ({
 	)
 }
 
-export const OffersPanel = ({ isCaptain }: { isCaptain?: boolean }) => {
+export const OffersPanel = () => {
+	const { authenticatedUserSnapshot } = useAuthContext()
+	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 	const { outgoingOffersQuerySnapshot, incomingOffersQuerySnapshot } =
 		useOffersContext()
-	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
+
+	const isAuthenticatedUserCaptain = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.some(
+					(item) =>
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
+						item.captain
+				),
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
+	)
 
 	const outgoingOffers = useOffer(
 		outgoingOffersQuerySnapshot,
@@ -151,8 +167,14 @@ export const OffersPanel = ({ isCaptain }: { isCaptain?: boolean }) => {
 	return (
 		<div className="max-w-[600px] flex-1 basis-80 space-y-4">
 			<OffersCard
-				title={isCaptain ? 'Pending requests' : 'Pending invites'}
-				description={getOfferMessage(isCaptain, incomingPending, 'incoming')}
+				title={
+					isAuthenticatedUserCaptain ? 'Pending requests' : 'Pending invites'
+				}
+				description={getOfferMessage(
+					isAuthenticatedUserCaptain,
+					incomingPending,
+					'incoming'
+				)}
 			>
 				{incomingOffers?.map((incomingOffer: ExtendedOfferData, index) => (
 					<OfferRow
@@ -164,22 +186,32 @@ export const OffersPanel = ({ isCaptain }: { isCaptain?: boolean }) => {
 								: 'bg-muted-foreground'
 						}
 						message={
-							isCaptain ? 'would like to join' : 'would like you to join'
+							isAuthenticatedUserCaptain
+								? 'would like to join'
+								: 'would like you to join'
 						}
 						actions={incomingActions}
 					/>
 				))}
 			</OffersCard>
 			<OffersCard
-				title={isCaptain ? 'Sent invites' : 'Sent requests'}
-				description={getOfferMessage(isCaptain, outgoingPending, 'outgoing')}
+				title={isAuthenticatedUserCaptain ? 'Sent invites' : 'Sent requests'}
+				description={getOfferMessage(
+					isAuthenticatedUserCaptain,
+					outgoingPending,
+					'outgoing'
+				)}
 			>
 				{outgoingOffers?.map((outgoingOffer: ExtendedOfferData, index) => (
 					<OfferRow
 						key={`outgoingOffer-row-${index}`}
 						data={outgoingOffer}
 						color={'bg-muted-foreground'}
-						message={isCaptain ? 'invite sent for' : 'request sent for'}
+						message={
+							isAuthenticatedUserCaptain
+								? 'invite sent for'
+								: 'request sent for'
+						}
 						actions={outgoingActions}
 					/>
 				))}
