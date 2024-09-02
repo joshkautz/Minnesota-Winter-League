@@ -1,6 +1,33 @@
 import { DocumentData, DocumentReference } from '@/firebase/firestore'
 import { Timestamp } from '@firebase/firestore'
 
+export enum OfferCreator {
+	CAPTAIN = 'captain',
+	NONCAPTAIN = 'noncaptain',
+}
+
+export enum OfferStatus {
+	PENDING = 'pending',
+	ACCEPTED = 'accepted',
+	REJECTED = 'rejected',
+}
+
+export enum OfferType {
+	INCOMING = 'incoming',
+	OUTGOING = 'outgoing',
+}
+
+export interface OfferAction {
+	title: string
+	action: (
+		offerDocumentReference: DocumentReference<OfferData, DocumentData>
+	) => void
+}
+
+/////////////////////////////////////////////////////////////////
+///////////////////////// Document Data /////////////////////////
+/////////////////////////////////////////////////////////////////
+
 export interface PlayerData extends DocumentData {
 	admin: boolean
 	email: string
@@ -40,16 +67,16 @@ export interface SeasonData extends DocumentData {
 }
 
 export interface OfferData extends DocumentData {
-	creator: string
+	creator: OfferCreator
+	creatorName: string
 	player: DocumentReference<PlayerData, DocumentData>
-	status: string
+	status: OfferStatus
 	team: DocumentReference<TeamData, DocumentData>
 }
 
 export interface ExtendedOfferData extends OfferData {
 	playerName: string
 	teamName: string
-	ref: DocumentReference
 }
 
 export interface CheckoutSessionData extends DocumentData {

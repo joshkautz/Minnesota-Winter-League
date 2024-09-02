@@ -3,6 +3,7 @@ import {
 	invitePlayer,
 	getPlayersQuery,
 	QueryDocumentSnapshot,
+	DocumentSnapshot,
 } from '@/firebase/firestore'
 import { useCallback, useMemo, useState } from 'react'
 import { NotificationCard } from '../notification-card'
@@ -12,12 +13,11 @@ import { ManageInvitePlayerDetail } from './manage-invite-player-detail'
 import { ManageInvitePlayerSearchBar } from './manage-invite-player-search-bar'
 import { usePlayersSearch } from '../use-players-search'
 import { useDebounce } from '@/lib/use-debounce'
+import { useSeasonsContext } from '@/contexts/seasons-context'
+import { useTeamsContext } from '@/contexts/teams-context'
+import { useAuthContext } from '@/contexts/auth-context'
 
-export const ManageInvitePlayerList = ({
-	teamQueryDocumentSnapshot,
-}: {
-	teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
-}) => {
+export const ManageInvitePlayerList = () => {
 	const [search, setSearch] = useState('')
 	const debouncedSearch = useDebounce(search)
 
@@ -29,19 +29,51 @@ export const ManageInvitePlayerList = ({
 	const { playersQuerySnapshot, playersQuerySnapshotLoading } =
 		usePlayersSearch(playersQuery)
 
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
+	const { authenticatedUserSnapshot } = useAuthContext()
+
+	const teamQueryDocumentSnapshot = useMemo(
+		() =>
+			currentSeasonTeamsQuerySnapshot?.docs.find(
+				(team) =>
+					team.id ===
+					authenticatedUserSnapshot
+						?.data()
+						?.seasons.find(
+							(item) =>
+								item.season.id === currentSeasonQueryDocumentSnapshot?.id
+						)?.team?.id
+			),
+		[
+			authenticatedUserSnapshot,
+			currentSeasonTeamsQuerySnapshot,
+			currentSeasonQueryDocumentSnapshot,
+		]
+	)
+
 	const handleInvite = useCallback(
 		(
 			playerQueryDocumentSnapshot: QueryDocumentSnapshot<
 				PlayerData,
 				DocumentData
 			>,
-			teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
+			teamQueryDocumentSnapshot:
+				| QueryDocumentSnapshot<TeamData, DocumentData>
+				| undefined,
+			authenticatedUserDocumentSnapshot:
+				| DocumentSnapshot<PlayerData, DocumentData>
+				| undefined
 		) => {
-			invitePlayer(playerQueryDocumentSnapshot, teamQueryDocumentSnapshot)
+			invitePlayer(
+				playerQueryDocumentSnapshot,
+				teamQueryDocumentSnapshot,
+				authenticatedUserDocumentSnapshot
+			)
 				?.then(() => {
 					toast({
 						title: 'Invite sent',
-						description: `${playerQueryDocumentSnapshot.data().firstname} ${playerQueryDocumentSnapshot.data().lastname} has been invited to join ${teamQueryDocumentSnapshot.data().name}.`,
+						description: `${playerQueryDocumentSnapshot.data().firstname} ${playerQueryDocumentSnapshot.data().lastname} has been invited to join ${teamQueryDocumentSnapshot?.data().name}.`,
 						variant: 'default',
 					})
 				})

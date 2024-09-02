@@ -1,5 +1,6 @@
 import {
 	DocumentData,
+	DocumentSnapshot,
 	QueryDocumentSnapshot,
 	requestToJoinTeam,
 } from '@/firebase/firestore'
@@ -8,7 +9,7 @@ import { useCallback, useContext } from 'react'
 import { NotificationCard } from '../notification-card'
 import { useAuthContext } from '@/contexts/auth-context'
 import { toast } from '../ui/use-toast'
-import { TeamData } from '@/lib/interfaces'
+import { PlayerData, TeamData } from '@/lib/interfaces'
 import { ManageTeamDetail } from './manage-team-detail'
 import { ReloadIcon } from '@radix-ui/react-icons'
 
@@ -21,9 +22,16 @@ export const ManageTeamRequestCard = () => {
 
 	const handleRequest = useCallback(
 		(
+			authenticatedUserDocumentSnapshot:
+				| DocumentSnapshot<PlayerData, DocumentData>
+				| undefined,
+
 			teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
 		) =>
-			requestToJoinTeam(authenticatedUserSnapshot, teamQueryDocumentSnapshot)
+			requestToJoinTeam(
+				authenticatedUserDocumentSnapshot,
+				teamQueryDocumentSnapshot
+			)
 				?.then(() => {
 					toast({
 						title: 'Request sent',
@@ -39,7 +47,7 @@ export const ManageTeamRequestCard = () => {
 						variant: 'destructive',
 					})
 				}),
-		[authenticatedUserSnapshot]
+		[]
 	)
 
 	return (

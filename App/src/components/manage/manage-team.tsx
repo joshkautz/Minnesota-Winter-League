@@ -1,29 +1,17 @@
-import { useCallback, useMemo, useState } from 'react'
-import { deleteTeam, removeFromTeam } from '@/firebase/firestore'
-import { toast } from '../ui/use-toast'
+import { useMemo } from 'react'
 import { useAuthContext } from '@/contexts/auth-context'
 import { ManageTeamRequestCard } from './manage-team-request-card'
 import { ManageInvitePlayerList } from './manage-invite-player-list'
-import { Button } from '../ui/button'
-import { DotsVerticalIcon } from '@radix-ui/react-icons'
-import { DestructiveConfirmationDialog } from '../destructive-confirmation-dialog'
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
 import { GradientHeader } from '../gradient-header'
-import { ManageEditTeamDialog } from './manage-edit-team-dialog'
 import { useSeasonsContext } from '@/contexts/seasons-context'
-import { OffersPanel } from './offers-panel'
-import { useTeamsContext } from '@/contexts/teams-context'
 import { ManageTeamRosterCard } from './manage-team-roster-card'
+import { ManageCaptainActions } from './manage-captain-actions'
+import { ManageNonCaptainActions } from './manage-non-captain-actions'
+import { ManageCaptainsOffersPanel } from './manage-captains-offers-panel'
+import { ManageNonCaptainsOffersPanel } from './manage-non-captains-offers-panel'
 
 export const ManageTeam = () => {
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
-	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
 
 	const {
 		authStateUser,
@@ -58,25 +46,6 @@ export const ManageTeam = () => {
 		]
 	)
 
-	const teamQueryDocumentSnapshot = useMemo(
-		() =>
-			currentSeasonTeamsQuerySnapshot?.docs.find(
-				(team) =>
-					team.id ===
-					authenticatedUserSnapshot
-						?.data()
-						?.seasons.find(
-							(item) =>
-								item.season.id === currentSeasonQueryDocumentSnapshot?.id
-						)?.team?.id
-			),
-		[
-			authenticatedUserSnapshot,
-			currentSeasonTeamsQuerySnapshot,
-			currentSeasonQueryDocumentSnapshot,
-		]
-	)
-
 	const isAuthenticatedUserCaptain = useMemo(
 		() =>
 			authenticatedUserSnapshot
@@ -101,141 +70,6 @@ export const ManageTeam = () => {
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
-	const [open, setOpen] = useState(false)
-
-	const removeFromTeamOnClickHandler = useCallback(async () => {
-		removeFromTeam(
-			authenticatedUserSnapshot?.ref,
-			teamQueryDocumentSnapshot?.ref,
-			currentSeasonQueryDocumentSnapshot?.ref
-		)
-			.then(() => {
-				toast({
-					title: `${
-						authenticatedUserSnapshot?.data()?.firstname ?? 'Player'
-					} has left the team`,
-					description: 'Send player invites to build up your roster.',
-				})
-			})
-			.catch((error) => {
-				toast({
-					title: 'Unable to Remove',
-					description: error.message,
-					variant: 'destructive',
-				})
-			})
-	}, [
-		authenticatedUserSnapshot,
-		teamQueryDocumentSnapshot,
-		currentSeasonQueryDocumentSnapshot,
-	])
-
-	const deleteTeamOnClickHandler = useCallback(async () => {
-		deleteTeam(
-			teamQueryDocumentSnapshot?.ref,
-			currentSeasonQueryDocumentSnapshot?.ref
-		)
-			.then(() => {
-				toast({
-					title: `${
-						authenticatedUserSnapshot?.data()?.firstname ?? 'Player'
-					} has left the team`,
-					description: 'Send player invites to build up your roster.',
-				})
-			})
-			.catch((error) => {
-				toast({
-					title: 'Unable to Delete Team',
-					description: error.message,
-					variant: 'destructive',
-				})
-			})
-	}, [
-		authenticatedUserSnapshot,
-		teamQueryDocumentSnapshot,
-		currentSeasonQueryDocumentSnapshot,
-	])
-
-	const captainActions = (
-		<div className="absolute right-6 top-6">
-			<DropdownMenu open={open} onOpenChange={setOpen}>
-				<DropdownMenuTrigger asChild>
-					<Button size={'sm'} variant={'ghost'}>
-						<DotsVerticalIcon />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuGroup>
-						<ManageEditTeamDialog closeDialog={() => setOpen(false)}>
-							<DropdownMenuItem onClick={(event) => event.preventDefault()}>
-								Edit team
-							</DropdownMenuItem>
-						</ManageEditTeamDialog>
-						<DestructiveConfirmationDialog
-							title={'Are you sure you want to leave?'}
-							description={
-								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
-							}
-							onConfirm={removeFromTeamOnClickHandler}
-						>
-							<DropdownMenuItem
-								className="focus:bg-destructive focus:text-destructive-foreground"
-								onClick={(event) => event.preventDefault()}
-							>
-								Leave team
-							</DropdownMenuItem>
-						</DestructiveConfirmationDialog>
-
-						<DestructiveConfirmationDialog
-							title={'Are you sure?'}
-							description={
-								'The entire team will be deleted. This action is irreversible.'
-							}
-							onConfirm={deleteTeamOnClickHandler}
-						>
-							<DropdownMenuItem
-								className="focus:bg-destructive focus:text-destructive-foreground"
-								onClick={(event) => event.preventDefault()}
-							>
-								Delete team
-							</DropdownMenuItem>
-						</DestructiveConfirmationDialog>
-					</DropdownMenuGroup>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
-	)
-
-	const playerActions = (
-		<div className="absolute right-6 top-6">
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button size={'sm'} variant={'ghost'}>
-						<DotsVerticalIcon />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent className={'w-56'}>
-					<DropdownMenuGroup>
-						<DestructiveConfirmationDialog
-							title={'Are you sure you want to leave?'}
-							description={
-								'You will not be able to rejoin unless a captain accepts you back on to the roster.'
-							}
-							onConfirm={removeFromTeamOnClickHandler}
-						>
-							<DropdownMenuItem
-								className="focus:bg-destructive focus:text-destructive-foreground"
-								onClick={(event) => event.preventDefault()}
-							>
-								Leave team
-							</DropdownMenuItem>
-						</DestructiveConfirmationDialog>
-					</DropdownMenuGroup>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
-	)
-
 	return (
 		<div className={'container'}>
 			<GradientHeader>
@@ -253,21 +87,24 @@ export const ManageTeam = () => {
 					{isAuthenticatedUserRostered ? (
 						<ManageTeamRosterCard
 							actions={
-								isAuthenticatedUserCaptain ? captainActions : playerActions
+								isAuthenticatedUserCaptain ? (
+									<ManageCaptainActions />
+								) : (
+									<ManageNonCaptainActions />
+								)
 							}
 						/>
 					) : (
 						<ManageTeamRequestCard />
 					)}
-					{isAuthenticatedUserCaptain && teamQueryDocumentSnapshot && (
-						<ManageInvitePlayerList
-							teamQueryDocumentSnapshot={teamQueryDocumentSnapshot}
-						/>
-					)}
+					{isAuthenticatedUserCaptain && <ManageInvitePlayerList />}
 				</div>
 				{/* RIGHT SIDE PANEL */}
-				{/* TODO: Create distinct componenets for incoming and outcoming and for captain and non-captain players */}
-				<OffersPanel />
+				{isAuthenticatedUserCaptain ? (
+					<ManageCaptainsOffersPanel />
+				) : (
+					<ManageNonCaptainsOffersPanel />
+				)}
 			</div>
 		</div>
 	)

@@ -24,7 +24,6 @@ import {
 	QuerySnapshot,
 	Timestamp,
 	Query,
-	getCountFromServer,
 	documentId,
 } from 'firebase/firestore'
 
@@ -38,6 +37,7 @@ import {
 	PlayerData,
 	TeamData,
 	SeasonData,
+	OfferStatus,
 } from '@/lib/interfaces'
 import { deleteImage, ref, storage } from './storage'
 import { v4 as uuidv4 } from 'uuid'
@@ -50,21 +50,26 @@ enum Collections {
 	SEASONS = 'seasons',
 }
 
+enum OfferCreator {
+	CAPTAIN = 'captain',
+	NONCAPTAIN = 'noncaptain',
+}
+
 const firestore = getFirestore(app)
 
 const acceptOffer = (
-	offerRef: DocumentReference<OfferData, DocumentData>
+	offerDocumentReference: DocumentReference<OfferData, DocumentData>
 ): Promise<void> => {
-	return updateDoc(offerRef, {
-		status: 'accepted',
+	return updateDoc(offerDocumentReference, {
+		status: OfferStatus.ACCEPTED,
 	})
 }
 
 const rejectOffer = (
-	offerRef: DocumentReference<OfferData, DocumentData>
+	offerDocumentReference: DocumentReference<OfferData, DocumentData>
 ): Promise<void> => {
-	return updateDoc(offerRef, {
-		status: 'rejected',
+	return updateDoc(offerDocumentReference, {
+		status: OfferStatus.REJECTED,
 	})
 }
 
@@ -418,15 +423,20 @@ const invitePlayer = (
 		| undefined,
 	teamQueryDocumentSnapshot:
 		| QueryDocumentSnapshot<TeamData, DocumentData>
+		| undefined,
+	authenticatedUserDocumentSnapshot:
+		| DocumentSnapshot<PlayerData, DocumentData>
 		| undefined
 ) => {
 	if (!playerQueryDocumentSnapshot) return
 	if (!teamQueryDocumentSnapshot) return
+	if (!authenticatedUserDocumentSnapshot) return
 	return addDoc(collection(firestore, Collections.OFFERS), {
-		creator: 'captain',
+		creator: OfferCreator.CAPTAIN,
+		creatorName: `${authenticatedUserDocumentSnapshot.data()?.firstname} ${authenticatedUserDocumentSnapshot.data()?.lastname}`,
 		player: playerQueryDocumentSnapshot.ref,
 		team: teamQueryDocumentSnapshot.ref,
-		status: 'pending',
+		status: OfferStatus.PENDING,
 	})
 }
 
@@ -439,10 +449,11 @@ const requestToJoinTeam = (
 	if (!playerDocumentSnapshot) return
 	if (!teamQueryDocumentSnapshot) return
 	return addDoc(collection(firestore, Collections.OFFERS), {
-		creator: 'player',
+		creator: OfferCreator.NONCAPTAIN,
+		creatorName: `${playerDocumentSnapshot.data()?.firstname} ${playerDocumentSnapshot.data()?.lastname}`,
 		player: playerDocumentSnapshot.ref,
 		team: teamQueryDocumentSnapshot.ref,
-		status: 'pending',
+		status: OfferStatus.PENDING,
 	})
 }
 
@@ -665,7 +676,7 @@ const outgoingOffersQuery = (
 		return query(
 			collection(firestore, Collections.OFFERS),
 			where('team', '==', team),
-			where('creator', '==', 'captain')
+			where('creator', '==', OfferCreator.CAPTAIN)
 		) as Query<OfferData, DocumentData>
 	}
 
@@ -673,7 +684,7 @@ const outgoingOffersQuery = (
 	return query(
 		collection(firestore, Collections.OFFERS),
 		where('player', '==', playerDocumentSnapshot.ref),
-		where('creator', '==', 'player')
+		where('creator', '==', OfferCreator.NONCAPTAIN)
 	) as Query<OfferData, DocumentData>
 }
 
@@ -709,7 +720,7 @@ const incomingOffersQuery = (
 		return query(
 			collection(firestore, Collections.OFFERS),
 			where('team', '==', team),
-			where('creator', '==', 'player')
+			where('creator', '==', OfferCreator.NONCAPTAIN)
 		) as Query<OfferData, DocumentData>
 	}
 
@@ -717,7 +728,7 @@ const incomingOffersQuery = (
 	return query(
 		collection(firestore, Collections.OFFERS),
 		where('player', '==', playerDocumentSnapshot.ref),
-		where('creator', '==', 'captain')
+		where('creator', '==', OfferCreator.CAPTAIN)
 	) as Query<OfferData, DocumentData>
 }
 

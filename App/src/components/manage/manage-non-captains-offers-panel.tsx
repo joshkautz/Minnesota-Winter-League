@@ -1,5 +1,10 @@
-import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
-import { NotificationCard, NotificationCardItem } from '../notification-card'
+import {
+	ExtendedOfferData,
+	OfferData,
+	OfferStatus,
+	OfferType,
+} from '@/lib/interfaces'
+import { NotificationCard } from '../notification-card'
 import { useOffersContext } from '@/contexts/offers-context'
 import { useOffer } from '@/lib/use-offer'
 import { useTeamsContext } from '@/contexts/teams-context'
@@ -10,10 +15,10 @@ import {
 	acceptOffer,
 } from '@/firebase/firestore'
 import { toast } from '@/components/ui/use-toast'
-import { ReactNode, useMemo } from 'react'
-import { useAuthContext } from '@/contexts/auth-context'
-import { useSeasonsContext } from '@/contexts/seasons-context'
+import { ReactNode } from 'react'
 import { ReloadIcon } from '@radix-ui/react-icons'
+import { NotificationCardItem } from '../notification-card-item'
+import { ManageOutgoingRequestsOfferRow } from './manage-outgoing-requests-offer-row'
 
 interface OfferAction {
 	title: string
@@ -26,30 +31,15 @@ interface OfferRowProps {
 	actions: OfferAction[]
 }
 
-const getOfferMessage = (
-	isAuthenticatedUserCaptain: boolean | undefined,
-	num: number | undefined,
-	type: 'incoming' | 'outgoing'
-) => {
-	if (isAuthenticatedUserCaptain) {
-		const term = type === 'incoming' ? 'request' : 'invite'
-		if (!num || num === 0) {
-			return `no ${term}s pending at this time.`
-		}
-		if (num === 1) {
-			return `you have one pending ${term}.`
-		}
-		return `you have ${num} pending ${term}s.`
-	}
-
-	const term = type === 'incoming' ? 'invite' : 'request'
-	if (!num || num === 0) {
+const getOfferMessage = (count: number | undefined, type: OfferType) => {
+	const term = type === OfferType.INCOMING ? 'invite' : 'request'
+	if (!count || count === 0) {
 		return `no ${term}s pending at this time.`
 	}
-	if (num === 1) {
+	if (count === 1) {
 		return `you have one pending ${term}.`
 	}
-	return `you have ${num} pending ${term}s.`
+	return `you have ${count} pending ${term}s.`
 }
 
 export const OfferRow = ({ data, color, message, actions }: OfferRowProps) => {
@@ -79,10 +69,8 @@ export const OffersCard = ({
 	)
 }
 
-export const OffersPanel = () => {
-	const { authenticatedUserSnapshot } = useAuthContext()
+export const ManageNonCaptainsOffersPanel = () => {
 	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
-	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 	const {
 		outgoingOffersQuerySnapshot,
 		outgoingOffersQuerySnapshotLoading,
@@ -90,28 +78,16 @@ export const OffersPanel = () => {
 		incomingOffersQuerySnapshotLoading,
 	} = useOffersContext()
 
-	const isAuthenticatedUserCaptain = useMemo(
-		() =>
-			authenticatedUserSnapshot
-				?.data()
-				?.seasons.some(
-					(item) =>
-						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
-						item.captain
-				),
-		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
-	)
-
 	const { offers: outgoingOffers, offersLoading: outgoingOffersLoading } =
 		useOffer(outgoingOffersQuerySnapshot, currentSeasonTeamsQuerySnapshot)
 	const { offers: incomingOffers, offersLoading: incomingOffersLoading } =
 		useOffer(incomingOffersQuerySnapshot, currentSeasonTeamsQuerySnapshot)
 
 	const outgoingPending = outgoingOffers?.filter(
-		(offer) => offer.status === 'pending'
+		(offer) => offer.status === OfferStatus.PENDING
 	).length
 	const incomingPending = incomingOffers?.filter(
-		(offer) => offer.status === 'pending'
+		(offer) => offer.status === OfferStatus.PENDING
 	).length
 
 	const handleReject = (
@@ -163,62 +139,44 @@ export const OffersPanel = () => {
 	return (
 		<div className="max-w-[600px] flex-1 basis-80 space-y-4">
 			<OffersCard
-				title={
-					isAuthenticatedUserCaptain ? 'Pending requests' : 'Pending invites'
-				}
-				description={getOfferMessage(
-					isAuthenticatedUserCaptain,
-					incomingPending,
-					'incoming'
-				)}
+				title={'Incoming invites'}
+				description={getOfferMessage(incomingPending, OfferType.INCOMING)}
 			>
 				{incomingOffersQuerySnapshotLoading || incomingOffersLoading ? (
 					<div className={'inset-0 flex items-center justify-center'}>
 						<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 					</div>
 				) : (
-					incomingOffers?.map((incomingOffer: ExtendedOfferData, index) => (
+					incomingOffers?.map((incomingOffer: ExtendedOfferData) => (
 						<OfferRow
-							key={`incomingOffer-row-${index}`}
+							key={`incomingOffer-row-${incomingOffer.ref.id}`}
 							data={incomingOffer}
 							color={
-								incomingOffer.status === 'pending'
+								incomingOffer.status === OfferStatus.PENDING
 									? 'bg-primary'
 									: 'bg-muted-foreground'
 							}
-							message={
-								isAuthenticatedUserCaptain
-									? 'would like to join'
-									: 'would like you to join'
-							}
+							message={'would like you to join'}
 							actions={incomingActions}
 						/>
 					))
 				)}
 			</OffersCard>
 			<OffersCard
-				title={isAuthenticatedUserCaptain ? 'Sent invites' : 'Sent requests'}
-				description={getOfferMessage(
-					isAuthenticatedUserCaptain,
-					outgoingPending,
-					'outgoing'
-				)}
+				title={'Outgoing requests'}
+				description={getOfferMessage(outgoingPending, OfferType.OUTGOING)}
 			>
 				{outgoingOffersQuerySnapshotLoading || outgoingOffersLoading ? (
 					<div className={'inset-0 flex items-center justify-center'}>
 						<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 					</div>
 				) : (
-					outgoingOffers?.map((outgoingOffer: ExtendedOfferData, index) => (
-						<OfferRow
-							key={`outgoingOffer-row-${index}`}
+					outgoingOffers?.map((outgoingOffer: ExtendedOfferData) => (
+						<ManageOutgoingRequestsOfferRow
+							key={`outgoingOffer-row-${outgoingOffer.ref.id}`}
 							data={outgoingOffer}
 							color={'bg-muted-foreground'}
-							message={
-								isAuthenticatedUserCaptain
-									? 'invite sent for'
-									: 'request sent for'
-							}
+							message={'request sent for'}
 							actions={outgoingActions}
 						/>
 					))

@@ -16,6 +16,9 @@ export const ManageTeamDetail = ({
 	playerDocumentSnapshot,
 }: {
 	handleRequest: (
+		authenticatedUserDocumentSnapshot:
+			| DocumentSnapshot<PlayerData, DocumentData>
+			| undefined,
 		teamQueryDocumentSnapshot: QueryDocumentSnapshot<TeamData, DocumentData>
 	) => Promise<void> | undefined
 	currentSeasonTeamsQueryDocumentSnapshot: QueryDocumentSnapshot<
@@ -57,7 +60,12 @@ export const ManageTeamDetail = ({
 					size={'sm'}
 					variant={'default'}
 					disabled={!offersForPlayerByTeamQuerySnapshot?.empty}
-					onClick={() => handleRequest(currentSeasonTeamsQueryDocumentSnapshot)}
+					onClick={() =>
+						handleRequest(
+							playerDocumentSnapshot,
+							currentSeasonTeamsQueryDocumentSnapshot
+						)
+					}
 				>
 					Request to join
 				</Button>

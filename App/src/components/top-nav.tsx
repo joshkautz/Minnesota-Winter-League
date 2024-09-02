@@ -14,6 +14,7 @@ import { toast } from './ui/use-toast'
 import { cn } from '@/lib/utils'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { SeasonSelect } from './season-select'
+import { OfferStatus } from '@/lib/interfaces'
 
 export const TopNav = ({
 	isOpen,
@@ -33,10 +34,6 @@ export const TopNav = ({
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [open, setOpen] = useState(false)
-
-	enum OfferStatus {
-		PENDING = 'pending',
-	}
 
 	const isAuthenticatedUserCaptain = useMemo(
 		() =>

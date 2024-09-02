@@ -23,6 +23,7 @@ import { useOffersContext } from '@/contexts/offers-context'
 import { useMemo } from 'react'
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import { OfferStatus } from '@/lib/interfaces'
 
 const getInitials = (
 	firstname: string | undefined,
@@ -54,7 +55,7 @@ export const UserAvatar = ({
 	)
 
 	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
-		(entry) => entry.data().status === 'pending'
+		(entry) => entry.data().status === OfferStatus.PENDING
 	).length
 	const isVerified = authStateUser?.emailVerified
 	const isRegistered = authenticatedUserSnapshot?.data()?.registered
