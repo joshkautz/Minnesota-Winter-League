@@ -26,8 +26,8 @@ import {
 	DocumentData,
 	DocumentReference,
 	FieldValue,
+	Query,
 	Timestamp,
-	WriteResult,
 	getFirestore,
 } from 'firebase-admin/firestore'
 
@@ -68,12 +68,25 @@ interface SeasonData extends DocumentData {
 	teams: DocumentReference<TeamData, DocumentData>[]
 }
 
+enum OfferCreator {
+	CAPTAIN = 'captain',
+	NONCAPTAIN = 'noncaptain',
+}
+
+enum OfferStatus {
+	PENDING = 'pending',
+	ACCEPTED = 'accepted',
+	REJECTED = 'rejected',
+}
+
 interface OfferData extends DocumentData {
-	creator: string
+	creator: OfferCreator
+	creatorName: string
 	player: DocumentReference<PlayerData, DocumentData>
-	status: string
+	status: OfferStatus
 	team: DocumentReference<TeamData, DocumentData>
 }
+
 interface WaiverData extends DocumentData {
 	player: DocumentReference<PlayerData>
 }
@@ -85,12 +98,6 @@ const COLLECTIONS = {
 	WAIVERS: 'waivers',
 	OFFERS: 'offers',
 	PLAYERS: 'players',
-}
-
-enum Offers {
-	ACCEPTED = 'accepted',
-	PENDING = 'pending',
-	REJECTED = 'rejected',
 }
 
 const FIELDS = {
@@ -106,7 +113,7 @@ const DROPBOX_TEMPLATE_ID = '0fb30e5f0123f06cc20fe3155f51a539c65f9218'
 
 initializeApp()
 
-// Fixed August 27, 2024.
+// Audited: September 2, 2024.
 /**
  * When a user is deleted via Firebase Authentication, delete the corresponding `Players` document, update the corresponding `Teams` documents, and delete the corresponding `Offers` documents.
  *
@@ -120,32 +127,34 @@ export const OnUserDeleted = functions
 		try {
 			const firestore = getFirestore()
 
-			const playerRef = firestore
+			const playerDocumentReference = firestore
 				.collection(COLLECTIONS.PLAYERS)
 				.doc(user.uid) as DocumentReference<PlayerData, DocumentData>
 
 			// Delete all the offers for the player.
 			const offersDeletionPromises = firestore
 				.collection(COLLECTIONS.OFFERS)
-				.where(FIELDS.PLAYER, '==', playerRef)
+				.where(FIELDS.PLAYER, '==', playerDocumentReference)
 				.get()
 				.then((offers) => offers.docs.map((offer) => offer.ref.delete()))
 
-			// Remove player from all their teams.
-			const teamsUpdatePromises = playerRef.get().then((player) =>
-				player.data()?.seasons.map((item) =>
-					item.team?.get().then((teamDocumentSnapshot) =>
-						item.team?.update({
-							roster: teamDocumentSnapshot
-								?.data()
-								?.roster.filter((item) => item.player.id !== user.uid),
-						})
+			// Remove player from all the teams they've ever been on.
+			const teamsUpdatePromises = playerDocumentReference
+				.get()
+				.then((playerDocumentSnapshot) =>
+					playerDocumentSnapshot.data()?.seasons.map((item) =>
+						item.team?.get().then((teamDocumentSnapshot) =>
+							item.team?.update({
+								roster: teamDocumentSnapshot
+									?.data()
+									?.roster.filter((item) => item.player.id !== user.uid),
+							})
+						)
 					)
 				)
-			)
 
 			// Delete player.
-			const deletePlayerPromise = playerRef.delete()
+			const deletePlayerPromise = playerDocumentReference.delete()
 
 			return Promise.all([
 				offersDeletionPromises,
@@ -158,7 +167,7 @@ export const OnUserDeleted = functions
 		}
 	})
 
-// Fixed August 27, 2024.
+// Audited: September 2, 2024.
 /**
  * When an offer is accepted, update the corresponding `Player` document, update the corresponding `Team` document, and delete all the coresponding `Offer` documents.
  *
@@ -175,67 +184,72 @@ export const OnOfferAccepted = onDocumentUpdated(
 			const previousValue = event.data?.before.data() as OfferData
 
 			if (
-				previousValue.status === Offers.PENDING &&
-				newValue.status === Offers.ACCEPTED
+				previousValue.status === OfferStatus.PENDING &&
+				newValue.status === OfferStatus.ACCEPTED
 			) {
 				const playerDocumentReference = newValue.player
 				const teamDocumentReference = newValue.team
 
-				const seasonsCollectionReference = firestore.collection(
-					COLLECTIONS.SEASONS
-				) as CollectionReference<SeasonData, DocumentData>
-
-				// Update player document - Add team to the player's seasons.
-				const updatePlayerPromise = seasonsCollectionReference
+				// Update player document - Add team to the player's current season.
+				const updatePlayerPromise = (
+					firestore.collection(COLLECTIONS.SEASONS) as CollectionReference<
+						SeasonData,
+						DocumentData
+					>
+				)
 					.get()
-					.then((seasonQuerySnapshot): Promise<void | WriteResult> => {
-						const currentSeason = seasonQuerySnapshot.docs
-							.sort(
-								(a, b) =>
-									b.data().dateStart.seconds - a.data().dateStart.seconds
-							)
-							.find((season) => season)
+					.then((seasonQuerySnapshot) =>
+						Promise.all([playerDocumentReference.get(), seasonQuerySnapshot])
+					)
+					.then(([playerDocumentSnapshot, seasonQuerySnapshot]) =>
+						playerDocumentReference.update({
+							seasons: playerDocumentSnapshot.data()?.seasons.map((item) =>
+								item.season.id ==
+								seasonQuerySnapshot.docs
+									.sort(
+										(a, b) =>
+											b.data().dateStart.seconds - a.data().dateStart.seconds
+									)
+									.find((season) => season)?.id
+									? {
+											captain: item.captain,
+											paid: item.paid,
+											season: item.season,
+											signed: item.signed,
+											team: teamDocumentReference,
+										}
+									: item
+							),
+						})
+					)
 
-						if (!currentSeason) return Promise.resolve()
-						return playerDocumentReference
-							.get()
-							.then((playerDocumentSnapshot) =>
-								playerDocumentReference.update({
-									seasons: playerDocumentSnapshot.data()?.seasons.map((item) =>
-										item.season.id == currentSeason?.id
-											? {
-													captain: item.captain,
-													paid: item.paid,
-													season: item.season,
-													signed: item.signed,
-													team: teamDocumentReference,
-												}
-											: item
-									),
-								})
-							)
-					})
-
-				// Update team document.
+				// Update team document - Add player to the team's roster.
 				const updateTeamPromise = teamDocumentReference
 					.get()
-					.then((teamDocumentSnapshot) => {
-						const roster = teamDocumentSnapshot.data()?.roster
-						roster?.push({
-							captain: false,
-							player: playerDocumentReference,
-						})
+					.then((teamDocumentSnapshot) =>
 						teamDocumentReference.update({
-							roster: roster,
+							roster: teamDocumentSnapshot.data()?.roster.concat({
+								captain: false,
+								player: playerDocumentReference,
+							}),
 						})
-					})
+					)
 
 				// Delete all the offers for the player.
-				const offersDeletionPromises = firestore
-					.collection(COLLECTIONS.OFFERS)
-					.where(FIELDS.PLAYER, '==', newValue.player)
+				const offersDeletionPromises = (
+					firestore
+						.collection(COLLECTIONS.OFFERS)
+						.where(FIELDS.PLAYER, '==', playerDocumentReference) as Query<
+						OfferData,
+						DocumentData
+					>
+				)
 					.get()
-					.then((offers) => offers.docs.map((offer) => offer.ref.delete()))
+					.then((offersQuerySnapshot) =>
+						offersQuerySnapshot.docs.map((offerQueryDocumentSnapshot) =>
+							offerQueryDocumentSnapshot.ref.delete()
+						)
+					)
 
 				return Promise.all([
 					updatePlayerPromise,
@@ -252,7 +266,7 @@ export const OnOfferAccepted = onDocumentUpdated(
 	}
 )
 
-// Fixed August 27, 2024.
+// Audited: September 2, 2024.
 /**
  * When an offer is rejected, delete the corresponding `Offer` document.
  *
@@ -266,8 +280,8 @@ export const OnOfferRejected = onDocumentUpdated(
 			const previousValue = event.data?.before.data() as OfferData
 
 			if (
-				newValue.status === Offers.REJECTED &&
-				previousValue.status === Offers.PENDING
+				newValue.status === OfferStatus.REJECTED &&
+				previousValue.status === OfferStatus.PENDING
 			) {
 				return Promise.all([event.data?.after.ref.delete()])
 			}
@@ -280,8 +294,9 @@ export const OnOfferRejected = onDocumentUpdated(
 	}
 )
 
+// Audited: September 2, 2024.
 /**
- * When a payment is created, send a signature request, and update the corresponding `Player` document.
+ * When a payment is created, update the player for the current season, and send them a Dropbox signature request.
  *
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_new_document_is_created_2 Trigger a function when a document is created.}
  */
@@ -294,63 +309,87 @@ export const OnPaymentCreated = onDocumentCreated(
 			const dropbox = new SignatureRequestApi()
 			dropbox.username = DROPBOX_SIGN_API_KEY
 
-			return firestore
-				.collection(COLLECTIONS.PLAYERS)
-				.doc(event.params.uid)
-				.update({
-					paid: true,
-				})
-				.then(() => {
-					firestore
-						.collection(COLLECTIONS.PLAYERS)
-						.doc(event.params.uid)
-						.get()
-						.then((playerSnapshot) => {
-							const player = playerSnapshot.data() as PlayerData
-							dropbox
-								.signatureRequestSendWithTemplate({
-									templateIds: [DROPBOX_TEMPLATE_ID],
-									subject: 'Minneapolis Winter League - Release of Liability',
-									message:
-										"We're so excited you decided to join Minneapolis Winter League. " +
-										'Please make sure to sign this Release of Liability to finalize ' +
-										'your participation. Looking forward to seeing you!',
-									signers: [
-										{
-											role: 'Participant',
-											name: `${player.firstname} ${player.lastname}`,
-											emailAddress: player.email,
-										},
-									],
-									signingOptions: {
-										draw: true,
-										type: true,
-										upload: true,
-										phone: false,
-										defaultType: SubSigningOptions.DefaultTypeEnum.Type,
-									},
-									testMode: true,
-								})
-								.then((response) => {
-									const signatureRequest = response.body.signatureRequest
-									if (signatureRequest) {
-										const signatureRequestId =
-											signatureRequest.signatureRequestId
-										if (signatureRequestId) {
-											return firestore
-												.collection(COLLECTIONS.WAIVERS)
-												.doc(signatureRequestId)
-												.set({
-													player: firestore
-														.collection(COLLECTIONS.PLAYERS)
-														.doc(event.params.uid),
-												})
+			return (
+				firestore
+					.collection(COLLECTIONS.PLAYERS)
+					.doc(event.params.uid) as DocumentReference<PlayerData, DocumentData>
+			)
+				.get()
+				.then((playerDocumentSnapshot) =>
+					Promise.all([
+						(
+							firestore.collection(COLLECTIONS.SEASONS) as CollectionReference<
+								SeasonData,
+								DocumentData
+							>
+						).get(),
+						playerDocumentSnapshot,
+					])
+				)
+				.then(([seasonQuerySnapshot, playerDocumentSnapshot]) =>
+					Promise.all([
+						playerDocumentSnapshot,
+						playerDocumentSnapshot.ref.update({
+							seasons: playerDocumentSnapshot.data()?.seasons.map((item) =>
+								item.season.id ===
+								seasonQuerySnapshot.docs
+									.sort(
+										(a, b) =>
+											b.data().dateStart.seconds - a.data().dateStart.seconds
+									)
+									.find((season) => season)?.id
+									? {
+											captain: item.captain,
+											paid: true,
+											season: item.season,
+											signed: item.signed,
+											team: item.team,
 										}
-									}
-									return
-								})
-						})
-				})
+									: item
+							),
+						}),
+					])
+				)
+				.then(([playerDocumentSnapshot]) =>
+					Promise.all([
+						dropbox.signatureRequestSendWithTemplate({
+							templateIds: [DROPBOX_TEMPLATE_ID],
+							subject: 'Minneapolis Winter League - Release of Liability',
+							message:
+								"We're so excited you decided to join Minneapolis Winter League. " +
+								'Please make sure to sign this Release of Liability to finalize ' +
+								'your participation. Looking forward to seeing you!',
+							signers: [
+								{
+									role: 'Participant',
+									name: `${playerDocumentSnapshot.data()!.firstname} ${playerDocumentSnapshot.data()!.lastname}`,
+									emailAddress: playerDocumentSnapshot.data()!.email,
+								},
+							],
+							signingOptions: {
+								draw: true,
+								type: true,
+								upload: true,
+								phone: false,
+								defaultType: SubSigningOptions.DefaultTypeEnum.Type,
+							},
+							testMode: true,
+						}),
+						playerDocumentSnapshot,
+					])
+				)
+				.then(([dropboxResponse, playerDocumentSnapshot]) =>
+					Promise.all([
+						firestore
+							.collection(COLLECTIONS.WAIVERS)
+							.doc(dropboxResponse.body.signatureRequest!.signatureRequestId!)
+							.set({
+								player: firestore
+									.collection(COLLECTIONS.PLAYERS)
+									.doc(playerDocumentSnapshot.id),
+							}),
+					])
+				)
 		} catch (e) {
 			error(e)
 			return e
