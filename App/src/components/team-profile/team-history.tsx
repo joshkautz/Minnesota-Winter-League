@@ -10,11 +10,11 @@ import { TeamData } from '@/lib/interfaces'
 const formatPlacement = (placement: number) => {
 	switch (placement) {
 		case 1:
-			return '1st'
+			return '1st 🥇'
 		case 2:
-			return '2nd'
+			return '2nd 🥈'
 		case 3:
-			return '3rd'
+			return '3rd 🥉'
 		case null:
 			return 'TBD'
 		default:
