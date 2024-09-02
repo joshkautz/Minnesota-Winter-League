@@ -15,3 +15,23 @@ export const formatTimestamp = (timestamp: Timestamp | undefined) => {
 		year: 'numeric',
 	})
 }
+
+export const getRequestMessage = (count: number | undefined) => {
+	if (!count || count === 0) {
+		return `no requests pending at this time.`
+	}
+	if (count === 1) {
+		return `you have one pending request.`
+	}
+	return `you have ${count} pending requests.`
+}
+
+export const getInviteMessage = (count: number | undefined) => {
+	if (!count || count === 0) {
+		return `no invites pending at this time.`
+	}
+	if (count === 1) {
+		return `you have one pending invite.`
+	}
+	return `you have ${count} pending invites.`
+}

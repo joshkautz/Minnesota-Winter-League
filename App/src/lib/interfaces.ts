@@ -13,8 +13,10 @@ export enum OfferStatus {
 }
 
 export enum OfferType {
-	INCOMING = 'incoming',
-	OUTGOING = 'outgoing',
+	OUTGOING_INVITE = 'outgoingInvite',
+	OUTGOING_REQUEST = 'outgoingRequest',
+	INCOMING_INVITE = 'incomingInvite',
+	INCOMING_REQUEST = 'incomingRequest',
 }
 
 export interface OfferAction {
@@ -22,6 +24,25 @@ export interface OfferAction {
 	action: (
 		offerDocumentReference: DocumentReference<OfferData, DocumentData>
 	) => void
+}
+
+export interface NotificationCardItemProps {
+	type: OfferType
+	data: ExtendedOfferData | DocumentData
+	statusColor?: string
+	message?: string
+	actionOptions: {
+		title: string
+		action: (arg: DocumentReference<OfferData, DocumentData>) => void
+	}[]
+}
+
+export enum Collections {
+	PLAYERS = 'players',
+	OFFERS = 'offers',
+	GAMES = 'games',
+	TEAMS = 'teams',
+	SEASONS = 'seasons',
 }
 
 /////////////////////////////////////////////////////////////////

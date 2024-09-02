@@ -1,9 +1,4 @@
-import {
-	ExtendedOfferData,
-	OfferData,
-	OfferStatus,
-	OfferType,
-} from '@/lib/interfaces'
+import { ExtendedOfferData, OfferData, OfferType } from '@/lib/interfaces'
 import { NotificationCard } from '../notification-card'
 import { useOffersContext } from '@/contexts/offers-context'
 import { useOffer } from '@/lib/use-offer'
@@ -15,59 +10,9 @@ import {
 	acceptOffer,
 } from '@/firebase/firestore'
 import { toast } from '@/components/ui/use-toast'
-import { ReactNode } from 'react'
 import { ReloadIcon } from '@radix-ui/react-icons'
+import { getInviteMessage, getRequestMessage } from '@/lib/utils'
 import { NotificationCardItem } from '../notification-card-item'
-import { ManageOutgoingRequestsOfferRow } from './manage-outgoing-requests-offer-row'
-
-interface OfferAction {
-	title: string
-	action: (offerRef: DocumentReference<OfferData, DocumentData>) => void
-}
-interface OfferRowProps {
-	data: ExtendedOfferData
-	color: string
-	message: string
-	actions: OfferAction[]
-}
-
-const getOfferMessage = (count: number | undefined, type: OfferType) => {
-	const term = type === OfferType.INCOMING ? 'invite' : 'request'
-	if (!count || count === 0) {
-		return `no ${term}s pending at this time.`
-	}
-	if (count === 1) {
-		return `you have one pending ${term}.`
-	}
-	return `you have ${count} pending ${term}s.`
-}
-
-export const OfferRow = ({ data, color, message, actions }: OfferRowProps) => {
-	return (
-		<NotificationCardItem
-			data={data}
-			statusColor={color}
-			message={message}
-			actionOptions={actions}
-		/>
-	)
-}
-
-export const OffersCard = ({
-	title,
-	description,
-	children,
-}: {
-	title: string
-	description: string
-	children: ReactNode
-}) => {
-	return (
-		<NotificationCard title={title} description={description}>
-			{children}
-		</NotificationCard>
-	)
-}
 
 export const ManageNonCaptainsOffersPanel = () => {
 	const { currentSeasonTeamsQuerySnapshot } = useTeamsContext()
@@ -78,22 +23,15 @@ export const ManageNonCaptainsOffersPanel = () => {
 		incomingOffersQuerySnapshotLoading,
 	} = useOffersContext()
 
-	const { offers: outgoingOffers, offersLoading: outgoingOffersLoading } =
+	const { offers: outgoingRequests, offersLoading: outgoingRequestsLoading } =
 		useOffer(outgoingOffersQuerySnapshot, currentSeasonTeamsQuerySnapshot)
-	const { offers: incomingOffers, offersLoading: incomingOffersLoading } =
+	const { offers: incomingInvites, offersLoading: incomingInvitesLoading } =
 		useOffer(incomingOffersQuerySnapshot, currentSeasonTeamsQuerySnapshot)
 
-	const outgoingPending = outgoingOffers?.filter(
-		(offer) => offer.status === OfferStatus.PENDING
-	).length
-	const incomingPending = incomingOffers?.filter(
-		(offer) => offer.status === OfferStatus.PENDING
-	).length
-
 	const handleReject = (
-		offerRef: DocumentReference<OfferData, DocumentData>
+		offerDocumentReference: DocumentReference<OfferData, DocumentData>
 	) => {
-		rejectOffer(offerRef)
+		rejectOffer(offerDocumentReference)
 			.then(() => {
 				toast({
 					title: 'Invite Rejected',
@@ -111,9 +49,9 @@ export const ManageNonCaptainsOffersPanel = () => {
 	}
 
 	const handleAccept = (
-		offerRef: DocumentReference<OfferData, DocumentData>
+		offerDocumentReference: DocumentReference<OfferData, DocumentData>
 	) => {
-		acceptOffer(offerRef)
+		acceptOffer(offerDocumentReference)
 			.then(() => {
 				toast({
 					title: 'Invite accepted',
@@ -138,50 +76,48 @@ export const ManageNonCaptainsOffersPanel = () => {
 
 	return (
 		<div className="max-w-[600px] flex-1 basis-80 space-y-4">
-			<OffersCard
+			<NotificationCard
 				title={'Incoming invites'}
-				description={getOfferMessage(incomingPending, OfferType.INCOMING)}
+				description={getInviteMessage(incomingInvites?.length)}
 			>
-				{incomingOffersQuerySnapshotLoading || incomingOffersLoading ? (
+				{incomingOffersQuerySnapshotLoading || incomingInvitesLoading ? (
 					<div className={'inset-0 flex items-center justify-center'}>
 						<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 					</div>
 				) : (
-					incomingOffers?.map((incomingOffer: ExtendedOfferData) => (
-						<OfferRow
-							key={`incomingOffer-row-${incomingOffer.ref.id}`}
-							data={incomingOffer}
-							color={
-								incomingOffer.status === OfferStatus.PENDING
-									? 'bg-primary'
-									: 'bg-muted-foreground'
-							}
+					incomingInvites?.map((incomingInvite: ExtendedOfferData) => (
+						<NotificationCardItem
+							key={`incomingInvite-row-${incomingInvite.ref.id}`}
+							type={OfferType.INCOMING_INVITE}
+							data={incomingInvite}
+							statusColor={'bg-primary'}
 							message={'would like you to join'}
-							actions={incomingActions}
+							actionOptions={incomingActions}
 						/>
 					))
 				)}
-			</OffersCard>
-			<OffersCard
+			</NotificationCard>{' '}
+			<NotificationCard
 				title={'Outgoing requests'}
-				description={getOfferMessage(outgoingPending, OfferType.OUTGOING)}
+				description={getRequestMessage(outgoingRequests?.length)}
 			>
-				{outgoingOffersQuerySnapshotLoading || outgoingOffersLoading ? (
+				{outgoingOffersQuerySnapshotLoading || outgoingRequestsLoading ? (
 					<div className={'inset-0 flex items-center justify-center'}>
 						<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
 					</div>
 				) : (
-					outgoingOffers?.map((outgoingOffer: ExtendedOfferData) => (
-						<ManageOutgoingRequestsOfferRow
-							key={`outgoingOffer-row-${outgoingOffer.ref.id}`}
-							data={outgoingOffer}
-							color={'bg-muted-foreground'}
+					outgoingRequests?.map((outgoingRequest: ExtendedOfferData) => (
+						<NotificationCardItem
+							key={`outgoingRequest-row-${outgoingRequest.ref.id}`}
+							type={OfferType.OUTGOING_REQUEST}
+							data={outgoingRequest}
+							statusColor={'bg-muted-foreground'}
 							message={'request sent for'}
-							actions={outgoingActions}
+							actionOptions={outgoingActions}
 						/>
 					))
 				)}
-			</OffersCard>
+			</NotificationCard>
 		</div>
 	)
 }

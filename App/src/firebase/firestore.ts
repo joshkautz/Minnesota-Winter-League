@@ -38,22 +38,11 @@ import {
 	TeamData,
 	SeasonData,
 	OfferStatus,
+	OfferCreator,
+	Collections,
 } from '@/lib/interfaces'
 import { deleteImage, ref, storage } from './storage'
 import { v4 as uuidv4 } from 'uuid'
-
-enum Collections {
-	PLAYERS = 'players',
-	OFFERS = 'offers',
-	GAMES = 'games',
-	TEAMS = 'teams',
-	SEASONS = 'seasons',
-}
-
-enum OfferCreator {
-	CAPTAIN = 'captain',
-	NONCAPTAIN = 'noncaptain',
-}
 
 const firestore = getFirestore(app)
 

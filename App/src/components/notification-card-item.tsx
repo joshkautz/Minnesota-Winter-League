@@ -1,19 +1,9 @@
-import { DocumentData, DocumentReference } from '@/firebase/firestore'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
-import { ExtendedOfferData, OfferData } from '@/lib/interfaces'
-
-interface NotificationCardItemProps {
-	data: ExtendedOfferData | DocumentData
-	statusColor?: string
-	message?: string
-	actionOptions: {
-		title: string
-		action: (arg: DocumentReference<OfferData, DocumentData>) => void
-	}[]
-}
+import { NotificationCardItemProps, OfferType } from '@/lib/interfaces'
 
 export const NotificationCardItem = ({
+	type,
 	data,
 	statusColor,
 	message,
@@ -30,7 +20,12 @@ export const NotificationCardItem = ({
 				/>
 			)}
 			<div className="mr-2">
-				<p>{data.creatorName}</p>
+				<p>
+					{type === OfferType.OUTGOING_INVITE ||
+					type === OfferType.INCOMING_REQUEST
+						? data.playerName
+						: data.creatorName}
+				</p>
 				<p className="overflow-hidden text-sm max-h-5 text-muted-foreground">
 					{`${message} ${data.teamName}`}
 				</p>
