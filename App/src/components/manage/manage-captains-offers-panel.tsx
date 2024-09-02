@@ -34,15 +34,15 @@ export const ManageCaptainsOffersPanel = () => {
 		rejectOffer(offerDocumentReference)
 			.then(() => {
 				toast({
-					title: 'Invite Rejected',
-					description: 'success',
+					title: 'Success',
+					description: 'Request rejected',
 					variant: 'default',
 				})
 			})
 			.catch(() => {
 				toast({
-					title: 'Unable to reject invite',
-					description: 'failure',
+					title: 'Failure',
+					description: 'Request not rejected',
 					variant: 'destructive',
 				})
 			})
@@ -54,21 +54,41 @@ export const ManageCaptainsOffersPanel = () => {
 		acceptOffer(offerDocumentReference)
 			.then(() => {
 				toast({
-					title: 'Invite accepted',
-					description: 'success',
+					title: 'Success',
+					description: 'Request accepted',
 					variant: 'default',
 				})
 			})
 			.catch(() => {
 				toast({
-					title: 'Unable to accept invite',
-					description: 'failure',
+					title: 'Failure',
+					description: 'Request not accepted',
 					variant: 'destructive',
 				})
 			})
 	}
 
-	const outgoingActions = [{ title: 'Cancel', action: handleReject }]
+	const handleCancel = (
+		offerDocumentReference: DocumentReference<OfferData, DocumentData>
+	) => {
+		rejectOffer(offerDocumentReference)
+			.then(() => {
+				toast({
+					title: 'Success',
+					description: 'Invite canceled',
+					variant: 'default',
+				})
+			})
+			.catch(() => {
+				toast({
+					title: 'Failure',
+					description: 'Invite not canceled',
+					variant: 'destructive',
+				})
+			})
+	}
+
+	const outgoingActions = [{ title: 'Cancel', action: handleCancel }]
 	const incomingActions = [
 		{ title: 'Accept', action: handleAccept },
 		{ title: 'Reject', action: handleReject },
