@@ -17,11 +17,21 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from './ui/use-toast'
 import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
 import { Label } from './ui/label'
-import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
+import {
+	CheckCircledIcon,
+	InfoCircledIcon,
+	ReloadIcon,
+} from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { Timestamp } from '@firebase/firestore'
 import { sendDropboxEmail } from '@/firebase/dropbox'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from './ui/tooltip'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -125,10 +135,8 @@ export const Profile = () => {
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.find(
-					(item) =>
-						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
-						item.paid
-				),
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
+				)?.paid,
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
@@ -263,7 +271,7 @@ export const Profile = () => {
 									)}
 								</Label>
 								<div>
-									{isLoading ? (
+									{isLoading || isVerified === undefined ? (
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
@@ -316,7 +324,7 @@ export const Profile = () => {
 									)}
 								</Label>
 								<div>
-									{isLoading ? (
+									{isLoading || isAuthenticatedUserPaid === undefined ? (
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
@@ -338,7 +346,7 @@ export const Profile = () => {
 												{stripeLoading && (
 													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
 												)}
-												Pay
+												Pay via Stripe
 											</Button>
 											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
 												Complete registration by paying via Stripe.
@@ -365,7 +373,7 @@ export const Profile = () => {
 									)}
 								</Label>
 								<div>
-									{isLoading ? (
+									{isLoading || isAuthenticatedUserSigned === undefined ? (
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
@@ -379,23 +387,39 @@ export const Profile = () => {
 										</div>
 									) : (
 										<>
-											<Button
-												variant={'default'}
-												onClick={sendDropboxEmailButtonOnClickHandler}
-												disabled={
-													!isRegistrationOpen ||
-													dropboxEmailLoading ||
-													dropboxEmailSent ||
-													!isAuthenticatedUserPaid
-												}
-											>
-												{dropboxEmailLoading && (
-													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-												)}
-												{dropboxEmailSent
-													? 'Email Sent!'
-													: 'Re-Send Waiver Email'}
-											</Button>
+											<span className="inline-flex items-center">
+												<Button
+													variant={'default'}
+													onClick={sendDropboxEmailButtonOnClickHandler}
+													disabled={
+														!isRegistrationOpen ||
+														dropboxEmailLoading ||
+														dropboxEmailSent ||
+														!isAuthenticatedUserPaid
+													}
+												>
+													{dropboxEmailLoading && (
+														<ReloadIcon
+															className={'mr-2 h-4 w-4 animate-spin'}
+														/>
+													)}
+													{dropboxEmailSent
+														? 'Email Sent!'
+														: 'Re-Send Waiver Email'}
+												</Button>
+												<TooltipProvider>
+													<Tooltip delayDuration={0}>
+														<TooltipTrigger asChild>
+															<div className={'flex-1'}>
+																<InfoCircledIcon className={'w-6 h-6'} />
+															</div>
+														</TooltipTrigger>
+														<TooltipContent>
+															<p>Waiver will be sent following payment.</p>
+														</TooltipContent>
+													</Tooltip>
+												</TooltipProvider>
+											</span>
 											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
 												Check your email for a Dropbox Sign link.
 											</p>
