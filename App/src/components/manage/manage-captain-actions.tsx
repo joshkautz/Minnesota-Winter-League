@@ -50,15 +50,13 @@ export const ManageCaptainActions = () => {
 		)
 			.then(() => {
 				toast({
-					title: `${
-						authenticatedUserSnapshot?.data()?.firstname ?? 'Player'
-					} has left the team`,
-					description: 'Send player invites to build up your roster.',
+					title: `Success`,
+					description: `You have left the team.`,
 				})
 			})
 			.catch((error) => {
 				toast({
-					title: 'Unable to Remove',
+					title: 'Failure',
 					description: error.message,
 					variant: 'destructive',
 				})
@@ -76,15 +74,13 @@ export const ManageCaptainActions = () => {
 		)
 			.then(() => {
 				toast({
-					title: `${
-						authenticatedUserSnapshot?.data()?.firstname ?? 'Player'
-					} has left the team`,
-					description: 'Send player invites to build up your roster.',
+					title: `Success`,
+					description: `Team has been deleted.`,
 				})
 			})
 			.catch((error) => {
 				toast({
-					title: 'Unable to Delete Team',
+					title: 'Failure',
 					description: error.message,
 					variant: 'destructive',
 				})

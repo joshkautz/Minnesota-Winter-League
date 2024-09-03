@@ -222,61 +222,55 @@ const deleteTeam = async (
 	if (!teamRef) return
 	if (!seasonRef) return
 
-	// Delete all offers involving this team.
-	const offersPromises = getDocs(
-		query(
-			collection(firestore, Collections.OFFERS),
-			where('team', '==', teamRef)
+	return (
+		(
+			getDocs(
+				query(
+					collection(firestore, Collections.OFFERS),
+					where('team', '==', teamRef)
+				)
+			) as Promise<QuerySnapshot<OfferData, DocumentData>>
 		)
-	).then((offersQuerySnapshot) =>
-		offersQuerySnapshot.docs.map((offer: QueryDocumentSnapshot) =>
-			deleteDoc(offer.ref)
-		)
-	)
-
-	// Update all players on this team to remove them from the team.
-	const playersPromises = getDoc(teamRef).then((teamDocumentSnapshot) =>
-		teamDocumentSnapshot.data()?.roster.map(async (item) =>
-			getDoc(item.player).then((playerDocumentSnapshot) =>
-				updateDoc(playerDocumentSnapshot.ref, {
-					seasons: playerDocumentSnapshot.data()?.seasons.map((item) => ({
-						captain: item.season.id === seasonRef.id ? false : item.team,
-						paid: item.paid,
-						season: item.season,
-						signed: item.signed,
-						team: item.season.id === seasonRef.id ? null : item.team,
-					})),
+			// Delete all offers involving this team.
+			.then((offersQuerySnapshot) =>
+				offersQuerySnapshot.docs.map((offer) => deleteDoc(offer.ref))
+			)
+			// Update all players on this team to remove them from the team.
+			.then(() => getDoc(teamRef))
+			.then((teamDocumentSnapshot) =>
+				teamDocumentSnapshot.data()?.roster.map(async (item) =>
+					getDoc(item.player).then((playerDocumentSnapshot) =>
+						updateDoc(playerDocumentSnapshot.ref, {
+							seasons: playerDocumentSnapshot.data()?.seasons.map((item) => ({
+								captain: item.season.id === seasonRef.id ? false : item.team,
+								paid: item.paid,
+								season: item.season,
+								signed: item.signed,
+								team: item.season.id === seasonRef.id ? null : item.team,
+							})),
+						})
+					)
+				)
+			)
+			// Update season document to remove the team.
+			.then(() => getDoc(seasonRef))
+			.then((seasonDocumentSnapshot) =>
+				updateDoc(seasonRef, {
+					teams: seasonDocumentSnapshot
+						.data()
+						?.teams.filter((team) => team.id !== teamRef.id),
 				})
 			)
-		)
+			// Delete team's image from storage.
+			.then(() => getDoc(teamRef))
+			.then((teamDocumentSnapshot) =>
+				teamDocumentSnapshot.data()?.storagePath
+					? deleteImage(ref(storage, teamDocumentSnapshot.data()?.storagePath))
+					: Promise.resolve()
+			)
+			// Delete the team document.
+			.then(() => deleteDoc(teamRef))
 	)
-
-	// Update season document to remove the team.
-	const seasonPromise = getDoc(seasonRef).then((seasonDocumentSnapshot) =>
-		updateDoc(seasonRef, {
-			teams: seasonDocumentSnapshot
-				.data()
-				?.teams.filter((team) => team.id !== teamRef.id),
-		})
-	)
-
-	// Delete team's image from storage.
-	const imagePromise = getDoc(teamRef).then((teamDocumentSnapshot) =>
-		teamDocumentSnapshot.data()?.storagePath
-			? deleteImage(ref(storage, teamDocumentSnapshot.data()?.storagePath))
-			: Promise.resolve()
-	)
-
-	// Delete the team document.
-	const teamPromise = deleteDoc(teamRef)
-
-	Promise.all([
-		offersPromises,
-		playersPromises,
-		seasonPromise,
-		imagePromise,
-		teamPromise,
-	])
 }
 
 const promoteToCaptain = async (
@@ -728,27 +722,32 @@ const stripeRegistration = async (
 	setLoadingState(true)
 
 	// Create new Checkout Session for the player
-	const checkoutSessionRef = (await addDoc(
-		collection(firestore, `customers/${authValue?.uid}/checkout_sessions`),
-		{
-			mode: 'payment',
-			price: Products.WinterLeagueRegistration2024, // TODO: Add to the season update guide. Add a new product for the new season on Stripe, then add its price code to the Products enum in stripe.ts., and then update this line to use the new product.
-			success_url: window.location.href,
-			cancel_url: window.location.href,
-		}
-	)) as DocumentReference<CheckoutSessionData, DocumentData>
-
-	// Listen for the URL of the Checkout Session
-	return onSnapshot(checkoutSessionRef, (checkoutSessionSnap) => {
-		const data = checkoutSessionSnap.data()
-		if (data) {
-			if (data.url) {
-				// We have a Stripe Checkout URL, let's redirect.
-				setLoadingState(false)
-				window.location.assign(data.url)
+	return (
+		addDoc(
+			collection(firestore, `customers/${authValue?.uid}/checkout_sessions`),
+			{
+				mode: 'payment',
+				price: Products.WinterLeagueRegistration2024, // TODO: Add to the season update guide. Add a new product for the new season on Stripe, then add its price code to the Products enum in stripe.ts., and then update this line to use the new product.
+				success_url: window.location.href,
+				cancel_url: window.location.href,
 			}
-		}
-	})
+		) as Promise<DocumentReference<CheckoutSessionData, DocumentData>>
+	).then((checkoutSessionDocumentReference) =>
+		// Listen for the URL of the Checkout Session
+		onSnapshot(
+			checkoutSessionDocumentReference,
+			(checkoutSessionDocumentSnapshot) => {
+				const data = checkoutSessionDocumentSnapshot.data()
+				if (data) {
+					if (data.url) {
+						// We have a Stripe Checkout URL, let's redirect.
+						setLoadingState(false)
+						window.location.assign(data.url)
+					}
+				}
+			}
+		)
+	)
 }
 
 export {
