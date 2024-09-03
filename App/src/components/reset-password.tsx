@@ -23,8 +23,10 @@ type PasswordResetEmailSchema = z.infer<typeof passwordResetEmailSchema>
 
 export const ResetPassword = ({
 	closeMobileSheet,
+	setIsForgotPasswordOpen,
 }: {
 	closeMobileSheet?: () => void
+	setIsForgotPasswordOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 	const { sendPasswordResetEmail, sendPasswordResetEmailError } =
 		useAuthContext()
@@ -77,6 +79,16 @@ export const ResetPassword = ({
 				/>
 
 				<Button type={'submit'}>Reset Password</Button>
+
+				<Button
+					variant={'link'}
+					onClick={(event) => {
+						event.preventDefault()
+						setIsForgotPasswordOpen(false)
+					}}
+				>
+					Back
+				</Button>
 			</form>
 		</Form>
 	)

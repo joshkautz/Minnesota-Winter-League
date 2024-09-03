@@ -12,7 +12,7 @@ import { SparklesCore } from './particles'
 export const HeroSection = () => {
 	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
-	const { toggleIsOpen } = useOutletContext<OutletContext>()
+	const { setIsMobileLoginOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()
 	const navigate = useNavigate()
 	const {
@@ -66,7 +66,7 @@ export const HeroSection = () => {
 	)
 	const handleCallToAction = () => {
 		if (!authenticatedUserSnapshot) {
-			toggleIsOpen()
+			setIsMobileLoginOpen(true)
 			return
 		}
 		navigate('/manage')

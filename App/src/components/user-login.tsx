@@ -14,15 +14,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
 import { useAuthContext } from '@/contexts/auth-context'
-import {
-	Dialog,
-	DialogContent,
-	DialogTitle,
-	DialogDescription,
-	DialogTrigger,
-} from './ui/dialog'
-import { ResetPasswordCard } from './reset-password-card'
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 const loginSchema = z.object({
 	email: z.string().email(),
@@ -33,8 +24,10 @@ type LoginSchema = z.infer<typeof loginSchema>
 
 export const UserLogin = ({
 	closeMobileSheet,
+	setIsForgotPasswordOpen,
 }: {
 	closeMobileSheet?: () => void
+	setIsForgotPasswordOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 	const { signInWithEmailAndPassword, signInWithEmailAndPasswordError } =
 		useAuthContext()
@@ -103,18 +96,9 @@ export const UserLogin = ({
 				/>
 				<Button type={'submit'}>Login</Button>
 
-				<Dialog>
-					<DialogTrigger asChild>
-						<Button variant={'link'}>Forgot Password?</Button>
-					</DialogTrigger>
-					<VisuallyHidden>
-						<DialogTitle>Reset Password</DialogTitle>
-						<DialogDescription>Reset your password</DialogDescription>
-					</VisuallyHidden>
-					<DialogContent className={'sm:max-w-[425px] pt-10'}>
-						<ResetPasswordCard />
-					</DialogContent>
-				</Dialog>
+				<Button variant={'link'} onClick={() => setIsForgotPasswordOpen(true)}>
+					Forgot Password?
+				</Button>
 			</form>
 		</Form>
 	)

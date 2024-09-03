@@ -2,7 +2,13 @@ import { HamburgerMenuIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { useState, useMemo } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetTitle,
+	SheetTrigger,
+} from './ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useAuthContext } from '@/contexts/auth-context'
 import { UserAvatar } from '@/components/user-avatar'
@@ -15,13 +21,14 @@ import { cn } from '@/lib/utils'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { SeasonSelect } from './season-select'
 import { OfferStatus } from '@/lib/interfaces'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 export const TopNav = ({
-	isOpen,
-	setIsOpen,
+	isMobileLoginOpen,
+	setIsMobileLoginOpen,
 }: {
-	isOpen: boolean
-	setIsOpen: () => void
+	isMobileLoginOpen: boolean
+	setIsMobileLoginOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 	const {
 		authStateUser,
@@ -33,7 +40,7 @@ export const TopNav = ({
 	const { incomingOffersQuerySnapshot } = useOffersContext()
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
-	const [open, setOpen] = useState(false)
+	const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
 
 	const isAuthenticatedUserCaptain = useMemo(
 		() =>
@@ -125,7 +132,7 @@ export const TopNav = ({
 	]
 
 	const handleClick = () => {
-		setOpen(!open)
+		setIsMobileNavOpen(!isMobileNavOpen)
 	}
 
 	return (
@@ -165,14 +172,21 @@ export const TopNav = ({
 					</nav>
 				</div>
 
-				<Sheet open={isOpen} onOpenChange={setIsOpen}>
+				<Sheet
+					open={isMobileLoginOpen}
+					onOpenChange={() => setIsMobileLoginOpen((prev) => !prev)}
+				>
+					<VisuallyHidden>
+						<SheetTitle>Mobile login</SheetTitle>
+						<SheetDescription>Mobile login sheet</SheetDescription>
+					</VisuallyHidden>
 					<SheetContent className="w-full pt-10">
-						<UserForm closeMobileSheet={setIsOpen} />
+						<UserForm closeMobileSheet={() => setIsMobileLoginOpen(false)} />
 					</SheetContent>
 				</Sheet>
 
-				{/* Mobile */}
-				<Sheet open={open} onOpenChange={setOpen}>
+				{/* Mobile HAMBERGER BUTTON */}
+				<Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
 					<SheetTrigger asChild>
 						<Button
 							variant={'ghost'}
@@ -184,6 +198,10 @@ export const TopNav = ({
 							<span className={'sr-only'}>Toggle Menu</span>
 						</Button>
 					</SheetTrigger>
+					<VisuallyHidden>
+						<SheetTitle>Mobile nav menu</SheetTitle>
+						<SheetDescription>Mobile nav menu</SheetDescription>
+					</VisuallyHidden>
 					<SheetContent side={'top'} className={'pr-0'}>
 						<ScrollArea className={'my-4 h-[calc(100vh-8rem)] pb-10 px-6'}>
 							<div className={'flex flex-col space-y-3'}>
@@ -269,8 +287,8 @@ export const TopNav = ({
 								) : (
 									<Button
 										onClick={() => {
-											setIsOpen()
-											setOpen(false)
+											setIsMobileLoginOpen(true)
+											setIsMobileNavOpen(false)
 										}}
 										disabled={authStateLoading}
 									>

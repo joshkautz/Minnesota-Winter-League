@@ -9,8 +9,10 @@ import { ResetPassword } from './reset-password'
 
 export const ResetPasswordCard = ({
 	closeMobileSheet,
+	setIsForgotPasswordOpen,
 }: {
 	closeMobileSheet?: () => void
+	setIsForgotPasswordOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 	return (
 		<Card>
@@ -22,7 +24,10 @@ export const ResetPasswordCard = ({
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<ResetPassword closeMobileSheet={closeMobileSheet} />
+				<ResetPassword
+					closeMobileSheet={closeMobileSheet}
+					setIsForgotPasswordOpen={setIsForgotPasswordOpen}
+				/>
 			</CardContent>
 		</Card>
 	)

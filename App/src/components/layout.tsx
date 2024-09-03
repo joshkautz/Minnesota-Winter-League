@@ -4,16 +4,13 @@ import { cn } from '@/lib/utils'
 import { useState } from 'react'
 
 export type OutletContext = {
-	toggleIsOpen: () => void
+	setIsMobileLoginOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const Layout = () => {
 	const { pathname } = useLocation()
-	const [isOpen, setIsOpen] = useState(false)
 
-	const toggleIsOpen = () => {
-		setIsOpen((prevState) => !prevState)
-	}
+	const [isMobileLoginOpen, setIsMobileLoginOpen] = useState(false)
 
 	return (
 		<div
@@ -22,8 +19,11 @@ export const Layout = () => {
 				pathname !== '/' && 'pb-10'
 			)}
 		>
-			<TopNav isOpen={isOpen} setIsOpen={toggleIsOpen} />
-			<Outlet context={{ toggleIsOpen } satisfies OutletContext} />
+			<TopNav
+				isMobileLoginOpen={isMobileLoginOpen}
+				setIsMobileLoginOpen={setIsMobileLoginOpen}
+			/>
+			<Outlet context={{ setIsMobileLoginOpen } satisfies OutletContext} />
 		</div>
 	)
 }
