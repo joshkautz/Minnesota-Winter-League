@@ -98,7 +98,7 @@ export const HeroSection = () => {
 						<div className={'mt-4 sm:mt-12 max-w-[490px] flex-1'}>
 							{`Join us this season for unforgettable Saturday nights of
 								organized league play. Whether you're a seasoned club veteran,
-								or a rookie in college, `}
+								or a rookie learning the sport, `}
 							<span className={'font-bold'}>
 								{`we can't wait to welcome you to the league.`}
 							</span>

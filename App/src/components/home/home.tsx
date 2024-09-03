@@ -48,13 +48,13 @@ export const Home = () => {
 							<CardContent className={'flex flex-col gap-4'}>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>What:</p>
-									<span>5v5 Open Ultimate on Turf Fields</span>
+									<span>5v5 Open Ultimate on Artificial Grass Fields</span>
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>When:</p>
 									<span>
-										Saturdays from 6:00 PM to 9:00 PM during November (4th,
-										11th, and 18th) and December (2nd, 9th, and 16th)
+										Saturdays (6:00 PM to 9:00 PM) during November (2nd, 9th,
+										16th, 23rd, and 30th) and December (7th and 14th)
 									</span>
 								</div>
 								<div className={'flex'}>
@@ -79,7 +79,15 @@ export const Home = () => {
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>Cost:</p>
-									<span>Just $10/person per night</span>
+									<span>{`$70 for the 2024 Fall season. 7 weeks of games. 2 games a night.`}</span>
+								</div>
+								<div className={'flex'}>
+									<p className={'w-16 mr-2 font-bold'}>New!</p>
+									<span>
+										We will have certified athletic trainers in attendance for
+										the duration of all games. Liability waivers can now be
+										completed electronically!
+									</span>
 								</div>
 							</CardContent>
 						</Card>
@@ -91,8 +99,7 @@ export const Home = () => {
 							<div className={'flex flex-col gap-4'}>
 								<p className={'text-2xl font-bold'}>Individuals</p>
 								<p>
-									{`If you're a solo player looking for a team, don't worry! We'll
-									help you find a team up to play with for the season! `}
+									{`If you're a solo player looking for a team, don't worry! Send some requests out to existing teams and see where you end up! We'll be happy to fully refund you if you don't find a team. `}
 									<Link to={'/#how-to-register'}>
 										<u>Learn more about registration below.</u>
 									</Link>
@@ -228,8 +235,7 @@ export const Home = () => {
 								3
 							</span>
 							<p>
-								{`Click on the "Register" button on your Profile to submit
-								payment.`}
+								{`Navigate your Profile to submit secure electronic payment via Stripe.`}
 							</p>
 						</div>
 						<div className={'w-full flex'}>
@@ -239,6 +245,18 @@ export const Home = () => {
 								}
 							>
 								4
+							</span>
+							<p>
+								{`Sign the Waiver of Liability that is electronically emailed to you following your submission of payment.`}
+							</p>
+						</div>
+						<div className={'w-full flex'}>
+							<span
+								className={
+									'bg-accent text-foreground dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
+								}
+							>
+								5
 							</span>
 							<p>
 								Request to join an existing team, accept an invitation from an
@@ -251,7 +269,7 @@ export const Home = () => {
 									'bg-accent text-foreground dark:text-background flex flex-shrink-0 w-4 h-4 mt-2 mr-2 text-xs items-center justify-center font-bold rounded-full -translate-y-0.5'
 								}
 							>
-								5
+								6
 							</span>
 							<p>Await confirmation and league updates via email.</p>
 						</div>
