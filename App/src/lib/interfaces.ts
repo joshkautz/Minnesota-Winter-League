@@ -102,6 +102,7 @@ export interface ExtendedOfferData extends OfferData {
 
 export interface CheckoutSessionData extends DocumentData {
 	cancel_url: string
+	error: { message: string }
 	client: string
 	created: Timestamp
 	mode: string

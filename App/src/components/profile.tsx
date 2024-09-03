@@ -1,6 +1,6 @@
 import { useAuthContext } from '@/contexts/auth-context'
 import { Input } from '@/components/ui/input'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
 	Form,
@@ -40,7 +40,8 @@ export const Profile = () => {
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const [sentEmail, setSentEmail] = useState(false)
-	const [stripeLoading, setStripeLoading] = useState(false)
+	const [stripeLoading, setStripeLoading] = useState<boolean>(false)
+	const [stripeError, setStripeError] = useState<string>()
 
 	const form = useForm<ProfileSchema>({
 		resolver: zodResolver(profileSchema),
@@ -58,32 +59,47 @@ export const Profile = () => {
 		}
 	}, [authenticatedUserSnapshot])
 
-	const onSubmit = (data: ProfileSchema) => {
-		updatePlayer(authStateUser, {
-			firstname: data.firstname,
-			lastname: data.lastname,
-		})
-			.then(() => {
-				toast({
-					title: `Updated profile!`,
-				})
+	useEffect(() => {
+		if (stripeError) {
+			console.log(stripeError)
+			toast({
+				title: `Failure`,
+				description: stripeError,
+				variant: 'destructive',
 			})
-			.catch((err) => {
-				toast({
-					title: `Failed to update profile: ${err}`,
-					variant: 'destructive',
-				})
+			setStripeError(undefined)
+		}
+	}, [stripeError])
+
+	const onSubmit = useCallback(
+		(data: ProfileSchema) => {
+			updatePlayer(authStateUser, {
+				firstname: data.firstname,
+				lastname: data.lastname,
 			})
-	}
+				.then(() => {
+					toast({
+						title: `Updated profile!`,
+					})
+				})
+				.catch((err) => {
+					toast({
+						title: `Failed to update profile: ${err}`,
+						variant: 'destructive',
+					})
+				})
+		},
+		[updatePlayer, authStateUser]
+	)
 
-	const registrationButtonOnClickHandler = () => {
-		stripeRegistration(authStateUser, setStripeLoading)
-	}
+	const registrationButtonOnClickHandler = useCallback(() => {
+		stripeRegistration(authStateUser, setStripeLoading, setStripeError)
+	}, [stripeRegistration, authStateUser, setStripeLoading, setStripeError])
 
-	const sendEmailVerificationButtonOnClickHandler = () => {
+	const sendEmailVerificationButtonOnClickHandler = useCallback(() => {
 		sendEmailVerification()
 		setSentEmail(true)
-	}
+	}, [sendEmailVerification, setSentEmail])
 
 	const isAuthenticatedUserPaid = useMemo(
 		() =>
@@ -291,7 +307,7 @@ export const Profile = () => {
 											<Button
 												variant={'default'}
 												onClick={registrationButtonOnClickHandler}
-												disabled={!isRegistrationOpen}
+												disabled={!isRegistrationOpen || stripeLoading}
 											>
 												{stripeLoading && (
 													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
@@ -341,9 +357,7 @@ export const Profile = () => {
 												variant={'default'}
 												disabled={!isRegistrationOpen}
 											>
-												{stripeLoading && (
-													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
-												)}
+												{/* <ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} /> */}
 												Sign
 											</Button>
 											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>

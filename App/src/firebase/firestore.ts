@@ -15,7 +15,6 @@ import {
 	getDocs,
 	collection,
 	onSnapshot,
-	Unsubscribe,
 	or,
 	and,
 	DocumentSnapshot,
@@ -717,9 +716,10 @@ const incomingOffersQuery = (
 
 const stripeRegistration = async (
 	authValue: User | null | undefined,
-	setLoadingState: React.Dispatch<React.SetStateAction<boolean>>
-): Promise<Unsubscribe> => {
-	setLoadingState(true)
+	setStripeLoading: React.Dispatch<React.SetStateAction<boolean>>,
+	setStripeError: React.Dispatch<React.SetStateAction<string | undefined>>
+) => {
+	setStripeLoading(true)
 
 	// Create new Checkout Session for the player
 	return (
@@ -732,7 +732,7 @@ const stripeRegistration = async (
 				cancel_url: window.location.href,
 			}
 		) as Promise<DocumentReference<CheckoutSessionData, DocumentData>>
-	).then((checkoutSessionDocumentReference) =>
+	).then((checkoutSessionDocumentReference) => {
 		// Listen for the URL of the Checkout Session
 		onSnapshot(
 			checkoutSessionDocumentReference,
@@ -741,13 +741,17 @@ const stripeRegistration = async (
 				if (data) {
 					if (data.url) {
 						// We have a Stripe Checkout URL, let's redirect.
-						setLoadingState(false)
 						window.location.assign(data.url)
+					}
+					if (data.error) {
+						setStripeLoading(false)
+						console.log('setting stripe error')
+						setStripeError(data.error.message)
 					}
 				}
 			}
 		)
-	)
+	})
 }
 
 export {

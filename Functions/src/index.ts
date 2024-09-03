@@ -88,7 +88,7 @@ interface OfferData extends DocumentData {
 }
 
 interface WaiverData extends DocumentData {
-	player: DocumentReference<PlayerData>
+	player: DocumentReference<PlayerData, DocumentData>
 }
 
 const REGION = 'us-central1'
@@ -565,6 +565,7 @@ export const SetTeamRegisteredDate_OnTeamRegisteredChange = onDocumentUpdated(
 	}
 )
 
+// Audited: September 3, 2024.
 /**
  * When Dropbox Sign sends a `signature_request_signed` callback event, update the corresponding `Player` document to reflect the signed status.
  *
@@ -595,16 +596,62 @@ export const dropboxSignHandleWebhookEvents = onRequest(
 						const signatureRequestId = signatureRequest.signatureRequestId
 
 						if (signatureRequestId) {
-							const waiverSnapshot = await firestore
-								.collection(COLLECTIONS.WAIVERS)
-								.doc(signatureRequestId)
+							// Update player document - Add team to the player's current season.
+							await (
+								firestore
+									.collection(COLLECTIONS.WAIVERS)
+									.doc(signatureRequestId) as DocumentReference<
+									WaiverData,
+									DocumentData
+								>
+							)
 								.get()
-
-							const waiver = waiverSnapshot.data() as WaiverData
-
-							await waiver.player.update({
-								signed: true,
-							})
+								.then((waiverDocumentSnapshot) =>
+									Promise.all([
+										waiverDocumentSnapshot,
+										(
+											firestore.collection(
+												COLLECTIONS.SEASONS
+											) as CollectionReference<SeasonData, DocumentData>
+										).get(),
+									])
+								)
+								.then(([waiverDocumentSnapshot, seasonQuerySnapshot]) =>
+									Promise.all([
+										waiverDocumentSnapshot,
+										seasonQuerySnapshot,
+										waiverDocumentSnapshot.data()?.player.get(),
+									])
+								)
+								.then(
+									([
+										waiverDocumentSnapshot,
+										seasonQuerySnapshot,
+										playerDocumentSnapshot,
+									]) =>
+										waiverDocumentSnapshot.data()?.player.update({
+											seasons: playerDocumentSnapshot
+												?.data()
+												?.seasons.map((item) =>
+													item.season.id ==
+													seasonQuerySnapshot.docs
+														.sort(
+															(a, b) =>
+																b.data().dateStart.seconds -
+																a.data().dateStart.seconds
+														)
+														.find((season) => season)?.id
+														? {
+																captain: item.captain,
+																paid: item.paid,
+																season: item.season,
+																signed: true,
+																team: item.team,
+															}
+														: item
+												),
+										})
+								)
 						}
 					}
 				}
