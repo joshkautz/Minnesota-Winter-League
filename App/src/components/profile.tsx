@@ -21,6 +21,7 @@ import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { Timestamp } from '@firebase/firestore'
+import { sendDropboxEmail } from '@/firebase/dropbox'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -39,9 +40,13 @@ export const Profile = () => {
 	} = useAuthContext()
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
-	const [sentEmail, setSentEmail] = useState(false)
+	const [verificationEmailSent, setVerificationEmailSent] = useState(false)
+	const [verificationEmailLoading, setVerificationEmailLoading] =
+		useState(false)
 	const [stripeLoading, setStripeLoading] = useState<boolean>(false)
 	const [stripeError, setStripeError] = useState<string>()
+	const [dropboxEmailSent, setDropboxEmailSent] = useState(false)
+	const [dropboxEmailLoading, setDropboxEmailLoading] = useState(false)
 
 	const form = useForm<ProfileSchema>({
 		resolver: zodResolver(profileSchema),
@@ -61,7 +66,6 @@ export const Profile = () => {
 
 	useEffect(() => {
 		if (stripeError) {
-			console.log(stripeError)
 			toast({
 				title: `Failure`,
 				description: stripeError,
@@ -92,14 +96,29 @@ export const Profile = () => {
 		[updatePlayer, authStateUser]
 	)
 
+	const sendVerificationEmailButtonOnClickHandler = useCallback(() => {
+		setVerificationEmailLoading(true)
+		sendEmailVerification().then(() => {
+			setVerificationEmailSent(true)
+			setVerificationEmailLoading(false)
+		})
+	}, [
+		sendEmailVerification,
+		setVerificationEmailSent,
+		setVerificationEmailLoading,
+	])
+
 	const registrationButtonOnClickHandler = useCallback(() => {
 		stripeRegistration(authStateUser, setStripeLoading, setStripeError)
 	}, [stripeRegistration, authStateUser, setStripeLoading, setStripeError])
 
-	const sendEmailVerificationButtonOnClickHandler = useCallback(() => {
-		sendEmailVerification()
-		setSentEmail(true)
-	}, [sendEmailVerification, setSentEmail])
+	const sendDropboxEmailButtonOnClickHandler = useCallback(() => {
+		setDropboxEmailLoading(true)
+		sendDropboxEmail().then(() => {
+			setDropboxEmailSent(true)
+			setDropboxEmailLoading(false)
+		})
+	}, [sendDropboxEmail, setDropboxEmailSent, setDropboxEmailLoading])
 
 	const isAuthenticatedUserPaid = useMemo(
 		() =>
@@ -260,10 +279,17 @@ export const Profile = () => {
 										<>
 											<Button
 												variant={'default'}
-												onClick={sendEmailVerificationButtonOnClickHandler}
-												disabled={sentEmail}
+												onClick={sendVerificationEmailButtonOnClickHandler}
+												disabled={
+													verificationEmailSent || verificationEmailLoading
+												}
 											>
-												{sentEmail ? 'Email Sent!' : 'Re-Send Email'}
+												{verificationEmailLoading && (
+													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+												)}
+												{verificationEmailSent
+													? 'Email Sent!'
+													: 'Re-Send Verification Email'}
 											</Button>
 											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
 												Check your email for a verification link.
@@ -275,7 +301,7 @@ export const Profile = () => {
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
 									Payment
-									{isLoading ? (
+									{isLoading || isAuthenticatedUserPaid === undefined ? (
 										<></>
 									) : (
 										!isAuthenticatedUserPaid && (
@@ -324,7 +350,7 @@ export const Profile = () => {
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
 									Waiver
-									{isLoading ? (
+									{isLoading || isAuthenticatedUserSigned === undefined ? (
 										<></>
 									) : (
 										!isAuthenticatedUserSigned && (
@@ -355,13 +381,23 @@ export const Profile = () => {
 										<>
 											<Button
 												variant={'default'}
-												disabled={!isRegistrationOpen}
+												onClick={sendDropboxEmailButtonOnClickHandler}
+												disabled={
+													!isRegistrationOpen ||
+													dropboxEmailLoading ||
+													dropboxEmailSent ||
+													!isAuthenticatedUserPaid
+												}
 											>
-												{/* <ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} /> */}
-												Sign
+												{dropboxEmailLoading && (
+													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
+												)}
+												{dropboxEmailSent
+													? 'Email Sent!'
+													: 'Re-Send Waiver Email'}
 											</Button>
 											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
-												Complete registration by signing via Dropbox.
+												Check your email for a Dropbox Sign link.
 											</p>
 										</>
 									)}
