@@ -80,7 +80,7 @@
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.9.1",
 		"eslint-config-google": "^0.14.0",
-		"eslint-plugin-react": "^7.35.0",
+		"eslint-plugin-react": "^7.35.1",
 		"jsdom": "^25.0.0",
 		"postcss": "^8.4.43",
 		"prettier": "^3.3.3",
