@@ -25,7 +25,7 @@ import {
 import { GradientHeader } from './gradient-header'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { Timestamp } from '@firebase/firestore'
-import { sendDropboxEmail } from '@/firebase/dropbox'
+import { sendDropboxEmail } from '../firebase/functions'
 import {
 	Tooltip,
 	TooltipContent,

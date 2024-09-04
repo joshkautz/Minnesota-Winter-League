@@ -17,7 +17,7 @@ import {
 	onDocumentUpdated,
 	onDocumentCreated,
 } from 'firebase-functions/v2/firestore'
-import { onRequest } from 'firebase-functions/v2/https'
+import { onCall, onRequest } from 'firebase-functions/v2/https'
 import { error } from 'firebase-functions/logger'
 
 // Firebase Firestore SDK
@@ -660,6 +660,67 @@ export const dropboxSignHandleWebhookEvents = onRequest(
 			error(e)
 		} finally {
 			resp.status(200).send('Hello API event received')
+		}
+	}
+)
+
+// Audited: September 3, 2024.
+/**
+ * When the App user clicks the "Re-Send Waiver Email," use the Dropbox Sign API to send a reminder email for their Signature Request.
+ *
+ * Firebase Documentation: {@link https://firebase.google.com/docs/functions/callable?gen=2nd#write_and_deploy_the_callable_function Trigger a function with a callable function.}
+ */
+
+export const dropboxSignSendReminderEmail = onCall(
+	{
+		region: REGION,
+		cors: ['https://mplswinterleague.com'],
+	},
+	async (req) => {
+		try {
+			const firestore = getFirestore()
+			const dropbox = new SignatureRequestApi()
+			dropbox.username = DROPBOX_SIGN_API_KEY
+
+			if (!req.auth?.uid) return undefined
+
+			return (
+				firestore
+					.collection(COLLECTIONS.PLAYERS)
+					.doc(req.auth?.uid) as DocumentReference<PlayerData, DocumentData>
+			)
+				.get()
+				.then((playerDocumentSnapshot) =>
+					Promise.all([
+						playerDocumentSnapshot,
+						(
+							firestore
+								.collection(COLLECTIONS.WAIVERS)
+								.where(
+									FIELDS.PLAYER,
+									'==',
+									playerDocumentSnapshot.ref
+								) as Query<WaiverData, DocumentData>
+						).get(),
+					])
+				)
+				.then(([playerDocumentSnapshot, waiverQuerySnapshot]) => {
+					const signatureRequestId = waiverQuerySnapshot.docs.find(
+						(waiver) => waiver
+					)?.id
+					const playerDocumentSnapshotData = playerDocumentSnapshot.data()
+					if (!signatureRequestId) return Promise.reject('No waiver found.')
+					if (!playerDocumentSnapshotData)
+						return Promise.reject('No player found.')
+
+					return dropbox.signatureRequestRemind(signatureRequestId, {
+						emailAddress: playerDocumentSnapshotData.email,
+						name: `${playerDocumentSnapshotData.firstname} ${playerDocumentSnapshotData.lastname}`,
+					})
+				})
+		} catch (e) {
+			error(e)
+			return e
 		}
 	}
 )

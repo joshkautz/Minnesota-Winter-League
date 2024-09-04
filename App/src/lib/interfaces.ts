@@ -43,6 +43,7 @@ export enum Collections {
 	GAMES = 'games',
 	TEAMS = 'teams',
 	SEASONS = 'seasons',
+	WAIVERS = 'waivers',
 }
 
 /////////////////////////////////////////////////////////////////
@@ -128,4 +129,8 @@ export interface GameData extends DocumentData {
 	home: DocumentReference<TeamData, DocumentData>
 	homeScore: number
 	season: DocumentReference<SeasonData, DocumentData>
+}
+
+export interface WaiverData extends DocumentData {
+	player: DocumentReference<PlayerData, DocumentData>
 }
