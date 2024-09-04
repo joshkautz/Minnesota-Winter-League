@@ -719,11 +719,23 @@ export const dropboxSignSendReminderEmail = onCall(
 					name: `${playerDocumentSnapshotData.firstname} ${playerDocumentSnapshotData.lastname}`,
 				})
 			})
-			.then((dropboxResponse) => ({
-				result: dropboxResponse.body.signatureRequest,
-			}))
-			.catch((e) => ({
-				error: e,
-			}))
+			.then((dropboxResponse) => {
+				console.log(dropboxResponse)
+				return {
+					result: {
+						signatureRequestId:
+							dropboxResponse.body.signatureRequest?.signatureRequestId,
+						signingUrl: dropboxResponse.body.signatureRequest?.signingUrl,
+						requesterEmailAddress:
+							dropboxResponse.body.signatureRequest?.requesterEmailAddress,
+					},
+				}
+			})
+			.catch((e) => {
+				console.log(e)
+				return {
+					error: e,
+				}
+			})
 	}
 )
