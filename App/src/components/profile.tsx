@@ -32,6 +32,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './ui/tooltip'
+import { DropboxError, DropboxResult } from '@/lib/interfaces'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -134,6 +135,17 @@ export const Profile = () => {
 			console.log(typeof result.data)
 			console.log(result.data)
 
+			const resultTest = result.data as DropboxResult
+			console.log(resultTest)
+			console.log(typeof resultTest)
+
+			const errorTest = result.data as DropboxError
+			console.log(errorTest)
+			console.log(typeof errorTest)
+
+			console.log('Is it a DropboxError?', 'error' in result.data)
+			console.log('Is it a DropboxResult?', 'result' in result.data)
+
 			setDropboxEmailSent(true)
 			setDropboxEmailLoading(false)
 			// toast({
@@ -144,7 +156,7 @@ export const Profile = () => {
 		})
 		// .catch((result) => {
 		// 	console.log('1', typeof result)
-		// 	console.log('2', result as HttpsCallableResult<DropboxError>)
+		// 	console.log('2', result as HttpsCallableResult<ropboxResult>)
 		// 	console.log('3', result.data as HttpsCallableResult<DropboxError>)
 		// 	console.log('4', result.data as DropboxError)
 		// 	console.log('5', result.data.error as DropboxError)
