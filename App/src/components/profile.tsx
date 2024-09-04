@@ -131,6 +131,7 @@ export const Profile = () => {
 		setDropboxEmailLoading(true)
 		sendDropboxEmail()
 			.then((result) => {
+				console.log(result)
 				setDropboxEmailSent(true)
 				setDropboxEmailLoading(false)
 				toast({
@@ -140,6 +141,7 @@ export const Profile = () => {
 				})
 			})
 			.catch((result) => {
+				console.log(result)
 				setDropboxEmailSent(false)
 				setDropboxEmailLoading(false)
 				toast({
