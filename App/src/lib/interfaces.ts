@@ -46,6 +46,23 @@ export enum Collections {
 	WAIVERS = 'waivers',
 }
 
+export interface DropboxResult {
+	result: {
+		signatureRequestId: string
+		signingUrl: string
+		requesterEmailAddress: string
+	}
+}
+
+export interface DropboxError {
+	error: {
+		message: string
+		name: string
+		statusCode: number
+		statusText: string
+	}
+}
+
 /////////////////////////////////////////////////////////////////
 ///////////////////////// Document Data /////////////////////////
 /////////////////////////////////////////////////////////////////

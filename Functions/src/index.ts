@@ -92,6 +92,23 @@ interface WaiverData extends DocumentData {
 	player: DocumentReference<PlayerData, DocumentData>
 }
 
+interface DropboxResult {
+	result: {
+		signatureRequestId: string
+		signingUrl: string
+		requesterEmailAddress: string
+	}
+}
+
+interface DropboxError {
+	error: {
+		message: string
+		name: string
+		statusCode: number
+		statusText: string
+	}
+}
+
 const REGION = 'us-central1'
 
 const COLLECTIONS = {
@@ -730,7 +747,7 @@ export const dropboxSignSendReminderEmail = onCall(
 						requesterEmailAddress:
 							dropboxResponse.body.signatureRequest?.requesterEmailAddress,
 					},
-				}
+				} as DropboxResult
 			})
 			.catch((e: HttpError) => {
 				console.log(e)
@@ -741,7 +758,7 @@ export const dropboxSignSendReminderEmail = onCall(
 						statusCode: e.statusCode,
 						statusText: e.response.statusText,
 					},
-				}
+				} as DropboxError
 			})
 	}
 )

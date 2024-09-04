@@ -32,6 +32,8 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './ui/tooltip'
+import { DropboxError, DropboxResult } from '@/lib/interfaces'
+import { HttpsCallableResult } from 'firebase/functions'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -127,11 +129,26 @@ export const Profile = () => {
 
 	const sendDropboxEmailButtonOnClickHandler = useCallback(() => {
 		setDropboxEmailLoading(true)
-		sendDropboxEmail().then(() => {
-			setDropboxEmailSent(true)
-			setDropboxEmailLoading(false)
-		})
-	}, [sendDropboxEmail, setDropboxEmailSent, setDropboxEmailLoading])
+		sendDropboxEmail()
+			.then((result) => {
+				setDropboxEmailSent(true)
+				setDropboxEmailLoading(false)
+				toast({
+					title: `Success`,
+					description: `Email sent to ${(result as HttpsCallableResult<DropboxResult>).data.result.requesterEmailAddress}`,
+					variant: 'default',
+				})
+			})
+			.catch((result) => {
+				setDropboxEmailSent(false)
+				setDropboxEmailLoading(false)
+				toast({
+					title: `Failure`,
+					description: `${(result as HttpsCallableResult<DropboxError>).data.error.message}`,
+					variant: 'destructive',
+				})
+			})
+	}, [sendDropboxEmail, setDropboxEmailSent, setDropboxEmailLoading, toast])
 
 	const isAuthenticatedUserPaid = useMemo(
 		() =>
