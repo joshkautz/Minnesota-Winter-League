@@ -146,7 +146,7 @@ export const Profile = () => {
 				setDropboxEmailLoading(false)
 				toast({
 					title: `Failure`,
-					description: data.error.message,
+					description: `Dropbox Error: ${data.error.message}`,
 					variant: 'destructive',
 				})
 			}
