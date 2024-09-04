@@ -142,21 +142,17 @@ export const Profile = () => {
 			})
 			.catch((result) => {
 				console.log(typeof result)
-				const test1 = result as HttpsCallableResult<DropboxError>
-				const test2 = result.data as HttpsCallableResult<DropboxError>
-				const test3 = result.data as DropboxError
-				const test4 = result.data.error as DropboxError
-				console.log(test1)
-				console.log(test2)
-				console.log(test3)
-				console.log(test4)
+				console.log(result as HttpsCallableResult<DropboxError>)
+				console.log(result.data as HttpsCallableResult<DropboxError>)
+				console.log(result.data as DropboxError)
+				console.log(result.data.error as DropboxError)
 				setDropboxEmailSent(false)
 				setDropboxEmailLoading(false)
-				toast({
-					title: `Failure`,
-					description: `${(result as HttpsCallableResult<DropboxError>).data.error.message}`,
-					variant: 'destructive',
-				})
+				// toast({
+				// 	title: `Failure`,
+				// 	description: `${(result as HttpsCallableResult<DropboxError>).data.error.message}`,
+				// 	variant: 'destructive',
+				// })
 			})
 	}, [sendDropboxEmail, setDropboxEmailSent, setDropboxEmailLoading, toast])
 
