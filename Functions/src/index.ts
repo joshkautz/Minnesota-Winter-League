@@ -5,6 +5,7 @@ import {
 	EventCallbackHelper,
 	EventCallbackRequest,
 	EventCallbackRequestEvent,
+	HttpError,
 	SignatureRequestApi,
 	SubSigningOptions,
 } from '@dropbox/sign'
@@ -731,10 +732,15 @@ export const dropboxSignSendReminderEmail = onCall(
 					},
 				}
 			})
-			.catch((e) => {
+			.catch((e: HttpError) => {
 				console.log(e)
 				return {
-					error: e,
+					error: {
+						message: e.body.error.errorMsg,
+						name: e.body.error.errorName,
+						statusCode: e.statusCode,
+						statusText: e.response.statusText,
+					},
 				}
 			})
 	}

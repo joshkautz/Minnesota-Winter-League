@@ -93,12 +93,15 @@ export const Profile = () => {
 			})
 				.then(() => {
 					toast({
-						title: `Updated profile!`,
+						title: `Success`,
+						description: `User updated!`,
+						variant: 'default',
 					})
 				})
 				.catch((err) => {
 					toast({
-						title: `Failed to update profile: ${err}`,
+						title: `Failure`,
+						description: `${err}`,
 						variant: 'destructive',
 					})
 				})
