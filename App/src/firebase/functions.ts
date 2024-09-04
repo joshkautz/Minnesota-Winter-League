@@ -10,6 +10,12 @@ const sendDropboxEmail = async () => {
 		'dropboxSignSendReminderEmail'
 	)
 	return dropboxSignSendReminderEmail()
+		.then((result) => {
+			console.log(result)
+		})
+		.catch((error) => {
+			console.error(error)
+		})
 }
 
 export { sendDropboxEmail }
