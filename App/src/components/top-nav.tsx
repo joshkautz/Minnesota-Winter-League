@@ -20,7 +20,6 @@ import { toast } from './ui/use-toast'
 import { cn } from '@/lib/utils'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { SeasonSelect } from './season-select'
-import { OfferStatus } from '@/lib/interfaces'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 export const TopNav = ({
@@ -67,10 +66,7 @@ export const TopNav = ({
 	)
 
 	const hasPendingOffers = useMemo(
-		() =>
-			incomingOffersQuerySnapshot?.docs.filter(
-				(offer) => offer.data().status === OfferStatus.PENDING
-			).length,
+		() => incomingOffersQuerySnapshot?.docs.length,
 		[incomingOffersQuerySnapshot]
 	)
 
@@ -236,7 +232,6 @@ export const TopNav = ({
 														<>
 															{label}
 															<span className="relative flex w-2 h-2 ml-1">
-																{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 																<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
 															</span>
 														</>
@@ -244,7 +239,6 @@ export const TopNav = ({
 														<>
 															{label}
 															<span className="relative flex w-2 h-2 ml-1">
-																{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 																<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
 															</span>
 														</>

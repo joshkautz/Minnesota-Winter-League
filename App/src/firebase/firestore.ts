@@ -24,6 +24,7 @@ import {
 	Timestamp,
 	Query,
 	documentId,
+	CollectionReference,
 } from 'firebase/firestore'
 
 import { app } from './app'
@@ -61,6 +62,7 @@ const rejectOffer = (
 	})
 }
 
+// Audited: September 4, 2024.
 const createTeam = async (
 	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
 	name: string | undefined,
@@ -72,45 +74,66 @@ const createTeam = async (
 	if (!name) return
 	if (!seasonRef) return
 
-	// Create the team document so we can upate the player document.
-	const teamDocumentReference = (await addDoc(
-		collection(firestore, Collections.TEAMS),
-		{
-			logo: logo ? logo : null,
-			name: name,
-			placement: null,
-			registered: false,
-			registeredDate: Timestamp.now(),
-			roster: [{ captain: true, player: playerRef }],
-			season: seasonRef,
-			storagePath: storagePath ? storagePath : null,
-			teamId: uuidv4(),
-		}
-	)) as DocumentReference<TeamData, DocumentData>
-
-	// Get the player document so we can update the player document.
-	const playerDocumentSnapshot = await getDoc(playerRef)
-
-	// Get the season document so we can update the season document.
-	const seasonDocumentSnapshot = await getDoc(seasonRef)
-
-	return Promise.all([
-		// Updated the player document.
-		updateDoc(playerRef, {
-			seasons: playerDocumentSnapshot.data()?.seasons.map((item) => ({
-				captain: item.season.id === seasonRef.id ? true : item.captain,
-				paid: item.paid,
-				season: item.season,
-				signed: item.signed,
-				team:
-					item.season.id === seasonRef.id ? teamDocumentReference : item.team,
-			})),
-		}),
-		// Updated the season document.
-		updateDoc(seasonRef, {
-			teams: seasonDocumentSnapshot.data()?.teams.concat(teamDocumentReference),
-		}),
-	])
+	return (
+		// Create the team document so we can upate the player document.
+		addDoc(
+			collection(firestore, Collections.TEAMS) as CollectionReference<
+				TeamData,
+				DocumentData
+			>,
+			{
+				logo: logo ? logo : null,
+				name: name,
+				placement: null,
+				registered: false,
+				registeredDate: Timestamp.now(),
+				roster: [{ captain: true, player: playerRef }],
+				season: seasonRef,
+				storagePath: storagePath ? storagePath : null,
+				teamId: uuidv4(),
+			}
+		)
+			// Get the player document so we can update the player document.
+			.then((teamDocumentReference) =>
+				Promise.all([teamDocumentReference, getDoc(playerRef)])
+			)
+			// Get the season document so we can update the season document.
+			.then(([teamDocumentReference, playerDocumentSnapshot]) =>
+				Promise.all([
+					teamDocumentReference,
+					playerDocumentSnapshot,
+					getDoc(seasonRef),
+				])
+			)
+			.then(
+				([
+					teamDocumentReference,
+					playerDocumentSnapshot,
+					seasonDocumentSnapshot,
+				]) =>
+					Promise.all([
+						// Updated the player document.
+						updateDoc(playerRef, {
+							seasons: playerDocumentSnapshot.data()?.seasons.map((item) => ({
+								captain: item.season.id === seasonRef.id ? true : item.captain,
+								paid: item.paid,
+								season: item.season,
+								signed: item.signed,
+								team:
+									item.season.id === seasonRef.id
+										? teamDocumentReference
+										: item.team,
+							})),
+						}),
+						// Updated the season document.
+						updateDoc(seasonRef, {
+							teams: seasonDocumentSnapshot
+								.data()
+								?.teams.concat(teamDocumentReference),
+						}),
+					])
+			)
+	)
 }
 
 const rolloverTeam = async (
@@ -214,6 +237,7 @@ const createPlayer = (
 	})
 }
 
+// Audited: September 4, 2024.
 const deleteTeam = async (
 	teamRef: DocumentReference<TeamData, DocumentData> | undefined,
 	seasonRef: DocumentReference<SeasonData, DocumentData> | undefined
@@ -262,16 +286,16 @@ const deleteTeam = async (
 			)
 			// Delete team's image from storage.
 			.then(() => getDoc(teamRef))
-			.then((teamDocumentSnapshot) =>
-				teamDocumentSnapshot.data()?.storagePath
-					? deleteImage(ref(storage, teamDocumentSnapshot.data()?.storagePath))
-					: Promise.resolve()
-			)
+			.then((teamDocumentSnapshot) => {
+				const url = teamDocumentSnapshot.data()!.storagePath
+				return url ? deleteImage(ref(storage, url)) : Promise.resolve()
+			})
 			// Delete the team document.
 			.then(() => deleteDoc(teamRef))
 	)
 }
 
+// Audited: September 4, 2024.
 const promoteToCaptain = async (
 	playerRef: DocumentReference<PlayerData, DocumentData> | undefined,
 	teamRef: DocumentReference<TeamData, DocumentData> | undefined,

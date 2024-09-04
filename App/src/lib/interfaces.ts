@@ -82,9 +82,9 @@ export interface PlayerData extends DocumentData {
 }
 
 export interface TeamData extends DocumentData {
-	logo: string
+	logo: string | null
 	name: string
-	placement: number
+	placement: number | null
 	registered: boolean
 	registeredDate: Timestamp
 	roster: {
@@ -92,7 +92,7 @@ export interface TeamData extends DocumentData {
 		player: DocumentReference<PlayerData, DocumentData>
 	}[]
 	season: DocumentReference<SeasonData, DocumentData>
-	storagePath: string
+	storagePath: string | null
 	teamId: string
 }
 
