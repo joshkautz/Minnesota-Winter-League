@@ -141,11 +141,11 @@ export const Profile = () => {
 				})
 			})
 			.catch((result) => {
-				console.log(typeof result)
-				console.log(result as HttpsCallableResult<DropboxError>)
-				console.log(result.data as HttpsCallableResult<DropboxError>)
-				console.log(result.data as DropboxError)
-				console.log(result.data.error as DropboxError)
+				console.log('1', typeof result)
+				console.log('2', result as HttpsCallableResult<DropboxError>)
+				console.log('3', result.data as HttpsCallableResult<DropboxError>)
+				console.log('4', result.data as DropboxError)
+				console.log('5', result.data.error as DropboxError)
 				setDropboxEmailSent(false)
 				setDropboxEmailLoading(false)
 				// toast({
