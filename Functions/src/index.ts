@@ -6,7 +6,9 @@ import {
 	EventCallbackRequest,
 	EventCallbackRequestEvent,
 	HttpError,
+	returnTypeT,
 	SignatureRequestApi,
+	SignatureRequestGetResponse,
 	SubSigningOptions,
 } from '@dropbox/sign'
 
@@ -737,7 +739,7 @@ export const dropboxSignSendReminderEmail = onCall(
 					name: `${playerDocumentSnapshotData.firstname} ${playerDocumentSnapshotData.lastname}`,
 				})
 			})
-			.then((dropboxResponse) => {
+			.then((dropboxResponse: returnTypeT<SignatureRequestGetResponse>) => {
 				console.log(dropboxResponse)
 				return {
 					result: {

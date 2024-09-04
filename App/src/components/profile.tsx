@@ -32,7 +32,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './ui/tooltip'
-import { DropboxError, DropboxResult } from '@/lib/interfaces'
+import { DropboxError } from '@/lib/interfaces'
 import { HttpsCallableResult } from 'firebase/functions'
 
 const profileSchema = z.object({
@@ -136,12 +136,20 @@ export const Profile = () => {
 				setDropboxEmailLoading(false)
 				toast({
 					title: `Success`,
-					description: `Email sent to ${(result as HttpsCallableResult<DropboxResult>).data.result.requesterEmailAddress}`,
+					description: `Email sent to ${result.data.result.requesterEmailAddress}`,
 					variant: 'default',
 				})
 			})
 			.catch((result) => {
-				console.log(result)
+				console.log(typeof result)
+				const test1 = result as HttpsCallableResult<DropboxError>
+				const test2 = result.data as HttpsCallableResult<DropboxError>
+				const test3 = result.data as DropboxError
+				const test4 = result.data.error as DropboxError
+				console.log(test1)
+				console.log(test2)
+				console.log(test3)
+				console.log(test4)
 				setDropboxEmailSent(false)
 				setDropboxEmailLoading(false)
 				toast({
