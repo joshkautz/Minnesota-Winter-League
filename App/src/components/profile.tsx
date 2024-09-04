@@ -129,45 +129,28 @@ export const Profile = () => {
 	const sendDropboxEmailButtonOnClickHandler = useCallback(() => {
 		setDropboxEmailLoading(true)
 		sendDropboxEmail().then((result) => {
-			console.log(typeof result)
-			console.log(result)
+			if ('result' in result.data) {
+				const data: DropboxResult = result.data as DropboxResult
+				setDropboxEmailSent(true)
+				setDropboxEmailLoading(false)
+				toast({
+					title: `Success`,
+					description: `Email sent to ${data.result.requesterEmailAddress}`,
+					variant: 'default',
+				})
+			}
 
-			console.log(typeof result.data)
-			console.log(result.data)
-
-			const resultTest = result.data as DropboxResult
-			console.log(resultTest)
-			console.log(typeof resultTest)
-
-			const errorTest = result.data as DropboxError
-			console.log(errorTest)
-			console.log(typeof errorTest)
-
-			console.log('Is it a DropboxError?', 'error' in result.data)
-			console.log('Is it a DropboxResult?', 'result' in result.data)
-
-			setDropboxEmailSent(true)
-			setDropboxEmailLoading(false)
-			// toast({
-			// 	title: `Success`,
-			// 	description: `Email sent to ${result.data.result.requesterEmailAddress}`,
-			// 	variant: 'default',
-			// })
+			if ('error' in result.data) {
+				const data: DropboxError = result.data as DropboxError
+				setDropboxEmailSent(false)
+				setDropboxEmailLoading(false)
+				toast({
+					title: `Failure`,
+					description: data.error.message,
+					variant: 'destructive',
+				})
+			}
 		})
-		// .catch((result) => {
-		// 	console.log('1', typeof result)
-		// 	console.log('2', result as HttpsCallableResult<ropboxResult>)
-		// 	console.log('3', result.data as HttpsCallableResult<DropboxError>)
-		// 	console.log('4', result.data as DropboxError)
-		// 	console.log('5', result.data.error as DropboxError)
-		// 	setDropboxEmailSent(false)
-		// 	setDropboxEmailLoading(false)
-		// 	// toast({
-		// 	// 	title: `Failure`,
-		// 	// 	description: `${(result as HttpsCallableResult<DropboxError>).data.error.message}`,
-		// 	// 	variant: 'destructive',
-		// 	// })
-		// })
 	}, [sendDropboxEmail, setDropboxEmailSent, setDropboxEmailLoading, toast])
 
 	const isAuthenticatedUserPaid = useMemo(
