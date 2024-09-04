@@ -5,17 +5,17 @@ import {
 } from 'firebase/functions'
 
 import { app } from './app'
-import { DropboxResult } from '@/lib/interfaces'
+import { DropboxError, DropboxResult } from '@/lib/interfaces'
 
 const functions = getFunctions(app)
 
 const sendDropboxEmail = async (): Promise<
-	HttpsCallableResult<DropboxResult>
+	HttpsCallableResult<DropboxResult | DropboxError>
 > => {
-	const dropboxSignSendReminderEmail = httpsCallable<unknown, DropboxResult>(
-		functions,
-		'dropboxSignSendReminderEmail'
-	)
+	const dropboxSignSendReminderEmail = httpsCallable<
+		unknown,
+		DropboxResult | DropboxError
+	>(functions, 'dropboxSignSendReminderEmail')
 	return dropboxSignSendReminderEmail()
 }
 

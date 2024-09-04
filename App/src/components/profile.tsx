@@ -32,8 +32,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './ui/tooltip'
-import { DropboxError } from '@/lib/interfaces'
-import { HttpsCallableResult } from 'firebase/functions'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -129,31 +127,35 @@ export const Profile = () => {
 
 	const sendDropboxEmailButtonOnClickHandler = useCallback(() => {
 		setDropboxEmailLoading(true)
-		sendDropboxEmail()
-			.then((result) => {
-				console.log(result)
-				setDropboxEmailSent(true)
-				setDropboxEmailLoading(false)
-				toast({
-					title: `Success`,
-					description: `Email sent to ${result.data.result.requesterEmailAddress}`,
-					variant: 'default',
-				})
-			})
-			.catch((result) => {
-				console.log('1', typeof result)
-				console.log('2', result as HttpsCallableResult<DropboxError>)
-				console.log('3', result.data as HttpsCallableResult<DropboxError>)
-				console.log('4', result.data as DropboxError)
-				console.log('5', result.data.error as DropboxError)
-				setDropboxEmailSent(false)
-				setDropboxEmailLoading(false)
-				// toast({
-				// 	title: `Failure`,
-				// 	description: `${(result as HttpsCallableResult<DropboxError>).data.error.message}`,
-				// 	variant: 'destructive',
-				// })
-			})
+		sendDropboxEmail().then((result) => {
+			console.log(typeof result)
+			console.log(result)
+
+			console.log(typeof result.data)
+			console.log(result.data)
+
+			setDropboxEmailSent(true)
+			setDropboxEmailLoading(false)
+			// toast({
+			// 	title: `Success`,
+			// 	description: `Email sent to ${result.data.result.requesterEmailAddress}`,
+			// 	variant: 'default',
+			// })
+		})
+		// .catch((result) => {
+		// 	console.log('1', typeof result)
+		// 	console.log('2', result as HttpsCallableResult<DropboxError>)
+		// 	console.log('3', result.data as HttpsCallableResult<DropboxError>)
+		// 	console.log('4', result.data as DropboxError)
+		// 	console.log('5', result.data.error as DropboxError)
+		// 	setDropboxEmailSent(false)
+		// 	setDropboxEmailLoading(false)
+		// 	// toast({
+		// 	// 	title: `Failure`,
+		// 	// 	description: `${(result as HttpsCallableResult<DropboxError>).data.error.message}`,
+		// 	// 	variant: 'destructive',
+		// 	// })
+		// })
 	}, [sendDropboxEmail, setDropboxEmailSent, setDropboxEmailLoading, toast])
 
 	const isAuthenticatedUserPaid = useMemo(
