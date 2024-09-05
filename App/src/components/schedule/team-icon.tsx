@@ -16,10 +16,12 @@ export const TeamIcon = ({
 		)
 	}
 
+	const url = team.data().logo
+
 	return (
 		<Link to={`/teams/${team.id}`}>
 			<img
-				src={team.data().logo}
+				src={url ? url : ''}
 				className={cn(
 					'mx-auto w-8 h-8 rounded-full object-cover bg-muted hover:scale-105 transition duration-300',
 					!team.data().logo && 'bg-gradient-to-r from-primary to-sky-300'

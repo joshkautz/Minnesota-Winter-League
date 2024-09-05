@@ -79,6 +79,7 @@ export const StandingsTable = ({
 						const teamData = teamsQuerySnapshot?.docs
 							.find((team) => team.id === key)
 							?.data()
+						const url = teamData?.logo
 						return (
 							<TableRow key={index}>
 								<TableCell className="font-medium ">{index + 1}</TableCell>
@@ -92,7 +93,7 @@ export const StandingsTable = ({
 														!teamData?.logo &&
 															'bg-gradient-to-r from-primary to-sky-300'
 													)}
-													src={teamData?.logo}
+													src={url ? url : ''}
 												/>
 											</div>
 											<span>{teamData?.name}</span>

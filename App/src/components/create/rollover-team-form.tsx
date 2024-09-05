@@ -116,8 +116,9 @@ export const RolloverTeamForm = ({
 	const onRolloverSubmit = useCallback(async () => {
 		try {
 			setIsSubmitting(true)
-			if (selectedTeamQueryDocumentSnapshot?.data().logo) {
-				fetch(selectedTeamQueryDocumentSnapshot?.data().logo)
+			const url = selectedTeamQueryDocumentSnapshot?.data().logo
+			if (url) {
+				fetch(url)
 					.then((response) => response.blob())
 					.then((blob) => {
 						uploadFile(ref(storage, `teams/${uuidv4()}`), blob, {

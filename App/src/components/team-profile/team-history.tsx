@@ -7,7 +7,7 @@ import {
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { TeamData } from '@/lib/interfaces'
 
-const formatPlacement = (placement: number) => {
+const formatPlacement = (placement: number | null) => {
 	switch (placement) {
 		case 1:
 			return '1st 🥇'

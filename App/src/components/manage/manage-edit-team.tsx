@@ -69,6 +69,8 @@ export const ManageEditTeam = ({
 		]
 	)
 
+	const url = team?.data().logo
+
 	const form = useForm<ManageEditTeamSchema>({
 		resolver: zodResolver(manageEditTeamSchema),
 		defaultValues: { name: '', logo: '' },
@@ -93,8 +95,9 @@ export const ManageEditTeam = ({
 
 	// Use the existing storage path/reference if it exists.
 	useEffect(() => {
-		if (team?.data().storagePath) {
-			setStorageRef(ref(storage, team?.data().storagePath))
+		const path = team?.data().storagePath
+		if (path) {
+			setStorageRef(ref(storage, path))
 		}
 	}, [team, storage, setStorageRef, ref])
 
@@ -261,9 +264,9 @@ export const ManageEditTeam = ({
 							<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
 								<img src={URL.createObjectURL(uploadedFile)} />
 							</div>
-						) : team?.data().logo ? (
+						) : url ? (
 							<div className="flex items-center justify-center w-40 h-40 mx-auto rounded-md overflow-clip">
-								<img src={team?.data().logo} />
+								<img src={url} />
 							</div>
 						) : (
 							<Skeleton className="h-[100px] md:h-[250px] md:w-[1/4]" />
