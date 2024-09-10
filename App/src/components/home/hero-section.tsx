@@ -108,7 +108,7 @@ export const HeroSection = () => {
 							<Skeleton className="w-24 mt-8 rounded sm:mt-12 bg-accent h-9" />
 						) : (
 							<Button
-								className="mt-8 sm:mt-12 bg-accent text-foreground dark:text-background"
+								className="z-50 mt-8 sm:mt-12 bg-accent text-foreground hover:bg-accent/90 dark:text-background"
 								onClick={handleCallToAction}
 							>
 								{!isAuthenticated
@@ -142,7 +142,9 @@ export const HeroSection = () => {
 			<img
 				src={'/wave.png'}
 				alt={'A white wave of snow.'}
-				className={'w-full h-auto absolute bottom-[-10px] inset-x-0'}
+				className={
+					'w-full h-auto absolute bottom-[-10px] inset-x-0 pointer-events-none'
+				}
 			/>
 		</section>
 	)
