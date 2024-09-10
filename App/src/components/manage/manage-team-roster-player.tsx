@@ -58,10 +58,8 @@ export const ManageTeamRosterPlayer = ({
 		() =>
 			team
 				?.data()
-				.roster.some(
-					(item) =>
-						item.player.id === authenticatedUserSnapshot?.id && item.captain
-				),
+				.roster.find((item) => item.player.id === authenticatedUserSnapshot?.id)
+				?.captain,
 		[team, authenticatedUserSnapshot]
 	)
 

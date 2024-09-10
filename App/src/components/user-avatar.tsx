@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useAuthContext } from '@/contexts/auth-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,7 @@ import { useOffersContext } from '@/contexts/offers-context'
 import { useMemo } from 'react'
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
-import { OfferStatus } from '@/lib/interfaces'
+import { useSeasonsContext } from '@/contexts/seasons-context'
 
 const getInitials = (
 	firstname: string | undefined,
@@ -44,6 +44,7 @@ export const UserAvatar = ({
 		signOut,
 	} = useAuthContext()
 	const { incomingOffersQuerySnapshot } = useOffersContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const userInitials = useMemo(
 		() =>
@@ -54,12 +55,38 @@ export const UserAvatar = ({
 		[authenticatedUserSnapshot]
 	)
 
-	const hasPendingOffers = incomingOffersQuerySnapshot?.docs.filter(
-		(entry) => entry.data().status === OfferStatus.PENDING
-	).length
-	const isVerified = authStateUser?.emailVerified
-	const isRegistered = authenticatedUserSnapshot?.data()?.registered
-	const hasRequiredTasks = !isVerified || !isRegistered
+	const hasPendingOffers = useMemo(
+		() => incomingOffersQuerySnapshot?.docs.length,
+		[incomingOffersQuerySnapshot]
+	)
+
+	const isAuthenticatedUserPaid = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
+				)?.paid,
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
+	)
+
+	const isAuthenticatedUserSigned = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
+				)?.signed,
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
+	)
+
+	const hasRequiredTasks = useMemo(
+		() =>
+			authStateUser?.emailVerified === false ||
+			isAuthenticatedUserPaid === false ||
+			isAuthenticatedUserSigned === false,
+		[authStateUser, isAuthenticatedUserPaid, isAuthenticatedUserSigned]
+	)
 
 	const isLoading = useMemo(
 		() =>
@@ -94,18 +121,14 @@ export const UserAvatar = ({
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Avatar className={'overflow-visible cursor-default'}>
-						{(!!hasPendingOffers || hasRequiredTasks) && (
+						{(hasPendingOffers || hasRequiredTasks) && (
 							<span
 								className={
 									'z-10 absolute bottom-0 right-0 w-2 h-2 rounded-full bg-primary'
 								}
 							/>
 						)}
-						{/* I dont think we even have this anymore... */}
-						<AvatarImage
-							src={authStateUser.photoURL ?? undefined}
-							alt={'profile image'}
-						/>
+
 						<AvatarFallback
 							className={
 								'transition-colors bg-secondary hover:bg-accent dark:hover:text-background uppercase'
@@ -124,7 +147,6 @@ export const UserAvatar = ({
 									<DropdownMenuItem className={'gap-1 cursor-pointer'}>
 										{label}{' '}
 										<span className="relative flex w-2 h-2 -translate-y-1">
-											{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 											<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
 										</span>
 									</DropdownMenuItem>
@@ -132,7 +154,6 @@ export const UserAvatar = ({
 									<DropdownMenuItem className={'gap-1 cursor-pointer'}>
 										{label}{' '}
 										<span className="relative flex w-2 h-2 -translate-y-1">
-											{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
 											<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
 										</span>
 									</DropdownMenuItem>

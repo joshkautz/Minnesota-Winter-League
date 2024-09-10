@@ -45,11 +45,9 @@ export const TopNav = ({
 		() =>
 			authenticatedUserSnapshot
 				?.data()
-				?.seasons.some(
-					(item) =>
-						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
-						item.captain
-				),
+				?.seasons.find(
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
+				)?.captain,
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
@@ -75,10 +73,8 @@ export const TopNav = ({
 			authenticatedUserSnapshot
 				?.data()
 				?.seasons.find(
-					(item) =>
-						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
-						item.paid
-				),
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
+				)?.paid,
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
@@ -92,9 +88,13 @@ export const TopNav = ({
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 
-	const isVerified = authStateUser?.emailVerified
-	const isRegistered = isAuthenticatedUserPaid && isAuthenticatedUserSigned
-	const hasRequiredTasks = !isVerified || !isRegistered
+	const hasRequiredTasks = useMemo(
+		() =>
+			authStateUser?.emailVerified === false ||
+			isAuthenticatedUserPaid === false ||
+			isAuthenticatedUserSigned === false,
+		[authStateUser, isAuthenticatedUserPaid, isAuthenticatedUserSigned]
+	)
 
 	const navContent = [
 		{ label: 'Home', path: '/#welcome', alt: 'home page' },
