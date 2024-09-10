@@ -215,10 +215,12 @@ export const Profile = () => {
 			{form ? (
 				<div
 					className={
-						'flex flex-row flex-wrap items-stretch justify-center w-full gap-8'
+						'flex md:flex-row flex-col flex-wrap items-stretch justify-center w-full md:space-x-16 md:space-y-0 space-y-16 space-x-0'
 					}
 				>
-					<div className={'max-w-[400px] flex-1 basis-[300px] shrink-0'}>
+					<div className={'max-w-screen-md flex-1 basis-[300px] shrink-0'}>
+						<p className="mb-4 text-xl font-bold">Details</p>
+
 						<Form {...form}>
 							<form
 								onSubmit={form.handleSubmit(onSubmit)}
@@ -279,40 +281,43 @@ export const Profile = () => {
 						</Form>
 					</div>
 
-					<div className={'max-w-[400px] flex-1 basis-[300px] shrink-0'}>
+					<div className={'max-w-screen-md flex-1 basis-[300px] shrink-0'}>
+						<p className="mb-4 text-xl font-bold">Actions</p>
 						<div className={'flex flex-col gap-6'}>
+							{/* EMAIL */}
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
 									Email Verification
 									{isLoading ? (
-										<></>
+										// loading state, pulse animation
+										<span className={'relative flex w-2 h-2 ml-1'}>
+											<span
+												className={
+													'relative inline-flex w-2 h-2 rounded-full bg-primary animate-pulse'
+												}
+											></span>
+										</span>
+									) : !isVerified ? (
+										// action needed, solid dot
+										<span className={'relative flex w-2 h-2 ml-1'}>
+											<span
+												className={
+													'relative inline-flex w-2 h-2 rounded-full bg-primary'
+												}
+											></span>
+										</span>
 									) : (
-										!isVerified && (
-											<span className={'relative flex w-2 h-2 ml-1'}>
-												{/* <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-primary"></span> */}
-												<span
-													className={
-														'relative inline-flex w-2 h-2 rounded-full bg-primary'
-													}
-												></span>
-											</span>
-										)
+										// action completed, checkIcon
+										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
 									)}
 								</Label>
+
 								<div>
 									{isLoading || isVerified === undefined ? (
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
-									) : isVerified ? (
-										<div
-											className={
-												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
-											}
-										>
-											Complete <CheckCircledIcon className={'w-4 h-4'} />
-										</div>
-									) : (
+									) : !isVerified ? (
 										<>
 											<Button
 												variant={'default'}
@@ -332,40 +337,43 @@ export const Profile = () => {
 												Check your email for a verification link.
 											</p>
 										</>
+									) : (
+										<></>
 									)}
 								</div>
 							</fieldset>
+
+							{/* PAYMENT */}
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
 									Payment
 									{isLoading || isAuthenticatedUserPaid === undefined ? (
-										<></>
+										<span className={'relative flex w-2 h-2 ml-1'}>
+											<span
+												className={
+													'relative inline-flex w-2 h-2 rounded-full bg-primary animate-pulse'
+												}
+											></span>
+										</span>
+									) : !isAuthenticatedUserPaid ? (
+										<span className={'relative flex w-2 h-2 ml-1'}>
+											<span
+												className={
+													'relative inline-flex w-2 h-2 rounded-full bg-primary'
+												}
+											></span>
+										</span>
 									) : (
-										!isAuthenticatedUserPaid && (
-											<span className={'relative flex w-2 h-2 ml-1'}>
-												<span
-													className={
-														'relative inline-flex w-2 h-2 rounded-full bg-primary'
-													}
-												></span>
-											</span>
-										)
+										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
 									)}
 								</Label>
+
 								<div>
 									{isLoading || isAuthenticatedUserPaid === undefined ? (
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
-									) : isAuthenticatedUserPaid ? (
-										<div
-											className={
-												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
-											}
-										>
-											Complete <CheckCircledIcon className={'w-4 h-4'} />
-										</div>
-									) : (
+									) : !isAuthenticatedUserPaid ? (
 										<>
 											<Button
 												variant={'default'}
@@ -399,40 +407,43 @@ export const Profile = () => {
 												</p>
 											)}
 										</>
+									) : (
+										<></>
 									)}
 								</div>
 							</fieldset>
+
+							{/* WAIVER */}
 							<fieldset className={'space-y-2'}>
 								<Label className={'inline-flex'}>
 									Waiver
 									{isLoading || isAuthenticatedUserSigned === undefined ? (
-										<></>
+										<span className={'relative flex w-2 h-2 ml-1'}>
+											<span
+												className={
+													'relative inline-flex w-2 h-2 rounded-full bg-primary animate-pulse'
+												}
+											></span>
+										</span>
+									) : !isAuthenticatedUserSigned ? (
+										<span className={'relative flex w-2 h-2 ml-1'}>
+											<span
+												className={
+													'relative inline-flex w-2 h-2 rounded-full bg-primary'
+												}
+											></span>
+										</span>
 									) : (
-										!isAuthenticatedUserSigned && (
-											<span className={'relative flex w-2 h-2 ml-1'}>
-												<span
-													className={
-														'relative inline-flex w-2 h-2 rounded-full bg-primary'
-													}
-												></span>
-											</span>
-										)
+										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
 									)}
 								</Label>
+
 								<div>
 									{isLoading || isAuthenticatedUserSigned === undefined ? (
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
-									) : isAuthenticatedUserSigned ? (
-										<div
-											className={
-												'inline-flex items-center gap-2 text-green-600 dark:text-green-500'
-											}
-										>
-											Complete <CheckCircledIcon className={'w-4 h-4'} />
-										</div>
-									) : (
+									) : !isAuthenticatedUserSigned ? (
 										<>
 											<span className="inline-flex items-center">
 												<Button
@@ -459,7 +470,7 @@ export const Profile = () => {
 													<Tooltip delayDuration={0}>
 														<TooltipTrigger asChild>
 															<div className={'flex-1'}>
-																<InfoCircledIcon className={'w-6 h-6'} />
+																<InfoCircledIcon className={'w-4 h-4 ml-1'} />
 															</div>
 														</TooltipTrigger>
 														<TooltipContent>
@@ -487,6 +498,8 @@ export const Profile = () => {
 												</p>
 											)}
 										</>
+									) : (
+										<></>
 									)}
 								</div>
 							</fieldset>
