@@ -47,15 +47,15 @@ export const Home = () => {
 							</CardHeader>
 							<CardContent className={'flex flex-col gap-4'}>
 								<div className={'flex'}>
-									<p className={'w-16 mr-2 font-bold'}>What:</p>
+									<p className={'w-16 mr-2 font-bold min-w-16'}>What:</p>
 									<span>{`5v5 Open Ultimate on Artificial Grass Fields.`}</span>
 								</div>
 								<div className={'flex'}>
-									<p className={'w-16 mr-2 font-bold'}>When:</p>
+									<p className={'w-16 mr-2 font-bold min-w-16'}>When:</p>
 									<span>{`Every Saturday, November 2nd - December 14th.`}</span>
 								</div>
 								<div className={'flex'}>
-									<p className={'w-16 mr-2 font-bold'}>Where:</p>
+									<p className={'w-16 mr-2 font-bold min-w-16'}>Where:</p>
 									<span>
 										<a
 											href="https://maps.app.goo.gl/avAamyReCbGmz8jWA"
@@ -67,19 +67,19 @@ export const Home = () => {
 									</span>
 								</div>
 								<div className={'flex'}>
-									<p className={'w-16 mr-2 font-bold'}>Skill:</p>
+									<p className={'w-16 mr-2 font-bold min-w-16'}>Skill:</p>
 									<span>{`Open to all skill levels`}</span>
 								</div>
 								<div className={'flex'}>
-									<p className={'w-16 mr-2 font-bold'}>Games:</p>
+									<p className={'w-16 mr-2 font-bold min-w-16'}>Games:</p>
 									<span>{`Two 40-minute games every Saturday`}</span>
 								</div>
 								<div className={'flex'}>
-									<p className={'w-16 mr-2 font-bold'}>Cost:</p>
+									<p className={'w-16 mr-2 font-bold min-w-16'}>Cost:</p>
 									<span>{`$70 for the 2024 Fall season. 7 weeks of games. 2 games a night.`}</span>
 								</div>
 								<div className={'flex'}>
-									<p className={'w-16 mr-2 font-bold'}>New!</p>
+									<p className={'w-16 mr-2 font-bold min-w-16'}>New!</p>
 									<span>
 										{`Certified athletic trainers present for all games! Waivers signed electronically! Additional dome time for warm-ups! League history! Ability to roll over teams from season to season!`}
 									</span>
