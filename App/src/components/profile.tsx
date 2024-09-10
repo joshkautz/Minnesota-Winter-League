@@ -33,6 +33,7 @@ import {
 	TooltipTrigger,
 } from './ui/tooltip'
 import { DropboxError, DropboxResult } from '@/lib/interfaces'
+import { formatTimestamp } from '@/lib/utils'
 
 const profileSchema = z.object({
 	firstname: z.string(),
@@ -152,6 +153,11 @@ export const Profile = () => {
 			}
 		})
 	}, [sendDropboxEmail, setDropboxEmailSent, setDropboxEmailLoading, toast])
+
+	const isAuthenticatedUserAdmin = useMemo(
+		() => authenticatedUserSnapshot?.data()?.admin,
+		[authenticatedUserSnapshot]
+	)
 
 	const isAuthenticatedUserPaid = useMemo(
 		() =>
@@ -364,16 +370,34 @@ export const Profile = () => {
 											<Button
 												variant={'default'}
 												onClick={registrationButtonOnClickHandler}
-												disabled={!isRegistrationOpen || stripeLoading}
+												disabled={
+													(!isRegistrationOpen && !isAuthenticatedUserAdmin) ||
+													stripeLoading
+												}
 											>
 												{stripeLoading && (
 													<ReloadIcon className={'mr-2 h-4 w-4 animate-spin'} />
 												)}
 												Pay via Stripe
 											</Button>
-											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
-												Complete registration by paying via Stripe.
-											</p>
+
+											{!isRegistrationOpen && !isAuthenticatedUserAdmin ? (
+												<p
+													className={'text-[0.8rem] text-muted-foreground mt-2'}
+												>
+													Registration opens on{' '}
+													{formatTimestamp(
+														currentSeasonQueryDocumentSnapshot?.data()
+															.registrationStart
+													)}
+												</p>
+											) : (
+												<p
+													className={'text-[0.8rem] text-muted-foreground mt-2'}
+												>
+													Complete registration by paying via Stripe.
+												</p>
+											)}
 										</>
 									)}
 								</div>
@@ -415,7 +439,8 @@ export const Profile = () => {
 													variant={'default'}
 													onClick={sendDropboxEmailButtonOnClickHandler}
 													disabled={
-														!isRegistrationOpen ||
+														(!isRegistrationOpen &&
+															!isAuthenticatedUserAdmin) ||
 														dropboxEmailLoading ||
 														dropboxEmailSent ||
 														!isAuthenticatedUserPaid
@@ -443,9 +468,24 @@ export const Profile = () => {
 													</Tooltip>
 												</TooltipProvider>
 											</span>
-											<p className={'text-[0.8rem] text-muted-foreground mt-2'}>
-												Check your email for a Dropbox Sign link.
-											</p>
+
+											{!isRegistrationOpen && !isAuthenticatedUserAdmin ? (
+												<p
+													className={'text-[0.8rem] text-muted-foreground mt-2'}
+												>
+													Registration opens on{' '}
+													{formatTimestamp(
+														currentSeasonQueryDocumentSnapshot?.data()
+															.registrationStart
+													)}
+												</p>
+											) : (
+												<p
+													className={'text-[0.8rem] text-muted-foreground mt-2'}
+												>
+													Check your email for a Dropbox Sign link.
+												</p>
+											)}
 										</>
 									)}
 								</div>

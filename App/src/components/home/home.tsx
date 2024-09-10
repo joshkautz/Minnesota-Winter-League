@@ -42,20 +42,17 @@ export const Home = () => {
 						>
 							<CardHeader>
 								<CardTitle className={'text-2xl font-bold self-center'}>
-									Dates + Details
+									2024 Fall | Dates + Details
 								</CardTitle>
 							</CardHeader>
 							<CardContent className={'flex flex-col gap-4'}>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>What:</p>
-									<span>5v5 Open Ultimate on Artificial Grass Fields</span>
+									<span>{`5v5 Open Ultimate on Artificial Grass Fields.`}</span>
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>When:</p>
-									<span>
-										Saturdays (6:00 PM to 9:00 PM) during November (2nd, 9th,
-										16th, 23rd, and 30th) and December (7th and 14th)
-									</span>
+									<span>{`Every Saturday, November 2nd - December 14th.`}</span>
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>Where:</p>
@@ -65,17 +62,17 @@ export const Home = () => {
 											target="_blank"
 											rel="noreferrer"
 										>
-											<u>University of Minnesota | URW Sports Field Complex</u>
+											<u>{`University of Minnesota | URW Sports Field Complex`}</u>
 										</a>
 									</span>
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>Skill:</p>
-									<span>Open to all skill levels</span>
+									<span>{`Open to all skill levels`}</span>
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>Games:</p>
-									<span>Two 40-minute games every Saturday</span>
+									<span>{`Two 40-minute games every Saturday`}</span>
 								</div>
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>Cost:</p>
@@ -84,9 +81,7 @@ export const Home = () => {
 								<div className={'flex'}>
 									<p className={'w-16 mr-2 font-bold'}>New!</p>
 									<span>
-										We will have certified athletic trainers in attendance for
-										the duration of all games. Liability waivers can now be
-										completed electronically!
+										{`Certified athletic trainers present for all games! Waivers signed electronically! Additional dome time for warm-ups! League history! Ability to roll over teams from season to season!`}
 									</span>
 								</div>
 							</CardContent>
@@ -99,7 +94,8 @@ export const Home = () => {
 							<div className={'flex flex-col gap-4'}>
 								<p className={'text-2xl font-bold'}>Individuals</p>
 								<p>
-									{`If you're a solo player looking for a team, don't worry! Send some requests out to existing teams and see where you end up! We'll be happy to fully refund you if you don't find a team. `}
+									{`If you're a solo player looking for a team, don't worry! Send some requests out to existing teams and see where you end up! We'll happily refund players who don't end up on a team.`}
+									{` `}
 									<Link to={'/#how-to-register'}>
 										<u>Learn more about registration below.</u>
 									</Link>
@@ -110,8 +106,9 @@ export const Home = () => {
 								<p>
 									Minneapolis Winter League has room for <b>12 teams.</b> Be
 									sure to register your team before space fills up. There is a{' '}
-									<b>10-player minimum</b> requirement for teams, with no roster
-									maximum. The first 12 teams to meet this requirement will be
+									<b>10-player minimum</b> requirement for teams, with{' '}
+									<u>no roster maximum.</u> The first twelve teams to meet this
+									requirement of ten fully registered players will be
 									successfully locked in. All other players have the option to:
 								</p>
 								<ul>
@@ -121,11 +118,11 @@ export const Home = () => {
 									</li>
 								</ul>
 								<p>
-									Check the{' '}
+									Visit the{' '}
 									<Link to={'/teams'}>
 										<u>Teams</u>
 									</Link>{' '}
-									page to see how many teams are currently locked in.
+									page to see how many teams are currently fully registered.
 								</p>
 							</div>
 						</div>
@@ -166,11 +163,10 @@ export const Home = () => {
 									The league is open to all skill levels, and is focused on
 									making sure everyone has valuable opportunities during the
 									winter months to continue playing, improving, and competing.
-									Weekly play will be organized, and results will be used to
-									ensure that teams are matched up against opponents of similar
-									skill levels. At the end of the season, the top teams will
-									compete to determine the league champion, while the other
-									teams will continue with regular games!
+									Weekly play will be organized, avoiding rematches as best as
+									possible, and results will be used to seed teams for the
+									playoffs. At the end of the season, teams will compete to
+									determine the league champion!
 								</div>
 							</div>
 						</div>
@@ -212,7 +208,7 @@ export const Home = () => {
 							>
 								1
 							</span>
-							<p>{`Click on the "Login" button to register and log in.`}</p>
+							<p>{`Click on the "Login" button to Log In or Sign Up.`}</p>
 						</div>
 						<div className={'w-full flex'}>
 							<span
@@ -223,7 +219,7 @@ export const Home = () => {
 								2
 							</span>
 							<p>
-								Confirm your email address by clicking on the link in the email.
+								{`Verify your email address by clicking the link in the email you receive.`}
 							</p>
 						</div>
 						<div className={'w-full flex'}>
@@ -235,7 +231,7 @@ export const Home = () => {
 								3
 							</span>
 							<p>
-								{`Navigate your Profile to submit secure electronic payment via Stripe.`}
+								{`Visit your profile to submit secure electronic payment via Stripe.`}
 							</p>
 						</div>
 						<div className={'w-full flex'}>
@@ -247,7 +243,7 @@ export const Home = () => {
 								4
 							</span>
 							<p>
-								{`Sign the Waiver of Liability that is electronically emailed to you following your submission of payment.`}
+								{`Electronically sign your Waiver of Liability that is emailed to you after paying.`}
 							</p>
 						</div>
 						<div className={'w-full flex'}>
@@ -259,8 +255,7 @@ export const Home = () => {
 								5
 							</span>
 							<p>
-								Request to join an existing team, accept an invitation from an
-								existing team, or create your own team.
+								{`Request to join an existing team, accept an invitation, or create your own team.`}
 							</p>
 						</div>
 						<div className={'w-full flex'}>
@@ -271,7 +266,7 @@ export const Home = () => {
 							>
 								6
 							</span>
-							<p>Await confirmation and league updates via email.</p>
+							<p>{`Receive confirmation and league updates via email.`}</p>
 						</div>
 					</div>
 				</section>
@@ -282,9 +277,7 @@ export const Home = () => {
 					}
 				>
 					<p className={'text-2xl max-w-[1040px] mx-auto'}>
-						{`Don't miss out on this opportunity to keep playing year-round.
-						Secure your spot today, and let's make this season of the
-						Minneapolis Winter League one to remember!`}
+						{`Don't miss out on this opportunity to keep playing year-round. Secure your spot today, and let's make this season of Minneapolis Winter League one to remember!`}
 					</p>
 				</div>
 

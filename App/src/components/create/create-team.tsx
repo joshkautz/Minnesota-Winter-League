@@ -39,6 +39,11 @@ export const CreateTeam = () => {
 	const [downloadUrl] = useDownloadURL(storageRef)
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
+	const isAuthenticatedUserAdmin = useMemo(
+		() => authenticatedUserSnapshot?.data()?.admin,
+		[authenticatedUserSnapshot]
+	)
+
 	const isAuthenticatedUserRostered = useMemo(
 		() =>
 			authenticatedUserSnapshot
@@ -234,9 +239,9 @@ export const CreateTeam = () => {
 					<CardHeader>{`You're already on a team!`}</CardHeader>
 					<CardContent>{`Leave your current team in order to create a new one.`}</CardContent>
 				</Card>
-			) : !isRegistrationOpen ? (
+			) : !isRegistrationOpen && !isAuthenticatedUserAdmin ? (
 				<Card className={cn('max-w-[800px] w-full mx-auto my-8')}>
-					<CardHeader>Registration closed</CardHeader>
+					<CardHeader>{`Registration not open.`}</CardHeader>
 					<CardContent>{`The next registration period begins on ${formatTimestamp(currentSeasonQueryDocumentSnapshot?.data()?.registrationStart)}`}</CardContent>
 				</Card>
 			) : (

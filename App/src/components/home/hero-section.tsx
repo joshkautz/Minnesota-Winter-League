@@ -10,7 +10,7 @@ import { CitySvg } from './city-svg'
 import { SparklesCore } from './particles'
 
 export const HeroSection = () => {
-	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const { setIsMobileLoginOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()
@@ -59,10 +59,10 @@ export const HeroSection = () => {
 				?.data()
 				?.seasons.some(
 					(item) =>
-						item.season.id === selectedSeasonQueryDocumentSnapshot?.id &&
+						item.season.id === currentSeasonQueryDocumentSnapshot?.id &&
 						item.team
 				),
-		[authenticatedUserSnapshot, selectedSeasonQueryDocumentSnapshot]
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
 	const handleCallToAction = () => {
 		if (!authenticatedUserSnapshot) {
