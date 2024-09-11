@@ -127,8 +127,11 @@ export const TopNav = ({
 			: []),
 	]
 
-	const handleClick = () => {
-		setIsMobileNavOpen(false)
+	const handleCloseMobileNav = () => {
+		if (isMobileNavOpen) {
+			console.log('handleCloseMobileNav is firing')
+			setIsMobileNavOpen(false)
+		}
 	}
 
 	return (
@@ -161,7 +164,7 @@ export const TopNav = ({
 						))}
 
 						<div className="flex items-center justify-end flex-1 gap-4">
-							<SeasonSelect />
+							<SeasonSelect handleCloseMobileNav={handleCloseMobileNav} />
 							<ThemeToggle />
 							<UserAvatar userContent={userContent} />
 						</div>
@@ -207,7 +210,7 @@ export const TopNav = ({
 										key={path}
 										to={path}
 										aria-label={alt}
-										onClick={handleClick}
+										onClick={handleCloseMobileNav}
 									>
 										{label}
 									</Link>
@@ -221,7 +224,7 @@ export const TopNav = ({
 												key={path}
 												to={path}
 												aria-label={alt}
-												onClick={handleClick}
+												onClick={handleCloseMobileNav}
 												className="inline-flex"
 											>
 												{path === '/manage' && !!hasPendingOffers ? (
@@ -257,7 +260,7 @@ export const TopNav = ({
 														description:
 															'You are no longer signed in to an account.',
 													})
-													handleClick()
+													handleCloseMobileNav()
 												})
 												.catch(() => {
 													toast({

@@ -9,7 +9,11 @@ import { useSeasonsContext } from '@/contexts/seasons-context'
 import { useEffect, useState } from 'react'
 import { Skeleton } from './ui/skeleton'
 
-export const SeasonSelect = () => {
+export const SeasonSelect = ({
+	handleCloseMobileNav,
+}: {
+	handleCloseMobileNav?: () => void
+}) => {
 	const {
 		selectedSeasonQueryDocumentSnapshot,
 		setSelectedSeasonQueryDocumentSnapshot,
@@ -32,6 +36,10 @@ export const SeasonSelect = () => {
 	useEffect(() => {
 		if (selectedSeasonQueryDocumentSnapshot) {
 			setStringValue(selectedSeasonQueryDocumentSnapshot.data().name)
+		}
+		if (handleCloseMobileNav) {
+			console.log('handleClose is firing')
+			handleCloseMobileNav()
 		}
 	}, [selectedSeasonQueryDocumentSnapshot])
 
