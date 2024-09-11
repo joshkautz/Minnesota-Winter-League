@@ -201,6 +201,7 @@ export const TopNav = ({
 					<SheetContent side={'top'} className={'pr-0'}>
 						<ScrollArea className={'my-4 h-[calc(100vh-8rem)] pb-10 px-6'}>
 							<div className={'flex flex-col space-y-3'}>
+								<SeasonSelect />
 								{navContent.map(({ path, label, alt }) => (
 									<Link
 										key={path}
