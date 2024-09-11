@@ -128,7 +128,7 @@ export const TopNav = ({
 	]
 
 	const handleClick = () => {
-		setIsMobileNavOpen(!isMobileNavOpen)
+		setIsMobileNavOpen(false)
 	}
 
 	return (
@@ -215,39 +215,33 @@ export const TopNav = ({
 									// Mostly placeholder links for now will refine later.
 									<>
 										<Separator />
-										{userContent.map(({ path, label, alt }) => {
-											return path === '/create' ? (
-												<span key={path} className="inline-flex text-slate-500">
-													{label}
-												</span>
-											) : (
-												<Link
-													key={path}
-													to={path}
-													aria-label={alt}
-													onClick={handleClick}
-													className="inline-flex"
-												>
-													{path === '/manage' && !!hasPendingOffers ? (
-														<>
-															{label}
-															<span className="relative flex w-2 h-2 ml-1">
-																<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
-															</span>
-														</>
-													) : path === '/profile' && hasRequiredTasks ? (
-														<>
-															{label}
-															<span className="relative flex w-2 h-2 ml-1">
-																<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
-															</span>
-														</>
-													) : (
-														label
-													)}
-												</Link>
-											)
-										})}
+										{userContent.map(({ path, label, alt }) => (
+											<Link
+												key={path}
+												to={path}
+												aria-label={alt}
+												onClick={handleClick}
+												className="inline-flex"
+											>
+												{path === '/manage' && !!hasPendingOffers ? (
+													<>
+														{label}
+														<span className="relative flex w-2 h-2 ml-1">
+															<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+														</span>
+													</>
+												) : path === '/profile' && hasRequiredTasks ? (
+													<>
+														{label}
+														<span className="relative flex w-2 h-2 ml-1">
+															<span className="relative inline-flex w-2 h-2 rounded-full bg-primary"></span>
+														</span>
+													</>
+												) : (
+													label
+												)}
+											</Link>
+										))}
 										<Separator />
 									</>
 								)}
@@ -289,7 +283,6 @@ export const TopNav = ({
 										Login
 									</Button>
 								)}
-								{/* <AuthButton loading={authStateLoading} user={authStateUser} /> */}
 							</div>
 						</ScrollArea>
 					</SheetContent>
