@@ -38,7 +38,6 @@ export const SeasonSelect = ({
 			setStringValue(selectedSeasonQueryDocumentSnapshot.data().name)
 		}
 		if (handleCloseMobileNav) {
-			console.log('handleClose is firing')
 			handleCloseMobileNav()
 		}
 	}, [selectedSeasonQueryDocumentSnapshot])

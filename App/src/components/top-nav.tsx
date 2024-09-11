@@ -129,7 +129,6 @@ export const TopNav = ({
 
 	const handleCloseMobileNav = () => {
 		if (isMobileNavOpen) {
-			console.log('handleCloseMobileNav is firing')
 			setIsMobileNavOpen(false)
 		}
 	}
