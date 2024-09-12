@@ -17,21 +17,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from './ui/use-toast'
 import { stripeRegistration, updatePlayer } from '@/firebase/firestore'
 import { Label } from './ui/label'
-import {
-	CheckCircledIcon,
-	InfoCircledIcon,
-	ReloadIcon,
-} from '@radix-ui/react-icons'
+import { CheckCircledIcon, ReloadIcon } from '@radix-ui/react-icons'
 import { GradientHeader } from './gradient-header'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { Timestamp } from '@firebase/firestore'
 import { sendDropboxEmail } from '../firebase/functions'
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from './ui/tooltip'
+
 import { DropboxError, DropboxResult } from '@/lib/interfaces'
 import { formatTimestamp } from '@/lib/utils'
 
@@ -290,14 +281,11 @@ export const Profile = () => {
 									Email Verification
 									{isLoading ? (
 										// loading state, pulse animation
-										<span className={'relative flex w-2 h-2 ml-1'}>
-											<span
-												className={
-													'relative inline-flex w-2 h-2 rounded-full bg-primary animate-pulse'
-												}
-											></span>
-										</span>
-									) : !isVerified ? (
+										<></>
+									) : isVerified ? (
+										// action completed, checkIcon
+										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
+									) : (
 										// action needed, solid dot
 										<span className={'relative flex w-2 h-2 ml-1'}>
 											<span
@@ -306,9 +294,6 @@ export const Profile = () => {
 												}
 											></span>
 										</span>
-									) : (
-										// action completed, checkIcon
-										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
 									)}
 								</Label>
 
@@ -317,7 +302,9 @@ export const Profile = () => {
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
-									) : !isVerified ? (
+									) : isVerified ? (
+										<></>
+									) : (
 										<>
 											<Button
 												variant={'default'}
@@ -337,8 +324,6 @@ export const Profile = () => {
 												Check your email for a verification link.
 											</p>
 										</>
-									) : (
-										<></>
 									)}
 								</div>
 							</fieldset>
@@ -348,14 +333,10 @@ export const Profile = () => {
 								<Label className={'inline-flex'}>
 									Payment
 									{isLoading || isAuthenticatedUserPaid === undefined ? (
-										<span className={'relative flex w-2 h-2 ml-1'}>
-											<span
-												className={
-													'relative inline-flex w-2 h-2 rounded-full bg-primary animate-pulse'
-												}
-											></span>
-										</span>
-									) : !isAuthenticatedUserPaid ? (
+										<></>
+									) : isAuthenticatedUserPaid ? (
+										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
+									) : (
 										<span className={'relative flex w-2 h-2 ml-1'}>
 											<span
 												className={
@@ -363,8 +344,6 @@ export const Profile = () => {
 												}
 											></span>
 										</span>
-									) : (
-										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
 									)}
 								</Label>
 
@@ -373,7 +352,9 @@ export const Profile = () => {
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
-									) : !isAuthenticatedUserPaid ? (
+									) : isAuthenticatedUserPaid ? (
+										<></>
+									) : (
 										<>
 											<Button
 												variant={'default'}
@@ -400,15 +381,18 @@ export const Profile = () => {
 													)}
 												</p>
 											) : (
-												<p
-													className={'text-[0.8rem] text-muted-foreground mt-2'}
-												>
-													Complete registration by paying via Stripe.
-												</p>
+												<>
+													<p
+														className={
+															'text-[0.8rem] text-muted-foreground mt-2'
+														}
+													>
+														Complete registration by paying via Stripe. This may
+														take a few seconds to process.
+													</p>
+												</>
 											)}
 										</>
-									) : (
-										<></>
 									)}
 								</div>
 							</fieldset>
@@ -418,14 +402,10 @@ export const Profile = () => {
 								<Label className={'inline-flex'}>
 									Waiver
 									{isLoading || isAuthenticatedUserSigned === undefined ? (
-										<span className={'relative flex w-2 h-2 ml-1'}>
-											<span
-												className={
-													'relative inline-flex w-2 h-2 rounded-full bg-primary animate-pulse'
-												}
-											></span>
-										</span>
-									) : !isAuthenticatedUserSigned ? (
+										<></>
+									) : isAuthenticatedUserSigned ? (
+										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
+									) : (
 										<span className={'relative flex w-2 h-2 ml-1'}>
 											<span
 												className={
@@ -433,8 +413,6 @@ export const Profile = () => {
 												}
 											></span>
 										</span>
-									) : (
-										<CheckCircledIcon className={'w-4 h-4 ml-1'} />
 									)}
 								</Label>
 
@@ -443,7 +421,9 @@ export const Profile = () => {
 										<div className={'inline-flex items-center gap-2'}>
 											Loading...
 										</div>
-									) : !isAuthenticatedUserSigned ? (
+									) : isAuthenticatedUserSigned ? (
+										<></>
+									) : (
 										<>
 											<span className="inline-flex items-center">
 												<Button
@@ -466,18 +446,6 @@ export const Profile = () => {
 														? 'Email Sent!'
 														: 'Re-Send Waiver Email'}
 												</Button>
-												<TooltipProvider>
-													<Tooltip delayDuration={0}>
-														<TooltipTrigger asChild>
-															<div className={'flex-1'}>
-																<InfoCircledIcon className={'w-4 h-4 ml-1'} />
-															</div>
-														</TooltipTrigger>
-														<TooltipContent>
-															<p>Waiver will be sent following payment.</p>
-														</TooltipContent>
-													</Tooltip>
-												</TooltipProvider>
 											</span>
 
 											{!isRegistrationOpen && !isAuthenticatedUserAdmin ? (
@@ -491,15 +459,18 @@ export const Profile = () => {
 													)}
 												</p>
 											) : (
-												<p
-													className={'text-[0.8rem] text-muted-foreground mt-2'}
-												>
-													Check your email for a Dropbox Sign link.
-												</p>
+												<>
+													<p
+														className={
+															'text-[0.8rem] text-muted-foreground mt-2'
+														}
+													>
+														Check your email for a Dropbox Sign link. Waiver
+														will be sent after payment.
+													</p>
+												</>
 											)}
 										</>
-									) : (
-										<></>
 									)}
 								</div>
 							</fieldset>
