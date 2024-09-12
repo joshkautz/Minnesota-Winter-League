@@ -1,11 +1,16 @@
+import { useSeasonsContext } from '@/contexts/seasons-context'
 import { useEffect, useState } from 'react'
 
 const HOURS = 1000 * 60 * 60
 const MINUTES = 1000 * 60
 
 export const RegistrationCountdown = () => {
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
+
 	const todaysDate = new Date()
-	const futureDate = new Date('2024-11-1')
+	const futureDate = currentSeasonQueryDocumentSnapshot
+		? currentSeasonQueryDocumentSnapshot?.data().registrationStart.toDate()
+		: new Date()
 
 	const timerEndDate = futureDate.getTime() - todaysDate.getTime()
 	const isRegistrationOpen = timerEndDate <= 0
