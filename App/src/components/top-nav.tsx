@@ -163,7 +163,7 @@ export const TopNav = ({
 						))}
 
 						<div className="flex items-center justify-end flex-1 gap-4">
-							<SeasonSelect handleCloseMobileNav={handleCloseMobileNav} />
+							<SeasonSelect />
 							<ThemeToggle />
 							<UserAvatar userContent={userContent} />
 						</div>
@@ -203,7 +203,7 @@ export const TopNav = ({
 					<SheetContent side={'top'} className={'pr-0'}>
 						<ScrollArea className={'my-4 h-[calc(100vh-8rem)] pb-10 px-6'}>
 							<div className={'flex flex-col space-y-3'}>
-								<SeasonSelect />
+								<SeasonSelect handleCloseMobileNav={handleCloseMobileNav} />
 								{navContent.map(({ path, label, alt }) => (
 									<Link
 										key={path}

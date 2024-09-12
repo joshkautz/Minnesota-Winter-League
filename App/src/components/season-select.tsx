@@ -22,6 +22,7 @@ export const SeasonSelect = ({
 	} = useSeasonsContext()
 
 	const [stringValue, setStringValue] = useState<string | undefined>(undefined)
+	const [initialSelection, setInitialSelection] = useState<boolean>(false)
 
 	const handleSeasonChange = (season: string) => {
 		setStringValue(season)
@@ -37,8 +38,11 @@ export const SeasonSelect = ({
 		if (selectedSeasonQueryDocumentSnapshot) {
 			setStringValue(selectedSeasonQueryDocumentSnapshot.data().name)
 		}
-		if (handleCloseMobileNav) {
+		if (handleCloseMobileNav && initialSelection) {
 			handleCloseMobileNav()
+		}
+		if (!initialSelection) {
+			setInitialSelection(true)
 		}
 	}, [selectedSeasonQueryDocumentSnapshot])
 
