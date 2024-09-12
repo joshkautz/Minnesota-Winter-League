@@ -8,6 +8,7 @@ import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
 import { CitySvg } from './city-svg'
 import { SparklesCore } from './particles'
+import { RegistrationCountdown } from './registration-countdown'
 
 export const HeroSection = () => {
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
@@ -95,14 +96,18 @@ export const HeroSection = () => {
 								'w-[220px] h-1 rounded bg-gradient-to-r from-primary to-sky-300'
 							}
 						/>
-						<div className={'mt-4 sm:mt-12 max-w-[490px] flex-1'}>
+						<div className="flex mt-4 sm:mt-12">
+							<RegistrationCountdown />
+						</div>
+						{/* TEMPORARILY REMOVING THIS PARAGRAPH */}
+						{/* <div className={'mt-4 sm:mt-12 max-w-[490px] flex-1'}>
 							{`Join us this season for unforgettable Saturday nights of
 								organized league play. Whether you're a seasoned club veteran,
 								or a rookie learning the sport, `}
 							<span className={'font-bold'}>
 								{`we can't wait to welcome you to the league.`}
 							</span>
-						</div>
+						</div> */}
 
 						{isLoading ? (
 							<Skeleton className="w-24 mt-8 rounded sm:mt-12 bg-accent h-9" />
