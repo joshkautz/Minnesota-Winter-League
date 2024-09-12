@@ -11,10 +11,9 @@ import { SparklesCore } from './particles'
 import { RegistrationCountdown } from './registration-countdown'
 
 export const HeroSection = () => {
-	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
-
-	const { setIsMobileLoginOpen } = useOutletContext<OutletContext>()
 	useAnchorScroll()
+	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
+	const { setIsMobileLoginOpen } = useOutletContext<OutletContext>()
 	const navigate = useNavigate()
 	const {
 		authStateUser,
@@ -65,6 +64,7 @@ export const HeroSection = () => {
 				),
 		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
 	)
+
 	const handleCallToAction = () => {
 		if (!authenticatedUserSnapshot) {
 			setIsMobileLoginOpen(true)
@@ -72,6 +72,20 @@ export const HeroSection = () => {
 		}
 		navigate('/manage')
 	}
+
+	const sparklesCore = useMemo(() => {
+		return (
+			<SparklesCore
+				background="transparent"
+				minSize={0.6}
+				maxSize={1.4}
+				particleDensity={100}
+				className="w-full h-full"
+				particleColor="#FFFFFF"
+			/>
+		)
+	}, [])
+
 	return (
 		<section
 			id="welcome"
@@ -127,14 +141,7 @@ export const HeroSection = () => {
 				</div>
 			</div>
 			<div className="absolute inset-y-0 right-0 w-full h-screen pointer-events-none md:w-1/2">
-				<SparklesCore
-					background="transparent"
-					minSize={0.6}
-					maxSize={1.4}
-					particleDensity={100}
-					className="w-full h-full"
-					particleColor="#FFFFFF"
-				/>
+				{sparklesCore}
 			</div>
 			<CitySvg className="absolute right-0 bottom-0 w-auto h-full max-h-[400px] -z-10" />
 			<img
