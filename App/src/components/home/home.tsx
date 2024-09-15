@@ -186,7 +186,7 @@ export const Home = () => {
 
 			<div
 				className={
-					'border border-transparent container dark:text-foreground dark:bg-background text-background bg-foreground'
+					'border border-transparent xl:max-w-none container dark:text-foreground dark:bg-background text-background bg-foreground'
 				}
 			>
 				<section
@@ -195,7 +195,7 @@ export const Home = () => {
 						'my-32 flex justify-center md:items-stretch gap-8 flex-col md:flex-row items-center'
 					}
 				>
-					<div className="flex items-center justify-center flex-1 rounded-lg overflow-clip bg-secondary max-w-[500px]">
+					<div className="flex items-center justify-center flex-1 rounded-lg overflow-clip bg-primary dark:bg-secondary max-w-[500px]">
 						<img src="/Map.png" />
 					</div>
 					<div className="flex flex-col flex-1 gap-2 my-auto max-w-[500px]">

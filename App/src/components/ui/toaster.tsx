@@ -5,7 +5,7 @@ import {
 	ToastProvider,
 	ToastTitle,
 	ToastViewport,
-	ToastForever,
+	// ToastForever,
 } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
 
@@ -28,7 +28,8 @@ export const Toaster = () => {
 					</Toast>
 				)
 			})}
-			<ToastForever variant={'warning'}>
+			{/* Commenting out, may need to use again later */}
+			{/* <ToastForever variant={'warning'}>
 				<div className="grid gap-1">
 					<ToastTitle>{'Website is under active development!'}</ToastTitle>
 					<ToastDescription>
@@ -36,7 +37,7 @@ export const Toaster = () => {
 					</ToastDescription>
 				</div>
 				<ToastClose className="text-danger hover:text-danger" />
-			</ToastForever>
+			</ToastForever> */}
 			<ToastViewport />
 		</ToastProvider>
 	)
