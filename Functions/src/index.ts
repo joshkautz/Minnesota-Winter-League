@@ -393,7 +393,7 @@ export const OnPaymentCreated = onDocumentCreated(
 								phone: false,
 								defaultType: SubSigningOptions.DefaultTypeEnum.Type,
 							},
-							testMode: false,
+							testMode: true,
 						}),
 						playerDocumentSnapshot,
 					])
