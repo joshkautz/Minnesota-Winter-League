@@ -73,6 +73,7 @@ export interface PlayerData extends DocumentData {
 	firstname: string
 	lastname: string
 	seasons: {
+		banned: boolean
 		captain: boolean
 		paid: boolean
 		season: DocumentReference<SeasonData, DocumentData>

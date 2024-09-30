@@ -190,6 +190,16 @@ export const Profile = () => {
 		[authenticatedUserSnapshot, authenticatedUserSnapshotLoading]
 	)
 
+	const isAuthenticatedUserBanned = useMemo(
+		() =>
+			authenticatedUserSnapshot
+				?.data()
+				?.seasons.find(
+					(item) => item.season.id === currentSeasonQueryDocumentSnapshot?.id
+				)?.banned,
+		[authenticatedUserSnapshot, currentSeasonQueryDocumentSnapshot]
+	)
+
 	return (
 		<div
 			className={
@@ -310,7 +320,9 @@ export const Profile = () => {
 												variant={'default'}
 												onClick={sendVerificationEmailButtonOnClickHandler}
 												disabled={
-													verificationEmailSent || verificationEmailLoading
+													verificationEmailSent ||
+													verificationEmailLoading ||
+													isAuthenticatedUserBanned
 												}
 											>
 												{verificationEmailLoading && (
@@ -361,7 +373,8 @@ export const Profile = () => {
 												onClick={registrationButtonOnClickHandler}
 												disabled={
 													(!isRegistrationOpen && !isAuthenticatedUserAdmin) ||
-													stripeLoading
+													stripeLoading ||
+													isAuthenticatedUserBanned
 												}
 											>
 												{stripeLoading && (
@@ -380,6 +393,17 @@ export const Profile = () => {
 															.registrationStart
 													)}
 												</p>
+											) : isAuthenticatedUserBanned ? (
+												<>
+													<p
+														className={
+															'text-[0.8rem] text-muted-foreground mt-2 text-red-500'
+														}
+													>
+														Account has been regrettably suspended or banned
+														from Minneapolis Winter League.
+													</p>
+												</>
 											) : (
 												<>
 													<p
@@ -434,7 +458,8 @@ export const Profile = () => {
 															!isAuthenticatedUserAdmin) ||
 														dropboxEmailLoading ||
 														dropboxEmailSent ||
-														!isAuthenticatedUserPaid
+														!isAuthenticatedUserPaid ||
+														isAuthenticatedUserBanned
 													}
 												>
 													{dropboxEmailLoading && (
@@ -458,6 +483,17 @@ export const Profile = () => {
 															.registrationStart
 													)}
 												</p>
+											) : isAuthenticatedUserBanned ? (
+												<>
+													<p
+														className={
+															'text-[0.8rem] text-muted-foreground mt-2 text-red-500'
+														}
+													>
+														Account has been regrettably suspended or banned
+														from Minneapolis Winter League.
+													</p>
+												</>
 											) : (
 												<>
 													<p
