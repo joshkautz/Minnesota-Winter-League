@@ -432,21 +432,38 @@ export const OnPaymentCreated = onDocumentCreated(
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
 
-export const SetTeamRegistered_OnPlayerSignedChange = onDocumentUpdated(
+export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 	{ document: 'players/{playerId}', region: REGION },
 
 	async (event) => {
 		try {
-			const firestore = getFirestore()
+      const firestore = getFirestore()
+      
+      const seasonQuerySnapshot = await (
+        firestore.collection(
+          COLLECTIONS.SEASONS
+        ) as CollectionReference<SeasonData, DocumentData>
+      ).get()
 
-			const newValue = event.data?.after.data() as PlayerData
-			const previousValue = event.data?.before.data() as PlayerData
+      const playersNewCurrentSeasonData = (event.data?.after.data() as PlayerData).seasons.find((item) =>
+        item.season.id == seasonQuerySnapshot.docs.sort((a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds).find((season) => season)?.id)
+      const playersOldCurrentSeasonData = (event.data?.after.data() as PlayerData).seasons.find((item) =>
+        item.season.id == seasonQuerySnapshot.docs.sort((a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds).find((season) => season)?.id)
 
-			if (newValue.signed != previousValue.signed) {
+      if (!playersNewCurrentSeasonData || !playersOldCurrentSeasonData)
+        return
+
+      if (!playersNewCurrentSeasonData.team)
+        return
+
+      if (
+        playersNewCurrentSeasonData.signed != playersOldCurrentSeasonData.signed ||
+        playersNewCurrentSeasonData.paid != playersOldCurrentSeasonData.paid
+      ) {
 				const registeredPlayers = (
 					await firestore
 						.collection(COLLECTIONS.PLAYERS)
-						.where(FIELDS.TEAM, '==', newValue.team)
+						.where(FIELDS.TEAM, '==', playersNewCurrentSeasonData.team)
 						.where(FIELDS.PAID, '==', true)
 						.where(FIELDS.SIGNED, '==', true)
 						.count()
@@ -454,59 +471,11 @@ export const SetTeamRegistered_OnPlayerSignedChange = onDocumentUpdated(
 				).data().count
 
 				if (registeredPlayers >= 10) {
-					return newValue.team?.update({
+					return playersNewCurrentSeasonData.team.update({
 						registered: true,
 					})
 				} else {
-					return newValue.team?.update({
-						registered: false,
-					})
-				}
-			}
-
-			return
-		} catch (e) {
-			error(e)
-			return e
-		}
-	}
-)
-
-/**
- * @deprecated since version 2.0 - we can delete this, because waivers will never be signed before payments are made, I think...
- *
- * When a payment is made, update the corresponding `Team` document.
- *
- * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
- */
-
-export const SetTeamRegistered_OnPlayerPaidChange = onDocumentUpdated(
-	{ document: 'players/{playerId}', region: REGION },
-
-	async (event) => {
-		try {
-			const firestore = getFirestore()
-
-			const newValue = event.data?.after.data() as PlayerData
-			const previousValue = event.data?.before.data() as PlayerData
-
-			if (newValue.paid != previousValue.paid) {
-				const registeredPlayers = (
-					await firestore
-						.collection(COLLECTIONS.PLAYERS)
-						.where(FIELDS.TEAM, '==', newValue.team)
-						.where(FIELDS.PAID, '==', true)
-						.where(FIELDS.SIGNED, '==', true)
-						.count()
-						.get()
-				).data().count
-
-				if (registeredPlayers >= 10) {
-					return newValue.team?.update({
-						registered: true,
-					})
-				} else {
-					return newValue.team?.update({
+					return playersNewCurrentSeasonData.team.update({
 						registered: false,
 					})
 				}
@@ -526,7 +495,7 @@ export const SetTeamRegistered_OnPlayerPaidChange = onDocumentUpdated(
  * Firebase Documentation: {@link https://firebase.google.com/docs/functions/firestore-events?gen=1st#trigger_a_function_when_a_document_is_updated_2 Trigger a function when a document is updated.}
  */
 
-export const SetTeamRegistered_OnTeamRosterChange = onDocumentUpdated(
+export const SetTeamRegistered_OnTeamChange = onDocumentUpdated(
 	{ document: 'teams/{teamId}', region: REGION },
 	async (event) => {
 		try {
