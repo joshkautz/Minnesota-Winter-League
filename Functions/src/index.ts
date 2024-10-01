@@ -437,29 +437,47 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 
 	async (event) => {
 		try {
-      const firestore = getFirestore()
-      
-      const seasonQuerySnapshot = await (
-        firestore.collection(
-          COLLECTIONS.SEASONS
-        ) as CollectionReference<SeasonData, DocumentData>
-      ).get()
+			const firestore = getFirestore()
 
-      const playersNewCurrentSeasonData = (event.data?.after.data() as PlayerData).seasons.find((item) =>
-        item.season.id == seasonQuerySnapshot.docs.sort((a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds).find((season) => season)?.id)
-      const playersOldCurrentSeasonData = (event.data?.after.data() as PlayerData).seasons.find((item) =>
-        item.season.id == seasonQuerySnapshot.docs.sort((a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds).find((season) => season)?.id)
+			const seasonQuerySnapshot = await (
+				firestore.collection(COLLECTIONS.SEASONS) as CollectionReference<
+					SeasonData,
+					DocumentData
+				>
+			).get()
 
-      if (!playersNewCurrentSeasonData || !playersOldCurrentSeasonData)
-        return
+			const playersNewCurrentSeasonData = (
+				event.data?.after.data() as PlayerData
+			).seasons.find(
+				(item) =>
+					item.season.id ==
+					seasonQuerySnapshot.docs
+						.sort(
+							(a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds
+						)
+						.find((season) => season)?.id
+			)
+			const playersOldCurrentSeasonData = (
+				event.data?.after.data() as PlayerData
+			).seasons.find(
+				(item) =>
+					item.season.id ==
+					seasonQuerySnapshot.docs
+						.sort(
+							(a, b) => b.data().dateStart.seconds - a.data().dateStart.seconds
+						)
+						.find((season) => season)?.id
+			)
 
-      if (!playersNewCurrentSeasonData.team)
-        return
+			if (!playersNewCurrentSeasonData || !playersOldCurrentSeasonData) return
 
-      if (
-        playersNewCurrentSeasonData.signed != playersOldCurrentSeasonData.signed ||
-        playersNewCurrentSeasonData.paid != playersOldCurrentSeasonData.paid
-      ) {
+			if (!playersNewCurrentSeasonData.team) return
+
+			if (
+				playersNewCurrentSeasonData.signed !=
+					playersOldCurrentSeasonData.signed ||
+				playersNewCurrentSeasonData.paid != playersOldCurrentSeasonData.paid
+			) {
 				const registeredPlayers = (
 					await firestore
 						.collection(COLLECTIONS.PLAYERS)
