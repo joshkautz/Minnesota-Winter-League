@@ -1,8 +1,8 @@
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { useEffect, useState } from 'react'
 
-const HOURS = 1000 * 60 * 60
-const MINUTES = 1000 * 60
+// const HOURS = 1000 * 60 * 60
+// const MINUTES = 1000 * 60
 
 export const RegistrationCountdown = () => {
 	const { currentSeasonQueryDocumentSnapshot } = useSeasonsContext()
@@ -36,10 +36,10 @@ export const RegistrationCountdown = () => {
 		return () => clearInterval(interval)
 	}, [currentSeasonQueryDocumentSnapshot])
 
-	const days = remaining ? Math.floor(remaining / (HOURS * 24)) : '?'
-	const hours = remaining ? Math.floor((remaining % (HOURS * 24)) / HOURS) : '?'
-	const minutes = remaining ? Math.floor((remaining % HOURS) / MINUTES) : '?'
-	const seconds = remaining ? Math.floor((remaining % MINUTES) / 1000) : '?'
+	// const days = remaining ? Math.floor(remaining / (HOURS * 24)) : '?'
+	// const hours = remaining ? Math.floor((remaining % (HOURS * 24)) / HOURS) : '?'
+	// const minutes = remaining ? Math.floor((remaining % HOURS) / MINUTES) : '?'
+	// const seconds = remaining ? Math.floor((remaining % MINUTES) / 1000) : '?'
 
 	return (
 		<div className="flex flex-col items-start">
@@ -50,32 +50,32 @@ export const RegistrationCountdown = () => {
 			) : (
 				<div className="text-3xl font-bold">Registration opens soon!</div>
 			)}
-			<div className="flex mt-2 space-x-2">
+			{/* <div className="flex mt-2 space-x-2">
 				<div className="flex flex-col items-center min-w-16">
 					<p className="w-full p-2 text-3xl text-center rounded-lg bg-accent dark:bg-primary text-accent-foreground dark:text-primary-foreground">
-						{days}
+						{0}
 					</p>
 					<p className="text-sm font-bold">days</p>
 				</div>
 				<div className="flex flex-col items-center min-w-16">
 					<p className="w-full p-2 text-3xl text-center rounded-lg bg-accent dark:bg-primary text-accent-foreground dark:text-primary-foreground">
-						{hours}
+						{0}
 					</p>
 					<p className="text-sm font-bold">hours</p>
 				</div>
 				<div className="flex flex-col items-center min-w-16">
 					<p className="w-full p-2 text-3xl text-center rounded-lg bg-accent dark:bg-primary text-accent-foreground dark:text-primary-foreground">
-						{minutes}
+						{0}
 					</p>
 					<p className="text-sm font-bold">minutes</p>
 				</div>
 				<div className="flex flex-col items-center min-w-16">
 					<p className="w-full p-2 text-3xl text-center rounded-lg bg-accent dark:bg-primary text-accent-foreground dark:text-primary-foreground">
-						{seconds}
+						{0}
 					</p>
 					<p className="text-sm font-bold">seconds</p>
 				</div>
-			</div>
+			</div> */}
 		</div>
 	)
 }
