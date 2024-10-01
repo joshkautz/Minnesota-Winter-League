@@ -329,6 +329,15 @@ export const OnPaymentCreated = onDocumentCreated(
 			const dropbox = new SignatureRequestApi()
 			dropbox.username = DROPBOX_SIGN_API_KEY
 
+			const payment = await firestore
+				.collection('customers')
+				.doc(event.params.uid)
+				.collection('payments')
+				.doc(event.params.sid)
+				.get()
+
+			if (payment.data()?.status != 'succeeded') return
+
 			return (
 				firestore
 					.collection(COLLECTIONS.PLAYERS)
