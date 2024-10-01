@@ -171,7 +171,7 @@ export const Profile = () => {
 	)
 
 	const isVerified = useMemo(
-		() => authStateUser?.emailVerified,
+		() => authStateUser?.emailVerified || true,
 		[authStateUser]
 	)
 

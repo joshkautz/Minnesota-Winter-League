@@ -90,9 +90,8 @@ export const TopNav = ({
 
 	const hasRequiredTasks = useMemo(
 		() =>
-			authStateUser?.emailVerified === false ||
-			isAuthenticatedUserPaid === false ||
-			isAuthenticatedUserSigned === false,
+			// authStateUser?.emailVerified === false ||
+			isAuthenticatedUserPaid === false || isAuthenticatedUserSigned === false,
 		[authStateUser, isAuthenticatedUserPaid, isAuthenticatedUserSigned]
 	)
 
