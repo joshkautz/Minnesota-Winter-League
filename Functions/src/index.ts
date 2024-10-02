@@ -516,7 +516,11 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 									.find((season) => season)?.id
 						)?.signed
 
-					console.log(playerDocumentSnapshot, paid, signed)
+					console.log(
+						`${playerDocumentSnapshot.data()?.firstname} ${playerDocumentSnapshot.data()?.lastname}`,
+						paid,
+						signed
+					)
 				})
 
 				const registeredPlayers = playerDocumentSnapshots.filter(
@@ -545,11 +549,12 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 										)
 										.find((season) => season)?.id
 							)?.signed
-				).length
+				)
 
 				console.log(registeredPlayers)
+				console.log(registeredPlayers.length)
 
-				if (registeredPlayers >= 10) {
+				if (registeredPlayers.length >= 10) {
 					return playersNewCurrentSeasonData.team.update({
 						registered: true,
 					})
