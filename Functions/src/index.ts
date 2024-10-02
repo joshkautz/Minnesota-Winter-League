@@ -461,7 +461,7 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 			console.log(playersNewCurrentSeasonData)
 
 			const playersOldCurrentSeasonData = (
-				event.data?.after.data() as PlayerData
+				event.data?.before.data() as PlayerData
 			).seasons.find(
 				(item) =>
 					item.season.id ==
