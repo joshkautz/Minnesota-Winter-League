@@ -487,42 +487,6 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 
 				const playerDocumentSnapshots = await Promise.all(promises)
 
-				console.log(playerDocumentSnapshots.map((item) => item.id))
-
-				playerDocumentSnapshots.forEach((playerDocumentSnapshot) => {
-					const paid = playerDocumentSnapshot
-						.data()
-						?.seasons.find(
-							(item) =>
-								item.season.id ==
-								seasonQuerySnapshot.docs
-									.sort(
-										(a, b) =>
-											b.data().dateStart.seconds - a.data().dateStart.seconds
-									)
-									.find((season) => season)?.id
-						)?.paid
-
-					const signed = playerDocumentSnapshot
-						.data()
-						?.seasons.find(
-							(item) =>
-								item.season.id ==
-								seasonQuerySnapshot.docs
-									.sort(
-										(a, b) =>
-											b.data().dateStart.seconds - a.data().dateStart.seconds
-									)
-									.find((season) => season)?.id
-						)?.signed
-
-					console.log(
-						`${playerDocumentSnapshot.data()?.firstname} ${playerDocumentSnapshot.data()?.lastname}`,
-						paid,
-						signed
-					)
-				})
-
 				const registeredPlayers = playerDocumentSnapshots.filter(
 					(playerDocumentSnapshot) =>
 						playerDocumentSnapshot
@@ -609,11 +573,11 @@ export const SetTeamRegistered_OnTeamChange = onDocumentUpdated(
 
 				if (!promises) return
 
-				const players = await Promise.all(promises)
+				const playerDocumentSnapshots = await Promise.all(promises)
 
-				const registeredPlayers = players.filter(
-					(player) =>
-						player
+				const registeredPlayers = playerDocumentSnapshots.filter(
+					(playerDocumentSnapshot) =>
+						playerDocumentSnapshot
 							.data()
 							?.seasons.find(
 								(item) =>
@@ -625,7 +589,7 @@ export const SetTeamRegistered_OnTeamChange = onDocumentUpdated(
 										)
 										.find((season) => season)?.id
 							)?.paid &&
-						player
+						playerDocumentSnapshot
 							.data()
 							?.seasons.find(
 								(item) =>
@@ -637,9 +601,12 @@ export const SetTeamRegistered_OnTeamChange = onDocumentUpdated(
 										)
 										.find((season) => season)?.id
 							)?.signed
-				).length
+				)
 
-				if (registeredPlayers >= 10) {
+				console.log(registeredPlayers.map((item) => item.id))
+				console.log(`There are ${registeredPlayers.length} registered players`)
+
+				if (registeredPlayers.length >= 10) {
 					return teamRef.update({
 						registered: true,
 					})
