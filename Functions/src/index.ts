@@ -551,8 +551,8 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 							)?.signed
 				)
 
-				console.log(registeredPlayers)
-				console.log(registeredPlayers.length)
+				console.log(registeredPlayers.map((item) => item.id))
+				console.log(`There are ${registeredPlayers.length} registered players`)
 
 				if (registeredPlayers.length >= 10) {
 					return playersNewCurrentSeasonData.team.update({
