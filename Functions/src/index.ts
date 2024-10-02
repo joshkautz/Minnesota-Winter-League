@@ -457,6 +457,9 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 						)
 						.find((season) => season)?.id
 			)
+
+			console.log(playersNewCurrentSeasonData)
+
 			const playersOldCurrentSeasonData = (
 				event.data?.after.data() as PlayerData
 			).seasons.find(
@@ -468,6 +471,8 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 						)
 						.find((season) => season)?.id
 			)
+
+			console.log(playersOldCurrentSeasonData)
 
 			if (!playersNewCurrentSeasonData || !playersOldCurrentSeasonData) return
 
@@ -485,9 +490,13 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 					.data()
 					?.roster.map((item) => item.player.get())
 
+				console.log(promises)
+
 				if (!promises) return
 
 				const players = await Promise.all(promises)
+
+				console.log(players)
 
 				const registeredPlayers = players.filter(
 					(player) =>
@@ -516,6 +525,8 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 										.find((season) => season)?.id
 							)?.signed
 				).length
+
+				console.log(registeredPlayers)
 
 				if (registeredPlayers >= 10) {
 					return playersNewCurrentSeasonData.team.update({
