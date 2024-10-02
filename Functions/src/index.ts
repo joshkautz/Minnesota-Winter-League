@@ -478,15 +478,44 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 					playersOldCurrentSeasonData.signed ||
 				playersNewCurrentSeasonData.paid != playersOldCurrentSeasonData.paid
 			) {
-				const registeredPlayers = (
-					await firestore
-						.collection(COLLECTIONS.PLAYERS)
-						.where(FIELDS.TEAM, '==', playersNewCurrentSeasonData.team)
-						.where(FIELDS.PAID, '==', true)
-						.where(FIELDS.SIGNED, '==', true)
-						.count()
-						.get()
-				).data().count
+				const teamDocumentSnapshot =
+					await playersNewCurrentSeasonData.team.get()
+
+				const promises = teamDocumentSnapshot
+					.data()
+					?.roster.map((item) => item.player.get())
+
+				if (!promises) return
+
+				const players = await Promise.all(promises)
+
+				const registeredPlayers = players.filter(
+					(player) =>
+						player
+							.data()
+							?.seasons.find(
+								(item) =>
+									item.season.id ==
+									seasonQuerySnapshot.docs
+										.sort(
+											(a, b) =>
+												b.data().dateStart.seconds - a.data().dateStart.seconds
+										)
+										.find((season) => season)?.id
+							)?.paid &&
+						player
+							.data()
+							?.seasons.find(
+								(item) =>
+									item.season.id ==
+									seasonQuerySnapshot.docs
+										.sort(
+											(a, b) =>
+												b.data().dateStart.seconds - a.data().dateStart.seconds
+										)
+										.find((season) => season)?.id
+							)?.signed
+				).length
 
 				if (registeredPlayers >= 10) {
 					return playersNewCurrentSeasonData.team.update({
@@ -519,27 +548,66 @@ export const SetTeamRegistered_OnTeamChange = onDocumentUpdated(
 		try {
 			const firestore = getFirestore()
 
+			const seasonQuerySnapshot = await (
+				firestore.collection(COLLECTIONS.SEASONS) as CollectionReference<
+					SeasonData,
+					DocumentData
+				>
+			).get()
+
 			const newValue = event.data?.after.data() as TeamData
 			const previousValue = event.data?.before.data() as TeamData
-			const teamRef = event.data?.after.ref
+			const teamRef = event.data?.after.ref as DocumentReference<
+				TeamData,
+				DocumentData
+			>
+			if (!teamRef) return
 
 			if (newValue.roster.length != previousValue.roster.length) {
-				const registeredPlayers = (
-					await firestore
-						.collection(COLLECTIONS.PLAYERS)
-						.where(FIELDS.TEAM, '==', teamRef)
-						.where(FIELDS.PAID, '==', true)
-						.where(FIELDS.SIGNED, '==', true)
-						.count()
-						.get()
-				).data().count
+				const teamDocumentSnapshot = await teamRef.get()
+
+				const promises = teamDocumentSnapshot
+					.data()
+					?.roster.map((item) => item.player.get())
+
+				if (!promises) return
+
+				const players = await Promise.all(promises)
+
+				const registeredPlayers = players.filter(
+					(player) =>
+						player
+							.data()
+							?.seasons.find(
+								(item) =>
+									item.season.id ==
+									seasonQuerySnapshot.docs
+										.sort(
+											(a, b) =>
+												b.data().dateStart.seconds - a.data().dateStart.seconds
+										)
+										.find((season) => season)?.id
+							)?.paid &&
+						player
+							.data()
+							?.seasons.find(
+								(item) =>
+									item.season.id ==
+									seasonQuerySnapshot.docs
+										.sort(
+											(a, b) =>
+												b.data().dateStart.seconds - a.data().dateStart.seconds
+										)
+										.find((season) => season)?.id
+							)?.signed
+				).length
 
 				if (registeredPlayers >= 10) {
-					return teamRef?.update({
+					return teamRef.update({
 						registered: true,
 					})
 				} else {
-					return teamRef?.update({
+					return teamRef.update({
 						registered: false,
 					})
 				}
