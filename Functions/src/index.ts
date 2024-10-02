@@ -458,8 +458,6 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 						.find((season) => season)?.id
 			)
 
-			console.log(playersNewCurrentSeasonData)
-
 			const playersOldCurrentSeasonData = (
 				event.data?.before.data() as PlayerData
 			).seasons.find(
@@ -472,8 +470,6 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 						.find((season) => season)?.id
 			)
 
-			console.log(playersOldCurrentSeasonData)
-
 			if (!playersNewCurrentSeasonData || !playersOldCurrentSeasonData) return
 
 			if (!playersNewCurrentSeasonData.team) return
@@ -483,24 +479,49 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 					playersOldCurrentSeasonData.signed ||
 				playersNewCurrentSeasonData.paid != playersOldCurrentSeasonData.paid
 			) {
-				const teamDocumentSnapshot =
-					await playersNewCurrentSeasonData.team.get()
-
-				const promises = teamDocumentSnapshot
+				const promises = (await playersNewCurrentSeasonData.team.get())
 					.data()
 					?.roster.map((item) => item.player.get())
 
-				console.log(promises)
-
 				if (!promises) return
 
-				const players = await Promise.all(promises)
+				const playerDocumentSnapshots = await Promise.all(promises)
 
-				console.log(players)
+				console.log(playerDocumentSnapshots.map((item) => item.id))
 
-				const registeredPlayers = players.filter(
-					(player) =>
-						player
+				playerDocumentSnapshots.forEach((playerDocumentSnapshot) => {
+					const paid = playerDocumentSnapshot
+						.data()
+						?.seasons.find(
+							(item) =>
+								item.season.id ==
+								seasonQuerySnapshot.docs
+									.sort(
+										(a, b) =>
+											b.data().dateStart.seconds - a.data().dateStart.seconds
+									)
+									.find((season) => season)?.id
+						)?.paid
+
+					const signed = playerDocumentSnapshot
+						.data()
+						?.seasons.find(
+							(item) =>
+								item.season.id ==
+								seasonQuerySnapshot.docs
+									.sort(
+										(a, b) =>
+											b.data().dateStart.seconds - a.data().dateStart.seconds
+									)
+									.find((season) => season)?.id
+						)?.signed
+
+					console.log(playerDocumentSnapshot, paid, signed)
+				})
+
+				const registeredPlayers = playerDocumentSnapshots.filter(
+					(playerDocumentSnapshot) =>
+						playerDocumentSnapshot
 							.data()
 							?.seasons.find(
 								(item) =>
@@ -512,7 +533,7 @@ export const SetTeamRegistered_OnPlayerChange = onDocumentUpdated(
 										)
 										.find((season) => season)?.id
 							)?.paid &&
-						player
+						playerDocumentSnapshot
 							.data()
 							?.seasons.find(
 								(item) =>
