@@ -4,7 +4,7 @@ import { toast } from '@/components/ui/use-toast'
 import { useDownloadURL, useUploadFile } from 'react-firebase-hooks/storage'
 import { Label } from '@/components/ui/label'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { createTeam, rolloverTeam } from '@/firebase/firestore'
+// import { createTeam, rolloverTeam } from '@/firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { StorageReference } from '@/firebase/storage'
 import { GradientHeader } from '@/components/gradient-header'
@@ -86,56 +86,56 @@ export const CreateTeam = () => {
 				setStorageRef(newTeamData.storageRef)
 			} else {
 				if (rolloverMode) {
-					rolloverTeam(
-						authenticatedUserSnapshot?.ref,
-						newTeamData?.name,
-						undefined,
-						currentSeasonQueryDocumentSnapshot?.ref,
-						undefined,
-						newTeamData?.teamId
-					)
-						.then(() => {
-							handleResult({
-								success: true,
-								title: 'Team Rolled Over',
-								description: `Welcome back to the league, ${newTeamData?.name}!`,
-								navigation: true,
-							})
-						})
-						.catch((error) => {
-							setIsSubmitting(false)
-							handleResult({
-								success: false,
-								title: 'Error',
-								description: `${error.message}. Ensure your email is verified. Please try again later.`,
-								navigation: false,
-							})
-						})
+					// rolloverTeam(
+					// 	authenticatedUserSnapshot?.ref,
+					// 	newTeamData?.name,
+					// 	undefined,
+					// 	currentSeasonQueryDocumentSnapshot?.ref,
+					// 	undefined,
+					// 	newTeamData?.teamId
+					// )
+					// 	.then(() => {
+					// 		handleResult({
+					// 			success: true,
+					// 			title: 'Team Rolled Over',
+					// 			description: `Welcome back to the league, ${newTeamData?.name}!`,
+					// 			navigation: true,
+					// 		})
+					// 	})
+					// 	.catch((error) => {
+					// 		setIsSubmitting(false)
+					// 		handleResult({
+					// 			success: false,
+					// 			title: 'Error',
+					// 			description: `${error.message}. Ensure your email is verified. Please try again later.`,
+					// 			navigation: false,
+					// 		})
+					// 	})
 				} else {
-					createTeam(
-						authenticatedUserSnapshot?.ref,
-						newTeamData.name,
-						undefined,
-						currentSeasonQueryDocumentSnapshot?.ref,
-						undefined
-					)
-						.then(() => {
-							handleResult({
-								success: true,
-								title: 'Team Created',
-								description: `Welcome to the league, ${newTeamData.name}!`,
-								navigation: true,
-							})
-						})
-						.catch((error) => {
-							setIsSubmitting(false)
-							handleResult({
-								success: false,
-								title: 'Error',
-								description: `${error.message}. Ensure your email is verified. Please try again later.`,
-								navigation: false,
-							})
-						})
+					// createTeam(
+					// 	authenticatedUserSnapshot?.ref,
+					// 	newTeamData.name,
+					// 	undefined,
+					// 	currentSeasonQueryDocumentSnapshot?.ref,
+					// 	undefined
+					// )
+					// 	.then(() => {
+					// 		handleResult({
+					// 			success: true,
+					// 			title: 'Team Created',
+					// 			description: `Welcome to the league, ${newTeamData.name}!`,
+					// 			navigation: true,
+					// 		})
+					// 	})
+					// 	.catch((error) => {
+					// 		setIsSubmitting(false)
+					// 		handleResult({
+					// 			success: false,
+					// 			title: 'Error',
+					// 			description: `${error.message}. Ensure your email is verified. Please try again later.`,
+					// 			navigation: false,
+					// 		})
+					// 	})
 				}
 			}
 		}
@@ -144,56 +144,56 @@ export const CreateTeam = () => {
 	useEffect(() => {
 		if (downloadUrl) {
 			if (rolloverMode) {
-				rolloverTeam(
-					authenticatedUserSnapshot?.ref,
-					newTeamData?.name,
-					downloadUrl,
-					currentSeasonQueryDocumentSnapshot?.ref,
-					newTeamData?.storageRef?.fullPath,
-					newTeamData?.teamId
-				)
-					.then(() => {
-						handleResult({
-							success: true,
-							title: 'Team Rolled Over',
-							description: `Welcome back to the league, ${newTeamData?.name}!`,
-							navigation: true,
-						})
-					})
-					.catch((error) => {
-						setIsSubmitting(false)
-						handleResult({
-							success: false,
-							title: 'Error',
-							description: `${error.message}. Ensure your email is verified. Please try again later.`,
-							navigation: false,
-						})
-					})
+				// rolloverTeam(
+				// 	authenticatedUserSnapshot?.ref,
+				// 	newTeamData?.name,
+				// 	downloadUrl,
+				// 	currentSeasonQueryDocumentSnapshot?.ref,
+				// 	newTeamData?.storageRef?.fullPath,
+				// 	newTeamData?.teamId
+				// )
+				// 	.then(() => {
+				// 		handleResult({
+				// 			success: true,
+				// 			title: 'Team Rolled Over',
+				// 			description: `Welcome back to the league, ${newTeamData?.name}!`,
+				// 			navigation: true,
+				// 		})
+				// 	})
+				// 	.catch((error) => {
+				// 		setIsSubmitting(false)
+				// 		handleResult({
+				// 			success: false,
+				// 			title: 'Error',
+				// 			description: `${error.message}. Ensure your email is verified. Please try again later.`,
+				// 			navigation: false,
+				// 		})
+				// 	})
 			} else {
-				createTeam(
-					authenticatedUserSnapshot?.ref,
-					newTeamData?.name,
-					downloadUrl,
-					currentSeasonQueryDocumentSnapshot?.ref,
-					newTeamData?.storageRef?.fullPath
-				)
-					.then(() => {
-						handleResult({
-							success: true,
-							title: 'Team Created',
-							description: `Welcome to the league, ${newTeamData?.name}!`,
-							navigation: true,
-						})
-					})
-					.catch((error) => {
-						setIsSubmitting(false)
-						handleResult({
-							success: false,
-							title: 'Error',
-							description: `${error.message}. Ensure your email is verified. Please try again later.`,
-							navigation: false,
-						})
-					})
+				// createTeam(
+				// 	authenticatedUserSnapshot?.ref,
+				// 	newTeamData?.name,
+				// 	downloadUrl,
+				// 	currentSeasonQueryDocumentSnapshot?.ref,
+				// 	newTeamData?.storageRef?.fullPath
+				// )
+				// 	.then(() => {
+				// 		handleResult({
+				// 			success: true,
+				// 			title: 'Team Created',
+				// 			description: `Welcome to the league, ${newTeamData?.name}!`,
+				// 			navigation: true,
+				// 		})
+				// 	})
+				// 	.catch((error) => {
+				// 		setIsSubmitting(false)
+				// 		handleResult({
+				// 			success: false,
+				// 			title: 'Error',
+				// 			description: `${error.message}. Ensure your email is verified. Please try again later.`,
+				// 			navigation: false,
+				// 		})
+				// 	})
 			}
 		}
 	}, [downloadUrl])

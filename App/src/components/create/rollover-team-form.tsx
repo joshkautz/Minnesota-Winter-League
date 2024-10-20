@@ -238,10 +238,18 @@ export const RolloverTeamForm = ({
 					<Button
 						type={'submit'}
 						onClick={onRolloverSubmit}
-						disabled={isSubmitting || !selectedTeamQueryDocumentSnapshot}
+						disabled={
+							isSubmitting || !selectedTeamQueryDocumentSnapshot || true
+						}
 					>
 						Rollover
 					</Button>
+					<p
+						className={'text-[0.8rem] text-muted-foreground mt-2 text-red-500'}
+					>
+						The maximum number of fully registered teams for the current season
+						has been reached.
+					</p>
 				</div>
 			)}
 		</div>
