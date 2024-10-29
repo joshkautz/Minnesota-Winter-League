@@ -25,8 +25,7 @@ export const useStandings = (
 			const updateTeamStanding = (
 				teamId: string,
 				pointsFor: number,
-				pointsAgainst: number,
-				isWin: boolean
+				pointsAgainst: number
 			) => {
 				const teamStats = result[teamId] ?? {
 					pointsFor: 0,
@@ -40,13 +39,13 @@ export const useStandings = (
 					pointsFor: teamStats.pointsFor + pointsFor,
 					pointsAgainst: teamStats.pointsAgainst + pointsAgainst,
 					differential: teamStats.differential + (pointsFor - pointsAgainst),
-					wins: teamStats.wins + (isWin ? 1 : 0),
-					losses: teamStats.losses + (isWin ? 0 : 1),
+					wins: teamStats.wins + (pointsFor > pointsAgainst ? 1 : 0),
+					losses: teamStats.losses + (pointsFor < pointsAgainst ? 1 : 0),
 				}
 			}
 
-			updateTeamStanding(home.id, homeScore, awayScore, homeScore > awayScore)
-			updateTeamStanding(away.id, awayScore, homeScore, awayScore > homeScore)
+			updateTeamStanding(home.id, homeScore, awayScore)
+			updateTeamStanding(away.id, awayScore, homeScore)
 		})
 
 		return result
