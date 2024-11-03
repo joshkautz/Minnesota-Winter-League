@@ -28,11 +28,11 @@ export const StandingsTable = ({
 	}
 	teamsQuerySnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
 }) => {
-	const getColor = (value: number) => {
-		if (value > 9) {
+	const getColor = (gamesPlayed: number, pointDiff: number) => {
+		if (pointDiff > gamesPlayed * 5) {
 			return 'text-green-600'
 		}
-		if (value < -9) {
+		if (pointDiff < gamesPlayed * -5) {
 			return 'text-destructive'
 		}
 		return ''
@@ -102,7 +102,9 @@ export const StandingsTable = ({
 								</TableCell>
 								<TableCell>{wins}</TableCell>
 								<TableCell>{losses}</TableCell>
-								<TableCell className={getColor(pointsFor - pointsAgainst)}>
+								<TableCell
+									className={getColor(wins + losses, pointsFor - pointsAgainst)}
+								>
 									{pointsFor - pointsAgainst}
 								</TableCell>
 							</TableRow>
