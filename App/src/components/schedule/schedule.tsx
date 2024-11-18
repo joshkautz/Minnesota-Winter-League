@@ -8,6 +8,13 @@ import { useGamesContext } from '@/contexts/games-context'
 import { ScheduleCard } from './schedule-card'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { formatTimestamp } from '@/lib/utils'
+import {
+	Card,
+	CardHeader,
+	CardTitle,
+	CardDescription,
+	CardContent,
+} from '../ui/card'
 
 export const Schedule = () => {
 	const { gamesQuerySnapshot } = useGamesContext()
@@ -45,13 +52,13 @@ export const Schedule = () => {
 			<GradientHeader>Schedule</GradientHeader>
 
 			{!gamesQuerySnapshot ? (
-				<div className={'absolute inset-0 flex items-center justify-center'}>
-					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
+				<div className={'flex absolute inset-0 justify-center items-center'}>
+					<ReloadIcon className={'mr-2 w-10 h-10 animate-spin'} />
 				</div>
 			) : gamesQuerySnapshot.docs.length == 0 ? (
 				<div className={'flex flex-wrap gap-8'}>
 					<ComingSoon>
-						<p className={' pt-6 '}>
+						<p className={'pt-6'}>
 							{`There is no schedule to display. Please wait for registration to end on ${formatTimestamp(selectedSeasonQueryDocumentSnapshot?.data()?.registrationEnd)}.`}
 						</p>
 					</ComingSoon>
@@ -67,6 +74,265 @@ export const Schedule = () => {
 							}`}
 						/>
 					))}
+
+					{/* TEMPORARY */}
+					{/* Hardcoded placeholder schedule for rounds 6 and 7 */}
+					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+						<CardHeader>
+							<CardTitle>Week 6 | Round 1</CardTitle>
+							<CardDescription>December 7th</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-2">
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 1</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 2</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 3</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+						<CardHeader>
+							<CardTitle>Week 6 | Round 2</CardTitle>
+							<CardDescription>December 7th</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-2">
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 1</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 2</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 3</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+						<CardHeader>
+							<CardTitle>Week 6 | Round 3</CardTitle>
+							<CardDescription>December 7th</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-2">
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 1</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 2</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 3</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+						<CardHeader>
+							<CardTitle>Week 6 | Round 4</CardTitle>
+							<CardDescription>December 7th</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-2">
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 1</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 2</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 3</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+						<CardHeader>
+							<CardTitle>Week 7 | Round 1</CardTitle>
+							<CardDescription>December 14th</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-2">
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 1</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 2</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 3</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+						<CardHeader>
+							<CardTitle>Week 7 | Round 2</CardTitle>
+							<CardDescription>December 14th</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-2">
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 1</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 2</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 3</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+						<CardHeader>
+							<CardTitle>Week 7 | Round 3</CardTitle>
+							<CardDescription>December 14th</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-2">
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 1</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 2</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 3</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+						<CardHeader>
+							<CardTitle>Week 7 | Round 4</CardTitle>
+							<CardDescription>December 14th</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-2">
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 1</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 2</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+							<div className={'flex justify-start items-center max-h-10'}>
+								<div className={'flex-1'}>Field 3</div>
+								<div className="flex gap-4 justify-center items-center flex-[4]">
+									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center select-none">vs</p>
+									<p className="flex-1 text-center">TBD</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
 				</div>
 			)}
 		</div>
