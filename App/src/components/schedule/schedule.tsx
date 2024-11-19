@@ -80,7 +80,7 @@ export const Schedule = () => {
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 6 | Round 1</CardTitle>
-							<CardDescription>December 7th</CardDescription>
+							<CardDescription>Saturday, December 7th at 6:00 PM</CardDescription>
 						</CardHeader>
 						<CardContent className="flex flex-col gap-2">
 							<div className={'flex justify-start items-center max-h-10'}>
@@ -112,7 +112,7 @@ export const Schedule = () => {
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 6 | Round 2</CardTitle>
-							<CardDescription>December 7th</CardDescription>
+							<CardDescription>Saturday, December 7th at 6:45 PM</CardDescription>
 						</CardHeader>
 						<CardContent className="flex flex-col gap-2">
 							<div className={'flex justify-start items-center max-h-10'}>
@@ -144,7 +144,7 @@ export const Schedule = () => {
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 6 | Round 3</CardTitle>
-							<CardDescription>December 7th</CardDescription>
+							<CardDescription>Saturday, December 7th at 7:30 PM</CardDescription>
 						</CardHeader>
 						<CardContent className="flex flex-col gap-2">
 							<div className={'flex justify-start items-center max-h-10'}>
@@ -176,7 +176,7 @@ export const Schedule = () => {
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 6 | Round 4</CardTitle>
-							<CardDescription>December 7th</CardDescription>
+							<CardDescription>Saturday, December 7th at 8:15 PM</CardDescription>
 						</CardHeader>
 						<CardContent className="flex flex-col gap-2">
 							<div className={'flex justify-start items-center max-h-10'}>
@@ -208,7 +208,7 @@ export const Schedule = () => {
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 7 | Round 1</CardTitle>
-							<CardDescription>December 14th</CardDescription>
+							<CardDescription>Saturday, December 14th at 6:00 PM</CardDescription>
 						</CardHeader>
 						<CardContent className="flex flex-col gap-2">
 							<div className={'flex justify-start items-center max-h-10'}>
@@ -240,7 +240,7 @@ export const Schedule = () => {
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 7 | Round 2</CardTitle>
-							<CardDescription>December 14th</CardDescription>
+							<CardDescription>Saturday, December 14th at 6:45 PM</CardDescription>
 						</CardHeader>
 						<CardContent className="flex flex-col gap-2">
 							<div className={'flex justify-start items-center max-h-10'}>
@@ -272,7 +272,7 @@ export const Schedule = () => {
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 7 | Round 3</CardTitle>
-							<CardDescription>December 14th</CardDescription>
+							<CardDescription>Saturday, December 14th at 7:30 PM</CardDescription>
 						</CardHeader>
 						<CardContent className="flex flex-col gap-2">
 							<div className={'flex justify-start items-center max-h-10'}>
@@ -304,7 +304,7 @@ export const Schedule = () => {
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 7 | Round 4</CardTitle>
-							<CardDescription>December 14th</CardDescription>
+							<CardDescription>Saturday, December 14th at 8:15 PM</CardDescription>
 						</CardHeader>
 						<CardContent className="flex flex-col gap-2">
 							<div className={'flex justify-start items-center max-h-10'}>
