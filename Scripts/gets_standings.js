@@ -1,27 +1,27 @@
-import { initializeApp } from 'firebase-admin/app'
-import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { initializeApp } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
 const firebaseConfig = {
-	storageBucket: 'minnesota-winter-league.appspot.com',
-}
+  storageBucket: "minnesota-winter-league.appspot.com",
+};
 
-initializeApp(firebaseConfig)
+initializeApp(firebaseConfig);
 
-const firestore = getFirestore()
+const firestore = getFirestore();
 
 /////////////////////////////// Get Standings ///////////////////////////////
 
 const standingsSnapshot = await firestore
-	.collection('standings')
-	.orderBy('wins', 'desc')
-	.orderBy('differential', 'desc')
-	.get()
+  .collection("standings")
+  .orderBy("wins", "desc")
+  .orderBy("differential", "desc")
+  .get();
 await Promise.all(
-	standingsSnapshot.docs.map((standing, index) =>
-		firestore
-			.collection('teams')
-			.doc(standing.id)
-			.get()
-			.then((team) => team.data().name)
-	)
-)
+  standingsSnapshot.docs.map((standing, index) =>
+    firestore
+      .collection("teams")
+      .doc(standing.id)
+      .get()
+      .then((team) => team.data().name),
+  ),
+);

@@ -1,103 +1,103 @@
-import { initializeApp } from 'firebase-admin/app'
-import { getFirestore, FieldValue } from 'firebase-admin/firestore'
-import { getStorage, getDownloadURL } from 'firebase-admin/storage'
+import { initializeApp } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getStorage, getDownloadURL } from "firebase-admin/storage";
 
-import random_name from 'node-random-name'
+import random_name from "node-random-name";
 
 import {
-	uniqueNamesGenerator,
-	adjectives,
-	colors,
-	animals,
-} from 'unique-names-generator'
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+  animals,
+} from "unique-names-generator";
 
 const firebaseConfig = {
-	storageBucket: 'minnesota-winter-league.appspot.com',
-}
+  storageBucket: "minnesota-winter-league.appspot.com",
+};
 
-initializeApp(firebaseConfig)
+initializeApp(firebaseConfig);
 
-const firestore = getFirestore()
-const storage = getStorage()
-const bucket = storage.bucket()
+const firestore = getFirestore();
+const storage = getStorage();
+const bucket = storage.bucket();
 
 /////////////////////////////// Update Player ///////////////////////////////
 
-const playerID = ''
-const playerReference = firestore.collection('players').doc(playerID)
-const playerSnapshot = await playerReference.get()
-const teamID = playerSnapshot.data().team.id
+const playerID = "";
+const playerReference = firestore.collection("players").doc(playerID);
+const playerSnapshot = await playerReference.get();
+const teamID = playerSnapshot.data().team.id;
 
-await firestore.collection('players').doc(playerID).update({
-	captain: false,
-	team: null,
-})
+await firestore.collection("players").doc(playerID).update({
+  captain: false,
+  team: null,
+});
 
-await new Promise((r) => setTimeout(r, 500))
+await new Promise((r) => setTimeout(r, 500));
 
 /////////////////////////////// Update Team ///////////////////////////////
 
 await firestore
-	.collection('teams')
-	.doc(teamID)
-	.update({
-		captains: FieldValue.arrayRemove(playerReference),
-		roster: FieldValue.arrayRemove(playerReference),
-	})
+  .collection("teams")
+  .doc(teamID)
+  .update({
+    captains: FieldValue.arrayRemove(playerReference),
+    roster: FieldValue.arrayRemove(playerReference),
+  });
 
-await new Promise((r) => setTimeout(r, 500))
+await new Promise((r) => setTimeout(r, 500));
 
 /////////////////////////////// Create Offers ///////////////////////////////
 
-const offers = []
-const teams = []
-const teamsQuerySnapshot = await firestore.collection('teams').get()
+const offers = [];
+const teams = [];
+const teamsQuerySnapshot = await firestore.collection("teams").get();
 teamsQuerySnapshot.forEach((doc) => {
-	teams.push(doc)
-})
+  teams.push(doc);
+});
 
 const getTeam = () => {
-	return teams[Math.floor(Math.random() * teams.length)]
-}
+  return teams[Math.floor(Math.random() * teams.length)];
+};
 
 const getOffer = () => {
-	const team = getTeam()
+  const team = getTeam();
 
-	const offer = JSON.stringify({
-		team: team.id,
-		player: playerReference.id,
-	})
+  const offer = JSON.stringify({
+    team: team.id,
+    player: playerReference.id,
+  });
 
-	if (offers.includes(offer)) return getOffer()
+  if (offers.includes(offer)) return getOffer();
 
-	offers.push(offer)
-	return { team }
-}
+  offers.push(offer);
+  return { team };
+};
 
 // Create Request offers.
 for (let i = 0; i < 10; i++) {
-	const { team } = getOffer()
+  const { team } = getOffer();
 
-	await firestore.collection('offers').add({
-		creator: 'player',
-		team: team.ref,
-		player: playerReference,
-		status: 'pending',
-	})
+  await firestore.collection("offers").add({
+    creator: "player",
+    team: team.ref,
+    player: playerReference,
+    status: "pending",
+  });
 
-	await new Promise((r) => setTimeout(r, 500))
+  await new Promise((r) => setTimeout(r, 500));
 }
 
 // Create Invitation offers.
 for (let i = 0; i < 10; i++) {
-	const { team } = getOffer()
+  const { team } = getOffer();
 
-	await firestore.collection('offers').add({
-		creator: 'captain',
-		team: team.ref,
-		player: playerReference,
-		status: 'pending',
-	})
+  await firestore.collection("offers").add({
+    creator: "captain",
+    team: team.ref,
+    player: playerReference,
+    status: "pending",
+  });
 
-	await new Promise((r) => setTimeout(r, 500))
+  await new Promise((r) => setTimeout(r, 500));
 }
