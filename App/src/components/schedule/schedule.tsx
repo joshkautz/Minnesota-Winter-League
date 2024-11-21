@@ -88,25 +88,25 @@ export const Schedule = () => {
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 1</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 1</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 8</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 2</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 3</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 11</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 3</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 7</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 10</p>
 								</div>
 							</div>
 						</CardContent>
@@ -122,25 +122,25 @@ export const Schedule = () => {
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 1</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 1</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 9</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 2</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 4</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 5</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 3</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 6</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 11</p>
 								</div>
 							</div>
 						</CardContent>
@@ -156,25 +156,25 @@ export const Schedule = () => {
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 1</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 8</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 9</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 2</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 4</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 12</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 3</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 2</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 7</p>
 								</div>
 							</div>
 						</CardContent>
@@ -190,25 +190,25 @@ export const Schedule = () => {
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 1</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 3</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 6</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 2</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 5</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 12</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 3</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 2</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Seed 10</p>
 								</div>
 							</div>
 						</CardContent>
@@ -224,25 +224,25 @@ export const Schedule = () => {
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 1</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 1 (1)</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 4 (1)</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 2</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 1 (2)</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 4 (2)</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 3</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 1 (3)</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 4 (3)</p>
 								</div>
 							</div>
 						</CardContent>
@@ -258,25 +258,25 @@ export const Schedule = () => {
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 1</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 2 (1)</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 3 (1)</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 2</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 2 (2)</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 3 (2)</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 3</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 2 (3)</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">Pool 3 (3)</p>
 								</div>
 							</div>
 						</CardContent>
@@ -292,25 +292,25 @@ export const Schedule = () => {
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 1</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">L Round 1</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">L Round 2</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 2</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">L Round 1</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">L Round 2</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 3</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">L Round 1</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">L Round 2</p>
 								</div>
 							</div>
 						</CardContent>
@@ -326,25 +326,25 @@ export const Schedule = () => {
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 1</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">W Round 1</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">W Round 2</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 2</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">W Round 1</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">W Round 2</p>
 								</div>
 							</div>
 							<div className={'flex justify-start items-center max-h-10'}>
 								<div className={'flex-1'}>Field 3</div>
 								<div className="flex gap-4 justify-center items-center flex-[4]">
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">W Round 1</p>
 									<p className="flex-1 text-center select-none">vs</p>
-									<p className="flex-1 text-center">TBD</p>
+									<p className="flex-1 text-center">W Round 2</p>
 								</div>
 							</div>
 						</CardContent>
