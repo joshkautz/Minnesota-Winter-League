@@ -1,3 +1,4 @@
+import { TeamUpdateRequest } from "@dropbox/sign";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp, Filter } from "firebase-admin/firestore";
 
@@ -88,12 +89,12 @@ const teams = {};
 await firestore
   .collection("games")
   .where("season", "==", SEASON.ref)
-  .where("home", "==", SleepyHeads.ref)
-  .where("away", "==", NortheastNeutrons.ref)
+  .where("home", "==", MaustonMousers.ref)
+  .where("away", "==", BirdtownBallers.ref)
   .where(
     "date",
     "==",
-    Timestamp.fromDate(new Date(Date.parse("16 Nov 2024 20:15:00 CST"))),
+    Timestamp.fromDate(new Date(Date.parse("30 Nov 2024 18:00:00 CST"))),
   )
   .get()
   .then((querySnapshot) => {
@@ -101,8 +102,8 @@ await firestore
       if (index === 0) {
         querySnapshot.docs[index].ref
           .update({
-            homeScore: 10,
-            awayScore: 11,
+            homeScore: 8,
+            awayScore: 0,
           })
           .then(() => {
             console.log(
