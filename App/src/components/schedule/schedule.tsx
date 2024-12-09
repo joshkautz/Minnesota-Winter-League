@@ -213,7 +213,7 @@ export const Schedule = () => {
 							</div>
 						</CardContent>
 					</Card> */}
-					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+					{/* <Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 7 | Round 1</CardTitle>
 							<CardDescription>
@@ -280,7 +280,7 @@ export const Schedule = () => {
 								</div>
 							</div>
 						</CardContent>
-					</Card>
+					</Card> */}
 					<Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 7 | Round 3</CardTitle>
