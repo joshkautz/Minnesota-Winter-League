@@ -29,6 +29,10 @@
         }
       },
       {
+        "source": "/preview",
+        "destination": "https://docs.google.com/document/d/e/2PACX-1vQVZuhWkACfZxA8QMF2rXokFff5_k6IWmo4FJ-O9ovHTwz1MQZMLlyf6sM9vQ-gzpKhpMEvtWLFcbNt/pub"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
