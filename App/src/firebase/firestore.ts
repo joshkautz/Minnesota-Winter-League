@@ -487,7 +487,8 @@ const currentSeasonGamesQuery = (
 
 	return query(
 		collection(firestore, Collections.GAMES),
-		where('season', '==', seasonSnapshot.ref)
+		where('season', '==', seasonSnapshot.ref),
+		where('type', '==', 'regular')
 	) as Query<GameData, DocumentData>
 }
 
