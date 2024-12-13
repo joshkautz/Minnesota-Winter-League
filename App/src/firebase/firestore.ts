@@ -480,7 +480,7 @@ const getPlayerRef = (
 	) as DocumentReference<PlayerData, DocumentData>
 }
 
-const currentSeasonGamesQuery = (
+const currentSeasonRegularGamesQuery = (
 	seasonSnapshot: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
 ): Query<GameData, DocumentData> | undefined => {
 	if (!seasonSnapshot) return undefined
@@ -489,6 +489,17 @@ const currentSeasonGamesQuery = (
 		collection(firestore, Collections.GAMES),
 		where('season', '==', seasonSnapshot.ref),
 		where('type', '==', 'regular')
+	) as Query<GameData, DocumentData>
+}
+
+const currentSeasonGamesQuery = (
+	seasonSnapshot: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
+): Query<GameData, DocumentData> | undefined => {
+	if (!seasonSnapshot) return undefined
+
+	return query(
+		collection(firestore, Collections.GAMES),
+		where('season', '==', seasonSnapshot.ref)
 	) as Query<GameData, DocumentData>
 }
 
@@ -787,6 +798,7 @@ export {
 	getPlayersQuery,
 	teamsHistoryQuery,
 	currentSeasonTeamsQuery,
+	currentSeasonRegularGamesQuery,
 	currentSeasonGamesQuery,
 	requestToJoinTeam,
 	invitePlayer,
