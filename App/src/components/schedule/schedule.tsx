@@ -8,13 +8,13 @@ import { useGamesContext } from '@/contexts/games-context'
 import { ScheduleCard } from './schedule-card'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { formatTimestamp } from '@/lib/utils'
-import {
-	Card,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-	CardContent,
-} from '../ui/card'
+// import {
+// 	Card,
+// 	CardHeader,
+// 	CardTitle,
+// 	CardDescription,
+// 	CardContent,
+// } from '../ui/card'
 
 export const Schedule = () => {
 	const { gamesQuerySnapshot } = useGamesContext()
@@ -281,7 +281,7 @@ export const Schedule = () => {
 							</div>
 						</CardContent>
 					</Card> */}
-					<Card className={'flex-1 flex-shrink-0 basis-80'}>
+					{/* <Card className={'flex-1 flex-shrink-0 basis-80'}>
 						<CardHeader>
 							<CardTitle>Week 7 | Round 3</CardTitle>
 							<CardDescription>
@@ -348,7 +348,7 @@ export const Schedule = () => {
 								</div>
 							</div>
 						</CardContent>
-					</Card>
+					</Card> */}
 				</div>
 			)}
 		</div>
