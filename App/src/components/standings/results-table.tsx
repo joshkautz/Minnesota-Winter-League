@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table'
 import { QuerySnapshot, DocumentData } from '@/firebase/firestore'
 import { TeamData } from '@/lib/interfaces'
-import { TeamResult } from '@/lib/use-results'
+import { TeamStanding } from '@/lib/use-standings'
 import { cn } from '@/lib/utils'
 import { Link } from 'react-router-dom'
 
@@ -18,7 +18,7 @@ export const ResultsTable = ({
 	teamsQuerySnapshot,
 }: {
 	results: {
-		[key: string]: TeamResult
+		[key: string]: TeamStanding
 	}
 	teamsQuerySnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
 }) => {
@@ -33,14 +33,22 @@ export const ResultsTable = ({
 	}
 
 	const sortByPlacement = (
-		a: [string, TeamResult],
-		b: [string, TeamResult]
+		a: [string, TeamStanding],
+		b: [string, TeamStanding]
 	) => {
-		if (a[1].placement < b[1].placement) {
-			return -1
-		}
-		if (a[1].placement > b[1].placement) {
-			return 1
+		const aPlacement = teamsQuerySnapshot?.docs
+			.find((team) => team.id === a[0])
+			?.data()?.placement
+		const bPlacement = teamsQuerySnapshot?.docs
+			.find((team) => team.id === b[0])
+			?.data()?.placement
+		if (aPlacement && bPlacement) {
+			if (aPlacement < bPlacement) {
+				return -1
+			}
+			if (aPlacement > bPlacement) {
+				return 1
+			}
 		}
 		return 0
 	}

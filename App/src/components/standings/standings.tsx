@@ -4,7 +4,6 @@ import { useTeamsContext } from '@/contexts/teams-context'
 import { useGamesContext } from '@/contexts/games-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { useStandings } from '@/lib/use-standings'
-import { useResults } from '@/lib/use-results'
 import { StandingsTable } from './standings-table'
 import { ResultsTable } from './results-table'
 import { useSeasonsContext } from '@/contexts/seasons-context'
@@ -17,7 +16,7 @@ export const Standings = () => {
 	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const standings = useStandings(regularSeasonGamesQuerySnapshot)
-	const results = useResults(playoffGamesQuerySnapshot)
+	const results = useStandings(playoffGamesQuerySnapshot)
 
 	return (
 		<div className="container">
