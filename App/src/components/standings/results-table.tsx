@@ -9,16 +9,16 @@ import {
 } from '@/components/ui/table'
 import { QuerySnapshot, DocumentData } from '@/firebase/firestore'
 import { TeamData } from '@/lib/interfaces'
-import { TeamStanding } from '@/lib/use-standings'
+import { TeamResult } from '@/lib/use-results'
 import { cn } from '@/lib/utils'
 import { Link } from 'react-router-dom'
 
-export const StandingsTable = ({
-	standings,
+export const ResultsTable = ({
+	results,
 	teamsQuerySnapshot,
 }: {
-	standings: {
-		[key: string]: TeamStanding
+	results: {
+		[key: string]: TeamResult
 	}
 	teamsQuerySnapshot: QuerySnapshot<TeamData, DocumentData> | undefined
 }) => {
@@ -32,20 +32,14 @@ export const StandingsTable = ({
 		return ''
 	}
 
-	const sortByWinsThenDiff = (
-		a: [string, TeamStanding],
-		b: [string, TeamStanding]
+	const sortByPlacement = (
+		a: [string, TeamResult],
+		b: [string, TeamResult]
 	) => {
-		if (a[1].wins > b[1].wins) {
+		if (a[1].placement < b[1].placement) {
 			return -1
 		}
-		if (a[1].wins < b[1].wins) {
-			return 1
-		}
-		if (a[1].differential > b[1].differential) {
-			return -1
-		}
-		if (a[1].differential < b[1].differential) {
+		if (a[1].placement > b[1].placement) {
 			return 1
 		}
 		return 0
@@ -56,7 +50,7 @@ export const StandingsTable = ({
 			<TableCaption></TableCaption>
 			<TableHeader>
 				<TableRow>
-					<TableHead>Rank</TableHead>
+					<TableHead>Placement</TableHead>
 					<TableHead>Team</TableHead>
 					<TableHead>W</TableHead>
 					<TableHead>L</TableHead>
@@ -64,8 +58,8 @@ export const StandingsTable = ({
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{Object.entries(standings)
-					.sort((a, b) => sortByWinsThenDiff(a, b))
+				{Object.entries(results)
+					.sort((a, b) => sortByPlacement(a, b))
 					.map(([key, { wins, losses, pointsFor, pointsAgainst }], index) => {
 						const team = teamsQuerySnapshot?.docs.find(
 							(team) => team.id === key

@@ -8,6 +8,7 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import {
 	currentSeasonGamesQuery,
 	currentSeasonRegularGamesQuery,
+	currentSeasonPlayoffGamesQuery,
 	DocumentData,
 	FirestoreError,
 	QuerySnapshot,
@@ -24,6 +25,9 @@ interface GameProps {
 		| undefined
 	regularSeasonGamesQuerySnapshotLoading: boolean
 	regularSeasonGamesQuerySnapshotError: FirestoreError | undefined
+	playoffGamesQuerySnapshot: QuerySnapshot<GameData, DocumentData> | undefined
+	playoffGamesQuerySnapshotLoading: boolean
+	playoffGamesQuerySnapshotError: FirestoreError | undefined
 }
 
 export const GamesContext = createContext<GameProps>({
@@ -33,6 +37,9 @@ export const GamesContext = createContext<GameProps>({
 	regularSeasonGamesQuerySnapshot: undefined,
 	regularSeasonGamesQuerySnapshotLoading: false,
 	regularSeasonGamesQuerySnapshotError: undefined,
+	playoffGamesQuerySnapshot: undefined,
+	playoffGamesQuerySnapshotLoading: false,
+	playoffGamesQuerySnapshotError: undefined,
 })
 
 export const useGamesContext = () => useContext(GamesContext)
@@ -58,6 +65,14 @@ export const GamesContextProvider: React.FC<PropsWithChildren> = ({
 		currentSeasonRegularGamesQuery(selectedSeasonQueryDocumentSnapshot)
 	)
 
+	const [
+		playoffGamesQuerySnapshot,
+		playoffGamesQuerySnapshotLoading,
+		playoffGamesQuerySnapshotError,
+	] = useCollection(
+		currentSeasonPlayoffGamesQuery(selectedSeasonQueryDocumentSnapshot)
+	)
+
 	return (
 		<GamesContext.Provider
 			value={{
@@ -67,6 +82,9 @@ export const GamesContextProvider: React.FC<PropsWithChildren> = ({
 				regularSeasonGamesQuerySnapshot,
 				regularSeasonGamesQuerySnapshotLoading,
 				regularSeasonGamesQuerySnapshotError,
+				playoffGamesQuerySnapshot,
+				playoffGamesQuerySnapshotLoading,
+				playoffGamesQuerySnapshotError,
 			}}
 		>
 			{children}

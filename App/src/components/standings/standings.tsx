@@ -4,20 +4,24 @@ import { useTeamsContext } from '@/contexts/teams-context'
 import { useGamesContext } from '@/contexts/games-context'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { useStandings } from '@/lib/use-standings'
+import { useResults } from '@/lib/use-results'
 import { StandingsTable } from './standings-table'
+import { ResultsTable } from './results-table'
 import { useSeasonsContext } from '@/contexts/seasons-context'
 import { formatTimestamp } from '@/lib/utils'
 
 export const Standings = () => {
 	const { selectedSeasonTeamsQuerySnapshot } = useTeamsContext()
-	const { regularSeasonGamesQuerySnapshot } = useGamesContext()
+	const { regularSeasonGamesQuerySnapshot, playoffGamesQuerySnapshot } =
+		useGamesContext()
 	const { selectedSeasonQueryDocumentSnapshot } = useSeasonsContext()
 
 	const standings = useStandings(regularSeasonGamesQuerySnapshot)
+	const results = useResults(playoffGamesQuerySnapshot)
 
 	return (
 		<div className="container">
-			<GradientHeader>Standings</GradientHeader>
+			<GradientHeader>Standings (Regular Season)</GradientHeader>
 			{!regularSeasonGamesQuerySnapshot ? (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<ReloadIcon className={'mr-2 h-10 w-10 animate-spin'} />
@@ -29,10 +33,17 @@ export const Standings = () => {
 					</p>
 				</ComingSoon>
 			) : (
-				<StandingsTable
-					standings={standings}
-					teamsQuerySnapshot={selectedSeasonTeamsQuerySnapshot}
-				/>
+				<>
+					<StandingsTable
+						standings={standings}
+						teamsQuerySnapshot={selectedSeasonTeamsQuerySnapshot}
+					/>
+					<GradientHeader>Results (Post Season)</GradientHeader>
+					<ResultsTable
+						results={results}
+						teamsQuerySnapshot={selectedSeasonTeamsQuerySnapshot}
+					/>
+				</>
 			)}
 		</div>
 	)

@@ -492,6 +492,18 @@ const currentSeasonRegularGamesQuery = (
 	) as Query<GameData, DocumentData>
 }
 
+const currentSeasonPlayoffGamesQuery = (
+	seasonSnapshot: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
+): Query<GameData, DocumentData> | undefined => {
+	if (!seasonSnapshot) return undefined
+
+	return query(
+		collection(firestore, Collections.GAMES),
+		where('season', '==', seasonSnapshot.ref),
+		where('type', '==', 'playoff')
+	) as Query<GameData, DocumentData>
+}
+
 const currentSeasonGamesQuery = (
 	seasonSnapshot: QueryDocumentSnapshot<SeasonData, DocumentData> | undefined
 ): Query<GameData, DocumentData> | undefined => {
@@ -799,6 +811,7 @@ export {
 	teamsHistoryQuery,
 	currentSeasonTeamsQuery,
 	currentSeasonRegularGamesQuery,
+	currentSeasonPlayoffGamesQuery,
 	currentSeasonGamesQuery,
 	requestToJoinTeam,
 	invitePlayer,
